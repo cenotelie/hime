@@ -107,7 +107,7 @@ namespace Hime.SDK.Output
 			writer.WriteLine();
 
 			writer.WriteLine("/// Static resource for the serialized lexer automaton");
-			writer.WriteLine("const LEXER_AUTOMATON: &'static [u8] = include_bytes!(\"" + binResource + "\");");
+			writer.WriteLine("const LEXER_AUTOMATON: &[u8] = include_bytes!(\"" + binResource + "\");");
 			writer.WriteLine();
 
 			for (int i = 2; i != terminals.Count; i++)
@@ -133,7 +133,7 @@ namespace Hime.SDK.Output
 			writer.WriteLine("/// The collection of terminals matched by this lexer");
 			writer.WriteLine("/// The terminals are in an order consistent with the automaton,");
 			writer.WriteLine("/// so that terminal indices in the automaton can be used to retrieve the terminals in this table");
-			writer.WriteLine("const TERMINALS: &'static [Symbol] = &[");
+			writer.WriteLine("const TERMINALS: &[Symbol] = &[");
 			bool first = true;
 			foreach (Terminal terminal in terminals)
 			{

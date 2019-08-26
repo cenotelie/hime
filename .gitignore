@@ -21,3 +21,7 @@ Cargo.lock
 
 # GEdit temp file
 *~
+
+# Hime test
+tests-results/
+TestResults.xml

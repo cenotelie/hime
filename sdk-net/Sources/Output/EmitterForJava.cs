@@ -109,7 +109,7 @@ namespace Hime.SDK.Output
 			PlatformID platform = Environment.OSVersion.Platform;
 			bool success;
 			if (platform == PlatformID.Unix || platform == PlatformID.MacOSX)
-				success = ExecuteCommandMvn("mvn", "package -f " + Path.Combine(projectFolder, "pom.xml"));
+				success = ExecuteCommandMvn("mvn", "package -f " + Path.Combine(projectFolder, "pom.xml" + " -Duser.home=" + Environment.GetEnvironmentVariable("HOME")));
 			else
 				success = ExecuteCommandMvn("cmd.exe", "/c mvn.cmd package -f " + Path.Combine(projectFolder, "pom.xml"));
 			// extract the result

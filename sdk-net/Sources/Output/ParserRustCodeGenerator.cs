@@ -114,7 +114,7 @@ namespace Hime.SDK.Output
 			StreamWriter writer = new StreamWriter(file, true, new UTF8Encoding(false));
 
 			writer.WriteLine("/// Static resource for the serialized parser automaton");
-			writer.WriteLine("const PARSER_AUTOMATON: &'static [u8] = include_bytes!(\"" + binResource + "\");");
+			writer.WriteLine("const PARSER_AUTOMATON: &[u8] = include_bytes!(\"" + binResource + "\");");
 			writer.WriteLine();
 			GenerateCodeSymbols(writer);
 			GenerateCodeVariables(writer);
@@ -156,7 +156,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("/// The collection of variables matched by this parser");
 			stream.WriteLine("/// The variables are in an order consistent with the automaton,");
 			stream.WriteLine("/// so that variable indices in the automaton can be used to retrieve the variables in this table");
-			stream.WriteLine("const VARIABLES: &'static [Symbol] = &[");
+			stream.WriteLine("const VARIABLES: &[Symbol] = &[");
 			bool first = true;
 			foreach (Variable var in variables)
 			{
@@ -178,7 +178,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("/// The collection of virtuals matched by this parser");
 			stream.WriteLine("/// The virtuals are in an order consistent with the automaton,");
 			stream.WriteLine("/// so that virtual indices in the automaton can be used to retrieve the virtuals in this table");
-			stream.WriteLine("const VIRTUALS: &'static [Symbol] = &[");
+			stream.WriteLine("const VIRTUALS: &[Symbol] = &[");
 			bool first = true;
 			foreach (Virtual v in virtuals)
 			{
@@ -204,7 +204,7 @@ namespace Hime.SDK.Output
 			foreach (Action action in actions)
 			{
 				stream.WriteLine("    /// The " + action.Name + " semantic action");
-				stream.WriteLine("    fn " + Helper.ToSnakeCase(action.Name) + "(&mut self, head: Symbol, body: &SemanticBody);");
+				stream.WriteLine("    fn " + Helper.ToSnakeCase(action.Name) + "(&mut self, head: Symbol, body: &dyn SemanticBody);");
 			}
 			stream.WriteLine("}");
 			stream.WriteLine();
@@ -213,7 +213,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine();
 			stream.WriteLine("impl Actions for NoActions {");
 			foreach (Action action in actions)
-				stream.WriteLine("    fn " + Helper.ToSnakeCase(action.Name) + "(&mut self, _head: Symbol, _body: &SemanticBody) {}");
+				stream.WriteLine("    fn " + Helper.ToSnakeCase(action.Name) + "(&mut self, _head: Symbol, _body: &dyn SemanticBody) {}");
 			stream.WriteLine("}");
 			stream.WriteLine();
 		}
@@ -243,7 +243,7 @@ namespace Hime.SDK.Output
 					stream.WriteLine("#[no_mangle]");
 					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_utf16\"]");
 				}
-				stream.WriteLine("pub fn parse_utf16(input: &mut Read, big_endian: bool) -> ParseResult {");
+				stream.WriteLine("pub fn parse_utf16(input: &mut dyn Read, big_endian: bool) -> ParseResult {");
 				stream.WriteLine("    let text = Text::from_utf16_stream(input, big_endian);");
 				stream.WriteLine("    parse_text(text)");
 				stream.WriteLine("}");
@@ -254,14 +254,14 @@ namespace Hime.SDK.Output
 					stream.WriteLine("#[no_mangle]");
 					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_utf8\"]");
 				}
-				stream.WriteLine("pub fn parse_utf8(input: &mut Read) -> ParseResult {");
+				stream.WriteLine("pub fn parse_utf8(input: &mut dyn Read) -> ParseResult {");
 				stream.WriteLine("    let text = Text::from_utf8_stream(input);");
 				stream.WriteLine("    parse_text(text)");
 				stream.WriteLine("}");
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified text with this parser");
 				stream.WriteLine("fn parse_text(text: Text) -> ParseResult {");
-				stream.WriteLine("    let mut my_actions = |_index: usize, _head: Symbol, _body: &SemanticBody| ();");
+				stream.WriteLine("    let mut my_actions = |_index: usize, _head: Symbol, _body: &dyn SemanticBody| ();");
 				stream.WriteLine("    let mut result = ParseResult::new(TERMINALS, VARIABLES, VIRTUALS, text);");
 				stream.WriteLine("    {");
 				stream.WriteLine("        let data = result.get_parsing_data();");
@@ -292,7 +292,7 @@ namespace Hime.SDK.Output
 					stream.WriteLine("#[no_mangle]");
 					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_string_with\"]");
 				}
-				stream.WriteLine("pub fn parse_string_with(input: &str, actions: &mut Actions) -> ParseResult {");
+				stream.WriteLine("pub fn parse_string_with(input: &str, actions: &mut dyn Actions) -> ParseResult {");
 				stream.WriteLine("    let text = Text::new(input);");
 				stream.WriteLine("    parse_text(text, actions)");
 				stream.WriteLine("}");
@@ -303,7 +303,7 @@ namespace Hime.SDK.Output
 					stream.WriteLine("#[no_mangle]");
 					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_utf16\"]");
 				}
-				stream.WriteLine("pub fn parse_utf16(input: &mut Read, big_endian: bool) -> ParseResult {");
+				stream.WriteLine("pub fn parse_utf16(input: &mut dyn Read, big_endian: bool) -> ParseResult {");
 				stream.WriteLine("    let mut actions = NoActions {};");
 				stream.WriteLine("    parse_utf16_with(input, big_endian, &mut actions)");
 				stream.WriteLine("}");
@@ -314,7 +314,7 @@ namespace Hime.SDK.Output
 					stream.WriteLine("#[no_mangle]");
 					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_utf16_with\"]");
 				}
-				stream.WriteLine("pub fn parse_utf16_with(input: &mut Read, big_endian: bool, actions: &mut Actions) -> ParseResult {");
+				stream.WriteLine("pub fn parse_utf16_with(input: &mut dyn Read, big_endian: bool, actions: &mut dyn Actions) -> ParseResult {");
 				stream.WriteLine("    let text = Text::from_utf16_stream(input, big_endian);");
 				stream.WriteLine("    parse_text(text, actions)");
 				stream.WriteLine("}");
@@ -325,7 +325,7 @@ namespace Hime.SDK.Output
 					stream.WriteLine("#[no_mangle]");
 					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_utf8\"]");
 				}
-				stream.WriteLine("pub fn parse_utf8(input: &mut Read) -> ParseResult {");
+				stream.WriteLine("pub fn parse_utf8(input: &mut dyn Read) -> ParseResult {");
 				stream.WriteLine("    let mut actions = NoActions {};");
 				stream.WriteLine("    parse_utf8_with(input, &mut actions)");
 				stream.WriteLine("}");
@@ -336,13 +336,13 @@ namespace Hime.SDK.Output
 					stream.WriteLine("#[no_mangle]");
 					stream.WriteLine("#[export_name = \"" + nmespace + "_parse_utf8_with\"]");
 				}
-				stream.WriteLine("pub fn parse_utf8_with(input: &mut Read, actions: &mut Actions) -> ParseResult {");
+				stream.WriteLine("pub fn parse_utf8_with(input: &mut dyn Read, actions: &mut dyn Actions) -> ParseResult {");
 				stream.WriteLine("    let text = Text::from_utf8_stream(input);");
 				stream.WriteLine("    parse_text(text, actions)");
 				stream.WriteLine("}");
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified text with this parser");
-				stream.WriteLine("fn parse_text(text: Text, actions: &mut Actions) -> ParseResult {");
+				stream.WriteLine("fn parse_text(text: Text, actions: &mut dyn Actions) -> ParseResult {");
 				stream.WriteLine("    let mut my_actions = |index: usize, head: Symbol, body: &SemanticBody| match index {");
 				int i = 0;
 				foreach (Action action in actions)
@@ -394,14 +394,14 @@ namespace Hime.SDK.Output
 			stream.WriteLine("}");
 			stream.WriteLine("");
 			stream.WriteLine("/// Walk the AST of a result using a visitor");
-			stream.WriteLine("pub fn visit(result: &ParseResult, visitor: &Visitor) {");
+			stream.WriteLine("pub fn visit(result: &ParseResult, visitor: &dyn Visitor) {");
 			stream.WriteLine("    let ast = result.get_ast();");
 			stream.WriteLine("    let root = ast.get_root();");
 			stream.WriteLine("    visit_ast_node(root, visitor);");
 			stream.WriteLine("}");
 			stream.WriteLine("");
 			stream.WriteLine("/// Walk the sub-AST from the specified node using a visitor");
-			stream.WriteLine("pub fn visit_ast_node<'a>(node: AstNode<'a>, visitor: &Visitor) {");
+			stream.WriteLine("pub fn visit_ast_node<'a>(node: AstNode<'a>, visitor: &dyn Visitor) {");
 			stream.WriteLine("    let children = node.children();");
 			stream.WriteLine("    for child in children.iter() {");
 			stream.WriteLine("        visit_ast_node(child, visitor);");
