@@ -31,6 +31,8 @@ RUN apt update && apt-get install -y --no-install-recommends \
 # Add JDK 8 and maven
 RUN add-apt-repository ppa:openjdk-r/ppa && apt install -y --no-install-recommends \
 		openjdk-8-jdk \
+    && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install -y --no-install-recommends \
 		maven \
     && rm -rf /var/lib/apt/lists/*
 
