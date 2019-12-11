@@ -15,6 +15,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+//! Unicode support
+
 use std::collections::HashMap;
 
 /// Represents a Unicode code point

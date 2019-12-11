@@ -15,4 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+//! Library for automata
+
 pub mod fa;
+pub mod lr;

@@ -15,6 +15,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
+//! Rust SDK for the Hime parser generator
+
 use std::cmp::Ordering;
 
 pub mod automata;
