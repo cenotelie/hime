@@ -208,6 +208,53 @@ struct DFAPartition<'a> {
 }
 
 impl DFA {
+    /// Initializes this dfa as equivalent to the given nfa
+    pub fn from_nfa(nfa: NFA) -> DFA {
+        let mut nfa = nfa;
+        // Create the first NFA set, add the entry and close it
+        let mut nfa_init = NFAStateSet::new();
+        nfa_init.add_unique(nfa.entry);
+        nfa_init.close_with_marks(&nfa);
+        let mut nfa_sets = vec![nfa_init];
+        // Create the initial state for the DFA
+        let mut states = vec![DFAState::new(0)];
+        // For each set in the list of the NFA states
+        let mut i = 0;
+        while i < nfa_sets.len() {
+            // normalize transitions
+            nfa_sets[i].normalize(&mut nfa);
+            // Get the transitions for the set
+            let transitions = nfa_sets[i].get_transitions(&nfa);
+            // For each transition
+            for (value, child_set) in transitions.into_iter() {
+                match nfa_sets
+                    .iter_mut()
+                    .enumerate()
+                    .find(|(_, set)| *set == &child_set)
+                {
+                    Some((index, _)) => {
+                        // An existing equivalent set is already present
+                        states[i].add_transition(value, index);
+                    }
+                    None => {
+                        // The child is not already present
+                        let id = states.len();
+                        // Add to the sets list
+                        nfa_sets.push(child_set);
+                        // Create the corresponding DFA state
+                        states.push(DFAState::new(id));
+                        // Setup transition
+                        states[i].add_transition(value, id);
+                    }
+                }
+            }
+            // Add finals
+            states[i].add_items(&nfa_sets[i].get_finals(&nfa));
+            i += 1;
+        }
+        DFA { states }
+    }
+
     /// Gets the number of states in this automaton
     pub fn len(&self) -> usize {
         self.states.len()
@@ -569,6 +616,59 @@ impl NFAState {
     pub fn clear_transitions(&mut self) {
         self.transitions.clear();
     }
+
+    /// Normalize the transitions in this state
+    pub fn normalize_self(&mut self) -> bool {
+        let mut modified = false;
+        let mut i = 0;
+        while i < self.transitions.len() {
+            let mut j = i + 1;
+            while j < self.transitions.len() {
+                if self.normalize_split(i, self.transitions[j].value) {
+                    modified = true;
+                }
+                j += 1;
+            }
+            i += 1;
+        }
+        modified
+    }
+
+    /// Normalize the transitions in this state with another state
+    pub fn normalize_with_other(&mut self, others: Vec<NFATransition>) -> bool {
+        let mut modified = false;
+        let mut i = 0;
+        while i < self.transitions.len() {
+            for transition in others.iter() {
+                if self.normalize_split(i, transition.value) {
+                    modified = true;
+                }
+            }
+            i += 1;
+        }
+        modified
+    }
+
+    /// Normalize a specific transition for a specific state in this set
+    pub fn normalize_split(&mut self, t: usize, splitter: CharSpan) -> bool {
+        let transition = self.transitions[t];
+        if transition.value == EPSILON || transition.value == splitter {
+            return false;
+        }
+        let intersection = transition.value.intersect(splitter);
+        if intersection == CHARSPAN_INVALID {
+            return false;
+        }
+        let (part1, part2) = transition.value.split(intersection);
+        self.transitions[t].value = intersection;
+        if part1 != CHARSPAN_INVALID {
+            self.add_transition(part1, transition.next);
+        }
+        if part2 != CHARSPAN_INVALID {
+            self.add_transition(part2, transition.next);
+        }
+        true
+    }
 }
 
 impl PartialEq for NFAState {
@@ -714,6 +814,16 @@ impl NFA {
         nfa.add_transition(exit_positive, EPSILON, exit);
         nfa.states[exit].items.push(FinalItem::Dummy);
 
+        let mut dfa = DFA::from_nfa(nfa);
+        dfa.prune();
+        let mut nfa = NFA::from_dfa(&dfa);
+        nfa.exit = nfa.add_state().id;
+        for state in nfa.states.iter_mut() {
+            if state.items.contains(&FinalItem::Dummy) {
+                state.clear_items();
+                state.add_transition(EPSILON, nfa.exit);
+            }
+        }
         nfa
     }
 
@@ -814,38 +924,31 @@ impl NFA {
 
 /// Represents a set of states in a Non-deterministic Finite Automaton
 /// A state can only appear once in a set
-struct NFAStateSet<'a> {
+struct NFAStateSet {
     /// The backend storage for the states in this set
-    states: Vec<&'a NFAState>
+    states: Vec<usize>
 }
 
-impl<'a> NFAStateSet<'a> {
+impl NFAStateSet {
     /// Initializes this set
-    fn new() -> NFAStateSet<'a> {
+    fn new() -> NFAStateSet {
         NFAStateSet { states: Vec::new() }
     }
 
     /// Adds the given state in this set if it is not already present
-    fn add_unique(&mut self, state: &'a NFAState) {
+    fn add_unique(&mut self, state: usize) {
         if !self.states.contains(&state) {
             self.states.push(state);
         }
     }
 
-    /// Adds the given states in this set if they are not already present
-    fn add_all(&mut self, states: &'a [NFAState]) {
-        for state in states {
-            self.add_unique(state);
-        }
-    }
-
     /// Closes this set by transitively adding to it all reachable state by the epsilon transition
-    fn close_normal(&mut self, nfa: &'a NFA) {
+    fn close_normal(&mut self, nfa: &NFA) {
         let mut i = 0;
         while i < self.states.len() {
-            for transition in self.states[i].transitions.iter() {
+            for transition in nfa.states[self.states[i]].transitions.iter() {
                 if transition.value == EPSILON {
-                    self.add_unique(&nfa.states[transition.next]);
+                    self.add_unique(nfa.states[transition.next].id);
                 }
             }
             i += 1;
@@ -854,24 +957,105 @@ impl<'a> NFAStateSet<'a> {
 
     /// Closes this set by transitively adding to it all reachable state by the epsilon transition
     /// This looks for the watermark of states
-    fn close_with_marks(&mut self, nfa: &'a NFA) {
+    fn close_with_marks(&mut self, nfa: &NFA) {
         // Close the set
         self.close_normal(nfa);
         // Look for a positive and a negative node
         let mut state_positive = None;
         let mut state_negative = None;
         for state in self.states.iter() {
-            if state.mark > 0 {
+            if nfa.states[*state].mark > 0 {
                 state_positive = Some(*state);
-            } else if state.mark < 0 {
+            } else if nfa.states[*state].mark < 0 {
                 state_negative = Some(*state);
             }
         }
         // With both negative and positive states
         // remove the states immediately reached with epsilon from the positive state
         if let (Some(state_positive), Some(_)) = (state_positive, state_negative) {
-            self.states
-                .retain(|s| state_positive.transitions.iter().all(|t| t.next != s.id));
+            self.states.retain(|s| {
+                nfa.states[state_positive]
+                    .transitions
+                    .iter()
+                    .all(|t| t.next != *s)
+            });
         }
     }
+
+    /// Gets all the final markers of all the states in this set
+    fn get_finals(&self, nfa: &NFA) -> Vec<FinalItem> {
+        let mut result = Vec::new();
+        for state in self.states.iter() {
+            for fi in nfa.states[*state].items.iter() {
+                result.push(*fi);
+            }
+        }
+        result
+    }
+
+    /// Builds transitions from this set to other sets
+    fn get_transitions(&self, nfa: &NFA) -> HashMap<CharSpan, NFAStateSet> {
+        let mut transitions = HashMap::new();
+        for state in self.states.iter() {
+            for transition in nfa.states[*state].transitions.iter() {
+                if transition.value == EPSILON {
+                    // If this is an ε-transition : pass
+                    continue;
+                }
+                // Add the transition's target to set's transitions dictionnary
+                transitions
+                    .entry(transition.value)
+                    .or_insert_with(NFAStateSet::new)
+                    .states
+                    .push(nfa.states[transition.next].id);
+            }
+        }
+        // Close all children
+        for (_, set) in transitions.iter_mut() {
+            set.close_with_marks(nfa);
+        }
+        transitions
+    }
+
+    /// Normalize this set
+    fn normalize(&self, nfa: &mut NFA) {
+        while self.normalize_once(nfa) {}
+    }
+
+    /// Normalize this set
+    fn normalize_once(&self, nfa: &mut NFA) -> bool {
+        let mut modified = false;
+        let nb_states = self.states.len();
+        let mut s1 = 0;
+        while s1 < nb_states {
+            if nfa.states[self.states[s1]].normalize_self() {
+                modified = true;
+            }
+            let mut s2 = s1 + 1;
+            while s2 < nb_states {
+                let transitions = nfa.states[self.states[s2]].transitions.clone();
+                if nfa.states[self.states[s1]].normalize_with_other(transitions) {
+                    modified = true;
+                }
+                let transitions = nfa.states[self.states[s1]].transitions.clone();
+                if nfa.states[self.states[s2]].normalize_with_other(transitions) {
+                    modified = true;
+                }
+                s2 += 1;
+            }
+            s1 += 1;
+        }
+        modified
+    }
 }
+
+impl PartialEq for NFAStateSet {
+    fn eq(&self, other: &Self) -> bool {
+        if self.states.len() != other.states.len() {
+            return false;
+        }
+        self.states.iter().all(|s| other.states.contains(s))
+    }
+}
+
+impl Eq for NFAStateSet {}
