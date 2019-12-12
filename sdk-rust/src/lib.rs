@@ -20,6 +20,7 @@
 use std::cmp::Ordering;
 
 pub mod automata;
+pub mod grammars;
 pub mod unicode;
 
 /// Represents a range of characters

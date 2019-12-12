@@ -30,14 +30,14 @@ pub enum FinalItem {
     /// Represents a fake marker of a final state in an automaton
     Dummy,
     /// A terminal symbol in a grammar
-    Terminal(i32)
+    Terminal(usize)
 }
 
 impl FinalItem {
     /// Gets the priority of this item
-    pub fn priority(self) -> i32 {
+    pub fn priority(self) -> usize {
         match self {
-            FinalItem::Dummy => -1,
+            FinalItem::Dummy => 0,
             FinalItem::Terminal(id) => id
         }
     }
@@ -90,17 +90,24 @@ impl DFAState {
     }
 
     /// Adds a new item making this state a final state
-    pub fn add_item(&mut self, item: FinalItem) {
+    fn do_add_item(&mut self, item: FinalItem) {
         if !self.items.contains(&item) {
             self.items.push(item);
         }
     }
 
+    /// Adds a new item making this state a final state
+    pub fn add_item(&mut self, item: FinalItem) {
+        self.do_add_item(item);
+        self.items.sort();
+    }
+
     /// Adds new items making this state a final state
     pub fn add_items(&mut self, items: &[FinalItem]) {
         for item in items.iter() {
-            self.add_item(*item);
+            self.do_add_item(*item);
         }
+        self.items.sort();
     }
 
     /// Clears all markers for this states making it non-final

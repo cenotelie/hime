@@ -14,6 +14,11 @@ include = ["README.md", "Cargo.toml", "src/**/*.rs"]
 edition = "2018"
 
 [dependencies]
+log = "0.4"
+hime_redist = "3.4.2"
 
 [badges]
 maintenance = { status = "actively-developed" }
+
+[patch.crates-io]
+hime_redist = { path = "../runtime-rust" }
