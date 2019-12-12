@@ -177,9 +177,6 @@ impl TerminalSet {
     }
 }
 
-/// A function that is able to retrieve the firsts for a variable
-pub type GetFirstsOfVariable = dyn Fn(usize) -> TerminalSet;
-
 /// Represents a virtual symbol in a grammar
 #[derive(Debug, Clone)]
 pub struct Virtual {
@@ -294,11 +291,11 @@ impl Variable {
     }
 
     /// Computes the FIRSTS set for this variable
-    pub fn compute_firsts(&mut self, get_firsts_of: &GetFirstsOfVariable) -> bool {
+    pub fn compute_firsts(&mut self, firsts_for_var: &mut HashMap<usize, TerminalSet>) -> bool {
         let mut modified = false;
         for rule in self.rules.iter_mut() {
             modified |= self.firsts.add_others(&rule.body.firsts);
-            modified |= rule.body.compute_firsts(get_firsts_of);
+            modified |= rule.body.compute_firsts(firsts_for_var);
         }
         modified
     }
@@ -410,7 +407,7 @@ impl RuleChoice {
     pub fn compute_firsts(
         &mut self,
         next: &TerminalSet,
-        get_firsts_of: &GetFirstsOfVariable
+        firsts_for_var: &mut HashMap<usize, TerminalSet>
     ) -> bool {
         // If the choice is empty : Add the ε to the Firsts and return
         if self.parts.is_empty() {
@@ -419,13 +416,15 @@ impl RuleChoice {
         match self.parts[0].symbol {
             SymbolRef::Variable(id) => {
                 let mut modified = false;
-                for first in get_firsts_of(id).content.into_iter() {
-                    match first {
-                        TerminalRef::Epsilon => {
-                            modified |= self.firsts.add_others(next);
-                        }
-                        _ => {
-                            modified |= self.firsts.add(first);
+                if let Some(var_firsts) = firsts_for_var.get(&id) {
+                    for first in var_firsts.content.iter() {
+                        match *first {
+                            TerminalRef::Epsilon => {
+                                modified |= self.firsts.add_others(next);
+                            }
+                            _ => {
+                                modified |= self.firsts.add(*first);
+                            }
                         }
                     }
                 }
@@ -531,14 +530,14 @@ impl RuleBody {
     }
 
     /// Computes the FIRSTS set for this rule
-    pub fn compute_firsts(&mut self, get_firsts_of: &GetFirstsOfVariable) -> bool {
+    pub fn compute_firsts(&mut self, firsts_for_var: &mut HashMap<usize, TerminalSet>) -> bool {
         let mut modified = false;
         for i in (0..self.choices.len()).rev() {
             if i == self.choices.len() - 1 {
-                modified |= self.choices[i].compute_firsts(&TerminalSet::default(), get_firsts_of);
+                modified |= self.choices[i].compute_firsts(&TerminalSet::default(), firsts_for_var);
             } else {
                 let next_firsts = self.choices[i + 1].firsts.clone();
-                modified |= self.choices[i].compute_firsts(&next_firsts, get_firsts_of);
+                modified |= self.choices[i].compute_firsts(&next_firsts, firsts_for_var);
             }
         }
         modified |= self.firsts.add_others(&self.choices[0].firsts);
