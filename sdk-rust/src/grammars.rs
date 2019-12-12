@@ -144,24 +144,30 @@ impl TerminalSet {
     }
 
     /// Adds a new terminal
-    fn do_add(&mut self, item: TerminalRef) {
+    fn do_add(&mut self, item: TerminalRef) -> bool {
         if !self.content.contains(&item) {
             self.content.push(item);
+            true
+        } else {
+            false
         }
     }
 
     /// Adds a new terminal
-    pub fn add(&mut self, item: TerminalRef) {
-        self.do_add(item);
+    pub fn add(&mut self, item: TerminalRef) -> bool {
+        let modified = self.do_add(item);
         self.content.sort();
+        modified
     }
 
     /// Adds new terminals
-    pub fn add_items(&mut self, items: &[TerminalRef]) {
-        for item in items.iter() {
-            self.do_add(*item);
+    pub fn add_others(&mut self, others: &TerminalSet) -> bool {
+        let mut modified = false;
+        for item in others.content.iter() {
+            modified |= self.do_add(*item);
         }
         self.content.sort();
+        modified
     }
 
     /// Removes all items from this collection
@@ -170,6 +176,9 @@ impl TerminalSet {
     }
 }
 
+/// A function that is able to retrieve the firsts for a variable
+pub type GetFirstsOfVariable = dyn Fn(usize) -> TerminalSet;
+
 /// Represents a virtual symbol in a grammar
 #[derive(Debug, Clone)]
 pub struct Virtual {
@@ -177,6 +186,13 @@ pub struct Virtual {
     pub id: usize,
     /// The name of this symbol
     pub name: String
+}
+
+impl Virtual {
+    /// Creates a new variable
+    pub fn new(id: usize, name: String) -> Virtual {
+        Virtual { id, name }
+    }
 }
 
 impl Symbol for Virtual {
@@ -208,6 +224,13 @@ pub struct Action {
     pub name: String
 }
 
+impl Action {
+    /// Creates a new variable
+    pub fn new(id: usize, name: String) -> Action {
+        Action { id, name }
+    }
+}
+
 impl Symbol for Action {
     /// Gets the unique indentifier (within a grammar) of this symbol
     fn get_id(&self) -> usize {
@@ -235,10 +258,47 @@ pub struct Variable {
     pub id: usize,
     /// The name of this symbol
     pub name: String,
+    /// The rules for this variable
+    pub rules: Vec<Rule>,
     /// The FIRSTS set for this variable
     pub firsts: TerminalSet,
     /// The FOLLOWERS set for this variable
     pub followers: TerminalSet
+}
+
+impl Variable {
+    /// Creates a new variable
+    pub fn new(id: usize, name: String) -> Variable {
+        Variable {
+            id,
+            name,
+            rules: Vec::new(),
+            firsts: TerminalSet::default(),
+            followers: TerminalSet::default()
+        }
+    }
+
+    /// Computes the FIRSTS set for this variable
+    pub fn compute_firsts(&mut self, get_firsts_of: &GetFirstsOfVariable) -> bool {
+        let mut modified = false;
+        for rule in self.rules.iter_mut() {
+            modified |= self.firsts.add_others(&rule.body.firsts);
+            modified |= rule.body.compute_firsts(get_firsts_of);
+        }
+        modified
+    }
+}
+
+impl Symbol for Variable {
+    /// Gets the unique indentifier (within a grammar) of this symbol
+    fn get_id(&self) -> usize {
+        self.id
+    }
+
+    /// Gets the name of this symbol
+    fn get_name(&self) -> &str {
+        &self.name
+    }
 }
 
 impl PartialEq for Variable {
@@ -312,6 +372,40 @@ impl RuleChoice {
     pub fn append_choice(&mut self, other: &RuleChoice) {
         for element in other.parts.iter() {
             self.parts.push(*element);
+        }
+    }
+
+    /// Computes the FIRSTS set for this rule choice
+    pub fn compute_firsts(
+        &mut self,
+        next: &TerminalSet,
+        get_firsts_of: &GetFirstsOfVariable
+    ) -> bool {
+        // If the choice is empty : Add the ε to the Firsts and return
+        if self.parts.is_empty() {
+            return self.firsts.add(TerminalRef::Epsilon);
+        }
+        match self.parts[0].symbol {
+            SymbolRef::Variable(id) => {
+                let mut modified = false;
+                for first in get_firsts_of(id).content.into_iter() {
+                    match first {
+                        TerminalRef::Epsilon => {
+                            modified |= self.firsts.add_others(next);
+                        }
+                        _ => {
+                            modified |= self.firsts.add(first);
+                        }
+                    }
+                }
+                modified
+            }
+            SymbolRef::Terminal(id) => self.firsts.add(TerminalRef::Terminal(id)),
+            SymbolRef::Dummy => self.firsts.add(TerminalRef::Dummy),
+            SymbolRef::Epsilon => self.firsts.add(TerminalRef::Epsilon),
+            SymbolRef::Dollar => self.firsts.add(TerminalRef::Dollar),
+            SymbolRef::NullTerminal => self.firsts.add(TerminalRef::NullTerminal),
+            _ => false
         }
     }
 }
@@ -404,6 +498,46 @@ impl RuleBody {
             element.action = action;
         }
     }
+
+    /// Computes the FIRSTS set for this rule
+    pub fn compute_firsts(&mut self, get_firsts_of: &GetFirstsOfVariable) -> bool {
+        self.compute_choices();
+        let mut modified = false;
+        for i in (0..self.choices.len()).rev() {
+            if i == self.choices.len() - 1 {
+                modified |= self.choices[i].compute_firsts(&TerminalSet::default(), get_firsts_of);
+            } else {
+                let next_firsts = self.choices[i + 1].firsts.clone();
+                modified |= self.choices[i].compute_firsts(&next_firsts, get_firsts_of);
+            }
+        }
+        modified |= self.firsts.add_others(&self.choices[0].firsts);
+        modified
+    }
+
+    /// Computes the choices for this rule body
+    fn compute_choices(&mut self) {
+        if self.choices.is_empty() {
+            // For each part of the definition which is not a virtual symbol nor an action symbol
+            for element in self.parts.iter() {
+                match element.symbol {
+                    SymbolRef::Virtual(_) => {}
+                    SymbolRef::Action(_) => {}
+                    _ => {
+                        // Append the symbol to all the choices definition
+                        for choice in self.choices.iter_mut() {
+                            choice.append_symbol(element.symbol);
+                        }
+                        // Create a new choice with only the symbol
+                        self.choices.push(RuleChoice::new(element.symbol));
+                    }
+                }
+            }
+            // Create a new empty choice
+            self.choices.push(RuleChoice::default());
+            self.firsts.add_others(&self.choices[0].firsts);
+        }
+    }
 }
 
 impl PartialEq for RuleBody {
@@ -418,3 +552,36 @@ impl PartialEq for RuleBody {
 }
 
 impl Eq for RuleBody {}
+
+/// Represents a grammar rule
+#[derive(Debug, Clone)]
+pub struct Rule {
+    /// The rule's head variable
+    pub head: usize,
+    /// The action on the rule's head
+    pub head_action: TreeAction,
+    /// The rule's body
+    pub body: RuleBody,
+    /// The lexical context pushed by this rule
+    pub context: usize
+}
+
+impl Rule {
+    /// Initializes this rule
+    pub fn new(head: usize, head_action: TreeAction, body: RuleBody, context: usize) -> Rule {
+        Rule {
+            head,
+            head_action,
+            body,
+            context
+        }
+    }
+}
+
+impl PartialEq for Rule {
+    fn eq(&self, other: &Self) -> bool {
+        self.head == other.head && self.body == other.body
+    }
+}
+
+impl Eq for Rule {}
