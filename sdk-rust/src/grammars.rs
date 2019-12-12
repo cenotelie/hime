@@ -21,6 +21,7 @@ use crate::automata::fa::NFA;
 use crate::automata::lr::SymbolRef;
 use hime_redist::parsers::{TreeAction, TREE_ACTION_NONE};
 use std::cmp::Ordering;
+use std::collections::HashMap;
 
 /// Represents a symbol in a grammar
 pub trait Symbol {
@@ -278,12 +279,42 @@ impl Variable {
         }
     }
 
+    /// Adds the given rule for this variable as a unique element
+    pub fn add_rule(&mut self, rule: Rule) {
+        if !self.rules.contains(&rule) {
+            self.rules.push(rule);
+        }
+    }
+
+    /// Compute rule choices for all rules for this variable
+    pub fn compute_choices(&mut self) {
+        for rule in self.rules.iter_mut() {
+            rule.body.compute_choices();
+        }
+    }
+
     /// Computes the FIRSTS set for this variable
     pub fn compute_firsts(&mut self, get_firsts_of: &GetFirstsOfVariable) -> bool {
         let mut modified = false;
         for rule in self.rules.iter_mut() {
             modified |= self.firsts.add_others(&rule.body.firsts);
             modified |= rule.body.compute_firsts(get_firsts_of);
+        }
+        modified
+    }
+
+    /// Computes the initial FOLLOWERS sets
+    pub fn compute_initial_follower(&self, followers: &mut HashMap<usize, TerminalSet>) {
+        for rule in self.rules.iter() {
+            rule.body.compute_initial_follower(followers);
+        }
+    }
+
+    /// Propagate the followers
+    pub fn propagate_followers(&self, followers: &mut HashMap<usize, TerminalSet>) -> bool {
+        let mut modified = false;
+        for rule in self.rules.iter() {
+            modified |= rule.body.propagate_followers(rule.head, followers);
         }
         modified
     }
@@ -501,7 +532,6 @@ impl RuleBody {
 
     /// Computes the FIRSTS set for this rule
     pub fn compute_firsts(&mut self, get_firsts_of: &GetFirstsOfVariable) -> bool {
-        self.compute_choices();
         let mut modified = false;
         for i in (0..self.choices.len()).rev() {
             if i == self.choices.len() - 1 {
@@ -537,6 +567,46 @@ impl RuleBody {
             self.choices.push(RuleChoice::default());
             self.firsts.add_others(&self.choices[0].firsts);
         }
+    }
+
+    /// Computes the initial FOLLOWERS sets
+    pub fn compute_initial_follower(&self, followers: &mut HashMap<usize, TerminalSet>) {
+        // For all choices but the last (empty)
+        for (i, choice) in self.choices.iter().enumerate().take(self.choices.len() - 1) {
+            if let SymbolRef::Variable(id) = choice.parts[0].symbol {
+                // add the FIRSTS set of the next choice to the variable followers except ε
+                for first in self.choices[i + 1].firsts.content.iter() {
+                    if *first != TerminalRef::Epsilon {
+                        followers.entry(id).or_default().add(*first);
+                    }
+                }
+            }
+        }
+    }
+
+    /// Propagate the followers
+    pub fn propagate_followers(
+        &self,
+        head: usize,
+        followers: &mut HashMap<usize, TerminalSet>
+    ) -> bool {
+        let mut modified = false;
+        // For all choices but the last (empty)
+        for (i, choice) in self.choices.iter().enumerate().take(self.choices.len() - 1) {
+            if let SymbolRef::Variable(id) = choice.parts[0].symbol {
+                // if the next choice FIRSTS set contains ε
+                // add the FOLLOWERS of the head variable to the FOLLOWERS of the found variable
+                if self.choices[i + 1]
+                    .firsts
+                    .content
+                    .contains(&TerminalRef::Epsilon)
+                {
+                    let head_followers = followers.get(&head).cloned().unwrap_or_default();
+                    modified |= followers.entry(id).or_default().add_others(&head_followers);
+                }
+            }
+        }
+        modified
     }
 }
 
