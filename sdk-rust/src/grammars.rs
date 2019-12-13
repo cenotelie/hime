@@ -17,7 +17,7 @@
 
 //! Library for grammars
 
-use crate::automata::fa::NFA;
+use crate::automata::fa::{FinalItem, NFA};
 use hime_redist::parsers::{TreeAction, TREE_ACTION_NONE};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -45,6 +45,8 @@ pub struct Terminal {
     pub nfa: NFA,
     /// The context of this terminal
     pub context: usize,
+    /// Whether the terminal is anonymous
+    pub is_anonymous: bool,
     /// Whether the terminal is a fragment
     pub is_fragment: bool
 }
@@ -423,9 +425,9 @@ impl RuleChoice {
     }
 
     /// Initializes this rule body from parts
-    pub fn from_parts(parts: &[RuleBodyElement]) -> RuleBody {
+    pub fn from_parts(parts: Vec<RuleBodyElement>) -> RuleBody {
         RuleBody {
-            parts: parts.to_vec(),
+            parts,
             firsts: TerminalSet::default(),
             choices: Vec::new()
         }
@@ -526,9 +528,9 @@ impl RuleBody {
     }
 
     /// Initializes this rule body from parts
-    pub fn from_parts(parts: &[RuleBodyElement]) -> RuleBody {
+    pub fn from_parts(parts: Vec<RuleBodyElement>) -> RuleBody {
         RuleBody {
-            parts: parts.to_vec(),
+            parts,
             firsts: TerminalSet::default(),
             choices: Vec::new()
         }
@@ -776,6 +778,13 @@ impl Grammar {
         }
     }
 
+    /// Gets the next available symbol id
+    fn get_next_sid(&mut self) -> usize {
+        let result = self.next_sid;
+        self.next_sid += 1;
+        result
+    }
+
     /// Adds an option to this grammar
     pub fn add_option(&mut self, name: String, value: String) {
         self.options.insert(name, value);
@@ -811,6 +820,248 @@ impl Grammar {
                 let index = self.contexts.len();
                 self.contexts.push(name.to_string());
                 index
+            }
+        }
+    }
+
+    /// Adds the given anonymous terminal to this grammar
+    pub fn add_terminal_anonymous(&mut self, value: &str, nfa: NFA) -> SymbolRef {
+        let name = format!("{}{}", PREFIX_GENERATED_TERMINAL, generate_unique_id());
+        self.add_terminal(&name, value, nfa, 0, true, false)
+    }
+
+    /// Adds the given named terminal to this grammar
+    pub fn add_terminal_named(
+        &mut self,
+        name: &str,
+        value: &str,
+        nfa: NFA,
+        context: &str,
+        is_fragment: bool
+    ) -> SymbolRef {
+        let context = self.contexts.iter().position(|c| c == context).unwrap();
+        self.add_terminal(name, value, nfa, context, false, is_fragment)
+    }
+
+    /// Adds a terminal to the grammar
+    fn add_terminal(
+        &mut self,
+        name: &str,
+        value: &str,
+        nfa: NFA,
+        context: usize,
+        is_anonymous: bool,
+        is_fragment: bool
+    ) -> SymbolRef {
+        let sid = self.get_next_sid();
+        let terminal = Terminal {
+            id: sid,
+            name: name.to_string(),
+            value: value.to_string(),
+            nfa,
+            context,
+            is_anonymous,
+            is_fragment
+        };
+        self.terminals.push(terminal);
+        SymbolRef::Terminal(sid)
+    }
+
+    /// Gets the terminal with the given name
+    pub fn get_terminal_for_name(&self, name: &str) -> Option<&Terminal> {
+        self.terminals.iter().find(|t| t.name == name)
+    }
+
+    /// Gets the terminal with the given name
+    pub fn get_terminal_for_value(&self, value: &str) -> Option<&Terminal> {
+        self.terminals.iter().find(|t| t.value == value)
+    }
+
+    /// Generates a new variable
+    pub fn generate_variable(&mut self) -> &mut Variable {
+        let index = self.variables.len();
+        let sid = self.get_next_sid();
+        let name = format!("{}{}", PREFIX_GENERATED_VARIABLE, sid);
+        self.variables.push(Variable::new(sid, name));
+        &mut self.variables[index]
+    }
+
+    /// Adds a variable with the given name to this grammar
+    pub fn add_variable(&mut self, name: &str) -> &mut Variable {
+        if let Some(index) = self.variables.iter().position(|v| v.name == name) {
+            return &mut self.variables[index];
+        }
+        let index = self.variables.len();
+        let sid = self.get_next_sid();
+        self.variables.push(Variable::new(sid, name.to_string()));
+        &mut self.variables[index]
+    }
+
+    /// Adds a virtual symbol with the given name to this grammar
+    pub fn add_virtual(&mut self, name: &str) -> &mut Virtual {
+        let index = self.virtuals.len();
+        let sid = self.get_next_sid();
+        self.virtuals.push(Virtual::new(sid, name.to_string()));
+        &mut self.virtuals[index]
+    }
+
+    /// Adds an action symbol with the given name to this grammar
+    pub fn add_action(&mut self, name: &str) -> &mut Action {
+        let index = self.actions.len();
+        let sid = self.get_next_sid();
+        self.actions.push(Action::new(sid, name.to_string()));
+        &mut self.actions[index]
+    }
+
+    /// Inherit from the given parent
+    pub fn inherit(&mut self, other: &Grammar) {
+        self.inherit_options(other);
+        self.inherit_terminals(other);
+        self.inherit_virtuals(other);
+        self.inherit_actions(other);
+        self.inherit_variables(other);
+    }
+
+    /// Inherits the options from the parent grammar
+    fn inherit_options(&mut self, other: &Grammar) {
+        for (name, value) in other.options.iter() {
+            self.add_option(name.to_string(), value.to_string());
+        }
+    }
+
+    /// Inherits the terminals from the parent grammar
+    fn inherit_terminals(&mut self, other: &Grammar) {
+        for terminal in other.terminals.iter() {
+            if let Some(redefined) = self
+                .terminals
+                .iter()
+                .find(|t| t.name == terminal.name || t.value == terminal.value)
+            {
+                // is a redefinition
+                warn!(
+                    "In grammar {}, ignored redefined terminal {} from {}",
+                    &self.name, &redefined.name, &other.name
+                );
+            } else {
+                let sid = self.get_next_sid();
+                let mut nfa = terminal.nfa.clone_no_finals();
+                nfa.states[nfa.exit].items.push(FinalItem::Terminal(sid));
+                let context = self.resolve_context(&other.contexts[terminal.context]);
+                self.terminals.push(Terminal {
+                    id: sid,
+                    name: terminal.name.clone(),
+                    value: terminal.value.clone(),
+                    nfa,
+                    context,
+                    is_fragment: terminal.is_fragment,
+                    is_anonymous: terminal.is_anonymous
+                });
+            }
+        }
+    }
+
+    /// Inherits the virtuals from the parent grammar
+    fn inherit_virtuals(&mut self, other: &Grammar) {
+        for symbol in other.virtuals.iter() {
+            self.add_virtual(&symbol.name);
+        }
+    }
+
+    /// Inherits the actions from the parent grammar
+    fn inherit_actions(&mut self, other: &Grammar) {
+        for symbol in other.actions.iter() {
+            self.add_action(&symbol.name);
+        }
+    }
+
+    /// Inherits the variables from the parent grammar
+    fn inherit_variables(&mut self, other: &Grammar) {
+        for symbol in other.variables.iter() {
+            self.add_variable(&symbol.name);
+        }
+        // clone the rules
+        for variable in other.variables.iter() {
+            let head = self
+                .variables
+                .iter()
+                .find(|v| v.name == variable.name)
+                .unwrap()
+                .id;
+            let mut rules = variable
+                .rules
+                .iter()
+                .map(|rule| {
+                    let context_name = &other.contexts[rule.context];
+                    let context = self
+                        .contexts
+                        .iter()
+                        .position(|c| c == context_name)
+                        .unwrap();
+                    let parts = rule
+                        .body
+                        .parts
+                        .iter()
+                        .map(|part| {
+                            RuleBodyElement::new(
+                                self.map_symbol_ref(other, part.symbol),
+                                part.action
+                            )
+                        })
+                        .collect();
+                    Rule::new(head, rule.head_action, RuleBody::from_parts(parts), context)
+                })
+                .collect();
+            let head = self
+                .variables
+                .iter_mut()
+                .find(|v| v.name == variable.name)
+                .unwrap();
+            head.rules.append(&mut rules);
+        }
+    }
+
+    /// Maps a symbol from a grammar to this one
+    fn map_symbol_ref(&self, other: &Grammar, symbol: SymbolRef) -> SymbolRef {
+        match symbol {
+            SymbolRef::Dummy => SymbolRef::Dummy,
+            SymbolRef::Epsilon => SymbolRef::Epsilon,
+            SymbolRef::Dollar => SymbolRef::Dollar,
+            SymbolRef::NullTerminal => SymbolRef::NullTerminal,
+            SymbolRef::Terminal(id) => {
+                let other_symbol = other.terminals.iter().find(|s| s.id == id).unwrap();
+                let symbol = self
+                    .terminals
+                    .iter()
+                    .find(|s| s.name == other_symbol.name)
+                    .unwrap();
+                SymbolRef::Terminal(symbol.id)
+            }
+            SymbolRef::Variable(id) => {
+                let other_symbol = other.variables.iter().find(|s| s.id == id).unwrap();
+                let symbol = self
+                    .variables
+                    .iter()
+                    .find(|s| s.name == other_symbol.name)
+                    .unwrap();
+                SymbolRef::Variable(symbol.id)
+            }
+            SymbolRef::Virtual(id) => {
+                let other_symbol = other.virtuals.iter().find(|s| s.id == id).unwrap();
+                let symbol = self
+                    .virtuals
+                    .iter()
+                    .find(|s| s.name == other_symbol.name)
+                    .unwrap();
+                SymbolRef::Virtual(symbol.id)
+            }
+            SymbolRef::Action(id) => {
+                let other_symbol = other.actions.iter().find(|s| s.id == id).unwrap();
+                let symbol = self
+                    .actions
+                    .iter()
+                    .find(|s| s.name == other_symbol.name)
+                    .unwrap();
+                SymbolRef::Action(symbol.id)
             }
         }
     }

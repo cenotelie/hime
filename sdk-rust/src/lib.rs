@@ -17,6 +17,10 @@
 
 //! Rust SDK for the Hime parser generator
 
+#[macro_use]
+extern crate log;
+extern crate hime_redist;
+
 use std::cmp::Ordering;
 
 pub mod automata;
