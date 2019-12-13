@@ -18,7 +18,6 @@
 //! Library for grammars
 
 use crate::automata::fa::NFA;
-use crate::automata::lr::SymbolRef;
 use hime_redist::parsers::{TreeAction, TREE_ACTION_NONE};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -339,6 +338,55 @@ impl PartialEq for Variable {
 }
 
 impl Eq for Variable {}
+
+/// Represents a reference to a grammar symbol
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum SymbolRef {
+    /// Represents a fake terminal, used as a marker by LR-related algorithms
+    Dummy,
+    /// Represents the epsilon symbol in a grammar, i.e. a terminal with an empty value
+    Epsilon,
+    /// Represents the dollar symbol in a grammar, i.e. the marker of end of input
+    Dollar,
+    /// Represents the absence of terminal, used as a marker by LR-related algorithms
+    NullTerminal,
+    /// A terminal in a grammar
+    Terminal(usize),
+    /// A variable in a grammar
+    Variable(usize),
+    /// A virtual symbol in a grammar
+    Virtual(usize),
+    /// An action symbol in a grammar
+    Action(usize)
+}
+
+impl SymbolRef {
+    /// Gets the terminal priority
+    pub fn priority(self) -> usize {
+        match self {
+            SymbolRef::Dummy => 0,
+            SymbolRef::Epsilon => 1,
+            SymbolRef::Dollar => 2,
+            SymbolRef::NullTerminal => 0,
+            SymbolRef::Terminal(id) => id,
+            SymbolRef::Variable(id) => id,
+            SymbolRef::Virtual(id) => id,
+            SymbolRef::Action(id) => id
+        }
+    }
+}
+
+impl Ord for SymbolRef {
+    fn cmp(&self, other: &SymbolRef) -> Ordering {
+        self.priority().cmp(&other.priority())
+    }
+}
+
+impl PartialOrd for SymbolRef {
+    fn partial_cmp(&self, other: &SymbolRef) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
 
 /// Represents an element in the body of a grammar rule
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -725,6 +773,45 @@ impl Grammar {
             variables: Vec::new(),
             virtuals: Vec::new(),
             actions: Vec::new()
+        }
+    }
+
+    /// Adds an option to this grammar
+    pub fn add_option(&mut self, name: String, value: String) {
+        self.options.insert(name, value);
+    }
+
+    /// Gets an option
+    pub fn get_option(&self, name: &str) -> Option<&str> {
+        self.options.get(name).map(|v| v.as_ref())
+    }
+
+    /// Gets the symbol with the given name in this grammar
+    pub fn get_symbol(&self, name: &str) -> Option<SymbolRef> {
+        if let Some(symbol) = self.terminals.iter().find(|t| t.name == name) {
+            return Some(SymbolRef::Terminal(symbol.id));
+        }
+        if let Some(symbol) = self.variables.iter().find(|t| t.name == name) {
+            return Some(SymbolRef::Terminal(symbol.id));
+        }
+        if let Some(symbol) = self.virtuals.iter().find(|t| t.name == name) {
+            return Some(SymbolRef::Terminal(symbol.id));
+        }
+        if let Some(symbol) = self.actions.iter().find(|t| t.name == name) {
+            return Some(SymbolRef::Terminal(symbol.id));
+        }
+        None
+    }
+
+    /// Resolves the specified lexical context name for this grammar
+    pub fn resolve_context(&mut self, name: &str) -> usize {
+        match self.contexts.iter().position(|c| name == c) {
+            Some(index) => index,
+            None => {
+                let index = self.contexts.len();
+                self.contexts.push(name.to_string());
+                index
+            }
         }
     }
 }

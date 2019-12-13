@@ -16,27 +16,7 @@
  ******************************************************************************/
 
 //! LR automata
-
-/// Represents a reference to a grammar symbol
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-pub enum SymbolRef {
-    /// Represents a fake terminal, used as a marker by LR-related algorithms
-    Dummy,
-    /// Represents the epsilon symbol in a grammar, i.e. a terminal with an empty value
-    Epsilon,
-    /// Represents the dollar symbol in a grammar, i.e. the marker of end of input
-    Dollar,
-    /// Represents the absence of terminal, used as a marker by LR-related algorithms
-    NullTerminal,
-    /// A terminal in a grammar
-    Terminal(usize),
-    /// A variable in a grammar
-    Variable(usize),
-    /// A virtual symbol in a grammar
-    Virtual(usize),
-    /// An action symbol in a grammar
-    Action(usize)
-}
+use crate::grammars::SymbolRef;
 
 /// Represents a transition in a LR automaton
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
