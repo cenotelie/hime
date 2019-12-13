@@ -22,6 +22,7 @@ use crate::automata::lr::SymbolRef;
 use hime_redist::parsers::{TreeAction, TREE_ACTION_NONE};
 use std::cmp::Ordering;
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicUsize, Ordering as AtomicOrdering};
 
 /// Represents a symbol in a grammar
 pub trait Symbol {
@@ -44,7 +45,9 @@ pub struct Terminal {
     /// The NFA that is used to match this terminal
     pub nfa: NFA,
     /// The context of this terminal
-    pub context: usize
+    pub context: usize,
+    /// Whether the terminal is a fragment
+    pub is_fragment: bool
 }
 
 impl Terminal {
@@ -654,3 +657,74 @@ impl PartialEq for Rule {
 }
 
 impl Eq for Rule {}
+
+/// The prefix for the generated terminal names
+pub const PREFIX_GENERATED_TERMINAL: &str = "__T";
+/// The prefix for the generated variable names
+pub const PREFIX_GENERATED_VARIABLE: &str = "__V";
+/// The name of the generated axiom variable
+pub const GENERATED_AXIOM: &str = "__VAxiom";
+/// Name of the grammar option specifying the grammar's axiom variable
+pub const OPTION_AXIOM: &str = "Axiom";
+/// Name of the grammar option specifying the grammar's separator terminal
+pub const OPTION_SEPARATOR: &str = "Separator";
+/// The output path for compilation artifacts
+pub const OPTION_OUTPUT_PATH: &str = "OutputPath";
+/// The compilation mode to use, defaults to Source
+pub const OPTION_COMPILATION_MODE: &str = "CompilationMode";
+/// The parser type to generate, defaults to LALR1
+pub const OPTION_PARSER_TYPE: &str = "ParserType";
+/// The runtime to target, defaults to Net
+pub const OPTION_RUNTIME: &str = "Runtime";
+/// The namespace to use for the generated code
+pub const OPTION_NAMESPACE: &str = "Namespace";
+/// The access mode for the generated code, defaults to Internal
+pub const OPTION_ACCESS_MODIFIER: &str = "AccessModifier";
+/// The name of the default lexical context
+pub const DEFAULT_CONTEXT_NAME: &str = "__default";
+
+/// The counter for the generation of unique names across multiple grammars
+static NEXT_UNIQUE_SID: AtomicUsize = AtomicUsize::new(0);
+
+/// Generates a unique identifier
+fn generate_unique_id() -> String {
+    let value = NEXT_UNIQUE_SID.fetch_add(1, AtomicOrdering::SeqCst);
+    format!("{:0X}", value)
+}
+
+/// Represents a grammar
+#[derive(Debug, Clone)]
+pub struct Grammar {
+    /// The grammar's name
+    pub name: String,
+    /// The next unique symbol identifier for this grammar
+    pub next_sid: usize,
+    /// The grammar's options
+    pub options: HashMap<String, String>,
+    /// The lexical contexts defined in this grammar
+    pub contexts: Vec<String>,
+    /// The grammar's terminals
+    pub terminals: Vec<Terminal>,
+    /// The grammar's variables
+    pub variables: Vec<Variable>,
+    /// The grammar's virtual symbols
+    pub virtuals: Vec<Virtual>,
+    /// The grammar's action symbols
+    pub actions: Vec<Action>
+}
+
+impl Grammar {
+    /// Initializes this grammar
+    pub fn new(name: &str) -> Grammar {
+        Grammar {
+            name: name.to_string(),
+            next_sid: 3,
+            options: HashMap::new(),
+            contexts: vec![DEFAULT_CONTEXT_NAME.to_string()],
+            terminals: Vec::new(),
+            variables: Vec::new(),
+            virtuals: Vec::new(),
+            actions: Vec::new()
+        }
+    }
+}

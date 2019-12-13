@@ -36,6 +36,11 @@ pub struct CharSpan {
 pub const CHARSPAN_INVALID: CharSpan = CharSpan { begin: 1, end: 0 };
 
 impl CharSpan {
+    /// Creates a new span
+    pub fn new(begin: u16, end: u16) -> CharSpan {
+        CharSpan { begin, end }
+    }
+
     /// Gets the range's length in number of characters
     pub fn len(self) -> u16 {
         self.end - self.begin + 1
@@ -48,32 +53,14 @@ impl CharSpan {
 
     /// Gets the intersection between two spans
     pub fn intersect(self, right: CharSpan) -> CharSpan {
-        if self.begin < right.begin {
-            if self.end < right.begin {
-                CHARSPAN_INVALID
-            } else if self.end < right.end {
-                CharSpan {
-                    begin: right.begin,
-                    end: self.end
-                }
-            } else {
-                CharSpan {
-                    begin: right.begin,
-                    end: right.end
-                }
-            }
-        } else if right.end < self.begin {
+        let result = CharSpan {
+            begin: self.begin.max(right.begin),
+            end: self.end.min(right.end)
+        };
+        if result.is_empty() {
             CHARSPAN_INVALID
-        } else if right.end < self.end {
-            CharSpan {
-                begin: self.begin,
-                end: right.end
-            }
         } else {
-            CharSpan {
-                begin: self.begin,
-                end: self.end
-            }
+            result
         }
     }
 
@@ -123,6 +110,83 @@ impl PartialOrd for CharSpan {
     fn partial_cmp(&self, other: &CharSpan) -> Option<Ordering> {
         Some(self.cmp(other))
     }
+}
+
+#[test]
+fn test_charspan_intersect() {
+    // empty charspan
+    assert_eq!(
+        CharSpan::new(1, 0).intersect(CharSpan::new(3, 4)),
+        CHARSPAN_INVALID
+    );
+    assert_eq!(
+        CharSpan::new(3, 4).intersect(CharSpan::new(1, 0)),
+        CHARSPAN_INVALID
+    );
+    assert_eq!(
+        CharSpan::new(1, 0).intersect(CharSpan::new(1, 0)),
+        CHARSPAN_INVALID
+    );
+    // no intersection
+    assert_eq!(
+        CharSpan::new(1, 2).intersect(CharSpan::new(3, 4)),
+        CHARSPAN_INVALID
+    );
+    assert_eq!(
+        CharSpan::new(3, 4).intersect(CharSpan::new(1, 2)),
+        CHARSPAN_INVALID
+    );
+    // intersect single
+    assert_eq!(
+        CharSpan::new(1, 2).intersect(CharSpan::new(2, 3)),
+        CharSpan::new(2, 2)
+    );
+    assert_eq!(
+        CharSpan::new(2, 3).intersect(CharSpan::new(1, 2)),
+        CharSpan::new(2, 2)
+    );
+    // intersect range
+    assert_eq!(
+        CharSpan::new(1, 5).intersect(CharSpan::new(3, 10)),
+        CharSpan::new(3, 5)
+    );
+    assert_eq!(
+        CharSpan::new(3, 10).intersect(CharSpan::new(1, 5)),
+        CharSpan::new(3, 5)
+    );
+    // containment
+    assert_eq!(
+        CharSpan::new(1, 10).intersect(CharSpan::new(3, 5)),
+        CharSpan::new(3, 5)
+    );
+    assert_eq!(
+        CharSpan::new(3, 5).intersect(CharSpan::new(1, 10)),
+        CharSpan::new(3, 5)
+    );
+}
+
+#[test]
+fn test_charspan_split() {
+    // align left
+    assert_eq!(
+        CharSpan::new(1, 10).split(CharSpan::new(1, 3)),
+        (CharSpan::new(4, 10), CHARSPAN_INVALID)
+    );
+    // align right
+    assert_eq!(
+        CharSpan::new(1, 10).split(CharSpan::new(6, 10)),
+        (CharSpan::new(1, 5), CHARSPAN_INVALID)
+    );
+    // full
+    assert_eq!(
+        CharSpan::new(1, 10).split(CharSpan::new(1, 10)),
+        (CHARSPAN_INVALID, CHARSPAN_INVALID)
+    );
+    // split middle
+    assert_eq!(
+        CharSpan::new(1, 10).split(CharSpan::new(4, 6)),
+        (CharSpan::new(1, 3), CharSpan::new(7, 10))
+    );
 }
 
 /// Represents a parsing method
