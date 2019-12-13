@@ -17,8 +17,8 @@
 
 //! Library for grammars
 
-use crate::automata::fa::{FinalItem, NFA};
-use hime_redist::parsers::{TreeAction, TREE_ACTION_NONE};
+use crate::automata::fa::{FinalItem, DFA, EPSILON, NFA};
+use hime_redist::parsers::{TreeAction, TREE_ACTION_DROP, TREE_ACTION_NONE, TREE_ACTION_PROMOTE};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering as AtomicOrdering};
@@ -742,6 +742,14 @@ fn generate_unique_id() -> String {
     format!("{:0X}", value)
 }
 
+/// Errors for grammars
+pub enum GrammarError {
+    /// The grammar's axiom has not been specified in the options
+    AxiomNotSpecified,
+    /// The grammar's axiom is not defined (does not exist)
+    AxiomNotDefined
+}
+
 /// Represents a grammar
 #[derive(Debug, Clone)]
 pub struct Grammar {
@@ -1062,6 +1070,93 @@ impl Grammar {
                     .find(|s| s.name == other_symbol.name)
                     .unwrap();
                 SymbolRef::Action(symbol.id)
+            }
+        }
+    }
+
+    /// Builds the complete DFA that matches the terminals in this grammar
+    pub fn build_dfa(&self) -> DFA {
+        let mut nfa = NFA::new_minimal();
+        for terminal in self.terminals.iter() {
+            let (entry, _) = nfa.insert_sub_nfa(&terminal.nfa);
+            nfa.add_transition(nfa.entry, EPSILON, entry);
+        }
+        let mut dfa = DFA::from_nfa(nfa).minimize();
+        dfa.repack_transitions();
+        dfa.prune();
+        dfa
+    }
+
+    /// Prepares this grammar for code and data generation
+    /// This methods inserts a new grammar rule as its axiom and computes the FIRSTS and FOLLOWERS sets
+    pub fn prepare(&mut self) -> Result<(), GrammarError> {
+        self.add_real_axiom()?;
+        self.compute_firsts();
+        self.compute_followers();
+        Ok(())
+    }
+
+    /// Adds the real axiom to this grammar
+    fn add_real_axiom(&mut self) -> Result<(), GrammarError> {
+        let axiom_name = self
+            .options
+            .get(OPTION_AXIOM)
+            .ok_or(GrammarError::AxiomNotSpecified)?;
+        let axiom_id = self
+            .variables
+            .iter()
+            .find(|v| &v.name == axiom_name)
+            .ok_or(GrammarError::AxiomNotDefined)?
+            .id;
+        // Create the real axiom rule variable and rule
+        let real_axiom = self.add_variable(GENERATED_AXIOM);
+        real_axiom.rules.push(Rule::new(
+            real_axiom.id,
+            TREE_ACTION_NONE,
+            RuleBody::from_parts(vec![
+                RuleBodyElement::new(SymbolRef::Variable(axiom_id), TREE_ACTION_PROMOTE),
+                RuleBodyElement::new(SymbolRef::Dollar, TREE_ACTION_DROP),
+            ]),
+            0
+        ));
+        Ok(())
+    }
+
+    /// Computes the FIRSTS sets for this grammar
+    fn compute_firsts(&mut self) {
+        let mut firsts_for_var = HashMap::new();
+        let mut modified = true;
+        while modified {
+            modified = false;
+            for variable in self.variables.iter_mut() {
+                modified |= variable.compute_firsts(&mut firsts_for_var);
+            }
+        }
+        for variable in self.variables.iter_mut() {
+            if let Some(firsts) = firsts_for_var.remove(&variable.id) {
+                variable.firsts = firsts;
+            }
+        }
+    }
+
+    /// Computes the FOLLOWERS sets for this grammar
+    fn compute_followers(&mut self) {
+        let mut followers = HashMap::new();
+        // Apply step 1 to each variable
+        for variable in self.variables.iter() {
+            variable.compute_initial_follower(&mut followers);
+        }
+        // Apply step 2 and 3 while some modification has occured
+        let mut modified = true;
+        while modified {
+            modified = false;
+            for variable in self.variables.iter() {
+                modified |= variable.propagate_followers(&mut followers);
+            }
+        }
+        for variable in self.variables.iter_mut() {
+            if let Some(followers) = followers.remove(&variable.id) {
+                variable.followers = followers;
             }
         }
     }
