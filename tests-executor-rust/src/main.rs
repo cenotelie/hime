@@ -33,7 +33,6 @@ use hime_redist::ast::AstNode;
 use hime_redist::errors::ParseErrorDataTrait;
 use hime_redist::result::ParseResult;
 use hime_redist::symbols::SemanticElementTrait;
-use hime_redist::utils::iterable::Iterable;
 
 /// The parser must produce an AST that matches the expected one
 const VERB_MATCHES: &str = "matches";
@@ -95,7 +94,7 @@ fn get_parser_library_name(my_path: &path::Path) -> path::PathBuf {
 
 /// Reads the arguments
 fn read_args() -> Vec<String> {
-    let mut args = Vec::<String>::new();
+    let mut args = Vec::new();
     for argument in env::args().enumerate() {
         if argument.0 != 0 {
             args.push(argument.1);
@@ -172,14 +171,14 @@ fn execute_test_matches(
     parser_name: &str
 ) -> i32 {
     let expected = get_expected_ast(my_path, library);
-    if expected.get_errors().get_count() > 0 {
+    if !expected.errors.errors.is_empty() {
         println!("Failed to parse the expected AST");
         return RESULT_FAILURE_PARSING;
     }
     let real_result = get_parsed_input(my_path, library, parser_name);
-    for error in real_result.get_errors().iter() {
+    for error in real_result.errors.errors.iter() {
         println!("{}", error.get_message());
-        let context = real_result.get_input().get_context_at(error.get_position());
+        let context = real_result.text.get_context_at(error.get_position());
         println!("{}", context.content);
         println!("{}", context.pointer);
     }
@@ -187,7 +186,7 @@ fn execute_test_matches(
         println!("Failed to parse the input");
         return RESULT_FAILURE_PARSING;
     }
-    if real_result.get_errors().get_count() > 0 {
+    if !real_result.errors.errors.is_empty() {
         println!("Some errors while parsing the input");
         return RESULT_FAILURE_PARSING;
     }
@@ -209,14 +208,14 @@ fn execute_test_no_matches(
     parser_name: &str
 ) -> i32 {
     let expected = get_expected_ast(my_path, library);
-    if expected.get_errors().get_count() > 0 {
+    if !expected.errors.errors.is_empty() {
         println!("Failed to parse the expected AST");
         return RESULT_FAILURE_PARSING;
     }
     let real_result = get_parsed_input(my_path, library, parser_name);
-    for error in real_result.get_errors().iter() {
+    for error in real_result.errors.errors.iter() {
         println!("{}", error.get_message());
-        let context = real_result.get_input().get_context_at(error.get_position());
+        let context = real_result.text.get_context_at(error.get_position());
         println!("{}", context.content);
         println!("{}", context.pointer);
     }
@@ -224,7 +223,7 @@ fn execute_test_no_matches(
         println!("Failed to parse the input");
         return RESULT_FAILURE_PARSING;
     }
-    if real_result.get_errors().get_count() > 0 {
+    if !real_result.errors.errors.is_empty() {
         println!("Some errors while parsing the input");
         return RESULT_FAILURE_PARSING;
     }
@@ -249,7 +248,7 @@ fn execute_test_fails(
     if !real_result.is_success() {
         return RESULT_SUCCESS;
     }
-    if real_result.get_errors().get_count() > 0 {
+    if !real_result.errors.errors.is_empty() {
         return RESULT_SUCCESS;
     }
     println!("No error found while parsing, while some were expected");
@@ -267,12 +266,12 @@ fn execute_test_outputs(
     let real_result = get_parsed_input(my_path, library, parser_name);
     if expected_lines.is_empty() || (expected_lines.len() == 1 && expected_lines[0].is_empty()) {
         // expect empty output
-        if real_result.is_success() && real_result.get_errors().get_count() == 0 {
+        if real_result.is_success() && real_result.errors.errors.is_empty() {
             return RESULT_SUCCESS;
         }
-        for error in real_result.get_errors().iter() {
+        for error in real_result.errors.errors.iter() {
             println!("{}", error.get_message());
-            let context = real_result.get_input().get_context_at(error.get_position());
+            let context = real_result.text.get_context_at(error.get_position());
             println!("{}", context.content);
             println!("{}", context.pointer);
         }
@@ -281,9 +280,9 @@ fn execute_test_outputs(
     }
 
     let mut i = 0;
-    for error in real_result.get_errors().iter() {
+    for error in real_result.errors.errors.iter() {
         let message = format!("{}", error);
-        let context = real_result.get_input().get_context_at(error.get_position());
+        let context = real_result.text.get_context_at(error.get_position());
         if i + 2 >= expected_lines.len() {
             println!("Unexpected error:");
             println!("{}", message);
@@ -409,7 +408,7 @@ fn is_line_ending(c1: char, c2: char) -> bool {
 
 /// Finds all the lines in this content
 fn find_lines_in(input: &str) -> Vec<&str> {
-    let mut result = Vec::<&str>::new();
+    let mut result = Vec::new();
     let mut c1;
     let mut c2: char = '\0';
     let mut start = 0;
