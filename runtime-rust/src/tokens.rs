@@ -17,15 +17,15 @@
 
 //! Module for the definition of lexical tokens
 
-use super::symbols::SemanticElementTrait;
-use super::symbols::Symbol;
-use super::text::Text;
-use super::text::TextContext;
-use super::text::TextPosition;
-use super::text::TextSpan;
-use super::utils::biglist::BigList;
-use super::utils::iterable::Iterable;
-use super::utils::EitherMut;
+use crate::symbols::SemanticElementTrait;
+use crate::symbols::Symbol;
+use crate::text::Text;
+use crate::text::TextContext;
+use crate::text::TextPosition;
+use crate::text::TextSpan;
+use crate::utils::biglist::BigList;
+use crate::utils::iterable::Iterable;
+use crate::utils::EitherMut;
 
 /// Represents the metadata of a token
 #[derive(Copy, Clone)]

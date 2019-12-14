@@ -21,16 +21,16 @@ use std::fmt::Display;
 use std::fmt::Error;
 use std::fmt::Formatter;
 
-use super::symbols::SemanticElementTrait;
-use super::symbols::Symbol;
-use super::text::TextContext;
-use super::text::TextPosition;
-use super::text::TextSpan;
-use super::tokens::Token;
-use super::tokens::TokenRepository;
-use super::utils::biglist::BigList;
-use super::utils::iterable::Iterable;
-use super::utils::EitherMut;
+use crate::symbols::SemanticElementTrait;
+use crate::symbols::Symbol;
+use crate::text::TextContext;
+use crate::text::TextPosition;
+use crate::text::TextSpan;
+use crate::tokens::Token;
+use crate::tokens::TokenRepository;
+use crate::utils::biglist::BigList;
+use crate::utils::iterable::Iterable;
+use crate::utils::EitherMut;
 
 /// Represents a type of symbol table
 #[derive(Copy, Clone, Eq, PartialEq)]
@@ -127,11 +127,7 @@ impl AstImpl {
     /// Creates a new implementation
     pub fn new() -> AstImpl {
         AstImpl {
-            nodes: BigList::<AstCell>::new(AstCell::new(
-                TableElemRef::new(TableType::None, 0),
-                0,
-                0
-            )),
+            nodes: BigList::new(AstCell::new(TableElemRef::new(TableType::None, 0), 0, 0)),
             root: None
         }
     }

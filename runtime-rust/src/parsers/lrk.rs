@@ -19,18 +19,18 @@
 
 use std::usize;
 
-use super::super::ast::Ast;
-use super::super::ast::TableElemRef;
-use super::super::ast::TableType;
-use super::super::errors::ParseErrorUnexpectedToken;
-use super::super::lexers::Lexer;
-use super::super::lexers::TokenKernel;
-use super::super::lexers::DEFAULT_CONTEXT;
-use super::super::symbols::SemanticBody;
-use super::super::symbols::SemanticElement;
-use super::super::symbols::SemanticElementTrait;
 use super::subtree::SubTree;
 use super::*;
+use crate::ast::Ast;
+use crate::ast::TableElemRef;
+use crate::ast::TableType;
+use crate::errors::ParseErrorUnexpectedToken;
+use crate::lexers::Lexer;
+use crate::lexers::TokenKernel;
+use crate::lexers::DEFAULT_CONTEXT;
+use crate::symbols::SemanticBody;
+use crate::symbols::SemanticElement;
+use crate::symbols::SemanticElementTrait;
 
 /// Represents the LR(k) parsing table and productions
 pub struct LRkAutomaton {
@@ -55,7 +55,7 @@ impl LRkAutomaton {
         let states_count = read_u16(data, 2) as usize;
         let productions_count = read_u16(data, 4) as usize;
         let columns_map = LRColumnMap::new(data, 6, columns_count);
-        let mut contexts = Vec::<LRContexts>::with_capacity(states_count);
+        let mut contexts = Vec::with_capacity(states_count);
         let mut index = 6 + columns_count * 2;
         for _i in 0..states_count {
             let mut context = LRContexts::new();
@@ -69,7 +69,7 @@ impl LRkAutomaton {
         }
         let table = read_table_u16(data, index, states_count * columns_count * 2);
         index += states_count * columns_count * 4;
-        let mut productions = Vec::<LRProduction>::with_capacity(productions_count);
+        let mut productions = Vec::with_capacity(productions_count);
         for _i in 0..productions_count {
             let production = LRProduction::new(data, &mut index);
             productions.push(production);
@@ -190,9 +190,9 @@ impl<'l> LRkAstBuilder<'l> {
     pub fn new(lexer: &'l mut dyn Lexer<'l>, result: Ast<'l>) -> LRkAstBuilder<'l> {
         LRkAstBuilder {
             lexer,
-            stack: Vec::<SubTree>::new(),
+            stack: Vec::new(),
             result,
-            handle: Vec::<usize>::new(),
+            handle: Vec::new(),
             reduction: None
         }
     }
@@ -620,7 +620,7 @@ impl<'l, 'a: 'l> LRkParser<'l, 'a> {
         ast: Ast<'l>,
         actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
     ) -> LRkParser<'l, 'a> {
-        let mut stack = Vec::<LRkHead>::new();
+        let mut stack = Vec::new();
         stack.push(LRkHead {
             state: 0,
             identifier: 0
@@ -653,7 +653,7 @@ impl<'l, 'a: 'l> LRkParser<'l, 'a> {
             self.data.stack[self.data.stack.len() - 1].state,
             self.builder.lexer.get_terminals()
         );
-        let mut my_expected = Vec::<Symbol>::new();
+        let mut my_expected = Vec::new();
         for x in expected_on_head.shifts.iter() {
             my_expected.push(*x);
         }

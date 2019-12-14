@@ -17,9 +17,9 @@
 
 //! Module for lexers' automata
 
-use super::super::text::Text;
-use super::super::text::Utf16C;
-use super::super::utils::bin::*;
+use crate::text::Text;
+use crate::text::Utf16C;
+use crate::utils::bin::*;
 
 /// Identifier of an invalid state in an automaton
 pub const DEAD_STATE: u32 = 0xFFFF;

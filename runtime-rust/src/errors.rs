@@ -310,9 +310,7 @@ pub struct ParseErrors {
 impl ParseErrors {
     /// Creates a new instance of the Errors structure
     pub fn new() -> ParseErrors {
-        ParseErrors {
-            errors: Vec::<ParseError>::new()
-        }
+        ParseErrors { errors: Vec::new() }
     }
 
     /// Handles the end-of-input error

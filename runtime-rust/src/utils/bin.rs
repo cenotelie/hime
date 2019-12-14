@@ -32,7 +32,7 @@ pub fn read_u32(buffer: &[u8], index: usize) -> u32 {
 
 /// Reads a table of u16 from a byte buffer
 pub fn read_table_u16(buffer: &[u8], start: usize, count: usize) -> Vec<u16> {
-    let mut result = Vec::<u16>::with_capacity(count);
+    let mut result = Vec::with_capacity(count);
     for i in 0..count {
         result.push(read_u16(buffer, start + i * 2));
     }
@@ -41,7 +41,7 @@ pub fn read_table_u16(buffer: &[u8], start: usize, count: usize) -> Vec<u16> {
 
 /// Reads a table of u32 from a byte buffer
 pub fn read_table_u32(buffer: &[u8], start: usize, count: usize) -> Vec<u32> {
-    let mut result = Vec::<u32>::with_capacity(count);
+    let mut result = Vec::with_capacity(count);
     for i in 0..count {
         result.push(read_u32(buffer, start + i * 4));
     }

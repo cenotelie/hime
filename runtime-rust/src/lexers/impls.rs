@@ -17,12 +17,6 @@
 
 //! Module for lexers' implementation
 
-use super::super::errors::ParseErrorUnexpectedChar;
-use super::super::errors::ParseErrors;
-use super::super::symbols::Symbol;
-use super::super::symbols::SID_DOLLAR;
-use super::super::text::Text;
-use super::super::tokens::TokenRepository;
 use super::automaton::run_dfa;
 use super::automaton::Automaton;
 use super::automaton::TokenMatch;
@@ -30,6 +24,12 @@ use super::fuzzy::FuzzyMatcher;
 use super::ContextProvider;
 use super::Lexer;
 use super::TokenKernel;
+use crate::errors::ParseErrorUnexpectedChar;
+use crate::errors::ParseErrors;
+use crate::symbols::Symbol;
+use crate::symbols::SID_DOLLAR;
+use crate::text::Text;
+use crate::tokens::TokenRepository;
 
 /// The default maximum Levenshtein distance to go to for the recovery of a matching failure
 const DEFAULT_RECOVERY_MATCHING_DISTANCE: usize = 3;

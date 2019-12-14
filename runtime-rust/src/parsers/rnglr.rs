@@ -20,20 +20,20 @@
 use std::collections::VecDeque;
 use std::usize;
 
-use super::super::ast::Ast;
-use super::super::ast::AstCell;
-use super::super::ast::TableElemRef;
-use super::super::ast::TableType;
-use super::super::errors::ParseErrorUnexpectedToken;
-use super::super::lexers::Lexer;
-use super::super::lexers::TokenKernel;
-use super::super::lexers::DEFAULT_CONTEXT;
-use super::super::symbols::SemanticBody;
-use super::super::symbols::SemanticElement;
-use super::super::symbols::SemanticElementTrait;
-use super::super::symbols::SID_EPSILON;
-use super::super::utils::biglist::BigList;
 use super::*;
+use crate::ast::Ast;
+use crate::ast::AstCell;
+use crate::ast::TableElemRef;
+use crate::ast::TableType;
+use crate::errors::ParseErrorUnexpectedToken;
+use crate::lexers::Lexer;
+use crate::lexers::TokenKernel;
+use crate::lexers::DEFAULT_CONTEXT;
+use crate::symbols::SemanticBody;
+use crate::symbols::SemanticElement;
+use crate::symbols::SemanticElementTrait;
+use crate::symbols::SID_EPSILON;
+use crate::utils::biglist::BigList;
 
 /// Represents a cell in a RNGLR parse table
 #[derive(Copy, Clone)]
@@ -79,7 +79,7 @@ impl RNGLRAutomaton {
         // reads the column map
         let columns_map = LRColumnMap::new(data, 14, columns_count);
         // read the contexts table
-        let mut contexts = Vec::<LRContexts>::with_capacity(states_count);
+        let mut contexts = Vec::with_capacity(states_count);
         let mut index = 14 + columns_count * 2;
         for _i in 0..states_count {
             let mut context = LRContexts::new();
@@ -92,7 +92,7 @@ impl RNGLRAutomaton {
             contexts.push(context);
         }
         // read the automaton cells
-        let mut cells = Vec::<RNGLRAutomatonCell>::with_capacity(columns_count * states_count);
+        let mut cells = Vec::with_capacity(columns_count * states_count);
         for _i in 0..(columns_count * states_count) {
             cells.push(RNGLRAutomatonCell {
                 count: u32::from(read_u16(data, index)),
@@ -104,7 +104,7 @@ impl RNGLRAutomaton {
         let table = read_table_u16(data, index, actions_count * 2);
         index += actions_count * 4;
         // read the production table
-        let mut productions = Vec::<LRProduction>::with_capacity(productions_count);
+        let mut productions = Vec::with_capacity(productions_count);
         for _i in 0..productions_count {
             let production = LRProduction::new(data, &mut index);
             productions.push(production);
@@ -252,7 +252,7 @@ impl GSSPath {
             labels: if length == 0 {
                 None
             } else {
-                Some(Vec::<GSSLabel>::with_capacity(length))
+                Some(Vec::with_capacity(length))
             }
         }
     }
@@ -308,9 +308,9 @@ impl GSS {
     /// Initializes the GSS
     pub fn new() -> GSS {
         GSS {
-            node_labels: BigList::<u32>::new(0),
-            node_generations: BigList::<GSSGeneration>::new(GSSGeneration { start: 0, count: 0 }),
-            edges: BigList::<GSSEdge>::new(GSSEdge {
+            node_labels: BigList::new(0),
+            node_generations: BigList::new(GSSGeneration { start: 0, count: 0 }),
+            edges: BigList::new(GSSEdge {
                 from: 0,
                 to: 0,
                 label: GSSLabel {
@@ -318,7 +318,7 @@ impl GSS {
                     symbol_id: SID_EPSILON
                 }
             }),
-            edges_generations: BigList::<GSSGeneration>::new(GSSGeneration { start: 0, count: 0 }),
+            edges_generations: BigList::new(GSSGeneration { start: 0, count: 0 }),
             current_generation: 0
         }
     }
@@ -410,7 +410,7 @@ impl GSS {
 
     /// Gets all paths in the GSS starting at the given node and with the given length
     pub fn get_paths(&self, from: usize, length: usize) -> Vec<GSSPath> {
-        let mut paths = Vec::<GSSPath>::new();
+        let mut paths = Vec::new();
         if length == 0 {
             // 0-length path, simply return a single path with the 'from' node
             paths.push(GSSPath::new_length0(from, 0));
@@ -524,7 +524,7 @@ impl SPPFNodeVersion {
                 children: None
             }
         } else {
-            let mut children = Vec::<SPPFNodeRef>::with_capacity(count);
+            let mut children = Vec::with_capacity(count);
             for x in buffer.iter().take(count) {
                 children.push(*x);
             }
@@ -569,7 +569,7 @@ impl SPPFNodeTrait for SPPFNodeNormal {
 impl SPPFNodeNormal {
     /// Initializes this node
     pub fn new(label: TableElemRef) -> SPPFNodeNormal {
-        let mut versions = Vec::<SPPFNodeVersion>::new();
+        let mut versions = Vec::new();
         versions.push(SPPFNodeVersion::new(label));
         SPPFNodeNormal {
             original: label,
@@ -584,7 +584,7 @@ impl SPPFNodeNormal {
         buffer: &[SPPFNodeRef],
         count: usize
     ) -> SPPFNodeNormal {
-        let mut versions = Vec::<SPPFNodeVersion>::new();
+        let mut versions = Vec::new();
         versions.push(SPPFNodeVersion::from(label, buffer, count));
         SPPFNodeNormal { original, versions }
     }
@@ -635,8 +635,8 @@ impl SPPFNodeReplaceable {
                 actions: None
             }
         } else {
-            let mut children = Vec::<SPPFNodeRef>::with_capacity(count);
-            let mut actions = Vec::<TreeAction>::with_capacity(count);
+            let mut children = Vec::with_capacity(count);
+            let mut actions = Vec::with_capacity(count);
             for i in 0..count {
                 children.push(children_buffer[i]);
                 actions.push(actions_buffer[i]);
@@ -701,9 +701,7 @@ struct SPPF {
 impl SPPF {
     /// Initializes this SPPF
     pub fn new() -> SPPF {
-        SPPF {
-            nodes: Vec::<SPPFNode>::new()
-        }
+        SPPF { nodes: Vec::new() }
     }
 
     /// Gets the SPPF node for the specified identifier
@@ -837,7 +835,7 @@ impl<'l> SPPFBuilder<'l> {
     pub fn new(lexer: &'l mut dyn Lexer<'l>, result: Ast<'l>) -> SPPFBuilder<'l> {
         SPPFBuilder {
             lexer,
-            history: Vec::<HistoryPart>::new(),
+            history: Vec::new(),
             sppf: SPPF::new(),
             reduction: None,
             result
@@ -863,7 +861,7 @@ impl<'l> SPPFBuilder<'l> {
                 return;
             }
         }
-        let mut data = Vec::<usize>::new();
+        let mut data = Vec::new();
         data.push(label);
         my_history.push(HistoryPart { generation, data });
     }
@@ -891,7 +889,7 @@ impl<'l> SPPFBuilder<'l> {
 
     /// Prepares for the forthcoming reduction operations
     pub fn reduction_prepare(&mut self, first: GSSLabel, path: &GSSPath, length: usize) {
-        let mut stack = Vec::<GSSLabel>::new();
+        let mut stack = Vec::new();
         if length > 0 {
             if length > 1 {
                 let path_labels = path.labels.as_ref().unwrap();
@@ -902,9 +900,9 @@ impl<'l> SPPFBuilder<'l> {
             stack.push(first);
         }
         self.reduction = Some(SPPFReduction {
-            cache: Vec::<SPPFNodeRef>::with_capacity(length),
-            handle_indices: Vec::<usize>::with_capacity(length),
-            handle_actions: Vec::<TreeAction>::with_capacity(length),
+            cache: Vec::with_capacity(length),
+            handle_indices: Vec::with_capacity(length),
+            handle_actions: Vec::with_capacity(length),
             stack,
             pop_count: 0
         });
@@ -1148,7 +1146,7 @@ impl<'l> SPPFBuilder<'l> {
                 count: 0
             },
             Some(ref children) => {
-                let mut buffer = Vec::<AstCell>::with_capacity(children.len());
+                let mut buffer = Vec::with_capacity(children.len());
                 for child in children.iter() {
                     buffer.push(SPPFBuilder::build_final_ast(sppf, *child, result));
                 }
@@ -1230,9 +1228,9 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
         }
 
         // try to only look at stack heads that expect the terminal
-        let mut queue = Vec::<usize>::new();
-        let mut productions = Vec::<usize>::new();
-        let mut distances = Vec::<usize>::new();
+        let mut queue = Vec::new();
+        let mut productions = Vec::new();
+        let mut distances = Vec::new();
         let mut found_on_previous_shift = false;
         for shift in self.shifts.iter() {
             let count = self
@@ -1325,7 +1323,7 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
         // at this point, the requested context is not yet open
         // can it be open by a token with the specified terminal ID?
         // queue of GLR states to inspect:
-        let mut queue_gss_heads = Vec::<usize>::new(); // the related GSS head
+        let mut queue_gss_heads = Vec::new(); // the related GSS head
         let mut queue_vstack = Vec::<Vec<u32>>::new(); // the virtual stack
         for shift in self.shifts.iter() {
             let count = self
@@ -1334,7 +1332,7 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
             if count > 0 {
                 // enqueue the info, top GSS stack node and target GLR state
                 queue_gss_heads.push(shift.from);
-                let mut stack = Vec::<u32>::with_capacity(1);
+                let mut stack = Vec::with_capacity(1);
                 stack.push(shift.to as u32);
                 queue_vstack.push(stack);
             }
@@ -1366,9 +1364,8 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
                     queue_vstack.push(virtual_stack);
                 } else if production.reduction_length < queue_vstack[i].len() {
                     // we are still the virtual stack
-                    let mut virtual_stack = Vec::<u32>::with_capacity(
-                        queue_vstack[i].len() - production.reduction_length + 1
-                    );
+                    let mut virtual_stack =
+                        Vec::with_capacity(queue_vstack[i].len() - production.reduction_length + 1);
                     for k in 0..(queue_vstack[i].len() - production.reduction_length) {
                         virtual_stack.push(queue_vstack[i][k]);
                     }
@@ -1391,7 +1388,7 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
                         );
                         // enqueue the info, top GSS stack node and target GLR state
                         queue_gss_heads.push(path.last_node);
-                        let mut virtual_stack = Vec::<u32>::with_capacity(1);
+                        let mut virtual_stack = Vec::with_capacity(1);
                         virtual_stack.push(next.unwrap());
                         queue_vstack.push(virtual_stack);
                     }
@@ -1432,7 +1429,7 @@ impl<'a> RNGLRParserData<'a> {
     /// some terminals expected for reduction in the automaton are coming from other paths.
     fn check_is_expected(&self, gss_node: usize, terminal: Symbol) -> bool {
         // queue of GLR states to inspect:
-        let mut queue_gss_heads = Vec::<usize>::new(); // the related GSS head
+        let mut queue_gss_heads = Vec::new(); // the related GSS head
         let mut queue_vstack = Vec::<Vec<u32>>::new(); // the virtual stack
 
         // first reduction
@@ -1459,7 +1456,7 @@ impl<'a> RNGLRParserData<'a> {
                     );
                     // enqueue the info, top GSS stack node and target GLR state
                     queue_gss_heads.push(path.last_node);
-                    let mut virtual_stack = Vec::<u32>::with_capacity(1);
+                    let mut virtual_stack = Vec::with_capacity(1);
                     virtual_stack.push(next.unwrap());
                     queue_vstack.push(virtual_stack);
                 }
@@ -1497,9 +1494,8 @@ impl<'a> RNGLRParserData<'a> {
                     queue_vstack.push(virtual_stack);
                 } else if production.reduction_length < queue_vstack[i].len() {
                     // we are still the virtual stack
-                    let mut virtual_stack = Vec::<u32>::with_capacity(
-                        queue_vstack[i].len() - production.reduction_length + 1
-                    );
+                    let mut virtual_stack =
+                        Vec::with_capacity(queue_vstack[i].len() - production.reduction_length + 1);
                     for k in 0..(queue_vstack[i].len() - production.reduction_length) {
                         virtual_stack.push(queue_vstack[i][k]);
                     }
@@ -1522,7 +1518,7 @@ impl<'a> RNGLRParserData<'a> {
                         );
                         // enqueue the info, top GSS stack node and target GLR state
                         queue_gss_heads.push(path.last_node);
-                        let mut virtual_stack = Vec::<u32>::with_capacity(1);
+                        let mut virtual_stack = Vec::with_capacity(1);
                         virtual_stack.push(next.unwrap());
                         queue_vstack.push(virtual_stack);
                     }
@@ -1638,13 +1634,13 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                 automaton,
                 gss: GSS::new(),
                 next_token: None,
-                reductions: VecDeque::<RNGLRReduction>::new(),
-                shifts: VecDeque::<RNGLRShift>::new(),
+                reductions: VecDeque::new(),
+                shifts: VecDeque::new(),
                 variables: ast.get_variables(),
                 actions
             },
             builder: SPPFBuilder::new(lexer, ast),
-            nullables: Vec::<usize>::new()
+            nullables: Vec::new()
         };
         RNGLRParser::build_nullables(
             &mut parser.builder,
@@ -1743,7 +1739,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
 
     /// Gets the dependencies on nullable variables
     fn build_nullable_dependencies_for(production: &LRProduction) -> Vec<usize> {
-        let mut result = Vec::<usize>::new();
+        let mut result = Vec::new();
         let mut i = 0;
         while i < production.bytecode.len() {
             let op_code = production.bytecode[i];
@@ -1989,7 +1985,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
             .lexer
             .get_output()
             .get_token(kernel.index as usize);
-        let mut my_expected = Vec::<Symbol>::new();
+        let mut my_expected = Vec::new();
         let generation_data = self.data.gss.get_current_generation();
         for i in 0..generation_data.count {
             let expected_on_head = self.data.automaton.get_expected(

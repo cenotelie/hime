@@ -23,10 +23,10 @@ pub mod impls;
 
 use std::usize;
 
-use super::errors::ParseErrors;
-use super::symbols::Symbol;
-use super::text::Text;
-use super::tokens::TokenRepository;
+use crate::errors::ParseErrors;
+use crate::symbols::Symbol;
+use crate::text::Text;
+use crate::tokens::TokenRepository;
 
 /// Identifier of the default context
 pub const DEFAULT_CONTEXT: u16 = 0;

@@ -17,11 +17,11 @@
 
 //! Module for AST subtree in parsers
 
-use super::super::ast::Ast;
-use super::super::ast::AstCell;
-use super::super::ast::TableElemRef;
 use super::TreeAction;
 use super::TREE_ACTION_REPLACE_BY_CHILDREN;
+use crate::ast::Ast;
+use crate::ast::AstCell;
+use crate::ast::TableElemRef;
 
 /// Represents a sub-tree in an AST
 /// A sub-tree is composed of a root with its children.
@@ -42,8 +42,8 @@ impl SubTree {
     /// Creates a new sub-tree with the expected size
     pub fn new(size: usize) -> SubTree {
         SubTree {
-            nodes: Vec::<AstCell>::with_capacity(size),
-            actions: Vec::<TreeAction>::with_capacity(size)
+            nodes: Vec::with_capacity(size),
+            actions: Vec::with_capacity(size)
         }
     }
 

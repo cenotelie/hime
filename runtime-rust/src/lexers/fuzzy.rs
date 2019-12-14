@@ -19,16 +19,16 @@
 
 use std::mem::replace;
 
-use super::super::errors::ParseErrorEndOfInput;
-use super::super::errors::ParseErrorIncorrectEncodingSequence;
-use super::super::errors::ParseErrorUnexpectedChar;
-use super::super::errors::ParseErrors;
-use super::super::text::Text;
-use super::super::text::Utf16C;
 use super::automaton::Automaton;
 use super::automaton::AutomatonState;
 use super::automaton::TokenMatch;
 use super::automaton::DEAD_STATE;
+use crate::errors::ParseErrorEndOfInput;
+use crate::errors::ParseErrorIncorrectEncodingSequence;
+use crate::errors::ParseErrorUnexpectedChar;
+use crate::errors::ParseErrors;
+use crate::text::Text;
+use crate::text::Utf16C;
 
 /// Represents a DFA stack head
 #[derive(Clone)]
@@ -63,7 +63,7 @@ impl FuzzyMatcherHead {
         offset: usize,
         distance: usize
     ) -> FuzzyMatcherHead {
-        let mut errors = Vec::<u32>::with_capacity(distance);
+        let mut errors = Vec::with_capacity(distance);
         if previous.errors.is_some() {
             let others = previous.errors.as_ref().unwrap();
             for x in others.iter() {
@@ -129,10 +129,10 @@ impl FuzzyMatcherResult {
     /// Creates a new matcher state
     pub fn new() -> FuzzyMatcherResult {
         FuzzyMatcherResult {
-            heads: Vec::<FuzzyMatcherHead>::new(),
+            heads: Vec::new(),
             match_head: None,
             match_length: 0,
-            insertions: Vec::<u32>::new()
+            insertions: Vec::new()
         }
     }
 
@@ -220,7 +220,7 @@ impl<'a> FuzzyMatcher<'a> {
             } else {
                 self.text.at(self.origin_index + offset)
             };
-            let generation = replace(&mut result.heads, Vec::<FuzzyMatcherHead>::new());
+            let generation = replace(&mut result.heads, Vec::new());
             for head in generation {
                 if at_end {
                     self.inspect_at_end(&mut result, &head, offset);

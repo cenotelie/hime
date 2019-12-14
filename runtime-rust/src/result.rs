@@ -17,13 +17,13 @@
 
 //! Module for the definition of a parse result
 
-use super::ast::Ast;
-use super::ast::AstImpl;
-use super::errors::ParseErrors;
-use super::symbols::Symbol;
-use super::text::Text;
-use super::tokens::TokenRepository;
-use super::tokens::TokenRepositoryImpl;
+use crate::ast::Ast;
+use crate::ast::AstImpl;
+use crate::errors::ParseErrors;
+use crate::symbols::Symbol;
+use crate::text::Text;
+use crate::tokens::TokenRepository;
+use crate::tokens::TokenRepositoryImpl;
 
 /// Represents the output of a parser
 pub struct ParseResult {

@@ -21,9 +21,9 @@ pub mod lrk;
 pub mod rnglr;
 pub mod subtree;
 
-use super::lexers::ContextProvider;
-use super::symbols::Symbol;
-use super::utils::bin::*;
+use crate::lexers::ContextProvider;
+use crate::symbols::Symbol;
+use crate::utils::bin::*;
 
 /// The maximum number of errors
 pub const MAX_ERROR_COUNT: usize = 100;
@@ -101,7 +101,7 @@ impl LRColumnMap {
     pub fn new(data: &[u8], offset: usize, column_count: usize) -> LRColumnMap {
         let mut result = LRColumnMap {
             cache: [0; 512],
-            others: Vec::<LRColumnMapCell>::new()
+            others: Vec::new()
         };
         for i in 0..column_count {
             let index = offset + i * 2;
@@ -161,7 +161,7 @@ impl LRContexts {
     pub fn add(&mut self, identifier: u16, context: u16) {
         match self.openings {
             None => {
-                let mut content = Vec::<LRContextOpening>::new();
+                let mut content = Vec::new();
                 content.push(LRContextOpening {
                     identifier,
                     context
@@ -247,7 +247,7 @@ impl LRProduction {
         *index += 1;
         let bytecode_length = data[*index] as usize;
         *index += 1;
-        let mut bytecode = Vec::<LROpCode>::with_capacity(bytecode_length);
+        let mut bytecode = Vec::with_capacity(bytecode_length);
         for i in 0..bytecode_length {
             bytecode.push(read_u16(data, *index + i * 2));
         }
@@ -274,8 +274,8 @@ impl LRExpected {
     /// Initializes this container
     pub fn new() -> LRExpected {
         LRExpected {
-            shifts: Vec::<Symbol>::new(),
-            reductions: Vec::<Symbol>::new()
+            shifts: Vec::new(),
+            reductions: Vec::new()
         }
     }
 

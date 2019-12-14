@@ -24,8 +24,7 @@ use std::io::BufReader;
 use std::io::Read;
 use std::result::Result;
 
-use super::utils::biglist::BigList;
-use super::utils::iterable::Iterable;
+use crate::utils::biglist::BigList;
 
 /// `Utf16C` represents a single UTF-16 code unit.
 /// A UTF-16 code unit is always represented as a 16 bits unsigned integer.
@@ -39,7 +38,7 @@ use super::utils::iterable::Iterable;
 pub type Utf16C = u16;
 
 /// Represents a span of text in an input as a starting index and length
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct TextSpan {
     /// The starting index
     pub index: usize,
@@ -55,7 +54,7 @@ impl Display for TextSpan {
 }
 
 /// Represents a position in term of line and column in a text input
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct TextPosition {
     /// The line number
     pub line: usize,
@@ -84,6 +83,7 @@ impl Display for TextPosition {
 /// content = "public Struct Context"
 /// pointer = "       ^^^^^^"
 /// ```
+#[derive(Debug, Clone)]
 pub struct TextContext {
     /// The text content being represented
     pub content: String,
@@ -104,7 +104,7 @@ pub struct Text {
 impl Text {
     /// Initializes this text
     pub fn new(input: &str) -> Text {
-        let mut content = BigList::<Utf16C>::new(0);
+        let mut content = BigList::new(0);
         for c in input.chars() {
             let value = c as u32;
             if value <= 0xFFFF {
@@ -117,31 +117,31 @@ impl Text {
                 content.push(trail as Utf16C);
             }
         }
-        let lines = find_lines_in(&content);
+        let lines = find_lines_in(content.iter());
         Text { content, lines }
     }
 
     /// Initializes this text from a UTF-16 stream
     pub fn from_utf16_stream(input: &mut dyn Read, big_endian: bool) -> Text {
         let reader = &mut BufReader::new(input);
-        let mut content = BigList::<Utf16C>::new(0);
+        let mut content = BigList::new(0);
         let iterator = Utf16IteratorRaw::new(reader, big_endian);
         for c in iterator {
             content.push(c);
         }
-        let lines = find_lines_in(&content);
+        let lines = find_lines_in(content.iter());
         Text { content, lines }
     }
 
     /// Initializes this text from a UTF-8 stream
     pub fn from_utf8_stream(input: &mut dyn Read) -> Text {
         let reader = &mut BufReader::new(input);
-        let mut content = BigList::<Utf16C>::new(0);
+        let mut content = BigList::new(0);
         let iterator = Utf16IteratorOverUtf8::new(reader);
         for c in iterator {
             content.push(c);
         }
-        let lines = find_lines_in(&content);
+        let lines = find_lines_in(content.iter());
         Text { content, lines }
     }
 
@@ -427,12 +427,12 @@ fn is_white_space(c: Utf16C) -> bool {
 }
 
 /// Finds all the lines in this content
-fn find_lines_in<'a, T: Iterable<'a, Item = Utf16C>>(iterable: &'a T) -> Vec<usize> {
-    let mut result = Vec::<usize>::new();
+fn find_lines_in<T: Iterator<Item = Utf16C>>(iterator: T) -> Vec<usize> {
+    let mut result = Vec::new();
     let mut c1;
     let mut c2 = 0;
     result.push(0);
-    for (i, x) in iterable.iter().enumerate() {
+    for (i, x) in iterator.enumerate() {
         c1 = c2;
         c2 = x;
         if is_line_ending(c1, c2) {
@@ -458,7 +458,7 @@ fn find_line_at(lines: &[usize], index: usize) -> usize {
 
 /// Converts an excerpt of a UTF-16 buffer to a string
 fn utf16_to_string(content: &BigList<Utf16C>, start: usize, length: usize) -> String {
-    let mut buffer = Vec::<Utf16C>::with_capacity(length);
+    let mut buffer = Vec::with_capacity(length);
     for i in start..(start + length) {
         buffer.push(content[i]);
     }
@@ -485,7 +485,7 @@ fn test_read_utf8() {
     let bytes: [u8; 13] = [
         0x78, 0xE2, 0x80, 0xA8, 0xE2, 0x80, 0xA8, 0x78, 0xE2, 0x80, 0xA8, 0x79, 0x78
     ];
-    let mut content = Vec::<Utf16C>::new();
+    let mut content = Vec::new();
     let reader = &mut bytes.as_ref();
     let iterator = Utf16IteratorOverUtf8::new(reader);
     for c in iterator {

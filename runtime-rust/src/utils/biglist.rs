@@ -17,7 +17,6 @@
 
 //! Module for the definition of `BigList`
 
-use super::iterable::Iterable;
 use std::ops::Index;
 use std::ops::IndexMut;
 
@@ -47,7 +46,7 @@ pub struct BigList<T: Copy> {
 impl<T: Copy> BigList<T> {
     /// Creates a (empty) list
     pub fn new(neutral: T) -> BigList<T> {
-        let mut my_chunks = Vec::<[T; CHUNKS_SIZE]>::with_capacity(INIT_CHUNK_COUNT);
+        let mut my_chunks = Vec::with_capacity(INIT_CHUNK_COUNT);
         my_chunks.push([neutral; CHUNKS_SIZE]);
         BigList {
             neutral,
@@ -88,6 +87,14 @@ impl<T: Copy> BigList<T> {
         self.chunk_index += 1;
         self.cell_index = 0;
     }
+
+    /// Gets an iterator over the list
+    pub fn iter(&self) -> BigListIterator<T> {
+        BigListIterator {
+            list: &self,
+            index: 0
+        }
+    }
 }
 
 /// Implementation of the indexer operator for immutable BigList
@@ -127,21 +134,9 @@ impl<'a, T: 'a + Copy> Iterator for BigListIterator<'a, T> {
     }
 }
 
-/// Implementation of `Iterable` for `BigList`
-impl<'a, T: 'a + Copy> Iterable<'a> for BigList<T> {
-    type Item = T;
-    type IteratorType = BigListIterator<'a, T>;
-    fn iter(&'a self) -> Self::IteratorType {
-        BigListIterator {
-            list: &self,
-            index: 0
-        }
-    }
-}
-
 #[test]
 fn test_big_list() {
-    let mut list = BigList::<char>::new('\0');
+    let mut list = BigList::new('\0');
     assert_eq!(list.len(), 0);
     list.push('t');
     assert_eq!(list.len(), 1);

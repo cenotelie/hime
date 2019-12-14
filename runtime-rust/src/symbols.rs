@@ -21,10 +21,10 @@ use std::fmt::Display;
 use std::fmt::Error;
 use std::fmt::Formatter;
 
-use super::text::TextContext;
-use super::text::TextPosition;
-use super::text::TextSpan;
-use super::tokens::Token;
+use crate::text::TextContext;
+use crate::text::TextPosition;
+use crate::text::TextSpan;
+use crate::tokens::Token;
 
 /// The possible types of symbol
 #[derive(Copy, Clone, Eq, PartialEq)]
