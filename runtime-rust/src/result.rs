@@ -28,22 +28,22 @@ use crate::tokens::TokenRepositoryImpl;
 /// Represents the output of a parser
 pub struct ParseResult {
     /// The table of grammar terminals
-    terminals: &'static [Symbol],
+    pub terminals: &'static [Symbol],
     /// The table of grammar variables
-    variables: &'static [Symbol],
+    pub variables: &'static [Symbol],
     /// The table of grammar virtuals
-    virtuals: &'static [Symbol],
+    pub virtuals: &'static [Symbol],
     /// The input text
-    text: Text,
+    pub text: Text,
     /// The errors found in the input
-    errors: ParseErrors,
+    pub errors: ParseErrors,
     /// The table of matched tokens
-    tokens: TokenRepositoryImpl,
+    pub tokens: TokenRepositoryImpl,
     /// The produced AST
     ast: AstImpl
 }
 
-impl<'a> ParseResult {
+impl ParseResult {
     /// Initialize a new parse result
     pub fn new(
         terminals: &'static [Symbol],
@@ -56,40 +56,15 @@ impl<'a> ParseResult {
             variables,
             virtuals,
             text,
-            errors: ParseErrors::new(),
+            errors: ParseErrors::default(),
             tokens: TokenRepositoryImpl::new(),
             ast: AstImpl::new()
         }
     }
 
-    /// Gets the grammar terminals
-    pub fn get_terminals(&self) -> &'static [Symbol] {
-        self.terminals
-    }
-
-    /// Gets the grammar variables
-    pub fn get_variables(&self) -> &'static [Symbol] {
-        self.variables
-    }
-
-    /// Gets the grammar virtuals
-    pub fn get_virtuals(&self) -> &'static [Symbol] {
-        self.virtuals
-    }
-
-    /// Gets the input text for this result
-    pub fn get_input(&self) -> &Text {
-        &self.text
-    }
-
     /// Gets whether this result denotes a successful parsing
     pub fn is_success(&self) -> bool {
         self.ast.has_root()
-    }
-
-    /// Gets the collection of errors
-    pub fn get_errors(&self) -> &ParseErrors {
-        &self.errors
     }
 
     /// Gets the token repository associated with this result

@@ -29,7 +29,6 @@ use crate::text::TextSpan;
 use crate::tokens::Token;
 use crate::tokens::TokenRepository;
 use crate::utils::biglist::BigList;
-use crate::utils::iterable::Iterable;
 use crate::utils::EitherMut;
 
 /// Represents a type of symbol table
@@ -486,20 +485,6 @@ impl<'a> Iterator for AstFamilyIterator<'a> {
     }
 }
 
-/// Implementation of the `Iterable` trait for `AstFamily`
-impl<'a> Iterable<'a> for AstFamily<'a> {
-    type Item = AstNode<'a>;
-    type IteratorType = AstFamilyIterator<'a>;
-    fn iter(&'a self) -> Self::IteratorType {
-        let cell = self.tree.data.get().nodes[self.parent];
-        AstFamilyIterator {
-            tree: self.tree,
-            current: cell.first as usize,
-            end: (cell.first + cell.count) as usize
-        }
-    }
-}
-
 impl<'a> AstFamily<'a> {
     /// Gets whether the family is empty
     pub fn is_empty(&self) -> bool {
@@ -517,6 +502,16 @@ impl<'a> AstFamily<'a> {
         AstNode {
             tree: self.tree,
             index: cell.first as usize + index
+        }
+    }
+
+    /// Gets an iterator over this family
+    pub fn iter(&self) -> AstFamilyIterator {
+        let cell = self.tree.data.get().nodes[self.parent];
+        AstFamilyIterator {
+            tree: self.tree,
+            current: cell.first as usize,
+            end: (cell.first + cell.count) as usize
         }
     }
 }

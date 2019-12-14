@@ -24,7 +24,6 @@ use crate::text::TextContext;
 use crate::text::TextPosition;
 use crate::text::TextSpan;
 use crate::utils::biglist::BigList;
-use crate::utils::iterable::Iterable;
 use crate::utils::EitherMut;
 
 /// Represents the metadata of a token
@@ -119,18 +118,6 @@ impl<'a> Iterator for TokenRepositoryIterator<'a> {
     }
 }
 
-/// Implementation of `Iterable` for `TokenRepository`
-impl<'a> Iterable<'a> for TokenRepository<'a> {
-    type Item = Token<'a>;
-    type IteratorType = TokenRepositoryIterator<'a>;
-    fn iter(&'a self) -> Self::IteratorType {
-        TokenRepositoryIterator {
-            repository: self,
-            index: 0
-        }
-    }
-}
-
 impl<'a> TokenRepository<'a> {
     /// Creates a new repository
     pub fn new(
@@ -155,6 +142,14 @@ impl<'a> TokenRepository<'a> {
             terminals,
             text,
             data: EitherMut::Mutable(tokens)
+        }
+    }
+
+    /// Gets an iterator over the tokens
+    pub fn iter(&self) -> TokenRepositoryIterator {
+        TokenRepositoryIterator {
+            repository: self,
+            index: 0
         }
     }
 

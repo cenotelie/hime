@@ -19,7 +19,6 @@
 
 pub mod biglist;
 pub mod bin;
-pub mod iterable;
 
 /// Represents a reference to a structure that can be either mutable or immutable
 pub enum EitherMut<'a, T: 'a> {

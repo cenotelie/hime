@@ -20,12 +20,10 @@
 use std::fmt::Display;
 use std::fmt::Error;
 use std::fmt::Formatter;
-use std::ops::Index;
 
 use crate::symbols::Symbol;
 use crate::text::TextPosition;
 use crate::text::Utf16C;
-use crate::utils::iterable::Iterable;
 
 /// Common trait for data about an error
 pub trait ParseErrorDataTrait {
@@ -40,7 +38,7 @@ pub trait ParseErrorDataTrait {
 }
 
 /// Represents the unexpected of the input text while more characters were expected
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 pub struct ParseErrorEndOfInput {
     /// The error's position in the input text
     position: TextPosition
@@ -71,7 +69,7 @@ impl ParseErrorEndOfInput {
 }
 
 /// Represents an unexpected character error in the input stream of a lexer
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 pub struct ParseErrorUnexpectedChar {
     /// The error's position in the input text
     position: TextPosition,
@@ -126,7 +124,7 @@ impl ParseErrorUnexpectedChar {
 }
 
 /// Represents an incorrect encoding sequence error in the input of a lexer
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 pub struct ParseErrorIncorrectEncodingSequence {
     /// The error's position in the input text
     position: TextPosition,
@@ -301,18 +299,13 @@ impl Display for ParseError {
 }
 
 /// Represents an entity that can handle lexical and syntactic errors
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct ParseErrors {
     /// The overall errors
-    errors: Vec<ParseError>
+    pub errors: Vec<ParseError>
 }
 
 impl ParseErrors {
-    /// Creates a new instance of the Errors structure
-    pub fn new() -> ParseErrors {
-        ParseErrors { errors: Vec::new() }
-    }
-
     /// Handles the end-of-input error
     pub fn push_error_eoi(&mut self, error: ParseErrorEndOfInput) {
         self.errors.push(ParseError::UnexpectedEndOfInput(error));
@@ -344,52 +337,5 @@ impl ParseErrors {
     ) {
         self.errors
             .push(ParseError::IncorrectUTF16NoHighSurrogate(error));
-    }
-
-    /// Gets the number of errors
-    pub fn get_count(&self) -> usize {
-        self.errors.len()
-    }
-}
-
-/// Implementation of the indexer operator for immutable `ParseErrors`
-impl<'a> Index<usize> for ParseErrors {
-    type Output = ParseError;
-    fn index(&self, index: usize) -> &Self::Output {
-        &self.errors[index]
-    }
-}
-
-/// Represents an iterator over parse errors
-pub struct ParseErrorsIterator<'a> {
-    /// The parent parse errors
-    parent: &'a ParseErrors,
-    /// The current index
-    index: usize
-}
-
-/// Implementation of the `Iterator` trait for `ParseErrorsIterator`
-impl<'a> Iterator for ParseErrorsIterator<'a> {
-    type Item = &'a ParseError;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index >= self.parent.errors.len() {
-            None
-        } else {
-            let result = &self.parent[self.index];
-            self.index += 1;
-            Some(result)
-        }
-    }
-}
-
-/// Implementation of `Iterable` for `ParseErrors`
-impl<'a> Iterable<'a> for ParseErrors {
-    type Item = &'a ParseError;
-    type IteratorType = ParseErrorsIterator<'a>;
-    fn iter(&'a self) -> Self::IteratorType {
-        ParseErrorsIterator {
-            parent: &self,
-            index: 0
-        }
     }
 }
