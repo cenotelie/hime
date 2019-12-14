@@ -31,7 +31,6 @@ use hime_redist::symbols::SemanticElementTrait;
 use hime_redist::symbols::Symbol;
 use hime_redist::text::TextPosition;
 use hime_redist::text::TextSpan;
-use hime_redist::utils::iterable::Iterable;
 
 /// Main entry point
 fn main() {
@@ -46,13 +45,13 @@ fn main() {
 }
 
 /// Parses the input
-fn do_parse(input: &mut io::Read, lib_name: &str, parser_module: &str) -> String {
+fn do_parse(input: &mut dyn io::Read, lib_name: &str, parser_module: &str) -> String {
     let mut function_name = String::new();
     function_name.push_str(parser_module);
     function_name.push_str("::parse_utf8");
     let library = libloading::Library::new(lib_name).unwrap_or_else(|error| panic!("{}", error));
     unsafe {
-        let parser: libloading::Symbol<fn(&mut io::Read) -> ParseResult> = library
+        let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResult> = library
             .get(function_name.as_bytes())
             .unwrap_or_else(|error| panic!("{}", error));
         let result = parser(input);
@@ -64,7 +63,7 @@ fn do_parse(input: &mut io::Read, lib_name: &str, parser_module: &str) -> String
 
 /// Reads the arguments
 fn read_args() -> Vec<String> {
-    let mut args = Vec::<String>::new();
+    let mut args = Vec::new();
     for argument in env::args().enumerate() {
         if argument.0 != 0 {
             args.push(argument.1);
@@ -84,7 +83,7 @@ fn print_help() {
 /// Serializes a parse error
 fn serialize_result(builder: &mut String, result: ParseResult) {
     builder.push_str("{\"errors\": [");
-    let errors = result.get_errors();
+    let errors = &result.errors.errors;
     for error in errors.iter().enumerate() {
         if error.0 != 0 {
             builder.push_str(", ");
@@ -92,7 +91,7 @@ fn serialize_result(builder: &mut String, result: ParseResult) {
         serialize_error(builder, error.1);
     }
     builder.push_str("]");
-    if errors.get_count() == 0 {
+    if errors.is_empty() {
         builder.push_str(", \"root\": ");
         serialize_ast(builder, result.get_ast().get_root());
     }
@@ -103,13 +102,13 @@ fn serialize_result(builder: &mut String, result: ParseResult) {
 fn serialize_error(builder: &mut String, error: &ParseError) {
     builder.push_str("{\"type\": \"");
     match error {
-        &ParseError::UnexpectedEndOfInput(ref _x) => builder.push_str("UnexpectedEndOfInput"),
-        &ParseError::UnexpectedChar(ref _x) => builder.push_str("UnexpectedChar"),
-        &ParseError::UnexpectedToken(ref _x) => builder.push_str("UnexpectedToken"),
-        &ParseError::IncorrectUTF16NoHighSurrogate(ref _x) => {
+        ParseError::UnexpectedEndOfInput(ref _x) => builder.push_str("UnexpectedEndOfInput"),
+        ParseError::UnexpectedChar(ref _x) => builder.push_str("UnexpectedChar"),
+        ParseError::UnexpectedToken(ref _x) => builder.push_str("UnexpectedToken"),
+        ParseError::IncorrectUTF16NoHighSurrogate(ref _x) => {
             builder.push_str("IncorrectUTF16NoHighSurrogate")
         }
-        &ParseError::IncorrectUTF16NoLowSurrogate(ref _x) => {
+        ParseError::IncorrectUTF16NoLowSurrogate(ref _x) => {
             builder.push_str("IncorrectUTF16NoLowSurrogate")
         }
     }
