@@ -708,6 +708,83 @@ impl PartialEq for Rule {
 
 impl Eq for Rule {}
 
+/// A symbol in a template rule
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum TemplateRuleSymbol {
+    /// A reference to the n-th parameter of the template
+    Parameter(usize),
+    /// A usual reference to a grammar symbol
+    Symbol(SymbolRef)
+}
+
+/// An element in a template rule
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub struct TemplateRuleElement {
+    /// The symbol of this element
+    pub symbol: TemplateRuleSymbol,
+    /// The action applied on this element
+    pub action: TreeAction
+}
+
+/// An instance of a template rule
+#[derive(Debug, Clone)]
+pub struct TemplateRuleInstance {
+    /// The arguments used for this instance
+    pub arguments: Vec<SymbolRef>,
+    /// The identifier of the produced head variable
+    pub head: usize
+}
+
+impl PartialEq for TemplateRuleInstance {
+    fn eq(&self, other: &Self) -> bool {
+        self.arguments.len() == other.arguments.len()
+            && self
+                .arguments
+                .iter()
+                .zip(other.arguments.iter())
+                .all(|(arg1, arg2)| arg1 == arg2)
+    }
+}
+
+impl Eq for TemplateRuleInstance {}
+
+/// A template rule in a grammar
+#[derive(Debug, Clone)]
+pub struct TemplateRule {
+    /// The base head name for the rule
+    pub name: String,
+    /// The name of the parameters for the rule
+    pub parameters: Vec<String>,
+    /// The elements in the rule's body
+    pub elements: Vec<TemplateRuleElement>,
+    /// The known instanes of this rule
+    pub instances: Vec<TemplateRuleInstance>
+}
+
+impl TemplateRule {
+    /// Initializes a new template rule
+    pub fn new(name: String, parameters: Vec<String>) -> TemplateRule {
+        TemplateRule {
+            name,
+            parameters,
+            elements: Vec::new(),
+            instances: Vec::new()
+        }
+    }
+
+    /// Determines whether an instance for the specified arguments already exist
+    pub fn has_instance(&self, arguments: &[SymbolRef]) -> bool {
+        self.instances.iter().any(|instance| {
+            instance.arguments.len() == arguments.len()
+                && instance
+                    .arguments
+                    .iter()
+                    .zip(arguments.iter())
+                    .all(|(a1, a2)| a1 == a2)
+        })
+    }
+}
+
 /// The prefix for the generated terminal names
 pub const PREFIX_GENERATED_TERMINAL: &str = "__T";
 /// The prefix for the generated variable names
@@ -768,7 +845,9 @@ pub struct Grammar {
     /// The grammar's virtual symbols
     pub virtuals: Vec<Virtual>,
     /// The grammar's action symbols
-    pub actions: Vec<Action>
+    pub actions: Vec<Action>,
+    /// The template rules
+    pub template_rules: Vec<TemplateRule>
 }
 
 impl Grammar {
@@ -782,7 +861,8 @@ impl Grammar {
             terminals: Vec::new(),
             variables: Vec::new(),
             virtuals: Vec::new(),
-            actions: Vec::new()
+            actions: Vec::new(),
+            template_rules: Vec::new()
         }
     }
 
@@ -809,15 +889,49 @@ impl Grammar {
             return Some(SymbolRef::Terminal(symbol.id));
         }
         if let Some(symbol) = self.variables.iter().find(|t| t.name == name) {
-            return Some(SymbolRef::Terminal(symbol.id));
+            return Some(SymbolRef::Variable(symbol.id));
         }
         if let Some(symbol) = self.virtuals.iter().find(|t| t.name == name) {
-            return Some(SymbolRef::Terminal(symbol.id));
+            return Some(SymbolRef::Virtual(symbol.id));
         }
         if let Some(symbol) = self.actions.iter().find(|t| t.name == name) {
-            return Some(SymbolRef::Terminal(symbol.id));
+            return Some(SymbolRef::Action(symbol.id));
         }
         None
+    }
+
+    /// Gets the name of a symbol
+    pub fn get_symbol_name(&self, symbol: SymbolRef) -> &str {
+        match symbol {
+            SymbolRef::Dummy => "",
+            SymbolRef::Epsilon => "ε",
+            SymbolRef::Dollar => "$",
+            SymbolRef::NullTerminal => "",
+            SymbolRef::Terminal(id) => self
+                .terminals
+                .iter()
+                .find(|s| s.id == id)
+                .map(|s| &s.name)
+                .unwrap(),
+            SymbolRef::Variable(id) => self
+                .variables
+                .iter()
+                .find(|s| s.id == id)
+                .map(|s| &s.name)
+                .unwrap(),
+            SymbolRef::Virtual(id) => self
+                .virtuals
+                .iter()
+                .find(|s| s.id == id)
+                .map(|s| &s.name)
+                .unwrap(),
+            SymbolRef::Action(id) => self
+                .actions
+                .iter()
+                .find(|s| s.id == id)
+                .map(|s| &s.name)
+                .unwrap()
+        }
     }
 
     /// Resolves the specified lexical context name for this grammar
@@ -907,6 +1021,9 @@ impl Grammar {
 
     /// Adds a virtual symbol with the given name to this grammar
     pub fn add_virtual(&mut self, name: &str) -> &mut Virtual {
+        if let Some(index) = self.virtuals.iter().position(|v| v.name == name) {
+            return &mut self.virtuals[index];
+        }
         let index = self.virtuals.len();
         let sid = self.get_next_sid();
         self.virtuals.push(Virtual::new(sid, name.to_string()));
@@ -915,10 +1032,79 @@ impl Grammar {
 
     /// Adds an action symbol with the given name to this grammar
     pub fn add_action(&mut self, name: &str) -> &mut Action {
+        if let Some(index) = self.actions.iter().position(|v| v.name == name) {
+            return &mut self.actions[index];
+        }
         let index = self.actions.len();
         let sid = self.get_next_sid();
         self.actions.push(Action::new(sid, name.to_string()));
         &mut self.actions[index]
+    }
+
+    /// Adds a template rule with the given name to this grammar
+    pub fn add_template_rule(&mut self, name: &str, parameters: Vec<String>) -> &mut TemplateRule {
+        let index = self.template_rules.len();
+        self.template_rules
+            .push(TemplateRule::new(name.to_string(), parameters));
+        &mut self.template_rules[index]
+    }
+
+    /// Instantiate a template rule
+    pub fn instantiate_template_rule(
+        &mut self,
+        name: &str,
+        arguments: Vec<SymbolRef>
+    ) -> Result<SymbolRef, ()> {
+        match self.template_rules.iter().position(|r| r.name == name) {
+            None => Err(()), // no rule found for this name
+            Some(index) => {
+                let mut new_instance = TemplateRuleInstance { arguments, head: 0 };
+                match self.template_rules[index]
+                    .instances
+                    .iter()
+                    .find(|instance| *instance == &new_instance)
+                {
+                    Some(instance) => Ok(SymbolRef::Variable(instance.head)),
+                    None => {
+                        let args_names: Vec<&str> = new_instance
+                            .arguments
+                            .iter()
+                            .map(|arg| self.get_symbol_name(*arg))
+                            .collect();
+                        let args_names = args_names.join(", ");
+                        let name = format!("{}<{}>", name, args_names);
+                        let body = RuleBody::from_parts(
+                            self.template_rules[index]
+                                .elements
+                                .iter()
+                                .map(|elem| RuleBodyElement {
+                                    symbol: match elem.symbol {
+                                        TemplateRuleSymbol::Parameter(index) => {
+                                            new_instance.arguments[index]
+                                        }
+                                        TemplateRuleSymbol::Symbol(symbol) => symbol
+                                    },
+                                    action: elem.action
+                                })
+                                .collect()
+                        );
+                        let head = {
+                            let variable = self.add_variable(&name);
+                            variable.rules.push(Rule {
+                                head: variable.id,
+                                head_action: TREE_ACTION_NONE,
+                                body,
+                                context: 0
+                            });
+                            variable.id
+                        };
+                        new_instance.head = head;
+                        self.template_rules[index].instances.push(new_instance);
+                        Ok(SymbolRef::Variable(head))
+                    }
+                }
+            }
+        }
     }
 
     /// Inherit from the given parent
@@ -928,6 +1114,8 @@ impl Grammar {
         self.inherit_virtuals(other);
         self.inherit_actions(other);
         self.inherit_variables(other);
+        self.inherit_rules(other);
+        self.inherit_template_rules(other);
     }
 
     /// Inherits the options from the parent grammar
@@ -987,7 +1175,10 @@ impl Grammar {
         for symbol in other.variables.iter() {
             self.add_variable(&symbol.name);
         }
-        // clone the rules
+    }
+
+    /// Inherits the grammar rules from the parent grammar
+    fn inherit_rules(&mut self, other: &Grammar) {
         for variable in other.variables.iter() {
             let head = self
                 .variables
@@ -1025,6 +1216,58 @@ impl Grammar {
                 .find(|v| v.name == variable.name)
                 .unwrap();
             head.rules.append(&mut rules);
+        }
+    }
+
+    /// Inherit the template rules from the parent grammar
+    fn inherit_template_rules(&mut self, other: &Grammar) {
+        for rule in other.template_rules.iter() {
+            if self.template_rules.iter().all(|tr| tr.name != rule.name) {
+                // does not exist yet
+                self.template_rules.push(TemplateRule {
+                    name: rule.name.clone(),
+                    parameters: rule.parameters.clone(),
+                    elements: rule
+                        .elements
+                        .iter()
+                        .map(|elem| TemplateRuleElement {
+                            symbol: match elem.symbol {
+                                TemplateRuleSymbol::Parameter(index) => {
+                                    TemplateRuleSymbol::Parameter(index)
+                                }
+                                TemplateRuleSymbol::Symbol(symbol) => {
+                                    TemplateRuleSymbol::Symbol(self.map_symbol_ref(other, symbol))
+                                }
+                            },
+                            action: elem.action
+                        })
+                        .collect(),
+                    instances: rule
+                        .instances
+                        .iter()
+                        .map(|instance| {
+                            let old_variable = other
+                                .variables
+                                .iter()
+                                .find(|v| v.id == instance.head)
+                                .unwrap();
+                            let new_variable = self
+                                .variables
+                                .iter()
+                                .find(|v| v.name == old_variable.name)
+                                .unwrap();
+                            TemplateRuleInstance {
+                                arguments: instance
+                                    .arguments
+                                    .iter()
+                                    .map(|arg| self.map_symbol_ref(other, *arg))
+                                    .collect(),
+                                head: new_variable.id
+                            }
+                        })
+                        .collect()
+                });
+            }
         }
     }
 

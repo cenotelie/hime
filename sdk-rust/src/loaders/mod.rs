@@ -220,9 +220,6 @@ struct Loader {
     case_insensitive: bool
 }
 
-/// Represents the current lexical context for a template rule
-struct LexicalContext {}
-
 impl Loader {
     /// Creates a new loader
     fn new(resource: String, result: ParseResult) -> Loader {
