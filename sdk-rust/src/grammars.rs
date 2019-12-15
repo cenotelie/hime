@@ -773,9 +773,9 @@ pub struct Grammar {
 
 impl Grammar {
     /// Initializes this grammar
-    pub fn new(name: &str) -> Grammar {
+    pub fn new(name: String) -> Grammar {
         Grammar {
-            name: name.to_string(),
+            name,
             next_sid: 3,
             options: HashMap::new(),
             contexts: vec![DEFAULT_CONTEXT_NAME.to_string()],

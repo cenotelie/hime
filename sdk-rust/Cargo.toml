@@ -14,8 +14,9 @@ include = ["README.md", "Cargo.toml", "src/**/*.rs"]
 edition = "2018"
 
 [dependencies]
-log = "0.4"
 hime_redist = "3.4.2"
+log = "0.4"
+ansi_term = "0.11"
 
 [badges]
 maintenance = { status = "actively-developed" }

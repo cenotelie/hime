@@ -17,14 +17,16 @@
 
 //! Rust SDK for the Hime parser generator
 
+extern crate ansi_term;
+extern crate hime_redist;
 #[macro_use]
 extern crate log;
-extern crate hime_redist;
 
 use std::cmp::Ordering;
 
 pub mod automata;
 pub mod grammars;
+pub mod loaders;
 pub mod unicode;
 
 /// Represents a range of characters
