@@ -22,6 +22,7 @@ pub mod parser;
 use crate::grammars::Grammar;
 use ansi_term::Colour::{Blue, Red};
 use ansi_term::Style;
+use hime_redist::ast::AstNode;
 use hime_redist::errors::ParseErrorDataTrait;
 use hime_redist::result::ParseResult;
 use hime_redist::symbols::SemanticElementTrait;
@@ -295,5 +296,100 @@ impl Loader {
     /// Loads the content of the grammar
     fn load_content(&mut self) {
         info!("Loading grammar {} ...", self.grammar.name);
+        let ast = &self.result.get_ast();
+        let root = ast.get_root();
+        for node in root.children().iter() {
+            let id = node.get_symbol().id;
+            if id == parser::ID_TERMINAL_BLOCK_OPTIONS {
+                load_options(&mut self.grammar, node);
+                if let Some(value) = self.grammar.options.get("CaseSensitive") {
+                    if value == "false" {
+                        self.case_insensitive = true;
+                    }
+                }
+            }
+        }
     }
+}
+
+/// Loads the options block of a grammar
+fn load_options<'a>(grammar: &mut Grammar, node: AstNode<'a>) {
+    for child in node.children().iter() {
+        load_option(grammar, child);
+    }
+}
+
+/// Loads the grammar option in the given AST
+fn load_option<'a>(grammar: &mut Grammar, node: AstNode<'a>) {
+    let name = node.children().at(0).get_value().unwrap();
+    let value = replace_escapees(node.children().at(1).get_value().unwrap());
+    let value = value[1..(value.len() - 1)].to_string();
+    grammar.add_option(name, value);
+}
+
+/// Replaces the escape sequences in the given piece of text by their value
+fn replace_escapees(value: String) -> String {
+    if !value.contains('\\') {
+        return value;
+    }
+    let chars: Vec<char> = value.chars().collect();
+    let mut result = String::new();
+    let mut i = 0;
+    while i < chars.len() {
+        let mut c = chars[i];
+        if c != '\\' {
+            result.push(c);
+            i += 1;
+        } else {
+            c = chars[i + 1];
+            if c == '0' {
+                result.push('\0');
+                i += 2;
+            } else if c == 'a' {
+                result.push(std::char::from_u32(7).unwrap());
+                i += 2;
+            } else if c == 'b' {
+                result.push(std::char::from_u32(8).unwrap());
+                i += 2;
+            } else if c == 'f' {
+                result.push(std::char::from_u32(12).unwrap());
+                i += 2;
+            } else if c == 'n' {
+                result.push('\n');
+                i += 2;
+            } else if c == 'r' {
+                result.push('\r');
+                i += 2;
+            } else if c == 't' {
+                result.push('\t');
+                i += 2;
+            } else if c == 'v' {
+                result.push(std::char::from_u32(11).unwrap());
+                i += 2;
+            } else if c == 'u' {
+                let mut l = 0;
+                while i + 2 + l < chars.len() {
+                    c = chars[i + 2 + l];
+                    if (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') {
+                        l += 1;
+                    } else {
+                        break;
+                    }
+                }
+                if l >= 8 {
+                    l = 8;
+                } else if l >= 4 {
+                    l = 4;
+                }
+                let char_hexa: String = chars[(i + 2)..(i + 2 + l)].iter().collect();
+                let char_value = u32::from_str_radix(&char_hexa, 16).unwrap();
+                result.push(std::char::from_u32(char_value).unwrap());
+                i += l + 2;
+            } else {
+                result.push(c);
+                i += 2;
+            }
+        }
+    }
+    result
 }
