@@ -947,46 +947,46 @@ impl Grammar {
     }
 
     /// Adds the given anonymous terminal to this grammar
-    pub fn add_terminal_anonymous(&mut self, value: &str, nfa: NFA) -> SymbolRef {
+    pub fn add_terminal_anonymous(&mut self, value: String, nfa: NFA) -> &mut Terminal {
         let name = format!("{}{}", PREFIX_GENERATED_TERMINAL, generate_unique_id());
-        self.add_terminal(&name, value, nfa, 0, true, false)
+        self.add_terminal(name, value, nfa, 0, true, false)
     }
 
     /// Adds the given named terminal to this grammar
     pub fn add_terminal_named(
         &mut self,
-        name: &str,
-        value: &str,
+        name: String,
         nfa: NFA,
         context: &str,
         is_fragment: bool
-    ) -> SymbolRef {
+    ) -> &mut Terminal {
         let context = self.contexts.iter().position(|c| c == context).unwrap();
+        let value = name.clone();
         self.add_terminal(name, value, nfa, context, false, is_fragment)
     }
 
     /// Adds a terminal to the grammar
     fn add_terminal(
         &mut self,
-        name: &str,
-        value: &str,
+        name: String,
+        value: String,
         nfa: NFA,
         context: usize,
         is_anonymous: bool,
         is_fragment: bool
-    ) -> SymbolRef {
-        let sid = self.get_next_sid();
+    ) -> &mut Terminal {
+        let index = self.terminals.len();
         let terminal = Terminal {
-            id: sid,
-            name: name.to_string(),
-            value: value.to_string(),
+            id: self.get_next_sid(),
+            name,
+            value,
             nfa,
             context,
             is_anonymous,
             is_fragment
         };
         self.terminals.push(terminal);
-        SymbolRef::Terminal(sid)
+        &mut self.terminals[index]
     }
 
     /// Gets the terminal with the given name

@@ -1,0 +1,150 @@
+/*******************************************************************************
+ * Copyright (c) 2017 Association Cénotélie (cenotelie.fr)
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General
+ * Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+
+grammar HimeGrammar
+{
+    options
+    {
+        Axiom = "file";
+        Separator = "SEPARATOR";
+    }
+    terminals
+    {
+        fragment NEW_LINE       -> U+000D /* CR */
+                                |  U+000A /* LF */
+                                |  U+000D U+000A /* CR LF */
+                                |  U+2028 /* LS */
+                                |  U+2029 /* PS */ ;
+        fragment WHITE_SPACE    -> U+0020 | U+0009 | U+000B | U+000C ;
+        fragment COMMENT_LINE   -> '//' (.* - (.* NEW_LINE .*)) ;
+        fragment COMMENT_BLOCK  -> '/*' (.* - (.* '*/' .*)) '*/' ;
+        SEPARATOR               -> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK)+;
+
+        fragment NAME_FIRST     -> [_a-zA-Z];
+        NAME                    -> NAME_FIRST (NAME_FIRST | [0-9])* ;
+
+        INTEGER                 -> [1-9] [0-9]* | '0' ;
+        fragment ESCAPEES       -> '\\\\'        // Backslash
+                                | '\\0'        // Unicode character 0
+                                | '\\a'        // Alert (character 7)
+                                | '\\b'        // Backspace (character 8)
+                                | '\\f'        // Form feed (character 12)
+                                | '\\n'        // New line (character 10)
+                                | '\\r'        // Carriage return (character 13)
+                                | '\\t'        // Horizontal tab (character 9)
+                                | '\\v'        // Vertical quote (character 11)
+                                | '\\u' [0-9a-fA-F]{4}   // Unicode code point
+                                | '\\u' [0-9a-fA-F]{8} ; // Unicode code point
+        LITERAL_STRING          -> '"' ( [^"] | '\\"' | ESCAPEES )* '"';
+        LITERAL_ANY             -> '.';
+        LITERAL_TEXT            -> '~'? '\'' ( [^\\'] | '\\\'' | ESCAPEES )+ '\'';
+        LITERAL_CLASS           -> '[' ( [^\\\[\]] | '\\[' | '\\]' | '\\-' | '\\^' | ESCAPEES )+ ']';
+        UNICODE_BLOCK           -> 'ub' '{' ([_a-zA-Z0-9] | '-')+ '}' ;
+        UNICODE_CATEGORY        -> 'uc' '{' ([_a-zA-Z0-9] | '-')+ '}' ;
+        UNICODE_CODEPOINT       -> 'U+' [a-fA-F0-9]+;
+        UNICODE_SPAN_MARKER     -> '..';
+
+        OPERATOR_OPTIONAL       -> '?';
+        OPERATOR_ZEROMORE       -> '*';
+        OPERATOR_ONEMORE        -> '+';
+        OPERATOR_UNION          -> '|';
+        OPERATOR_DIFFERENCE     -> '-';
+
+        TREE_ACTION_PROMOTE     -> '^';
+        TREE_ACTION_DROP        -> '!';
+
+        BLOCK_OPTIONS           -> 'options';
+        BLOCK_TERMINALS         -> 'terminals';
+        BLOCK_RULES             -> 'rules';
+        BLOCK_CONTEXT           -> 'context';
+    }
+    rules
+    {
+        /* Options section definition */
+        option            -> NAME '='! LITERAL_STRING ';'! ;
+
+
+        /* Terminals section definition for text grammars */        
+        terminal_def_atom           -> LITERAL_ANY^
+                                    |  UNICODE_CODEPOINT^
+                                    |  LITERAL_TEXT^
+                                    |  LITERAL_CLASS^
+                                    |  UNICODE_CODEPOINT UNICODE_SPAN_MARKER^ UNICODE_CODEPOINT
+                                    |  UNICODE_BLOCK^
+                                    |  UNICODE_CATEGORY^
+                                    |  NAME^;
+        
+        terminal_def_element        -> terminal_def_atom^
+                                    | '('! terminal_definition^ ')'! ;
+        terminal_def_cardinalilty   -> OPERATOR_OPTIONAL^
+                                    |  OPERATOR_ZEROMORE^
+                                    |  OPERATOR_ONEMORE^
+                                    |  "range"^ '{'! INTEGER (','! INTEGER)? '}'! ;
+        terminal_def_repetition     -> terminal_def_element^ terminal_def_cardinalilty^?;
+        terminal_def_fragment       -> terminal_def_repetition^ ("concat"^ terminal_def_repetition)*;
+        terminal_def_restrict       -> terminal_def_fragment^ (OPERATOR_DIFFERENCE^ terminal_def_fragment)* ;
+        terminal_definition         -> terminal_def_restrict^ (OPERATOR_UNION^ terminal_def_restrict)*;
+        terminal_rule               -> NAME '->'! terminal_definition ';'! ;
+        terminal_fragment           -> 'fragment'! NAME '->'! terminal_definition ';'! ;
+        terminal_context            -> BLOCK_CONTEXT^ NAME '{'! terminal_rule* '}'! ;
+        terminal_item               -> terminal_rule^ | terminal_fragment^ | terminal_context^ ;
+
+
+        /* Define symbols for grammar rules */
+        rule_sym_action             -> '@'! NAME ;
+        rule_sym_virtual            -> LITERAL_STRING ;
+        rule_sym_ref_params         -> '<'! rule_def_atom (','! rule_def_atom)* '>'! ;
+        rule_sym_ref_template       -> NAME rule_sym_ref_params ;
+        rule_sym_ref_simple         -> NAME;
+
+        /* Define the rule definition */
+        rule_def_atom           -> rule_sym_action^
+                                |  rule_sym_virtual^
+                                |  rule_sym_ref_simple^
+                                |  rule_sym_ref_template^
+                                |  LITERAL_TEXT^ ;
+        rule_def_context        -> '#'! NAME '{'! rule_definition '}'! ;
+        rule_def_sub            -> '{'! rule_definition '}'! ;
+        rule_def_element        -> rule_def_atom^ | rule_def_context^ | rule_def_sub^ | '('! rule_definition^ ')'!;
+        rule_def_tree_action    -> rule_def_element^ (TREE_ACTION_PROMOTE | TREE_ACTION_DROP)^?;
+        rule_def_repetition     -> rule_def_tree_action^ (OPERATOR_OPTIONAL | OPERATOR_ONEMORE | OPERATOR_ZEROMORE)^?;
+        rule_def_fragment       -> rule_def_repetition^ ("concat"^ rule_def_repetition)*;
+        rule_def_choice         -> rule_def_fragment^ | "emptypart"^ ;
+        rule_definition         -> rule_def_choice^ (OPERATOR_UNION^ rule_def_choice)*;
+
+        /* Define rules */
+        rule_template_params    -> '<'! NAME (','! NAME)* '>'!;
+        cf_rule_template        -> NAME rule_template_params '->'! rule_definition ';'! ;
+        cf_rule_simple          -> NAME '->'! rule_definition ';'! ;
+        cf_rule                 -> cf_rule_simple^ | cf_rule_template^ ;
+
+
+        /* Define the grammars */
+        grammar_options         -> BLOCK_OPTIONS^ '{'! option* '}'! ;
+        grammar_terminals       -> BLOCK_TERMINALS^ '{'! terminal_item* '}'! ;
+        grammar_cf_rules        -> BLOCK_RULES^ '{'! cf_rule* '}'! ;
+        grammar_parency         -> (':'! NAME (','! NAME)*)? ;
+
+        cf_grammar              -> 'grammar'! NAME grammar_parency
+                                '{'!
+                                    grammar_options
+                                    grammar_terminals?
+                                    grammar_cf_rules
+                                '}'! ;
+        file                    -> cf_grammar+;
+    }
+}

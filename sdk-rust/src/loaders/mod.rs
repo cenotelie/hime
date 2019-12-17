@@ -19,7 +19,8 @@
 
 pub mod parser;
 
-use crate::grammars::Grammar;
+use crate::automata::fa::{FinalItem, NFA};
+use crate::grammars::{Grammar, DEFAULT_CONTEXT_NAME};
 use ansi_term::Colour::{Blue, Red};
 use ansi_term::Style;
 use hime_redist::ast::AstNode;
@@ -111,25 +112,32 @@ pub fn print_errors(errors: &[LoaderError]) {
 /// Loads all inputs into grammars
 pub fn load(inputs: &[String]) -> Result<Vec<Grammar>, ()> {
     let results = parse_inputs(inputs)?;
+    let mut errors = Vec::new();
     let (mut completed, mut to_resolve): (Vec<Loader>, Vec<Loader>) = inputs
         .iter()
         .zip(results.into_iter())
-        .map(|(input, result)| Loader::new(input.clone(), result))
+        .map(|(input, result)| Loader::new(input.clone(), result, &mut errors))
         .partition(|loader| loader.is_solved());
-    resolve_inheritance(&mut completed, &mut to_resolve)?;
-    Ok(completed.into_iter().map(|loader| loader.grammar).collect())
+    resolve_inheritance(&mut completed, &mut to_resolve, &mut errors);
+    if errors.is_empty() {
+        Ok(completed.into_iter().map(|loader| loader.grammar).collect())
+    } else {
+        print_errors(&errors);
+        Err(())
+    }
 }
 
 /// Resolves inheritance and load grammars
 fn resolve_inheritance(
     completed: &mut Vec<Loader>,
-    to_resolve: &mut Vec<Loader>
-) -> Result<(), ()> {
+    to_resolve: &mut Vec<Loader>,
+    errors: &mut Vec<LoaderError>
+) {
     loop {
         let mut modified = false;
         let mut finished_on_round = Vec::new();
         for mut target in to_resolve.drain(0..to_resolve.len()) {
-            modified |= target.load(completed);
+            modified |= target.load(completed, errors);
             if target.is_solved() {
                 completed.push(target);
             } else {
@@ -138,15 +146,13 @@ fn resolve_inheritance(
         }
         to_resolve.append(&mut finished_on_round);
         if to_resolve.is_empty() {
-            return Ok(());
+            return;
         }
         if !modified {
-            let mut errors = Vec::new();
             for loader in to_resolve.iter() {
-                loader.collect_errors(&to_resolve, &mut errors);
+                loader.collect_errors(&to_resolve, errors);
             }
-            print_errors(&errors);
-            return Err(());
+            return;
         }
     }
 }
@@ -223,7 +229,7 @@ struct Loader {
 
 impl Loader {
     /// Creates a new loader
-    fn new(resource: String, result: ParseResult) -> Loader {
+    fn new(resource: String, result: ParseResult, errors: &mut Vec<LoaderError>) -> Loader {
         let ast = result.get_ast();
         let root = ast.get_root();
         let name = root.children().at(0).get_value().unwrap();
@@ -242,7 +248,7 @@ impl Loader {
             case_insensitive: false
         };
         if loader.is_solved() {
-            loader.load_content();
+            loader.load_content(errors);
         }
         loader
     }
@@ -274,7 +280,7 @@ impl Loader {
     }
 
     /// Attempts to load data for the grammar
-    fn load(&mut self, completed: &[Loader]) -> bool {
+    fn load(&mut self, completed: &[Loader], errors: &mut Vec<LoaderError>) -> bool {
         let mut modified = false;
         let grammar = &mut self.grammar;
         self.inherited.retain(|parent| {
@@ -288,13 +294,13 @@ impl Loader {
             }
         });
         if self.is_solved() {
-            self.load_content();
+            self.load_content(errors);
         }
         modified
     }
 
     /// Loads the content of the grammar
-    fn load_content(&mut self) {
+    fn load_content(&mut self, errors: &mut Vec<LoaderError>) {
         info!("Loading grammar {} ...", self.grammar.name);
         let ast = &self.result.get_ast();
         let root = ast.get_root();
@@ -307,6 +313,8 @@ impl Loader {
                         self.case_insensitive = true;
                     }
                 }
+            } else if id == parser::ID_TERMINAL_BLOCK_TERMINALS {
+                load_terminals(&self.resource, errors, &mut self.grammar, node);
             }
         }
     }
@@ -325,6 +333,82 @@ fn load_option<'a>(grammar: &mut Grammar, node: AstNode<'a>) {
     let value = replace_escapees(node.children().at(1).get_value().unwrap());
     let value = value[1..(value.len() - 1)].to_string();
     grammar.add_option(name, value);
+}
+
+/// Loads the terminal blocks of a grammar
+fn load_terminals<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) {
+    for child in node.children().iter() {
+        let id = child.get_symbol().id;
+        if id == parser::ID_TERMINAL_BLOCK_CONTEXT {
+            load_terminal_rule_context(filename, errors, grammar, child);
+        } else if id == parser::ID_VARIABLE_TERMINAL_FRAGMENT {
+            load_terminal_rule(filename, errors, grammar, child, DEFAULT_CONTEXT_NAME, true);
+        } else if id == parser::ID_VARIABLE_TERMINAL_RULE {
+            load_terminal_rule(
+                filename,
+                errors,
+                grammar,
+                child,
+                DEFAULT_CONTEXT_NAME,
+                false
+            );
+        }
+    }
+}
+
+/// Loads the terminal context in the given AST
+fn load_terminal_rule_context<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) {
+    let children = node.children();
+    let name = children.at(0).get_value().unwrap();
+    for child in children.iter().skip(1) {
+        load_terminal_rule(filename, errors, grammar, child, &name, false);
+    }
+}
+
+/// Loads the terminal rule in the given AST
+fn load_terminal_rule<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>,
+    context: &str,
+    is_fragment: bool
+) {
+    let children = node.children();
+    let node_name = children.at(0);
+    let name = node_name.get_value().unwrap();
+    if grammar.get_terminal_for_name(&name).is_some() {
+        errors.push(LoaderError {
+            filename: filename.to_string(),
+            position: node_name.get_position().unwrap(),
+            context: node_name.get_context().unwrap(),
+            message: format!("Overriding the previous definition of `{}`", &name)
+        });
+        return;
+    }
+    let nfa = load_nfa(filename, errors, grammar, children.at(1));
+    let terminal = grammar.add_terminal_named(name, nfa, context, is_fragment);
+    terminal.nfa.states[terminal.nfa.exit].add_item(FinalItem::Terminal(terminal.id));
+}
+
+/// Builds the NFA represented by the AST node
+fn load_nfa<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &Grammar,
+    node: AstNode<'a>
+) -> NFA {
+    NFA::new_minimal()
 }
 
 /// Replaces the escape sequences in the given piece of text by their value
