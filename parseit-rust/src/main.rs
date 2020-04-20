@@ -46,13 +46,13 @@ fn main() {
 }
 
 /// Parses the input
-fn do_parse(input: &mut io::Read, lib_name: &str, parser_module: &str) -> String {
+fn do_parse(input: &mut dyn io::Read, lib_name: &str, parser_module: &str) -> String {
     let mut function_name = String::new();
     function_name.push_str(parser_module);
     function_name.push_str("::parse_utf8");
     let library = libloading::Library::new(lib_name).unwrap_or_else(|error| panic!("{}", error));
     unsafe {
-        let parser: libloading::Symbol<fn(&mut io::Read) -> ParseResult> = library
+        let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResult> = library
             .get(function_name.as_bytes())
             .unwrap_or_else(|error| panic!("{}", error));
         let result = parser(input);
@@ -102,14 +102,14 @@ fn serialize_result(builder: &mut String, result: ParseResult) {
 /// Serializes a parse error
 fn serialize_error(builder: &mut String, error: &ParseError) {
     builder.push_str("{\"type\": \"");
-    match error {
-        &ParseError::UnexpectedEndOfInput(ref _x) => builder.push_str("UnexpectedEndOfInput"),
-        &ParseError::UnexpectedChar(ref _x) => builder.push_str("UnexpectedChar"),
-        &ParseError::UnexpectedToken(ref _x) => builder.push_str("UnexpectedToken"),
-        &ParseError::IncorrectUTF16NoHighSurrogate(ref _x) => {
+    match *error {
+        ParseError::UnexpectedEndOfInput(ref _x) => builder.push_str("UnexpectedEndOfInput"),
+        ParseError::UnexpectedChar(ref _x) => builder.push_str("UnexpectedChar"),
+        ParseError::UnexpectedToken(ref _x) => builder.push_str("UnexpectedToken"),
+        ParseError::IncorrectUTF16NoHighSurrogate(ref _x) => {
             builder.push_str("IncorrectUTF16NoHighSurrogate")
         }
-        &ParseError::IncorrectUTF16NoLowSurrogate(ref _x) => {
+        ParseError::IncorrectUTF16NoLowSurrogate(ref _x) => {
             builder.push_str("IncorrectUTF16NoLowSurrogate")
         }
     }

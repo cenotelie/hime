@@ -1,0 +1,8 @@
+[workspace]
+members = [
+    "runtime-rust",
+    "parseit-rust"
+]
+
+[patch.crates-io]
+hime_redist = { path = './runtime-rust' }

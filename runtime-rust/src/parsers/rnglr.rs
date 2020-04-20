@@ -1860,8 +1860,8 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
             TableElemRef::new(TableType::Variable, production.head)
         );
         let label = GSSLabel {
-            sppf_node: if maybe_sppf.is_some() {
-                maybe_sppf.unwrap() as u32
+            sppf_node: if let Some(sppf) = maybe_sppf {
+                sppf as u32
             } else {
                 RNGLRParser::build_sppf(
                     &mut self.builder,

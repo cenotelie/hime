@@ -177,11 +177,7 @@ impl<'a> ContextFreeLexer<'a> {
                     index
                 );
             }
-            if result.is_none() {
-                // skip this character
-                index += 1;
-            } else {
-                let the_match = result.unwrap();
+            if let Some(the_match) = result {
                 if the_match.state == 0 {
                     // this is the dollar terminal, at the end of the input
                     // the index of the $ symbol is always 1
@@ -201,6 +197,9 @@ impl<'a> ContextFreeLexer<'a> {
                     }
                     index += the_match.length as usize;
                 }
+            } else {
+                // skip this character
+                index += 1;
             }
         }
     }
@@ -280,11 +279,7 @@ impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
                     self.input_index
                 );
             }
-            if result.is_none() {
-                // skip this character
-                self.input_index += 1;
-            } else {
-                let the_match = result.unwrap();
+            if let Some(the_match) = result {
                 if the_match.state == 0 {
                     // this is the dollar terminal, at the end of the input
                     // the index of the $ symbol is always 1
@@ -313,6 +308,9 @@ impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
                         self.input_index += the_match.length as usize;
                     }
                 }
+            } else {
+                // skip this character
+                self.input_index += 1;
             }
         }
     }
