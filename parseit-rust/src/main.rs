@@ -49,7 +49,7 @@ fn main() {
 fn do_parse(input: &mut dyn io::Read, lib_name: &str, parser_module: &str) -> String {
     let mut function_name = String::new();
     function_name.push_str(parser_module);
-    function_name.push_str("::parse_utf8");
+    function_name.push_str("_parse_utf8");
     let library = libloading::Library::new(lib_name).unwrap_or_else(|error| panic!("{}", error));
     unsafe {
         let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResult> = library
