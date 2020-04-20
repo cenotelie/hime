@@ -73,7 +73,7 @@ cp "$ROOT/tests-driver/bin/Release/net461/driver.exe" "$ROOT/tests-results/drive
 cp "$ROOT/tests-executor-net/bin/Release/net461/executor.exe" "$ROOT/tests-results/executor-net.exe"
 cp $ROOT/tests-executor-java/target/hime-test-executor-*.jar "$ROOT/tests-results/executor-java.jar"
 cp $ROOT/tests-executor-java/target/dependency/*.jar "$ROOT/tests-results/"
-cp "$ROOT/tests-executor-rust/target/release/tests_executor_rust" "$ROOT/tests-results/executor-rust"
+cp "$ROOT/target/release/tests_executor_rust" "$ROOT/tests-results/executor-rust"
 # Execute the tests
 cd "$ROOT/tests-results"
 mono driver.exe --all

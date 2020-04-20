@@ -78,7 +78,7 @@ impl TableElemRef {
 
     /// Gets the element's index in its respective table
     pub fn get_index(self) -> usize {
-        (self.data & 0x3FFF_FFFF)
+        self.data & 0x3FFF_FFFF
     }
 }
 

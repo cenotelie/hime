@@ -15,6 +15,3 @@ hime_redist = "3.4.2"
 libloading = "0.4.3"
 # Used for tests debugging
 # hime_generated = { path = "../tests-results/hime_generated-3.3.1" }
-
-[patch.crates-io]
-hime_redist = { path = "../runtime-rust" }

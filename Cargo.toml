@@ -1,7 +1,8 @@
 [workspace]
 members = [
     "runtime-rust",
-    "parseit-rust"
+    "parseit-rust",
+    "tests-executor-rust"
 ]
 
 [patch.crates-io]
