@@ -116,7 +116,7 @@ cp "$ROOT/parseit-net/bin/Release/netcoreapp2.0/publish/parseit.runtimeconfig.js
 cp "$ROOT/runtime-net/bin/Release/netstandard2.0/Hime.Redist.xml"               "$RELENG/hime-$VERSION/netcore20/Hime.Redist.xml"
 cp "$ROOT/sdk-net/bin/Release/netstandard2.0/Hime.SDK.xml"                      "$RELENG/hime-$VERSION/netcore20/Hime.SDK.xml"
 cp $ROOT/runtime-java/target/*.jar                                              "$RELENG/hime-$VERSION/java/"
-cp $ROOT/runtime-rust/target/package/*.crate                                    "$RELENG/hime-$VERSION/rust/"
+cp $ROOT/target/package/*.crate                                                 "$RELENG/hime-$VERSION/rust/"
 cd "$RELENG"
 zip -r "hime-v$VERSION.zip" "hime-$VERSION"
 cd "$ROOT"
