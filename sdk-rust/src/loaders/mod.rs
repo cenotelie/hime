@@ -19,10 +19,11 @@
 
 pub mod parser;
 
+use ansi_term::Colour::{Red, Blue};
+use ansi_term::Style;
 use crate::automata::fa::{FinalItem, NFA};
 use crate::grammars::{Grammar, DEFAULT_CONTEXT_NAME};
-use ansi_term::Colour::{Blue, Red};
-use ansi_term::Style;
+use crate::CharSpan;
 use hime_redist::ast::AstNode;
 use hime_redist::errors::ParseErrorDataTrait;
 use hime_redist::result::ParseResult;
@@ -408,7 +409,99 @@ fn load_nfa<'a>(
     grammar: &Grammar,
     node: AstNode<'a>
 ) -> NFA {
-    NFA::new_minimal()
+    match node.get_symbol().id {
+        parser::ID_TERMINAL_LITERAL_TEXT => load_nfa_simple_text(node),
+        parser::ID_TERMINAL_UNICODE_CODEPOINT => load_nfa_codepoint(filename, errors, node),
+        _ => NFA::new_minimal()
+    }
+}
+
+/// Builds a NFA from a piece of text
+fn load_nfa_simple_text(node: AstNode) -> NFA {
+    // build the raw piece of text
+    let mut value = node.get_value().unwrap();
+    let mut insensitive = false;
+    if value.starts_with('~') {
+        insensitive = true;
+        value = value[2..(value.len() - 1)].to_string();
+    } else {
+        value = value[1..(value.len() - 1)].to_string();
+    }
+    let value = replace_escapees(value);
+
+    // build the result
+    let mut nfa = NFA::new_minimal();
+    let mut buffer = [0; 2];
+    nfa.exit = nfa.entry;
+    for c in value.chars() {
+        if insensitive && c.is_ascii_alphabetic() {
+            let c2 = if c.is_ascii_lowercase() {
+                c.to_ascii_uppercase()
+            } else {
+                c.to_ascii_lowercase()
+            };
+            let temp = nfa.add_state().id;
+            let encoded1 = c.encode_utf16(&mut buffer)[0];
+            let encoded2 = c2.encode_utf16(&mut buffer)[0];
+            nfa.add_transition(nfa.exit, CharSpan::new(encoded1, encoded1), temp);
+            nfa.add_transition(nfa.exit, CharSpan::new(encoded2, encoded2), temp);
+            nfa.exit = temp;
+        } else {
+            for encoded in c.encode_utf16(&mut buffer).iter() {
+                let temp = nfa.add_state().id;
+                nfa.add_transition(nfa.exit, CharSpan::new(*encoded, *encoded), temp);
+                nfa.exit = temp;
+            }
+        }
+    }
+    nfa
+}
+
+/// Builds a NFA from a unicode code point
+fn load_nfa_codepoint(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) -> NFA {
+    // extract the code point value
+    let value = node.get_value().unwrap();
+    let value = u32::from_str_radix(&value[2..(value.len() - 1)], 16).unwrap();
+    let value = match std::char::from_u32(value) {
+        Some(v) => v,
+        None => {
+            errors.push(LoaderError {
+                filename: filename.to_string(),
+                position: node.get_position().unwrap(),
+                context: node.get_context().unwrap(),
+                message: format!(
+                    "The value U+{:0X} is not a supported unicode code point",
+                    value
+                )
+            });
+            return NFA::new_minimal();
+        }
+    };
+    // build the NFA
+    let mut nfa = NFA::new_minimal();
+    let mut buffer = [0; 2];
+    nfa.exit = nfa.entry;
+    for encoded in value.encode_utf16(&mut buffer).iter() {
+        let temp = nfa.add_state().id;
+        nfa.add_transition(nfa.exit, CharSpan::new(*encoded, *encoded), temp);
+        nfa.exit = temp;
+    }
+    nfa
+}
+
+/// Builds a NFA from a character class
+fn load_nfa_class(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) -> NFA {
+    // extract the value
+    let node_value = node.get_value().unwrap();
+    let value = &node_value[1..(node_value.len() - 1)];
+    let mut positive = true;
+    let chars: Vec<char> = if value.starts_with('^') {
+        positive = false;
+        value.chars().skip(1).collect()
+    } else {
+        value.chars().collect()
+    };
+    let mut spans = Vec::new();
 }
 
 /// Replaces the escape sequences in the given piece of text by their value
