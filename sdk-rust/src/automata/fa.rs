@@ -971,10 +971,10 @@ impl NFAStateSet {
         let mut state_positive = None;
         let mut state_negative = None;
         for state in self.states.iter() {
-            if nfa.states[*state].mark > 0 {
-                state_positive = Some(*state);
-            } else if nfa.states[*state].mark < 0 {
-                state_negative = Some(*state);
+            match nfa.states[*state].mark.cmp(&0) {
+                Ordering::Greater => state_positive = Some(*state),
+                Ordering::Less => state_negative = Some(*state),
+                _ => ()
             }
         }
         // With both negative and positive states

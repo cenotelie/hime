@@ -19,11 +19,11 @@
 
 pub mod parser;
 
-use ansi_term::Colour::{Red, Blue};
-use ansi_term::Style;
 use crate::automata::fa::{FinalItem, NFA};
 use crate::grammars::{Grammar, DEFAULT_CONTEXT_NAME};
 use crate::CharSpan;
+use ansi_term::Colour::{Blue, Red};
+use ansi_term::Style;
 use hime_redist::ast::AstNode;
 use hime_redist::errors::ParseErrorDataTrait;
 use hime_redist::result::ParseResult;
@@ -412,6 +412,7 @@ fn load_nfa<'a>(
     match node.get_symbol().id {
         parser::ID_TERMINAL_LITERAL_TEXT => load_nfa_simple_text(node),
         parser::ID_TERMINAL_UNICODE_CODEPOINT => load_nfa_codepoint(filename, errors, node),
+        parser::ID_TERMINAL_LITERAL_CLASS => load_nfa_class(filename, errors, node),
         _ => NFA::new_minimal()
     }
 }
@@ -502,6 +503,122 @@ fn load_nfa_class(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) 
         value.chars().collect()
     };
     let mut spans = Vec::new();
+    let mut i = 0;
+    while i < chars.len() {
+        let (b, l) = get_char_value(&chars, i);
+        let b = b as usize;
+        i += l;
+        if b >= 0xFFFF {
+            errors.push(LoaderError {
+                filename: filename.to_string(),
+                position: node.get_position().unwrap(),
+                context: node.get_context().unwrap(),
+                message: format!(
+                    "Unsupported non-plane 0 Unicode character ({0}) in character class",
+                    b
+                )
+            });
+        }
+        if i <= chars.len() - 2 && chars[i] == '-' {
+            // this is range, match the -
+            i += 1;
+            let (e, l2) = get_char_value(&chars, i);
+            let e = e as usize;
+            if b >= 0xFFFF {
+                errors.push(LoaderError {
+                    filename: filename.to_string(),
+                    position: node.get_position().unwrap(),
+                    context: node.get_context().unwrap(),
+                    message: format!(
+                        "Unsupported non-plane 0 Unicode character ({0}) in character class",
+                        e
+                    )
+                });
+            }
+            i += l2;
+            if b < 0x8D00 && e > 0xDFFF {
+                // oooh you ...
+                spans.push(CharSpan::new(b as u16, 0xD7FF));
+                spans.push(CharSpan::new(0xE000, e as u16));
+            } else {
+                spans.push(CharSpan::new(b as u16, e as u16));
+            }
+        } else {
+            // this is a normal character
+            spans.push(CharSpan::new(b as u16, b as u16));
+        }
+    }
+    let mut nfa = NFA::new_minimal();
+    if positive {
+        for span in spans.into_iter() {
+            nfa.add_transition(nfa.entry, span, nfa.exit);
+        }
+    } else {
+        spans.sort();
+        // TODO: Check for span intersections and overflow of b (when a span ends on 0xFFFF)
+        let mut b = 0;
+        for span in spans.into_iter() {
+            if span.begin > b {
+                nfa.add_transition(nfa.entry, CharSpan::new(b, span.begin - 1), nfa.exit);
+            }
+            b = span.end + 1;
+            // skip the surrogate encoding points
+            if b >= 0xD800 && b <= 0xDFFF {
+                b = 0xE000;
+            }
+        }
+        if b <= 0xD700 {
+            nfa.add_transition(nfa.entry, CharSpan::new(b, 0xD7FF), nfa.exit);
+            nfa.add_transition(nfa.entry, CharSpan::new(0xE000, 0xFFFF), nfa.exit);
+        } else if b != 0xFFFF {
+            // here b >= 0xE000
+            nfa.add_transition(nfa.entry, CharSpan::new(b, 0xFFFF), nfa.exit);
+        }
+        // surrogate pairs
+        let inter = nfa.add_state().id;
+        nfa.add_transition(nfa.entry, CharSpan::new(0xD800, 0xDEFF), inter);
+        nfa.add_transition(inter, CharSpan::new(0xDC00, 0xDFFF), nfa.exit);
+    }
+    nfa
+}
+
+/// Gets the char at the given index
+fn get_char_value(value: &[char], i: usize) -> (char, usize) {
+    let mut c = value[i];
+    if c != '\\' {
+        return (c, 1);
+    }
+    c = value[i + 1];
+    match c {
+        '0' => (0 as char, 2),  // null
+        'a' => (2 as char, 2),  // alert
+        'b' => (8 as char, 2),  // backspace
+        'f' => (12 as char, 2), // form feed
+        'n' => ('\n', 2),       //new line
+        'r' => ('\r', 2),       // carriage return
+        't' => ('\t', 2),       // horizontal tab
+        'v' => (11 as char, 2), // vertical tab
+        'u' => {
+            let mut l = 0;
+            while i + 2 + l < value.len() {
+                c = value[i + 2 + l];
+                if (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') {
+                    l += 1;
+                } else {
+                    break;
+                }
+            }
+            if l >= 8 {
+                l = 8;
+            } else if l >= 4 {
+                l = 4;
+            }
+            let char_hexa: String = value[(i + 2)..(i + 2 + l)].iter().collect();
+            let char_value = u32::from_str_radix(&char_hexa, 16).unwrap();
+            (std::char::from_u32(char_value).unwrap(), l + 2)
+        }
+        _ => (c, 2)
+    }
 }
 
 /// Replaces the escape sequences in the given piece of text by their value
@@ -513,60 +630,9 @@ fn replace_escapees(value: String) -> String {
     let mut result = String::new();
     let mut i = 0;
     while i < chars.len() {
-        let mut c = chars[i];
-        if c != '\\' {
-            result.push(c);
-            i += 1;
-        } else {
-            c = chars[i + 1];
-            if c == '0' {
-                result.push('\0');
-                i += 2;
-            } else if c == 'a' {
-                result.push(std::char::from_u32(7).unwrap());
-                i += 2;
-            } else if c == 'b' {
-                result.push(std::char::from_u32(8).unwrap());
-                i += 2;
-            } else if c == 'f' {
-                result.push(std::char::from_u32(12).unwrap());
-                i += 2;
-            } else if c == 'n' {
-                result.push('\n');
-                i += 2;
-            } else if c == 'r' {
-                result.push('\r');
-                i += 2;
-            } else if c == 't' {
-                result.push('\t');
-                i += 2;
-            } else if c == 'v' {
-                result.push(std::char::from_u32(11).unwrap());
-                i += 2;
-            } else if c == 'u' {
-                let mut l = 0;
-                while i + 2 + l < chars.len() {
-                    c = chars[i + 2 + l];
-                    if (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') {
-                        l += 1;
-                    } else {
-                        break;
-                    }
-                }
-                if l >= 8 {
-                    l = 8;
-                } else if l >= 4 {
-                    l = 4;
-                }
-                let char_hexa: String = chars[(i + 2)..(i + 2 + l)].iter().collect();
-                let char_value = u32::from_str_radix(&char_hexa, 16).unwrap();
-                result.push(std::char::from_u32(char_value).unwrap());
-                i += l + 2;
-            } else {
-                result.push(c);
-                i += 2;
-            }
-        }
+        let (c, l) = get_char_value(&chars, i);
+        result.push(c);
+        i += l;
     }
     result
 }
