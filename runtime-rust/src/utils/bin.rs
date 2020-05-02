@@ -19,15 +19,15 @@
 
 /// reads a u16 from an array of bytes
 pub fn read_u16(buffer: &[u8], index: usize) -> u16 {
-    (u16::from(buffer[index + 1]) << 8 | u16::from(buffer[index]))
+    u16::from(buffer[index + 1]) << 8 | u16::from(buffer[index])
 }
 
 /// reads a u32 from an array of bytes
 pub fn read_u32(buffer: &[u8], index: usize) -> u32 {
-    (u32::from(buffer[index + 3]) << 24
+    u32::from(buffer[index + 3]) << 24
         | u32::from(buffer[index + 2]) << 16
         | u32::from(buffer[index + 1]) << 8
-        | u32::from(buffer[index]))
+        | u32::from(buffer[index])
 }
 
 /// Reads a table of u16 from a byte buffer
