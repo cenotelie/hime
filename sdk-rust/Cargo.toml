@@ -20,6 +20,3 @@ ansi_term = "0.11"
 
 [badges]
 maintenance = { status = "actively-developed" }
-
-[patch.crates-io]
-hime_redist = { path = "../runtime-rust" }
