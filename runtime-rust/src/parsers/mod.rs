@@ -283,8 +283,8 @@ impl LRExpected {
     /// If the terminal is already added to the reduction collection it is removed from it.
     pub fn add_unique_shift(&mut self, terminal: Symbol) {
         let position = self.reductions.iter().position(|x| *x == terminal);
-        if position.is_some() {
-            self.reductions.remove(position.unwrap());
+        if let Some(p) = position {
+            self.reductions.remove(p);
         }
         if !self.shifts.contains(&terminal) {
             self.shifts.push(terminal);
