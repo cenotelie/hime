@@ -2,8 +2,10 @@
 members = [
     "runtime-rust",
     "parseit-rust",
-    "sdk-rust"
+    "sdk-rust",
+    "unicode-gen"
 ]
 
 [patch.crates-io]
 hime_redist = { path = "./runtime-rust" }
+hime_sdk = { path = "./sdk-rust" }

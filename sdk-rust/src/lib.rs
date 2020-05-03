@@ -17,6 +17,8 @@
 
 //! Rust SDK for the Hime parser generator
 
+#[macro_use]
+extern crate lazy_static;
 extern crate ansi_term;
 extern crate hime_redist;
 #[macro_use]

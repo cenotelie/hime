@@ -199,7 +199,7 @@ fn escape_str(value: &str) -> String {
             '\n' => result.push_str("\\n"),
             '\u{0008}' => result.push_str("\\b"),
             '\u{000C}' => result.push_str("\\c"),
-            _ => result.push(c),
+            _ => result.push(c)
         }
     }
     result
