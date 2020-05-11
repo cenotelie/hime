@@ -379,17 +379,17 @@ namespace Hime.SDK.Output
 			{
 				if (terminal.ID <= 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
 					continue;
-				stream.WriteLine("    fn on_terminal_" + Helper.ToSnakeCase(terminal.Name) + "(&self, node: &AstNode);");
+				stream.WriteLine("    fn on_terminal_" + Helper.ToSnakeCase(terminal.Name) + "(&self, _node: &AstNode) {}");
 			}
 			foreach (Variable var in variables)
 			{
 				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
 					continue;
-				stream.WriteLine("    fn on_variable_" + Helper.ToSnakeCase(var.Name) + "(&self, node: &AstNode);");
+				stream.WriteLine("    fn on_variable_" + Helper.ToSnakeCase(var.Name) + "(&self, _node: &AstNode) {}");
 			}
 			foreach (Virtual var in virtuals)
 			{
-				stream.WriteLine("    fn on_virtual_" + Helper.ToSnakeCase(var.Name) + "(&self, node: &AstNode);");
+				stream.WriteLine("    fn on_virtual_" + Helper.ToSnakeCase(var.Name) + "(&self, _node: &AstNode) {}");
 			}
 			stream.WriteLine("}");
 			stream.WriteLine("");
