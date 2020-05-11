@@ -14,7 +14,7 @@
     <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/../.releng/hime.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
     <PublicSign>True</PublicSign>
-    <Version>3.4.2</Version>
+    <Version>3.5.0</Version>
   </PropertyGroup>
   <PropertyGroup>
     <!-- NuGet properties -->
@@ -22,7 +22,7 @@
     <Title>Parseit</Title>
     <Authors>cenotelie</Authors>
     <Description>Command line to parse a piece of input using a packaged parser.</Description>
-    <Copyright>Copyright © Association Cénotélie 2019</Copyright>
+    <Copyright>Copyright © Association Cénotélie 2020</Copyright>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <PackageProjectUrl>https://cenotelie.fr/projects/hime</PackageProjectUrl>
     <PackageIcon>Logo.png</PackageIcon>

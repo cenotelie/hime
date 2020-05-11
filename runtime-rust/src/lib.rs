@@ -27,7 +27,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! hime_redist = "3.4.2"
+//! hime_redist = "3.5.0"
 //! ```
 //!
 //! and this to your crate root:
