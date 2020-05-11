@@ -1,6 +1,6 @@
 [package]
 name = "hime_sdk"
-version = "3.4.2"
+version = "3.5.1"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Development kit for the generation of LR and RNGLR parsers programmatically or in command line. Full API for the manipulation of context-free grammars."
 documentation = "https://cenotelie.fr/projects/hime"
@@ -14,7 +14,7 @@ include = ["README.md", "Cargo.toml", "src/**/*.rs"]
 edition = "2018"
 
 [dependencies]
-hime_redist = { path = "../runtime-rust" }
+hime_redist = "3.5.1"
 lazy_static = "1.4"
 log = "0.4"
 ansi_term = "0.11"

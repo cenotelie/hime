@@ -31,7 +31,6 @@ use hime_redist::symbols::SemanticElementTrait;
 use hime_redist::symbols::Symbol;
 use hime_redist::text::TextPosition;
 use hime_redist::text::TextSpan;
-use hime_redist::utils::iterable::Iterable;
 
 /// Main entry point
 fn main() {
