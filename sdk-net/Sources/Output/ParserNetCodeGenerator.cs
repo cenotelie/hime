@@ -126,6 +126,7 @@ namespace Hime.SDK.Output
 
 			WriteHeader(writer);
 
+			writer.WriteLine("using System.CodeDom.Compiler;");
 			writer.WriteLine("using System.Collections.Generic;");
 			writer.WriteLine("using Hime.Redist;");
 			writer.WriteLine("using Hime.Redist.Parsers;");
@@ -135,6 +136,7 @@ namespace Hime.SDK.Output
 			writer.WriteLine("\t/// <summary>");
 			writer.WriteLine("\t/// Represents a parser");
 			writer.WriteLine("\t/// </summary>");
+			writer.WriteLine("\t[GeneratedCodeAttribute(\"Hime.SDK\", \"" + CompilationTask.Version + "\")]");
 			writer.WriteLine("\t" + modifier.ToString().ToLower() + " class " + name + "Parser : " + parserType);
 			writer.WriteLine("\t{");
 
@@ -164,6 +166,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("\t\t/// <summary>");
 			stream.WriteLine("\t\t/// Contains the constant IDs for the variables and virtuals in this parser");
 			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\t[GeneratedCodeAttribute(\"Hime.SDK\", \"" + CompilationTask.Version + "\")]");
 			stream.WriteLine("\t\tpublic class ID");
 			stream.WriteLine("\t\t{");
 			foreach (Variable var in variables)
@@ -248,6 +251,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("\t\t/// <summary>");
 			stream.WriteLine("\t\t/// Represents a set of semantic actions in this parser");
 			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\t[GeneratedCodeAttribute(\"Hime.SDK\", \"" + CompilationTask.Version + "\")]");
 			stream.WriteLine("\t\tpublic class Actions");
 			stream.WriteLine("\t\t{");
 			foreach (Action action in actions)
@@ -348,6 +352,7 @@ namespace Hime.SDK.Output
 			stream.WriteLine("\t\t/// <summary>");
 			stream.WriteLine("\t\t/// Visitor interface");
 			stream.WriteLine("\t\t/// </summary>");
+			stream.WriteLine("\t\t[GeneratedCodeAttribute(\"Hime.SDK\", \"" + CompilationTask.Version + "\")]");
 			stream.WriteLine("\t\tpublic class Visitor");
 			stream.WriteLine("\t\t{");
 			foreach (Terminal terminal in terminals)

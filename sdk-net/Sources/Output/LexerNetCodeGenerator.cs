@@ -95,6 +95,7 @@ namespace Hime.SDK.Output
 
 			WriteHeader(writer);
 
+			writer.WriteLine("using System.CodeDom.Compiler;");
 			writer.WriteLine("using System.Collections.Generic;");
 			writer.WriteLine("using System.IO;");
 			writer.WriteLine("using Hime.Redist;");
@@ -106,6 +107,7 @@ namespace Hime.SDK.Output
 			writer.WriteLine("\t/// <summary>");
 			writer.WriteLine("\t/// Represents a lexer");
 			writer.WriteLine("\t/// </summary>");
+			writer.WriteLine("\t[GeneratedCodeAttribute(\"Hime.SDK\", \"" + CompilationTask.Version + "\")]");
 			writer.WriteLine("\t" + modifier.ToString().ToLower() + " class " + name + "Lexer : " + baseLexer);
 			writer.WriteLine("\t{");
 
@@ -117,6 +119,7 @@ namespace Hime.SDK.Output
 			writer.WriteLine("\t\t/// <summary>");
 			writer.WriteLine("\t\t/// Contains the constant IDs for the terminals for this lexer");
 			writer.WriteLine("\t\t/// </summary>");
+			writer.WriteLine("\t\t[GeneratedCodeAttribute(\"Hime.SDK\", \"" + CompilationTask.Version + "\")]");
 			writer.WriteLine("\t\tpublic class ID");
 			writer.WriteLine("\t\t{");
 			for (int i = 2; i != terminals.Count; i++)
@@ -134,6 +137,7 @@ namespace Hime.SDK.Output
 			writer.WriteLine("\t\t/// <summary>");
 			writer.WriteLine("\t\t/// Contains the constant IDs for the contexts for this lexer");
 			writer.WriteLine("\t\t/// </summary>");
+			writer.WriteLine("\t\t[GeneratedCodeAttribute(\"Hime.SDK\", \"" + CompilationTask.Version + "\")]");
 			writer.WriteLine("\t\tpublic class Context");
 			writer.WriteLine("\t\t{");
 			writer.WriteLine("\t\t\t/// <summary>");
