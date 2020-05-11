@@ -23,7 +23,7 @@ use crate::automata::fa::{FinalItem, NFA};
 use crate::errors::{print_errors, Error, LoaderError, MessageError};
 use crate::grammars::{Grammar, DEFAULT_CONTEXT_NAME};
 use crate::CharSpan;
-use hime_redist::ast::AstNode;
+use hime_redist::ast::{Ast, AstFamily, AstNode};
 use hime_redist::errors::ParseErrorDataTrait;
 use hime_redist::result::ParseResult;
 use hime_redist::symbols::SemanticElementTrait;
@@ -33,12 +33,22 @@ use std::io;
 /// Loads all inputs into grammars
 pub fn load(inputs: &[String]) -> Result<Vec<Grammar>, ()> {
     let results = parse_inputs(inputs)?;
+    let asts: Vec<Ast> = results.iter().map(|r| r.get_ast()).collect();
+    let roots: Vec<AstNode> = asts.iter().map(|ast| ast.get_root()).collect();
+    let families: Vec<AstFamily> = roots.iter().map(|root| root.children()).collect();
     let mut errors = Vec::new();
-    let (mut completed, mut to_resolve): (Vec<Loader>, Vec<Loader>) = inputs
-        .iter()
-        .zip(results.into_iter())
-        .map(|(input, result)| Loader::new(input.clone(), result, &mut errors))
-        .partition(|loader| loader.is_solved());
+    let mut completed = Vec::new();
+    let mut to_resolve = Vec::new();
+    for (input, family) in inputs.iter().zip(families.iter()) {
+        for sub_root in family.iter() {
+            let loader = Loader::new(input.clone(), sub_root, &mut errors);
+            if loader.is_solved() {
+                completed.push(loader);
+            } else {
+                to_resolve.push(loader);
+            }
+        }
+    }
     resolve_inheritance(&mut completed, &mut to_resolve, &mut errors);
     if errors.is_empty() {
         Ok(completed.into_iter().map(|loader| loader.grammar).collect())
@@ -49,9 +59,9 @@ pub fn load(inputs: &[String]) -> Result<Vec<Grammar>, ()> {
 }
 
 /// Resolves inheritance and load grammars
-fn resolve_inheritance(
-    completed: &mut Vec<Loader>,
-    to_resolve: &mut Vec<Loader>,
+fn resolve_inheritance<'a>(
+    completed: &mut Vec<Loader<'a>>,
+    to_resolve: &mut Vec<Loader<'a>>,
     errors: &mut Vec<LoaderError>
 ) {
     loop {
@@ -80,7 +90,7 @@ fn resolve_inheritance(
 
 /// Parses the specified input
 fn parse_input(input: &str) -> Result<ParseResult, ()> {
-    println!("Reading input {} ...", input);
+    println!("Reading {} ...", input);
     let file = match fs::File::open(input) {
         Ok(file) => file,
         Err(error) => {
@@ -136,11 +146,11 @@ fn parse_inputs(inputs: &[String]) -> Result<Vec<ParseResult>, ()> {
 }
 
 /// Represents a loader for a grammar
-struct Loader {
+struct Loader<'a> {
     /// The name of the resource containing the data that are loaded by this instance
     resource: String,
     /// The parse result
-    result: ParseResult,
+    root: AstNode<'a>,
     /// Lists of the inherited grammars
     inherited: Vec<String>,
     /// The resulting grammar
@@ -149,11 +159,9 @@ struct Loader {
     case_insensitive: bool
 }
 
-impl Loader {
+impl<'a> Loader<'a> {
     /// Creates a new loader
-    fn new(resource: String, result: ParseResult, errors: &mut Vec<LoaderError>) -> Loader {
-        let ast = result.get_ast();
-        let root = ast.get_root();
+    fn new(resource: String, root: AstNode<'a>, errors: &mut Vec<LoaderError>) -> Loader<'a> {
         let name = root.children().at(0).get_value().unwrap();
         let inherited = root
             .children()
@@ -164,7 +172,7 @@ impl Loader {
             .collect();
         let mut loader = Loader {
             resource,
-            result,
+            root,
             inherited,
             grammar: Grammar::new(name),
             case_insensitive: false
@@ -177,9 +185,7 @@ impl Loader {
 
     /// Prints errors for the unresolved inherited grammars
     fn collect_errors(&self, unresolved: &[Loader], errors: &mut Vec<LoaderError>) {
-        let ast = self.result.get_ast();
-        let root = ast.get_root();
-        for node in root.children().at(1).children().iter() {
+        for node in self.root.children().at(1).children().iter() {
             let name = node.get_value().unwrap();
             if self.inherited.contains(&name) {
                 // was not resolved
@@ -224,9 +230,7 @@ impl Loader {
     /// Loads the content of the grammar
     fn load_content(&mut self, errors: &mut Vec<LoaderError>) {
         println!("Loading grammar {} ...", self.grammar.name);
-        let ast = &self.result.get_ast();
-        let root = ast.get_root();
-        for node in root.children().iter() {
+        for node in self.root.children().iter() {
             let id = node.get_symbol().id;
             if id == parser::ID_TERMINAL_BLOCK_OPTIONS {
                 load_options(&mut self.grammar, node);
