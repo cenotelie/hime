@@ -1,19 +1,19 @@
 # Hime Rust SDK #
 
-The Rust implementation of the runtime for lexers and parsers generated with [Hime](https://github.com/cenotelie/hime).
+The Rust SDK for the generation of lexers and parsers with [Hime](https://github.com/cenotelie/hime).
 For more information about how to generate parsers using Hime, head to [Hime](https://cenotelie.fr/projects/hime).
 The code for this library is available on [GitHub](https://github.com/cenotelie/hime).
-The API documentation is available on [docs.rs](https://docs.rs/hime_redist/3.4.2/hime_redist/).
+The API documentation is available on [docs.rs](https://docs.rs/hime_sdk/3.5.1/hime_sdk/).
 This software is developed by the [Assocation Cénotélie](https://cenotelie.fr/), France.
 
 ## Usage ##
 
-This crate is [on crates.io](https://crates.io/crates/hime_redist) and can be
-used by adding `hime_redist` to your dependencies in your project's `Cargo.toml`.
+This crate is [on crates.io](https://crates.io/crates/hime_sdk) and can be
+used by adding `hime_sdk` to your dependencies in your project's `Cargo.toml`.
 
 ```toml
 [dependencies]
-hime_redist = "3.4.2"
+hime_sdk = "3.5.1"
 ```
 
 Generated lexer and parser codes will import this crate and provide a simple API to parse input text.
