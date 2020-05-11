@@ -14,17 +14,17 @@
     <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/../.releng/hime.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
     <PublicSign>True</PublicSign>
-    <Version>3.4.2</Version>
+    <Version>3.5.1</Version>
   </PropertyGroup>
   <PropertyGroup>
     <!-- NuGet properties -->
     <Title>Hime Runtime</Title>
     <Authors>cenotelie</Authors>
     <Description>Redistributable runtime library for parsers generated with Hime (LR, RNGLR).</Description>
-    <Copyright>Copyright © Association Cénotélie 2019</Copyright>
-    <PackageLicenseUrl>http://www.gnu.org/licenses/lgpl.txt</PackageLicenseUrl>
+    <Copyright>Copyright © Association Cénotélie 2020</Copyright>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <PackageProjectUrl>https://cenotelie.fr/projects/hime</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/cenotelie/hime/downloads/Logo.png</PackageIconUrl>
+    <PackageIcon>Logo.png</PackageIcon>
     <PackageTags>parser generator lr glr rnglr</PackageTags>
     <RepositoryUrl>https://github.com/cenotelie/hime</RepositoryUrl>
     <RepositoryType>hg</RepositoryType>
@@ -32,4 +32,7 @@
     <IncludeSource>true</IncludeSource>
     <IncludeBuildOutput>true</IncludeBuildOutput>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildProjectDirectory)/../.assets/Logo.png" Pack="true" PackagePath=""/>
+  </ItemGroup>
 </Project>

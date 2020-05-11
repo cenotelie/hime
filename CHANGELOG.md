@@ -1,5 +1,19 @@
 # Updates
 
+## 3.5.0
+
+Release in May 11th, 2020
+
+* Fixes:
+    * Fix usage of deprecated metadata on .Net packages
+    * Cleanup Rust code and fixed various warnings and linting issues
+    * Migrated SCM from mercurial to git
+    * [Issue #58](https://github.com/cenotelie/hime/issues/58): Added example or visitor usage in documentation
+    * [Issue #61](https://github.com/cenotelie/hime/issues/61): Mark generated .Net classes with GeneratedCodeAttribute
+    * [Issue #69](https://github.com/cenotelie/hime/issues/69): Bug when initializing RNGLR parsers with some nullable variables
+    * [Issue #70](https://github.com/cenotelie/hime/issues/70): Generate rust module for parser in snake case
+    * [Issue #71](https://github.com/cenotelie/hime/issues/71): Make all visitor method optional in Rust
+
 ## 3.4.1
 
 Release in January 10th, 2019

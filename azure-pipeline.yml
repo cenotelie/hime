@@ -17,4 +17,4 @@ stages:
       vmImage: 'ubuntu-latest'
     container: cenotelie/hime-build-env:latest
     steps:
-    - script: .releng/build.sh
+    - script: ./build.sh

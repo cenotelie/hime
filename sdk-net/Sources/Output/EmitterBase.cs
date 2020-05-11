@@ -150,7 +150,7 @@ namespace Hime.SDK.Output
 		/// </summary>
 		/// <param name="unit">The unit to emit data for</param>
 		/// <returns>The full path and name for the lexer code artifact</returns>
-		public string GetArtifactLexerCode(Unit unit)
+		public virtual string GetArtifactLexerCode(Unit unit)
 		{
 			return unit.OutputPath + unit.Name + SuffixLexerCode;
 		}
@@ -170,7 +170,7 @@ namespace Hime.SDK.Output
 		/// </summary>
 		/// <param name="unit">The unit to emit data for</param>
 		/// <returns>The full path and name for the parser code artifact</returns>
-		public string GetArtifactParserCode(Unit unit)
+		public virtual string GetArtifactParserCode(Unit unit)
 		{
 			return unit.OutputPath + unit.Name + SuffixParserCode;
 		}

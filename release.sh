@@ -1,12 +1,12 @@
 #!/bin/sh
 
 SCRIPT="$(readlink -f "$0")"
-RELENG="$(dirname "$SCRIPT")"
-ROOT="$(dirname "$RELENG")"
+ROOT="$(dirname "$SCRIPT")"
+RELENG="$ROOT/.releng"
 
 # Gather version info
 VERSION=$(grep "<Version>" "$ROOT/sdk-net/Hime.SDK.csproj" | grep -o -E "([[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]])+")
-HASH=$(hg -R "$ROOT" --debug id -i)
+HASH=$(git rev-parse HEAD)
 
 echo "Building Hime version $VERSION ($HASH)"
 
@@ -116,7 +116,7 @@ cp "$ROOT/parseit-net/bin/Release/netcoreapp2.0/publish/parseit.runtimeconfig.js
 cp "$ROOT/runtime-net/bin/Release/netstandard2.0/Hime.Redist.xml"               "$RELENG/hime-$VERSION/netcore20/Hime.Redist.xml"
 cp "$ROOT/sdk-net/bin/Release/netstandard2.0/Hime.SDK.xml"                      "$RELENG/hime-$VERSION/netcore20/Hime.SDK.xml"
 cp $ROOT/runtime-java/target/*.jar                                              "$RELENG/hime-$VERSION/java/"
-cp $ROOT/runtime-rust/target/package/*.crate                                    "$RELENG/hime-$VERSION/rust/"
+cp $ROOT/target/package/*.crate                                                 "$RELENG/hime-$VERSION/rust/"
 cd "$RELENG"
 zip -r "hime-v$VERSION.zip" "hime-$VERSION"
 cd "$ROOT"

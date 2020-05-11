@@ -343,7 +343,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified text with this parser");
 				stream.WriteLine("fn parse_text(text: Text, actions: &mut dyn Actions) -> ParseResult {");
-				stream.WriteLine("    let mut my_actions = |index: usize, head: Symbol, body: &SemanticBody| match index {");
+				stream.WriteLine("    let mut my_actions = |index: usize, head: Symbol, body: &dyn SemanticBody| match index {");
 				int i = 0;
 				foreach (Action action in actions)
 				{
@@ -379,17 +379,17 @@ namespace Hime.SDK.Output
 			{
 				if (terminal.ID <= 2 || terminal.Name.StartsWith(Grammar.PREFIX_GENERATED_TERMINAL))
 					continue;
-				stream.WriteLine("    fn on_terminal_" + Helper.ToSnakeCase(terminal.Name) + "(&self, node: &AstNode);");
+				stream.WriteLine("    fn on_terminal_" + Helper.ToSnakeCase(terminal.Name) + "(&self, _node: &AstNode) {}");
 			}
 			foreach (Variable var in variables)
 			{
 				if (var.Name.StartsWith(Grammar.PREFIX_GENERATED_VARIABLE))
 					continue;
-				stream.WriteLine("    fn on_variable_" + Helper.ToSnakeCase(var.Name) + "(&self, node: &AstNode);");
+				stream.WriteLine("    fn on_variable_" + Helper.ToSnakeCase(var.Name) + "(&self, _node: &AstNode) {}");
 			}
 			foreach (Virtual var in virtuals)
 			{
-				stream.WriteLine("    fn on_virtual_" + Helper.ToSnakeCase(var.Name) + "(&self, node: &AstNode);");
+				stream.WriteLine("    fn on_virtual_" + Helper.ToSnakeCase(var.Name) + "(&self, _node: &AstNode) {}");
 			}
 			stream.WriteLine("}");
 			stream.WriteLine("");

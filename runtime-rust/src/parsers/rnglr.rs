@@ -1752,7 +1752,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                     i += 1;
                 }
                 LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE => {
-                    result.push(production.bytecode[i + 1] as usize);
+                    result.push(production.bytecode[i] as usize);
                     i += 1;
                 }
                 _ => {
@@ -1856,8 +1856,8 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
             TableElemRef::new(TableType::Variable, production.head)
         );
         let label = GSSLabel {
-            sppf_node: if let Some(n) = maybe_sppf {
-                n as u32
+            sppf_node: if let Some(sppf) = maybe_sppf {
+                sppf as u32
             } else {
                 RNGLRParser::build_sppf(
                     &mut self.builder,
