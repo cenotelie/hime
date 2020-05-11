@@ -4,7 +4,8 @@ members = [
     "parseit-rust",
     "sdk-rust",
     "tests-executor-rust",
-    "unicode-gen"
+    "unicode-gen",
+    "himecc-rust"
 ]
 
 [patch.crates-io]

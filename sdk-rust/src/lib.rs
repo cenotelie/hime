@@ -21,15 +21,15 @@
 extern crate lazy_static;
 extern crate ansi_term;
 extern crate hime_redist;
-#[macro_use]
-extern crate log;
-
-use std::cmp::Ordering;
 
 pub mod automata;
+pub mod errors;
 pub mod grammars;
 pub mod loaders;
+pub mod output;
 pub mod unicode;
+
+use std::cmp::Ordering;
 
 /// Represents a range of characters
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
@@ -198,6 +198,7 @@ fn test_charspan_split() {
 }
 
 /// Represents a parsing method
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum ParsingMethod {
     /// The LR(0) parsing method
     LR0,
@@ -209,4 +210,86 @@ pub enum ParsingMethod {
     RNGLR1,
     /// The RNGLR parsing method based on a LALR(1) graph
     RNGLALR1
+}
+
+/// Represents a grammar's compilation mode
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+pub enum Mode {
+    /// Generates the source code for the lexer and parser
+    Source,
+    /// Generates the compiled assembly of the lexer and parser
+    Assembly,
+    /// Generates the source code for the lexer and parser and the compiled assembly
+    SourceAndAssembly,
+    /// Generates the source code for the lexer and parser, as well as the debug data
+    Debug
+}
+
+/// Represents the target runtime to compile for
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+pub enum Runtime {
+    /// The .Net platform
+    Net,
+    /// The Java platform
+    Java,
+    /// The Rust language
+    Rust
+}
+
+/// Represents the access modifiers for the generated code
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+pub enum Modifier {
+    /// Generated classes are public
+    Public,
+    /// Generated classes are internal
+    Internal
+}
+
+/// Represents a compilation task for the generation of lexers and parsers from grammars
+#[derive(Debug, Clone)]
+pub struct CompilationTask {
+    /// The input file names
+    pub input_files: Vec<String>,
+    /// The name of the grammar to compile in the case where several grammars are loaded.
+    pub grammar_name: Option<String>,
+    /// The compiler's output mode
+    pub mode: Mode,
+    /// The target runtime
+    pub output_target: Runtime,
+    /// The path to a local Rust target runtime
+    pub output_rust_runtime: Option<String>,
+    /// The path for the compiler's output
+    pub output_path: Option<String>,
+    /// The namespace for the generated code
+    pub output_namespace: Option<String>,
+    /// The access modifier for the generated code
+    pub output_modifier: Modifier,
+    /// The parsing method use
+    pub method: ParsingMethod
+}
+
+impl CompilationTask {
+    /// Creates a new task with default values
+    pub fn new() -> CompilationTask {
+        CompilationTask {
+            input_files: Vec::new(),
+            grammar_name: None,
+            mode: Mode::Source,
+            output_target: Runtime::Net,
+            output_rust_runtime: None,
+            output_path: None,
+            output_namespace: None,
+            output_modifier: Modifier::Internal,
+            method: ParsingMethod::LALR1
+        }
+    }
+
+    /// Executes this task
+    pub fn execute(&self) -> Result<(), ()> {
+        let grammars = match loaders::load(&self.input_files) {
+            Ok(grammars) => grammars,
+            Err(_) => return Err(())
+        };
+        Ok(())
+    }
 }

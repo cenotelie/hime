@@ -103,7 +103,6 @@ namespace Hime.SDK.Output
 			writer.WriteLine("use hime_redist::symbols::Symbol;");
 			writer.WriteLine("use hime_redist::text::Text;");
 			writer.WriteLine("use hime_redist::tokens::TokenRepository;");
-			writer.WriteLine("use hime_redist::utils::iterable::Iterable;");
 			writer.WriteLine();
 
 			writer.WriteLine("/// Static resource for the serialized lexer automaton");

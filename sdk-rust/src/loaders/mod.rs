@@ -15,100 +15,20 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-//! Loodaing facilities for grammars
+//! Loading facilities for grammars
 
 pub mod parser;
 
 use crate::automata::fa::{FinalItem, NFA};
+use crate::errors::{print_errors, Error, LoaderError, MessageError};
 use crate::grammars::{Grammar, DEFAULT_CONTEXT_NAME};
 use crate::CharSpan;
-use ansi_term::Colour::{Blue, Red};
-use ansi_term::Style;
 use hime_redist::ast::AstNode;
 use hime_redist::errors::ParseErrorDataTrait;
 use hime_redist::result::ParseResult;
 use hime_redist::symbols::SemanticElementTrait;
-use hime_redist::text::TextContext;
-use hime_redist::text::TextPosition;
 use std::fs;
 use std::io;
-
-/// Represents an error for the loader
-#[derive(Clone)]
-pub struct LoaderError {
-    /// The name of the originating file
-    pub filename: String,
-    /// The position in the file
-    pub position: TextPosition,
-    /// The context for the error
-    pub context: TextContext,
-    /// The error message
-    pub message: String
-}
-
-impl LoaderError {
-    /// Get the width of the line number of this error in number of characters
-    pub fn line_number_width(&self) -> usize {
-        if self.position.line < 10 {
-            1
-        } else if self.position.line < 100 {
-            2
-        } else if self.position.line < 1000 {
-            3
-        } else if self.position.line < 10_000 {
-            4
-        } else if self.position.line < 100_000 {
-            5
-        } else {
-            6
-        }
-    }
-
-    /// Prints this error
-    pub fn print(&self, max_width: usize) {
-        error!(
-            "{}{} {}",
-            Red.bold().paint("error"),
-            Style::new().bold().paint(":"),
-            Style::new().bold().paint(&self.message)
-        );
-        let pad = String::from_utf8(vec![0x20; max_width]).unwrap();
-        error!(
-            "{}{} {}:{}",
-            &pad,
-            Blue.bold().paint("-->"),
-            &self.filename,
-            self.position
-        );
-        let pad = String::from_utf8(vec![0x20; max_width + 1]).unwrap();
-        error!("{}{}", &pad, Blue.bold().paint("|"));
-        let pad = String::from_utf8(vec![0x20; max_width + 1 - self.line_number_width()]).unwrap();
-        error!(
-            "{}{}{}  {}",
-            Blue.bold().paint(format!("{}", self.position.line)),
-            &pad,
-            Blue.bold().paint("|"),
-            &self.context.content
-        );
-        let pad = String::from_utf8(vec![0x20; max_width + 1]).unwrap();
-        error!(
-            "{}{}  {}",
-            &pad,
-            Blue.bold().paint("|"),
-            Red.bold().paint(&self.context.pointer)
-        );
-        error!("");
-    }
-}
-
-/// Prints the specified errors
-pub fn print_errors(errors: &[LoaderError]) {
-    if let Some(max_width) = errors.iter().map(|error| error.line_number_width()).max() {
-        for error in errors.iter() {
-            error.print(max_width);
-        }
-    }
-}
 
 /// Loads all inputs into grammars
 pub fn load(inputs: &[String]) -> Result<Vec<Grammar>, ()> {
@@ -160,11 +80,12 @@ fn resolve_inheritance(
 
 /// Parses the specified input
 fn parse_input(input: &str) -> Result<ParseResult, ()> {
-    info!("Reading input {} ...", input);
+    println!("Reading input {} ...", input);
     let file = match fs::File::open(input) {
         Ok(file) => file,
         Err(error) => {
-            error!("Failed to open {}: {:?}", input, &error);
+            let msg_error = MessageError::from(error);
+            msg_error.print(0);
             return Err(());
         }
     };
@@ -302,7 +223,7 @@ impl Loader {
 
     /// Loads the content of the grammar
     fn load_content(&mut self, errors: &mut Vec<LoaderError>) {
-        info!("Loading grammar {} ...", self.grammar.name);
+        println!("Loading grammar {} ...", self.grammar.name);
         let ast = &self.result.get_ast();
         let root = ast.get_root();
         for node in root.children().iter() {

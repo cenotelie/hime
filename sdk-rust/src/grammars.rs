@@ -1134,7 +1134,7 @@ impl Grammar {
                 .find(|t| t.name == terminal.name || t.value == terminal.value)
             {
                 // is a redefinition
-                warn!(
+                println!(
                     "In grammar {}, ignored redefined terminal {} from {}",
                     &self.name, &redefined.name, &other.name
                 );
