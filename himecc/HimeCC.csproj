@@ -23,9 +23,9 @@
     <Authors>cenotelie</Authors>
     <Description>Command line compiler for Hime grammars.</Description>
     <Copyright>Copyright © Association Cénotélie 2019</Copyright>
-    <PackageLicenseUrl>http://www.gnu.org/licenses/lgpl.txt</PackageLicenseUrl>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <PackageProjectUrl>https://cenotelie.fr/projects/hime</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/cenotelie/hime/downloads/Logo.png</PackageIconUrl>
+    <PackageIcon>Logo.png</PackageIcon>
     <PackageTags>parser generator lr glr rnglr</PackageTags>
     <RepositoryUrl>https://github.com/cenotelie/hime</RepositoryUrl>
     <RepositoryType>hg</RepositoryType>
@@ -33,6 +33,9 @@
     <IncludeSource>true</IncludeSource>
     <IncludeBuildOutput>true</IncludeBuildOutput>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildProjectDirectory)/../.assets/Logo.png" Pack="true" PackagePath=""/>
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Sources/CommandLine.gram" />
     <EmbeddedResource Include="Sources/CommandLineLexer.bin" />
