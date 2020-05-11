@@ -1756,7 +1756,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
                     i += 1;
                 }
                 LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE => {
-                    result.push(production.bytecode[i + 1] as usize);
+                    result.push(production.bytecode[i] as usize);
                     i += 1;
                 }
                 _ => {
