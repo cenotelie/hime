@@ -343,7 +343,7 @@ namespace Hime.SDK.Output
 				stream.WriteLine();
 				stream.WriteLine("/// Parses the specified text with this parser");
 				stream.WriteLine("fn parse_text(text: Text, actions: &mut dyn Actions) -> ParseResult {");
-				stream.WriteLine("    let mut my_actions = |index: usize, head: Symbol, body: &SemanticBody| match index {");
+				stream.WriteLine("    let mut my_actions = |index: usize, head: Symbol, body: &dyn SemanticBody| match index {");
 				int i = 0;
 				foreach (Action action in actions)
 				{
