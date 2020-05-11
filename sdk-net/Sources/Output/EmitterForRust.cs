@@ -75,6 +75,26 @@ namespace Hime.SDK.Output
 		}
 
 		/// <summary>
+		/// Gets the full path and name for the lexer code artifact
+		/// </summary>
+		/// <param name="unit">The unit to emit data for</param>
+		/// <returns>The full path and name for the lexer code artifact</returns>
+		public override string GetArtifactLexerCode(Unit unit)
+		{
+			return unit.OutputPath + Helper.ToSnakeCase(unit.Name) + SuffixLexerCode;
+		}
+
+		/// <summary>
+		/// Gets the full path and name for the parser code artifact
+		/// </summary>
+		/// <param name="unit">The unit to emit data for</param>
+		/// <returns>The full path and name for the parser code artifact</returns>
+		public override string GetArtifactParserCode(Unit unit)
+		{
+			return unit.OutputPath + Helper.ToSnakeCase(unit.Name) + SuffixParserCode;
+		}
+
+		/// <summary>
 		/// Initializes this emitter
 		/// </summary>
 		/// <param name="units">The units to emit data for</param>
