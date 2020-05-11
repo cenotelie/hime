@@ -1,8 +1,7 @@
 #!/bin/sh
 
 SCRIPT="$(readlink -f "$0")"
-RELENG="$(dirname "$SCRIPT")"
-ROOT="$(dirname "$RELENG")"
+ROOT="$(dirname "$SCRIPT")"
 
 # Gather version info
 VERSION=$(grep "<Version>" "$ROOT/sdk-net/Hime.SDK.csproj" | grep -o -E "([[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]])+")
