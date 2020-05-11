@@ -6,7 +6,7 @@ ROOT="$(dirname "$RELENG")"
 
 # Gather version info
 VERSION=$(grep "<Version>" "$ROOT/sdk-net/Hime.SDK.csproj" | grep -o -E "([[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]])+")
-HASH=$(hg -R "$ROOT" --debug id -i)
+HASH=$(git rev-parse HEAD)
 
 echo "Building Hime version $VERSION ($HASH)"
 
