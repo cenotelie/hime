@@ -22,6 +22,7 @@ pub mod parser;
 use crate::automata::fa::{FinalItem, NFA};
 use crate::errors::{print_errors, Error, LoaderError, MessageError};
 use crate::grammars::{Grammar, DEFAULT_CONTEXT_NAME};
+use crate::unicode::{Span, BLOCKS, CATEGORIES};
 use crate::CharSpan;
 use hime_redist::ast::{Ast, AstFamily, AstNode};
 use hime_redist::errors::ParseErrorDataTrait;
@@ -338,6 +339,58 @@ fn load_nfa<'a>(
         parser::ID_TERMINAL_LITERAL_TEXT => load_nfa_simple_text(node),
         parser::ID_TERMINAL_UNICODE_CODEPOINT => load_nfa_codepoint(filename, errors, node),
         parser::ID_TERMINAL_LITERAL_CLASS => load_nfa_class(filename, errors, node),
+        parser::ID_TERMINAL_UNICODE_CATEGORY => load_nfa_unicode_category(filename, errors, node),
+        parser::ID_TERMINAL_UNICODE_BLOCK => load_nfa_unicode_block(filename, errors, node),
+        parser::ID_TERMINAL_UNICODE_SPAN_MARKER => load_nfa_unicode_span(filename, errors, node),
+        parser::ID_TERMINAL_LITERAL_ANY => load_nfa_any(),
+        parser::ID_TERMINAL_NAME => load_nfa_reference(filename, errors, grammar, node),
+        parser::ID_TERMINAL_OPERATOR_OPTIONAL => {
+            let inner = load_nfa(filename, errors, grammar, node.children().at(0));
+            inner.into_optional()
+        }
+        parser::ID_TERMINAL_OPERATOR_ZEROMORE => {
+            let inner = load_nfa(filename, errors, grammar, node.children().at(0));
+            inner.into_zero_or_more()
+        }
+        parser::ID_TERMINAL_OPERATOR_ONEMORE => {
+            let inner = load_nfa(filename, errors, grammar, node.children().at(0));
+            inner.into_one_or_more()
+        }
+        parser::ID_TERMINAL_OPERATOR_UNION => {
+            let left = load_nfa(filename, errors, grammar, node.children().at(0));
+            let right = load_nfa(filename, errors, grammar, node.children().at(1));
+            left.into_union_with(right)
+        }
+        parser::ID_TERMINAL_OPERATOR_DIFFERENCE => {
+            let left = load_nfa(filename, errors, grammar, node.children().at(0));
+            let right = load_nfa(filename, errors, grammar, node.children().at(1));
+            left.into_difference(right)
+        }
+        parser::ID_VIRTUAL_RANGE => {
+            let inner = load_nfa(filename, errors, grammar, node.children().at(0));
+            let children = node.children();
+            let min = children
+                .at(1)
+                .get_value()
+                .unwrap()
+                .parse::<usize>()
+                .unwrap();
+            let mut max = min;
+            if children.len() > 2 {
+                max = children
+                    .at(2)
+                    .get_value()
+                    .unwrap()
+                    .parse::<usize>()
+                    .unwrap();
+            }
+            inner.into_repeat_range(min, max)
+        }
+        parser::ID_VIRTUAL_CONCAT => {
+            let left = load_nfa(filename, errors, grammar, node.children().at(0));
+            let right = load_nfa(filename, errors, grammar, node.children().at(1));
+            left.into_concatenation(right)
+        }
         _ => NFA::new_minimal()
     }
 }
@@ -444,7 +497,7 @@ fn load_nfa_class(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) 
                 )
             });
         }
-        if i <= chars.len() - 2 && chars[i] == '-' {
+        if i + 2 <= chars.len() && chars[i] == '-' {
             // this is range, match the -
             i += 1;
             let (e, l2) = get_char_value(&chars, i);
@@ -505,6 +558,148 @@ fn load_nfa_class(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) 
         nfa.add_transition(inter, CharSpan::new(0xDC00, 0xDFFF), nfa.exit);
     }
     nfa
+}
+
+/// Builds a NFA from a unicode category
+fn load_nfa_unicode_category(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) -> NFA {
+    // extract the value
+    let node_value = node.get_value().unwrap();
+    let value = &node_value[3..(node_value.len() - 1)];
+    match CATEGORIES.get(value) {
+        Some(category) => {
+            let mut nfa = NFA::new_minimal();
+            for span in category.spans.iter() {
+                add_unicode_span_to_nfa(&mut nfa, *span);
+            }
+            nfa
+        }
+        None => {
+            errors.push(LoaderError {
+                filename: filename.to_string(),
+                position: node.get_position().unwrap(),
+                context: node.get_context().unwrap(),
+                message: format!("Unknown unicode category: {}", value)
+            });
+            NFA::new_minimal()
+        }
+    }
+}
+
+/// Builds a NFA from a unicode block
+fn load_nfa_unicode_block(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) -> NFA {
+    // extract the value
+    let node_value = node.get_value().unwrap();
+    let value = &node_value[3..(node_value.len() - 1)];
+    match BLOCKS.get(value) {
+        Some(block) => {
+            let mut nfa = NFA::new_minimal();
+            add_unicode_span_to_nfa(&mut nfa, block.span);
+            nfa
+        }
+        None => {
+            errors.push(LoaderError {
+                filename: filename.to_string(),
+                position: node.get_position().unwrap(),
+                context: node.get_context().unwrap(),
+                message: format!("Unknown unicode block: {}", value)
+            });
+            NFA::new_minimal()
+        }
+    }
+}
+
+/// Builds a NFA from a unicode span
+fn load_nfa_unicode_span(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) -> NFA {
+    // extract the value
+    let children = node.children();
+    let begin = children.at(0).get_value().unwrap();
+    let begin = u32::from_str_radix(&begin[2..(begin.len() - 1)], 16).unwrap();
+    let end = children.at(1).get_value().unwrap();
+    let end = u32::from_str_radix(&end[2..(end.len() - 1)], 16).unwrap();
+    if begin > end {
+        errors.push(LoaderError {
+            filename: filename.to_string(),
+            position: node.get_position().unwrap(),
+            context: node.get_context().unwrap(),
+            message: String::from(
+                "Invalid unicode character span, the end is before the beginning"
+            )
+        });
+        return NFA::new_minimal();
+    }
+    let mut nfa = NFA::new_minimal();
+    add_unicode_span_to_nfa(&mut nfa, Span::new(begin, end));
+    nfa
+}
+
+/// Builds a NFA that matches everything (a single character)
+fn load_nfa_any() -> NFA {
+    let mut nfa = NFA::new_minimal();
+    // plane 0 transitions
+    nfa.add_transition(nfa.entry, CharSpan::new(0x0000, 0xD7FF), nfa.exit);
+    nfa.add_transition(nfa.entry, CharSpan::new(0xE000, 0xFFFF), nfa.exit);
+    // surrogate pairs
+    let intermediate = nfa.add_state().id;
+    nfa.add_transition(nfa.entry, CharSpan::new(0xD800, 0xDBFF), intermediate);
+    nfa.add_transition(intermediate, CharSpan::new(0xDC00, 0xDFFF), nfa.exit);
+    nfa
+}
+
+/// Builds a NFA from a referenced terminal
+fn load_nfa_reference(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &Grammar,
+    node: AstNode
+) -> NFA {
+    let value = node.get_value().unwrap();
+    match grammar.get_terminal_for_name(&value) {
+        Some(terminal) => terminal.nfa.clone_no_finals(),
+        None => {
+            errors.push(LoaderError {
+                filename: filename.to_string(),
+                position: node.get_position().unwrap(),
+                context: node.get_context().unwrap(),
+                message: format!("Reference to unknown terminal {}", &value)
+            });
+            NFA::new_minimal()
+        }
+    }
+}
+
+/// Adds a unicode character span to an existing NFA automaton
+fn add_unicode_span_to_nfa(nfa: &mut NFA, span: Span) {
+    let b = span.begin.get_utf16();
+    let e = span.end.get_utf16();
+    if span.is_plane0() {
+        // this span is entirely in plane 0
+        nfa.add_transition(nfa.entry, CharSpan::new(b[0], e[0]), nfa.exit);
+    } else if span.begin.is_plane0() {
+        // this span has only a part in plane 0
+        if b[0] < 0xD800 {
+            nfa.add_transition(nfa.entry, CharSpan::new(b[0], 0xD7FF), nfa.exit);
+            nfa.add_transition(nfa.entry, CharSpan::new(0xE000, 0xFFFF), nfa.exit);
+        } else {
+            nfa.add_transition(nfa.entry, CharSpan::new(b[0], 0xFFFF), nfa.exit);
+        }
+        let intermediate = nfa.add_state().id;
+        nfa.add_transition(nfa.entry, CharSpan::new(0xD800, e[0]), intermediate);
+        nfa.add_transition(intermediate, CharSpan::new(0xDC00, e[1]), nfa.exit);
+    } else {
+        // there is at least one surrogate value between the first surrogates of begin and end
+        // build lower part
+        let ia = nfa.add_state().id;
+        nfa.add_transition(nfa.entry, CharSpan::new(b[0], b[0]), ia);
+        nfa.add_transition(ia, CharSpan::new(b[1], 0xDFFF), nfa.exit);
+        // build intermediate part
+        let im = nfa.add_state().id;
+        nfa.add_transition(nfa.entry, CharSpan::new(b[0] + 1, e[0] - 1), im);
+        nfa.add_transition(im, CharSpan::new(0xDC00, 0xDFFF), nfa.exit);
+        // build upper part
+        let iz = nfa.add_state().id;
+        nfa.add_transition(nfa.entry, CharSpan::new(e[0], e[0]), iz);
+        nfa.add_transition(iz, CharSpan::new(0xDC00, e[1]), nfa.exit);
+    }
 }
 
 /// Gets the char at the given index
