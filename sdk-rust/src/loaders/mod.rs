@@ -21,13 +21,14 @@ pub mod parser;
 
 use crate::automata::fa::{FinalItem, NFA};
 use crate::errors::{print_errors, Error, LoaderError, MessageError};
-use crate::grammars::{Grammar, DEFAULT_CONTEXT_NAME};
+use crate::grammars::{BodySet, Grammar, SymbolRef, TemplateRuleBody, DEFAULT_CONTEXT_NAME};
 use crate::unicode::{Span, BLOCKS, CATEGORIES};
 use crate::CharSpan;
 use hime_redist::ast::{Ast, AstFamily, AstNode};
 use hime_redist::errors::ParseErrorDataTrait;
 use hime_redist::result::ParseResult;
 use hime_redist::symbols::SemanticElementTrait;
+use std::collections::HashMap;
 use std::fs;
 use std::io;
 
@@ -160,6 +161,22 @@ struct Loader<'a> {
     case_insensitive: bool
 }
 
+/// Represents the lexical context of a loader
+#[derive(Clone)]
+struct LoaderContext {
+    /// The binding of template parameters to their value
+    references: HashMap<String, SymbolRef>
+}
+
+impl LoaderContext {
+    /// Creates a new empty context
+    fn new() -> LoaderContext {
+        LoaderContext {
+            references: HashMap::new()
+        }
+    }
+}
+
 impl<'a> Loader<'a> {
     /// Creates a new loader
     fn new(resource: String, root: AstNode<'a>, errors: &mut Vec<LoaderError>) -> Loader<'a> {
@@ -242,6 +259,8 @@ impl<'a> Loader<'a> {
                 }
             } else if id == parser::ID_TERMINAL_BLOCK_TERMINALS {
                 load_terminals(&self.resource, errors, &mut self.grammar, node);
+            } else if id == parser::ID_TERMINAL_BLOCK_RULES {
+                load_rules(&self.resource, errors, &mut self.grammar, node);
             }
         }
     }
@@ -701,6 +720,76 @@ fn add_unicode_span_to_nfa(nfa: &mut NFA, span: Span) {
         nfa.add_transition(iz, CharSpan::new(0xDC00, e[1]), nfa.exit);
     }
 }
+
+/// Loads the rules block of a grammar
+fn load_rules<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) {
+    // create new context
+    let mut context = LoaderContext::new();
+    // load new variables for the rule's head
+    for child in node.children().iter() {
+        let id = child.get_symbol().id;
+        if id == parser::ID_VARIABLE_CF_RULE_SIMPLE {
+            let name = child.children().at(0).get_value().unwrap();
+            grammar.add_variable(&name);
+        } else if id == parser::ID_VARIABLE_CF_RULE_TEMPLATE {
+            let name = child.children().at(0).get_value().unwrap();
+            let arguments: Vec<String> = child
+                .children()
+                .at(1)
+                .children()
+                .iter()
+                .map(|n| n.get_value().unwrap())
+                .collect();
+            grammar.add_template_rule(&name, arguments);
+        }
+    }
+    // load template rules
+    for child in node.children().iter() {
+        let id = child.get_symbol().id;
+        if id == parser::ID_VARIABLE_CF_RULE_TEMPLATE {
+            let name = child.children().at(0).get_value().unwrap();
+            let template = grammar
+                .template_rules
+                .iter_mut()
+                .find(|r| r.name == name)
+                .unwrap();
+            // TODO load template rule
+        }
+    }
+    // load simple rules
+    for child in node.children().iter() {
+        let id = child.get_symbol().id;
+        if id == parser::ID_VARIABLE_CF_RULE_SIMPLE {
+            let name = child.children().at(0).get_value().unwrap();
+            // TODO load simple rule
+        }
+    }
+}
+
+/*
+fn load_template_definition_atomic<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<TemplateRuleBody> {
+
+}
+
+fn load_template_definition_atomic<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<TemplateRuleBody> {
+
+}
+*/
 
 /// Gets the char at the given index
 fn get_char_value(value: &[char], i: usize) -> (char, usize) {

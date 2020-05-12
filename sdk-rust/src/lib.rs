@@ -286,7 +286,7 @@ impl CompilationTask {
 
     /// Executes this task
     pub fn execute(&self) -> Result<(), ()> {
-        let grammars = match loaders::load(&self.input_files) {
+        let _grammars = match loaders::load(&self.input_files) {
             Ok(grammars) => grammars,
             Err(_) => return Err(())
         };

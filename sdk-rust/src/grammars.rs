@@ -506,6 +506,42 @@ impl PartialEq for RuleChoice {
 
 impl Eq for RuleChoice {}
 
+/// Common trait for different kind of rule body
+pub trait RuleBodyTrait {
+    /// Produces the concatenation of two elements
+    fn concatenate(left: &Self, right: &Self) -> Self;
+
+    /// Apply a tree action to all elements in the body
+    fn apply_action(&mut self, action: TreeAction);
+}
+
+/// A set of rule bodies
+pub struct BodySet<T: RuleBodyTrait> {
+    /// The bodies in the set
+    pub bodies: Vec<T>
+}
+
+impl<T: RuleBodyTrait> BodySet<T> {
+    /// Builds the union of the left and right set
+    pub fn into_union_with(mut left: BodySet<T>, mut right: BodySet<T>) -> BodySet<T> {
+        let mut bodies = Vec::with_capacity(left.bodies.len() + right.bodies.len());
+        bodies.append(&mut left.bodies);
+        bodies.append(&mut right.bodies);
+        BodySet { bodies }
+    }
+
+    /// Builds the product of the left and right set
+    pub fn into_product_with(left: BodySet<T>, right: BodySet<T>) -> BodySet<T> {
+        let mut bodies = Vec::with_capacity(left.bodies.len() * right.bodies.len());
+        for body_left in left.bodies.into_iter() {
+            for body_right in right.bodies.iter() {
+                bodies.push(T::concatenate(&body_left, body_right));
+            }
+        }
+        BodySet { bodies }
+    }
+}
+
 /// Represents the body of a grammar rule
 #[derive(Debug, Clone, Default)]
 pub struct RuleBody {
@@ -515,6 +551,29 @@ pub struct RuleBody {
     pub firsts: TerminalSet,
     /// The choices in this body
     pub choices: Vec<RuleChoice>
+}
+
+impl RuleBodyTrait for RuleBody {
+    fn concatenate(left: &RuleBody, right: &RuleBody) -> RuleBody {
+        let mut parts = Vec::new();
+        for element in left.parts.iter() {
+            parts.push(*element);
+        }
+        for element in right.parts.iter() {
+            parts.push(*element);
+        }
+        RuleBody {
+            parts,
+            firsts: TerminalSet::default(),
+            choices: Vec::new()
+        }
+    }
+
+    fn apply_action(&mut self, action: TreeAction) {
+        for part in self.parts.iter_mut() {
+            part.action = action;
+        }
+    }
 }
 
 impl RuleBody {
@@ -529,22 +588,6 @@ impl RuleBody {
 
     /// Initializes this rule body from parts
     pub fn from_parts(parts: Vec<RuleBodyElement>) -> RuleBody {
-        RuleBody {
-            parts,
-            firsts: TerminalSet::default(),
-            choices: Vec::new()
-        }
-    }
-
-    /// Produces the concatenation of the left and right bodies
-    pub fn concatenate(left: &RuleBody, right: &RuleBody) -> RuleBody {
-        let mut parts = Vec::new();
-        for element in left.parts.iter() {
-            parts.push(*element);
-        }
-        for element in right.parts.iter() {
-            parts.push(*element);
-        }
         RuleBody {
             parts,
             firsts: TerminalSet::default(),
@@ -708,17 +751,28 @@ impl PartialEq for Rule {
 
 impl Eq for Rule {}
 
+/// Reference to a template rule
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct TemplateRuleRef {
+    /// Index of the template rule
+    pub template: usize,
+    /// The arguments to the template
+    pub arguments: Vec<TemplateRuleSymbol>
+}
+
 /// A symbol in a template rule
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum TemplateRuleSymbol {
     /// A reference to the n-th parameter of the template
     Parameter(usize),
     /// A usual reference to a grammar symbol
-    Symbol(SymbolRef)
+    Symbol(SymbolRef),
+    /// A call to template rule
+    Template(TemplateRuleRef)
 }
 
 /// An element in a template rule
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct TemplateRuleElement {
     /// The symbol of this element
     pub symbol: TemplateRuleSymbol,
@@ -748,6 +802,32 @@ impl PartialEq for TemplateRuleInstance {
 
 impl Eq for TemplateRuleInstance {}
 
+/// A body for a template rule
+#[derive(Debug, Clone)]
+pub struct TemplateRuleBody {
+    /// The elements in the rule's body
+    pub elements: Vec<TemplateRuleElement>
+}
+
+impl RuleBodyTrait for TemplateRuleBody {
+    fn concatenate(left: &TemplateRuleBody, right: &TemplateRuleBody) -> TemplateRuleBody {
+        let mut parts = Vec::new();
+        for element in left.elements.iter() {
+            parts.push(element.clone());
+        }
+        for element in right.elements.iter() {
+            parts.push(element.clone());
+        }
+        TemplateRuleBody { elements: parts }
+    }
+
+    fn apply_action(&mut self, action: TreeAction) {
+        for element in self.elements.iter_mut() {
+            element.action = action;
+        }
+    }
+}
+
 /// A template rule in a grammar
 #[derive(Debug, Clone)]
 pub struct TemplateRule {
@@ -755,8 +835,8 @@ pub struct TemplateRule {
     pub name: String,
     /// The name of the parameters for the rule
     pub parameters: Vec<String>,
-    /// The elements in the rule's body
-    pub elements: Vec<TemplateRuleElement>,
+    /// The possible bodies for the template rule
+    pub bodies: Vec<TemplateRuleBody>,
     /// The known instanes of this rule
     pub instances: Vec<TemplateRuleInstance>
 }
@@ -767,7 +847,7 @@ impl TemplateRule {
         TemplateRule {
             name,
             parameters,
-            elements: Vec::new(),
+            bodies: Vec::new(),
             instances: Vec::new()
         }
     }
@@ -1043,6 +1123,9 @@ impl Grammar {
 
     /// Adds a template rule with the given name to this grammar
     pub fn add_template_rule(&mut self, name: &str, parameters: Vec<String>) -> &mut TemplateRule {
+        if let Some(index) = self.template_rules.iter().position(|v| v.name == name) {
+            return &mut self.template_rules[index];
+        }
         let index = self.template_rules.len();
         self.template_rules
             .push(TemplateRule::new(name.to_string(), parameters));
@@ -1057,52 +1140,79 @@ impl Grammar {
     ) -> Result<SymbolRef, ()> {
         match self.template_rules.iter().position(|r| r.name == name) {
             None => Err(()), // no rule found for this name
-            Some(index) => {
-                let mut new_instance = TemplateRuleInstance { arguments, head: 0 };
-                match self.template_rules[index]
-                    .instances
-                    .iter()
-                    .find(|instance| *instance == &new_instance)
-                {
-                    Some(instance) => Ok(SymbolRef::Variable(instance.head)),
-                    None => {
-                        let args_names: Vec<&str> = new_instance
-                            .arguments
-                            .iter()
-                            .map(|arg| self.get_symbol_name(*arg))
-                            .collect();
-                        let args_names = args_names.join(", ");
-                        let name = format!("{}<{}>", name, args_names);
-                        let body = RuleBody::from_parts(
-                            self.template_rules[index]
-                                .elements
-                                .iter()
-                                .map(|elem| RuleBodyElement {
-                                    symbol: match elem.symbol {
-                                        TemplateRuleSymbol::Parameter(index) => {
-                                            new_instance.arguments[index]
-                                        }
-                                        TemplateRuleSymbol::Symbol(symbol) => symbol
-                                    },
-                                    action: elem.action
-                                })
-                                .collect()
-                        );
-                        let head = {
-                            let variable = self.add_variable(&name);
-                            variable.rules.push(Rule {
-                                head: variable.id,
-                                head_action: TREE_ACTION_NONE,
-                                body,
-                                context: 0
-                            });
-                            variable.id
-                        };
-                        new_instance.head = head;
-                        self.template_rules[index].instances.push(new_instance);
-                        Ok(SymbolRef::Variable(head))
-                    }
+            Some(index) => Ok(self.instantiate_template_rule_at(index, arguments))
+        }
+    }
+
+    /// Instantiate a symbol in a template rule
+    fn instantiate_template_symbol(
+        &mut self,
+        arguments: &[SymbolRef],
+        symbol: &TemplateRuleSymbol
+    ) -> SymbolRef {
+        match symbol {
+            TemplateRuleSymbol::Parameter(index) => arguments[*index],
+            TemplateRuleSymbol::Symbol(symbol) => *symbol,
+            TemplateRuleSymbol::Template(template_ref) => {
+                let mut new_arguments = Vec::new();
+                for arg in template_ref.arguments.iter() {
+                    new_arguments.push(self.instantiate_template_symbol(arguments, arg));
                 }
+                self.instantiate_template_rule_at(template_ref.template, new_arguments)
+            }
+        }
+    }
+
+    /// Instantiate a template rule
+    fn instantiate_template_rule_at(
+        &mut self,
+        index: usize,
+        arguments: Vec<SymbolRef>
+    ) -> SymbolRef {
+        let mut new_instance = TemplateRuleInstance { arguments, head: 0 };
+        match self.template_rules[index]
+            .instances
+            .iter()
+            .find(|instance| *instance == &new_instance)
+        {
+            Some(instance) => SymbolRef::Variable(instance.head),
+            None => {
+                let args_names: Vec<&str> = new_instance
+                    .arguments
+                    .iter()
+                    .map(|arg| self.get_symbol_name(*arg))
+                    .collect();
+                let args_names = args_names.join(", ");
+                let name = format!("{}<{}>", &self.template_rules[index].name, args_names);
+                let mut bodies = Vec::new();
+                for body in self.template_rules[index].bodies.clone().into_iter() {
+                    let mut elements = Vec::new();
+                    for element in body.elements.into_iter() {
+                        elements.push(RuleBodyElement {
+                            symbol: self.instantiate_template_symbol(
+                                &new_instance.arguments,
+                                &element.symbol
+                            ),
+                            action: element.action
+                        });
+                    }
+                    bodies.push(RuleBody::from_parts(elements));
+                }
+                let head = {
+                    let variable = self.add_variable(&name);
+                    for body in bodies.into_iter() {
+                        variable.rules.push(Rule {
+                            head: variable.id,
+                            head_action: TREE_ACTION_NONE,
+                            body,
+                            context: 0
+                        });
+                    }
+                    variable.id
+                };
+                new_instance.head = head;
+                self.template_rules[index].instances.push(new_instance);
+                SymbolRef::Variable(head)
             }
         }
     }
@@ -1219,29 +1329,49 @@ impl Grammar {
         }
     }
 
+    /// Creates the equivalent template rule symbol for this grammar
+    fn inherit_template_rule_symbol(
+        &self,
+        other: &Grammar,
+        symbol: &TemplateRuleSymbol
+    ) -> TemplateRuleSymbol {
+        match symbol {
+            TemplateRuleSymbol::Parameter(index) => TemplateRuleSymbol::Parameter(*index),
+            TemplateRuleSymbol::Symbol(symbol) => {
+                TemplateRuleSymbol::Symbol(self.map_symbol_ref(other, *symbol))
+            }
+            TemplateRuleSymbol::Template(template_ref) => {
+                let name = &other.template_rules[template_ref.template].name;
+                let index = self
+                    .template_rules
+                    .iter()
+                    .enumerate()
+                    .find(|(_i, r)| &r.name == name)
+                    .unwrap()
+                    .0;
+                TemplateRuleSymbol::Template(TemplateRuleRef {
+                    template: index,
+                    arguments: template_ref
+                        .arguments
+                        .iter()
+                        .map(|symbol| self.inherit_template_rule_symbol(other, symbol))
+                        .collect()
+                })
+            }
+        }
+    }
+
     /// Inherit the template rules from the parent grammar
     fn inherit_template_rules(&mut self, other: &Grammar) {
+        let mut couples: Vec<(usize, &TemplateRule)> = Vec::new();
         for rule in other.template_rules.iter() {
             if self.template_rules.iter().all(|tr| tr.name != rule.name) {
                 // does not exist yet
+                let index = self.template_rules.len();
                 self.template_rules.push(TemplateRule {
                     name: rule.name.clone(),
                     parameters: rule.parameters.clone(),
-                    elements: rule
-                        .elements
-                        .iter()
-                        .map(|elem| TemplateRuleElement {
-                            symbol: match elem.symbol {
-                                TemplateRuleSymbol::Parameter(index) => {
-                                    TemplateRuleSymbol::Parameter(index)
-                                }
-                                TemplateRuleSymbol::Symbol(symbol) => {
-                                    TemplateRuleSymbol::Symbol(self.map_symbol_ref(other, symbol))
-                                }
-                            },
-                            action: elem.action
-                        })
-                        .collect(),
+                    bodies: Vec::new(),
                     instances: rule
                         .instances
                         .iter()
@@ -1267,6 +1397,23 @@ impl Grammar {
                         })
                         .collect()
                 });
+                couples.push((index, rule));
+            }
+        }
+
+        for (index, other_rule) in couples.into_iter() {
+            for body in other_rule.bodies.iter() {
+                let mut elements = Vec::new();
+                for element in body.elements.iter() {
+                    let symbol = self.inherit_template_rule_symbol(other, &element.symbol);
+                    elements.push(TemplateRuleElement {
+                        symbol,
+                        action: element.action
+                    });
+                }
+                self.template_rules[index]
+                    .bodies
+                    .push(TemplateRuleBody { elements });
             }
         }
     }
