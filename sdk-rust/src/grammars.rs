@@ -796,6 +796,13 @@ pub struct TemplateRuleElement {
     pub action: TreeAction
 }
 
+impl TemplateRuleElement {
+    /// Creates a new body element
+    pub fn new(symbol: TemplateRuleSymbol, action: TreeAction) -> TemplateRuleElement {
+        TemplateRuleElement { symbol, action }
+    }
+}
+
 /// An instance of a template rule
 #[derive(Debug, Clone)]
 pub struct TemplateRuleInstance {
@@ -844,6 +851,22 @@ impl RuleBodyTrait for TemplateRuleBody {
     }
 }
 
+impl TemplateRuleBody {
+    /// Initializes this rule body
+    pub fn empty() -> TemplateRuleBody {
+        TemplateRuleBody {
+            elements: Vec::new()
+        }
+    }
+
+    /// Initializes this rule body
+    pub fn single(symbol: TemplateRuleSymbol) -> TemplateRuleBody {
+        TemplateRuleBody {
+            elements: vec![TemplateRuleElement::new(symbol, TREE_ACTION_NONE)]
+        }
+    }
+}
+
 /// A template rule in a grammar
 #[derive(Debug, Clone)]
 pub struct TemplateRule {
@@ -851,6 +874,10 @@ pub struct TemplateRule {
     pub name: String,
     /// The name of the parameters for the rule
     pub parameters: Vec<String>,
+    /// The action on the rule's head
+    pub head_action: TreeAction,
+    /// The lexical context pushed by this rule
+    pub context: usize,
     /// The possible bodies for the template rule
     pub bodies: Vec<TemplateRuleBody>,
     /// The known instanes of this rule
@@ -863,6 +890,8 @@ impl TemplateRule {
         TemplateRule {
             name,
             parameters,
+            head_action: TREE_ACTION_NONE,
+            context: 0,
             bodies: Vec::new(),
             instances: Vec::new()
         }
@@ -1152,6 +1181,13 @@ impl Grammar {
         &mut self.template_rules[index]
     }
 
+    /// Generates a new template rule
+    pub fn generate_template_rule(&mut self, parameters: Vec<String>) -> &mut TemplateRule {
+        let sid = self.get_next_sid();
+        let name = format!("{}{}", PREFIX_GENERATED_VARIABLE, sid);
+        self.add_template_rule(&name, parameters)
+    }
+
     /// Instantiate a template rule
     pub fn instantiate_template_rule(
         &mut self,
@@ -1213,6 +1249,8 @@ impl Grammar {
                     .collect();
                 let args_names = args_names.join(", ");
                 let name = format!("{}<{}>", &self.template_rules[index].name, args_names);
+                let head_action = self.template_rules[index].head_action;
+                let context = self.template_rules[index].context;
                 let mut bodies = Vec::new();
                 for body in self.template_rules[index].bodies.clone().into_iter() {
                     let mut elements = Vec::new();
@@ -1232,9 +1270,9 @@ impl Grammar {
                     for body in bodies.into_iter() {
                         variable.rules.push(Rule {
                             head: variable.id,
-                            head_action: TREE_ACTION_NONE,
+                            head_action,
                             body,
-                            context: 0
+                            context
                         });
                     }
                     variable.id
@@ -1400,6 +1438,8 @@ impl Grammar {
                 self.template_rules.push(TemplateRule {
                     name: rule.name.clone(),
                     parameters: rule.parameters.clone(),
+                    head_action: rule.head_action,
+                    context: rule.context,
                     bodies: Vec::new(),
                     instances: rule
                         .instances
