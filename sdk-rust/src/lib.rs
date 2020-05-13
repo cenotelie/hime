@@ -268,9 +268,9 @@ pub struct CompilationTask {
     pub method: ParsingMethod
 }
 
-impl CompilationTask {
+impl Default for CompilationTask {
     /// Creates a new task with default values
-    pub fn new() -> CompilationTask {
+    fn default() -> CompilationTask {
         CompilationTask {
             input_files: Vec::new(),
             grammar_name: None,
@@ -283,7 +283,9 @@ impl CompilationTask {
             method: ParsingMethod::LALR1
         }
     }
+}
 
+impl CompilationTask {
     /// Executes this task
     pub fn execute(&self) -> Result<(), ()> {
         let _grammars = match loaders::load(&self.input_files) {

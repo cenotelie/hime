@@ -143,7 +143,7 @@ pub fn main() {
     if matches.value_of("regenerate").is_some() {
         // TODO: regenerate
     } else {
-        let mut task = CompilationTask::new();
+        let mut task = CompilationTask::default();
         match matches.value_of("output_mode") {
             Some("sources") => task.mode = Mode::Source,
             Some("assembly") => task.mode = Mode::Assembly,

@@ -151,21 +151,19 @@ pub fn to_upper_case(name: &str) -> String {
             } else {
                 result.push(UNDERSCORE);
             }
-        } else {
-            if c >= UPPER_A && c <= UPPER_Z {
-                let x = (&name as &dyn AsRef<[u8]>).as_ref()[i - 1];
-                if (x >= LOWER_A && x <= LOWER_Z) || (x >= DIGIT9 && x <= DIGIT9) {
-                    // preceded by a lower-case character or a number, this is a new word
-                    result.push(UNDERSCORE);
-                }
-                result.push(c);
-            } else if c >= LOWER_A && c <= LOWER_Z {
-                result.push(c - TO_LOWER);
-            } else if c >= DIGIT0 && c <= DIGIT9 {
-                result.push(c);
-            } else {
+        } else if c >= UPPER_A && c <= UPPER_Z {
+            let x = (&name as &dyn AsRef<[u8]>).as_ref()[i - 1];
+            if (x >= LOWER_A && x <= LOWER_Z) || (x >= DIGIT0 && x <= DIGIT9) {
+                // preceded by a lower-case character or a number, this is a new word
                 result.push(UNDERSCORE);
             }
+            result.push(c);
+        } else if c >= LOWER_A && c <= LOWER_Z {
+            result.push(c - TO_LOWER);
+        } else if c >= DIGIT0 && c <= DIGIT9 {
+            result.push(c);
+        } else {
+            result.push(UNDERSCORE);
         }
     }
     String::from_utf8(result).unwrap()
@@ -196,21 +194,17 @@ pub fn to_snake_case(name: &str) -> String {
             } else {
                 result.push(UNDERSCORE);
             }
-        } else {
-            if c >= UPPER_A && c <= UPPER_Z {
-                let x = (&name as &dyn AsRef<[u8]>).as_ref()[i - 1];
-                if (x >= LOWER_A && x <= LOWER_Z) || (x >= DIGIT9 && x <= DIGIT9) {
-                    // preceded by a lower-case character or a number, this is a new word
-                    result.push(UNDERSCORE);
-                }
-                result.push(c + TO_LOWER);
-            } else if c >= LOWER_A && c <= LOWER_Z {
-                result.push(c);
-            } else if c >= DIGIT0 && c <= DIGIT9 {
-                result.push(c);
-            } else {
+        } else if c >= UPPER_A && c <= UPPER_Z {
+            let x = (&name as &dyn AsRef<[u8]>).as_ref()[i - 1];
+            if (x >= LOWER_A && x <= LOWER_Z) || (x >= DIGIT0 && x <= DIGIT9) {
+                // preceded by a lower-case character or a number, this is a new word
                 result.push(UNDERSCORE);
             }
+            result.push(c + TO_LOWER);
+        } else if (c >= LOWER_A && c <= LOWER_Z) || (c >= DIGIT0 && c <= DIGIT9) {
+            result.push(c);
+        } else {
+            result.push(UNDERSCORE);
         }
     }
     String::from_utf8(result).unwrap()

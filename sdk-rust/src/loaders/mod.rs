@@ -385,15 +385,16 @@ fn load_nfa<'a>(
                 .unwrap()
                 .parse::<usize>()
                 .unwrap();
-            let mut max = min;
-            if children.len() > 2 {
-                max = children
+            let max = if children.len() > 2 {
+                children
                     .at(2)
                     .get_value()
                     .unwrap()
                     .parse::<usize>()
-                    .unwrap();
-            }
+                    .unwrap()
+            } else {
+                min
+            };
             inner.into_repeat_range(min, max)
         }
         parser::ID_VIRTUAL_CONCAT => {
@@ -1008,7 +1009,7 @@ fn load_simple_rule_concat<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_simple_rule_empty_part<'a>() -> BodySet<RuleBody> {
+fn load_simple_rule_empty_part() -> BodySet<RuleBody> {
     BodySet {
         bodies: vec![RuleBody::empty()]
     }
@@ -1245,7 +1246,7 @@ fn load_template_rule_context<'a>(
             TemplateRuleRef {
                 template: template_index,
                 arguments: (0..parameters.len())
-                    .map(|i| TemplateRuleSymbol::Parameter(i))
+                    .map(TemplateRuleSymbol::Parameter)
                     .collect()
             }
         ))]
@@ -1276,7 +1277,7 @@ fn load_template_rule_sub_rule<'a>(
             TemplateRuleRef {
                 template: template_index,
                 arguments: (0..parameters.len())
-                    .map(|i| TemplateRuleSymbol::Parameter(i))
+                    .map(TemplateRuleSymbol::Parameter)
                     .collect()
             }
         ))]
@@ -1333,7 +1334,7 @@ fn load_template_rule_zero_or_more<'a>(
             TemplateRuleRef {
                 template: template_index,
                 arguments: (0..parameters.len())
-                    .map(|i| TemplateRuleSymbol::Parameter(i))
+                    .map(TemplateRuleSymbol::Parameter)
                     .collect()
             }
         ))]
@@ -1350,7 +1351,7 @@ fn load_template_rule_zero_or_more<'a>(
             TemplateRuleBody::single(TemplateRuleSymbol::Template(TemplateRuleRef {
                 template: template_index,
                 arguments: (0..parameters.len())
-                    .map(|i| TemplateRuleSymbol::Parameter(i))
+                    .map(TemplateRuleSymbol::Parameter)
                     .collect()
             })),
         ]
@@ -1388,7 +1389,7 @@ fn load_template_rule_one_or_more<'a>(
             TemplateRuleRef {
                 template: template_index,
                 arguments: (0..parameters.len())
-                    .map(|i| TemplateRuleSymbol::Parameter(i))
+                    .map(TemplateRuleSymbol::Parameter)
                     .collect()
             }
         ))]
@@ -1404,7 +1405,7 @@ fn load_template_rule_one_or_more<'a>(
             TemplateRuleRef {
                 template: template_index,
                 arguments: (0..parameters.len())
-                    .map(|i| TemplateRuleSymbol::Parameter(i))
+                    .map(TemplateRuleSymbol::Parameter)
                     .collect()
             }
         ))]
@@ -1500,7 +1501,7 @@ fn load_template_rule_concat<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_template_rule_empty_part<'a>() -> BodySet<TemplateRuleBody> {
+fn load_template_rule_empty_part() -> BodySet<TemplateRuleBody> {
     BodySet {
         bodies: vec![TemplateRuleBody::empty()]
     }
