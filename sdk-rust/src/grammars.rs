@@ -523,7 +523,7 @@ pub struct BodySet<T: RuleBodyTrait> {
 
 impl<T: RuleBodyTrait> BodySet<T> {
     /// Builds the union of the left and right set
-    pub fn into_union_with(mut left: BodySet<T>, mut right: BodySet<T>) -> BodySet<T> {
+    pub fn union(mut left: BodySet<T>, mut right: BodySet<T>) -> BodySet<T> {
         let mut bodies = Vec::with_capacity(left.bodies.len() + right.bodies.len());
         bodies.append(&mut left.bodies);
         bodies.append(&mut right.bodies);
@@ -531,7 +531,7 @@ impl<T: RuleBodyTrait> BodySet<T> {
     }
 
     /// Builds the product of the left and right set
-    pub fn into_product_with(left: BodySet<T>, right: BodySet<T>) -> BodySet<T> {
+    pub fn product(left: BodySet<T>, right: BodySet<T>) -> BodySet<T> {
         let mut bodies = Vec::with_capacity(left.bodies.len() * right.bodies.len());
         for body_left in left.bodies.into_iter() {
             for body_right in right.bodies.iter() {
@@ -539,6 +539,13 @@ impl<T: RuleBodyTrait> BodySet<T> {
             }
         }
         BodySet { bodies }
+    }
+
+    /// Apply a tree action to all elements in the bodies
+    pub fn apply_action(&mut self, action: TreeAction) {
+        for body in self.bodies.iter_mut() {
+            body.apply_action(action);
+        }
     }
 }
 
@@ -578,7 +585,16 @@ impl RuleBodyTrait for RuleBody {
 
 impl RuleBody {
     /// Initializes this rule body
-    pub fn new(symbol: SymbolRef) -> RuleBody {
+    pub fn empty() -> RuleBody {
+        RuleBody {
+            parts: Vec::new(),
+            firsts: TerminalSet::default(),
+            choices: Vec::new()
+        }
+    }
+
+    /// Initializes this rule body
+    pub fn single(symbol: SymbolRef) -> RuleBody {
         RuleBody {
             parts: vec![RuleBodyElement::new(symbol, TREE_ACTION_NONE)],
             firsts: TerminalSet::default(),
@@ -904,7 +920,11 @@ pub enum GrammarError {
     /// The grammar's axiom has not been specified in the options
     AxiomNotSpecified,
     /// The grammar's axiom is not defined (does not exist)
-    AxiomNotDefined
+    AxiomNotDefined,
+    /// The template rule could not be found
+    TemplateRuleNotFound,
+    /// When instantiating a template rule, the wrong number of arguments were supplied
+    TemplateRuleWrongNumberOfArgs(usize)
 }
 
 /// Represents a grammar
@@ -1137,10 +1157,19 @@ impl Grammar {
         &mut self,
         name: &str,
         arguments: Vec<SymbolRef>
-    ) -> Result<SymbolRef, ()> {
+    ) -> Result<SymbolRef, GrammarError> {
         match self.template_rules.iter().position(|r| r.name == name) {
-            None => Err(()), // no rule found for this name
-            Some(index) => Ok(self.instantiate_template_rule_at(index, arguments))
+            None => Err(GrammarError::TemplateRuleNotFound),
+            Some(index) => {
+                let rule = &self.template_rules[index];
+                if rule.parameters.len() != arguments.len() {
+                    Err(GrammarError::TemplateRuleWrongNumberOfArgs(
+                        rule.parameters.len()
+                    ))
+                } else {
+                    Ok(self.instantiate_template_rule_at(index, arguments))
+                }
+            }
         }
     }
 

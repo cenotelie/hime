@@ -21,11 +21,18 @@ pub mod parser;
 
 use crate::automata::fa::{FinalItem, NFA};
 use crate::errors::{print_errors, Error, LoaderError, MessageError};
-use crate::grammars::{BodySet, Grammar, SymbolRef, TemplateRuleBody, DEFAULT_CONTEXT_NAME};
+use crate::grammars::{
+    BodySet, Grammar, GrammarError, Rule, RuleBody, SymbolRef, DEFAULT_CONTEXT_NAME
+};
 use crate::unicode::{Span, BLOCKS, CATEGORIES};
 use crate::CharSpan;
 use hime_redist::ast::{Ast, AstFamily, AstNode};
 use hime_redist::errors::ParseErrorDataTrait;
+use hime_redist::lexers::DEFAULT_CONTEXT;
+use hime_redist::parsers::{
+    TREE_ACTION_DROP, TREE_ACTION_NONE, TREE_ACTION_PROMOTE, TREE_ACTION_REPLACE_BY_CHILDREN,
+    TREE_ACTION_REPLACE_BY_EPSILON
+};
 use hime_redist::result::ParseResult;
 use hime_redist::symbols::SemanticElementTrait;
 use std::collections::HashMap;
@@ -765,9 +772,413 @@ fn load_rules<'a>(
     for child in node.children().iter() {
         let id = child.get_symbol().id;
         if id == parser::ID_VARIABLE_CF_RULE_SIMPLE {
-            let name = child.children().at(0).get_value().unwrap();
-            // TODO load simple rule
+            load_simple_rule(filename, errors, grammar, child);
         }
+    }
+}
+
+/// Loads the syntactic rule in the given AST
+fn load_simple_rule<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) {
+    let name = node.children().at(0).get_value().unwrap();
+    let definitions = load_simple_rule_definitions(filename, errors, grammar, node);
+    let variable = grammar.add_variable(&name);
+    for body in definitions.bodies.into_iter() {
+        variable.add_rule(Rule::new(
+            variable.id,
+            TREE_ACTION_NONE,
+            body,
+            DEFAULT_CONTEXT as usize
+        ));
+    }
+}
+
+/// Builds the set of rule definitions that are represented by the given AST
+fn load_simple_rule_definitions<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    match node.get_symbol().id {
+        parser::ID_VARIABLE_RULE_DEF_CONTEXT => {
+            load_simple_rule_context(filename, errors, grammar, node)
+        }
+        parser::ID_VARIABLE_RULE_DEF_SUB => {
+            load_simple_rule_sub_rule(filename, errors, grammar, node)
+        }
+        parser::ID_TERMINAL_OPERATOR_OPTIONAL => {
+            load_simple_rule_optional(filename, errors, grammar, node)
+        }
+        parser::ID_TERMINAL_OPERATOR_ZEROMORE => {
+            load_simple_rule_zero_or_more(filename, errors, grammar, node)
+        }
+        parser::ID_TERMINAL_OPERATOR_ONEMORE => {
+            load_simple_rule_one_or_more(filename, errors, grammar, node)
+        }
+        parser::ID_TERMINAL_OPERATOR_UNION => {
+            load_simple_rule_union(filename, errors, grammar, node)
+        }
+        parser::ID_TERMINAL_TREE_ACTION_PROMOTE => {
+            load_simple_rule_tree_action_promote(filename, errors, grammar, node)
+        }
+        parser::ID_TERMINAL_TREE_ACTION_DROP => {
+            load_simple_rule_tree_action_drop(filename, errors, grammar, node)
+        }
+        parser::ID_VIRTUAL_CONCAT => load_simple_rule_concat(filename, errors, grammar, node),
+        parser::ID_VIRTUAL_EMPTYPART => load_simple_rule_empty_part(),
+        _ => load_simple_rule_atomic(filename, errors, grammar, node)
+    }
+}
+
+/// Builds the set of rule definitions that are represented by the given AST
+fn load_simple_rule_context<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    let name = node.children().at(0).get_value().unwrap();
+    let context_id = grammar.resolve_context(&name);
+    let definitions =
+        load_simple_rule_definitions(filename, errors, grammar, node.children().at(1));
+    let sub_var = grammar.generate_variable();
+    for body in definitions.bodies.into_iter() {
+        sub_var.add_rule(Rule::new(
+            sub_var.id,
+            TREE_ACTION_REPLACE_BY_CHILDREN,
+            body,
+            context_id
+        ));
+    }
+    BodySet {
+        bodies: vec![RuleBody::single(SymbolRef::Variable(sub_var.id))]
+    }
+}
+
+/// Builds the set of rule definitions that are represented by the given AST
+fn load_simple_rule_sub_rule<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    let definitions =
+        load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
+    let sub_var = grammar.generate_variable();
+    for body in definitions.bodies.into_iter() {
+        sub_var.add_rule(Rule::new(
+            sub_var.id,
+            TREE_ACTION_REPLACE_BY_EPSILON,
+            body,
+            DEFAULT_CONTEXT as usize
+        ));
+    }
+    BodySet {
+        bodies: vec![RuleBody::single(SymbolRef::Variable(sub_var.id))]
+    }
+}
+
+/// Builds the set of rule definitions that are represented by the given AST
+fn load_simple_rule_optional<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    let mut definitions =
+        load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
+    definitions.bodies.push(RuleBody::empty());
+    definitions
+}
+
+/// Builds the set of rule definitions that are represented by the given AST
+fn load_simple_rule_zero_or_more<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    // get definitions
+    let set_inner = load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
+    // generate the sub variables
+    let sub_var = grammar.generate_variable();
+    // build all rules
+    // sub_var -> definition
+    for body in set_inner.bodies.iter() {
+        sub_var.add_rule(Rule::new(
+            sub_var.id,
+            TREE_ACTION_REPLACE_BY_CHILDREN,
+            body.clone(),
+            DEFAULT_CONTEXT as usize
+        ));
+    }
+    // Produce single defition [sub_var]
+    let set_var = BodySet {
+        bodies: vec![RuleBody::single(SymbolRef::Variable(sub_var.id))]
+    };
+    let set_var = BodySet::product(set_var, set_inner);
+    // build all rules
+    // sub_var -> sub_var definition
+    for body in set_var.bodies.into_iter() {
+        sub_var.add_rule(Rule::new(
+            sub_var.id,
+            TREE_ACTION_REPLACE_BY_CHILDREN,
+            body,
+            DEFAULT_CONTEXT as usize
+        ));
+    }
+    BodySet {
+        bodies: vec![
+            RuleBody::empty(),
+            RuleBody::single(SymbolRef::Variable(sub_var.id)),
+        ]
+    }
+}
+
+/// Builds the set of rule definitions that are represented by the given AST
+fn load_simple_rule_one_or_more<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    // get definitions
+    let set_inner = load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
+    // generate the sub variables
+    let sub_var = grammar.generate_variable();
+    // build all rules
+    // sub_var -> definition
+    for body in set_inner.bodies.iter() {
+        sub_var.add_rule(Rule::new(
+            sub_var.id,
+            TREE_ACTION_REPLACE_BY_CHILDREN,
+            body.clone(),
+            DEFAULT_CONTEXT as usize
+        ));
+    }
+    // Produce single defition [sub_var]
+    let set_var = BodySet {
+        bodies: vec![RuleBody::single(SymbolRef::Variable(sub_var.id))]
+    };
+    let set_var = BodySet::product(set_var, set_inner);
+    // build all rules
+    // sub_var -> sub_var definition
+    for body in set_var.bodies.into_iter() {
+        sub_var.add_rule(Rule::new(
+            sub_var.id,
+            TREE_ACTION_REPLACE_BY_CHILDREN,
+            body,
+            DEFAULT_CONTEXT as usize
+        ));
+    }
+    BodySet {
+        bodies: vec![RuleBody::single(SymbolRef::Variable(sub_var.id))]
+    }
+}
+
+/// Builds the set of rule definitions that are represented by the given AST
+fn load_simple_rule_union<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    let set_left = load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
+    let set_right = load_simple_rule_definitions(filename, errors, grammar, node.children().at(1));
+    BodySet::union(set_left, set_right)
+}
+
+/// Builds the set of rule definitions that are represented by the given AST
+fn load_simple_rule_tree_action_promote<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    let mut set_inner =
+        load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
+    set_inner.apply_action(TREE_ACTION_PROMOTE);
+    set_inner
+}
+
+/// Builds the set of rule definitions that are represented by the given AST
+fn load_simple_rule_tree_action_drop<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    let mut set_inner =
+        load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
+    set_inner.apply_action(TREE_ACTION_DROP);
+    set_inner
+}
+
+/// Builds the set of rule definitions that are represented by the given AST
+fn load_simple_rule_concat<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    let set_left = load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
+    let set_right = load_simple_rule_definitions(filename, errors, grammar, node.children().at(1));
+    BodySet::product(set_left, set_right)
+}
+
+/// Builds the set of rule definitions that are represented by the given AST
+fn load_simple_rule_empty_part<'a>() -> BodySet<RuleBody> {
+    BodySet {
+        bodies: vec![RuleBody::empty()]
+    }
+}
+
+/// Builds the set of rule definitions that are represented by the given AST
+fn load_simple_rule_atomic<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    match node.get_symbol().id {
+        parser::ID_VARIABLE_RULE_SYM_ACTION => load_simple_rule_atomic_action(grammar, node),
+        parser::ID_VARIABLE_RULE_SYM_VIRTUAL => load_simple_rule_atomic_virtual(grammar, node),
+        parser::ID_VARIABLE_RULE_SYM_REF_SIMPLE => {
+            load_simple_rule_atomic_simple_ref(filename, errors, grammar, node)
+        }
+        parser::ID_VARIABLE_RULE_SYM_REF_TEMPLATE => {
+            load_simple_rule_atomic_template_ref(filename, errors, grammar, node)
+        }
+        parser::ID_TERMINAL_LITERAL_TEXT => load_simple_rule_atomic_inline_text(grammar, node),
+        _ => BodySet { bodies: Vec::new() }
+    }
+}
+
+/// Builds the set of rule definitions that represents a single semantic action
+fn load_simple_rule_atomic_action<'a>(
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    let name = node.children().at(0).get_value().unwrap();
+    let id = grammar.add_action(&name).id;
+    BodySet {
+        bodies: vec![RuleBody::single(SymbolRef::Action(id))]
+    }
+}
+
+/// Builds the set of rule definitions that represents a single virtual symbol
+fn load_simple_rule_atomic_virtual<'a>(
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    let name = node.children().at(0).get_value().unwrap();
+    let name = replace_escapees(name[1..(name.len() - 1)].to_string());
+    let id = grammar.add_virtual(&name).id;
+    BodySet {
+        bodies: vec![RuleBody::single(SymbolRef::Virtual(id))]
+    }
+}
+
+/// Builds the set of rule definitions that represents a single reference to a simple variable
+fn load_simple_rule_atomic_simple_ref<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    let name = node.children().at(0).get_value().unwrap();
+    match grammar.get_symbol(&name) {
+        Some(symbol_ref) => BodySet {
+            bodies: vec![RuleBody::single(symbol_ref)]
+        },
+        None => {
+            errors.push(LoaderError {
+                filename: filename.to_string(),
+                position: node.children().at(0).get_position().unwrap(),
+                context: node.children().at(0).get_context().unwrap(),
+                message: String::from("Undefined symbol")
+            });
+            BodySet { bodies: Vec::new() }
+        }
+    }
+}
+
+/// Builds the set of rule definitions that represents a single reference to a template variable
+fn load_simple_rule_atomic_template_ref<'a>(
+    filename: &str,
+    errors: &mut Vec<LoaderError>,
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    let name = node.children().at(0).get_value().unwrap();
+    let arguments: Vec<SymbolRef> = node
+        .children()
+        .at(1)
+        .children()
+        .iter()
+        .map(|n| load_simple_rule_atomic(filename, errors, grammar, n).bodies[0].parts[0].symbol)
+        .collect();
+    let arguments_count = arguments.len();
+    match grammar.instantiate_template_rule(&name, arguments) {
+        Ok(symbol_ref) => BodySet {
+            bodies: vec![RuleBody::single(symbol_ref)]
+        },
+        Err(GrammarError::TemplateRuleNotFound) => {
+            errors.push(LoaderError {
+                filename: filename.to_string(),
+                position: node.children().at(0).get_position().unwrap(),
+                context: node.children().at(0).get_context().unwrap(),
+                message: String::from("Undefined template rule")
+            });
+            BodySet { bodies: Vec::new() }
+        }
+        Err(GrammarError::TemplateRuleWrongNumberOfArgs(expected)) => {
+            errors.push(LoaderError {
+                filename: filename.to_string(),
+                position: node.children().at(0).get_position().unwrap(),
+                context: node.children().at(0).get_context().unwrap(),
+                message: format!("Expected {} arguments, {} given", expected, arguments_count)
+            });
+            BodySet { bodies: Vec::new() }
+        }
+        Err(_) => {
+            errors.push(LoaderError {
+                filename: filename.to_string(),
+                position: node.children().at(0).get_position().unwrap(),
+                context: node.children().at(0).get_context().unwrap(),
+                message: String::from("Unknown error")
+            });
+            BodySet { bodies: Vec::new() }
+        }
+    }
+}
+
+/// Builds the set of rule definitions that represents a single inline piece of text
+fn load_simple_rule_atomic_inline_text<'a>(
+    grammar: &mut Grammar,
+    node: AstNode<'a>
+) -> BodySet<RuleBody> {
+    // Construct the terminal name
+    let value = node.get_value().unwrap();
+    let start = if value.starts_with('~') { 2 } else { 1 };
+    let value = replace_escapees(value[start..(value.len() - 1)].to_string());
+    // Check for previous instance in the grammar
+    let id = match grammar.get_terminal_for_name(&value) {
+        None => {
+            // Create the terminal
+            let nfa = load_nfa_simple_text(node);
+            grammar.add_terminal_anonymous(value, nfa).id
+        }
+        Some(terminal) => terminal.id
+    };
+    // Create the definition set
+    BodySet {
+        bodies: vec![RuleBody::single(SymbolRef::Terminal(id))]
     }
 }
 
