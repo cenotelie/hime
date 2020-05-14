@@ -238,8 +238,8 @@ impl<'a> Loader<'a> {
             let id = node.get_symbol().id;
             if id == parser::ID_TERMINAL_BLOCK_OPTIONS {
                 load_options(&mut self.grammar, node);
-                if let Some(value) = self.grammar.options.get("CaseSensitive") {
-                    if value == "false" {
+                if let Some(option) = self.grammar.options.get("CaseSensitive") {
+                    if &option.value == "false" {
                         self.case_insensitive = true;
                     }
                 }
@@ -264,7 +264,12 @@ fn load_option<'a>(grammar: &mut Grammar, node: AstNode<'a>) {
     let name = node.children().at(0).get_value().unwrap();
     let value = replace_escapees(node.children().at(1).get_value().unwrap());
     let value = value[1..(value.len() - 1)].to_string();
-    grammar.add_option(name, value);
+    grammar.add_option(
+        InputReference::from(&grammar.input_ref.name, node.children().at(0)),
+        InputReference::from(&grammar.input_ref.name, node.children().at(1)),
+        name,
+        value
+    );
 }
 
 /// Loads the terminal blocks of a grammar

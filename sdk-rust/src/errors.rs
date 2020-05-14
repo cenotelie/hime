@@ -36,7 +36,7 @@ pub enum Error {
     /// The grammar's axiom has not been specified in the options
     AxiomNotSpecified(InputReference),
     /// The grammar's axiom is not defined (does not exist)
-    AxiomNotDefined(InputReference),
+    AxiomNotDefined(InputReference, String),
     /// The template rule could not be found
     TemplateRuleNotFound(InputReference, String),
     /// When instantiating a template rule, the wrong number of arguments were supplied (expected, supplied)
@@ -66,7 +66,6 @@ impl From<io::Error> for Error {
 }
 
 const MSG_AXIOM_NOT_SPECIFIED: &str = "Grammar axiom has not been specified";
-const MSG_AXIOM_NOT_DEFINED: &str = "Grammar axiom is not defined";
 
 impl Error {
     /// Gets the length of the line number for this error
@@ -77,7 +76,7 @@ impl Error {
             Error::Parsing(input, _) => input.get_line_number_width(),
             Error::GrammarNotFound(_) => 0,
             Error::AxiomNotSpecified(input) => input.get_line_number_width(),
-            Error::AxiomNotDefined(input) => input.get_line_number_width(),
+            Error::AxiomNotDefined(input, _) => input.get_line_number_width(),
             Error::TemplateRuleNotFound(input, _) => input.get_line_number_width(),
             Error::TemplateRuleWrongNumberOfArgs(input, _, _) => input.get_line_number_width(),
             Error::SymbolNotFound(input, _) => input.get_line_number_width(),
@@ -101,9 +100,11 @@ impl Error {
             Error::AxiomNotSpecified(input) => {
                 print_msg_with_input_ref(max_width, input, MSG_AXIOM_NOT_SPECIFIED)
             }
-            Error::AxiomNotDefined(input) => {
-                print_msg_with_input_ref(max_width, input, MSG_AXIOM_NOT_DEFINED)
-            }
+            Error::AxiomNotDefined(input, name) => print_msg_with_input_ref(
+                max_width,
+                input,
+                &format!("Grammar axiom `{}` is not defined", name)
+            ),
             Error::TemplateRuleNotFound(input, name) => print_msg_with_input_ref(
                 max_width,
                 input,

@@ -956,6 +956,17 @@ fn generate_unique_id() -> String {
     format!("{:0X}", value)
 }
 
+/// An option for the grammar
+#[derive(Debug, Clone)]
+pub struct GrammarOption {
+    /// The reference in the input for this option's name
+    pub name_input_ref: InputReference,
+    /// The reference in the input for this option's value
+    pub value_input_ref: InputReference,
+    /// The option's value
+    pub value: String
+}
+
 /// Represents a grammar
 #[derive(Debug, Clone)]
 pub struct Grammar {
@@ -966,7 +977,7 @@ pub struct Grammar {
     /// The next unique symbol identifier for this grammar
     pub next_sid: usize,
     /// The grammar's options
-    pub options: HashMap<String, String>,
+    pub options: HashMap<String, GrammarOption>,
     /// The lexical contexts defined in this grammar
     pub contexts: Vec<String>,
     /// The grammar's terminals
@@ -1006,13 +1017,26 @@ impl Grammar {
     }
 
     /// Adds an option to this grammar
-    pub fn add_option(&mut self, name: String, value: String) {
-        self.options.insert(name, value);
+    pub fn add_option(
+        &mut self,
+        name_input_ref: InputReference,
+        value_input_ref: InputReference,
+        name: String,
+        value: String
+    ) {
+        self.options.insert(
+            name,
+            GrammarOption {
+                name_input_ref,
+                value_input_ref,
+                value
+            }
+        );
     }
 
     /// Gets an option
-    pub fn get_option(&self, name: &str) -> Option<&str> {
-        self.options.get(name).map(|v| v.as_ref())
+    pub fn get_option(&self, name: &str) -> Option<&GrammarOption> {
+        self.options.get(name)
     }
 
     /// Gets the symbol with the given name in this grammar
@@ -1303,8 +1327,8 @@ impl Grammar {
 
     /// Inherits the options from the parent grammar
     fn inherit_options(&mut self, other: &Grammar) {
-        for (name, value) in other.options.iter() {
-            self.add_option(name.to_string(), value.to_string());
+        for (name, option) in other.options.iter() {
+            self.options.insert(name.clone(), option.clone());
         }
     }
 
@@ -1566,15 +1590,18 @@ impl Grammar {
 
     /// Adds the real axiom to this grammar
     fn add_real_axiom(&mut self) -> Result<(), Error> {
-        let axiom_name = self
+        let axiom_option = self
             .options
             .get(OPTION_AXIOM)
             .ok_or(Error::AxiomNotSpecified(self.input_ref.clone()))?;
         let axiom_id = self
             .variables
             .iter()
-            .find(|v| &v.name == axiom_name)
-            .ok_or(Error::AxiomNotDefined(self.input_ref.clone()))?
+            .find(|v| v.name == axiom_option.value)
+            .ok_or(Error::AxiomNotDefined(
+                axiom_option.value_input_ref.clone(),
+                axiom_option.value.clone()
+            ))?
             .id;
         // Create the real axiom rule variable and rule
         let real_axiom = self.add_variable(GENERATED_AXIOM);
