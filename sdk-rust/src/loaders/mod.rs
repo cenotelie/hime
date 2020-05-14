@@ -20,13 +20,14 @@
 pub mod parser;
 
 use crate::automata::fa::{FinalItem, NFA};
-use crate::errors::{print_errors, Error, LoaderError, MessageError};
+use crate::errors::{Error, Errors};
 use crate::grammars::{
-    BodySet, Grammar, GrammarError, Rule, RuleBody, SymbolRef, TemplateRuleBody, TemplateRuleRef,
+    BodySet, Grammar, Rule, RuleBody, SymbolRef, TemplateRuleBody, TemplateRuleRef,
     TemplateRuleSymbol, DEFAULT_CONTEXT_NAME
 };
 use crate::unicode::{Span, BLOCKS, CATEGORIES};
 use crate::CharSpan;
+use crate::InputReference;
 use hime_redist::ast::{Ast, AstFamily, AstNode};
 use hime_redist::errors::ParseErrorDataTrait;
 use hime_redist::lexers::DEFAULT_CONTEXT;
@@ -40,7 +41,7 @@ use std::fs;
 use std::io;
 
 /// Loads all inputs into grammars
-pub fn load(inputs: &[String]) -> Result<Vec<Grammar>, ()> {
+pub fn load(inputs: &[String]) -> Result<Vec<Grammar>, Errors> {
     let results = parse_inputs(inputs)?;
     let asts: Vec<Ast> = results.iter().map(|r| r.get_ast()).collect();
     let roots: Vec<AstNode> = asts.iter().map(|ast| ast.get_root()).collect();
@@ -62,8 +63,7 @@ pub fn load(inputs: &[String]) -> Result<Vec<Grammar>, ()> {
     if errors.is_empty() {
         Ok(completed.into_iter().map(|loader| loader.grammar).collect())
     } else {
-        print_errors(&errors);
-        Err(())
+        Err(Errors::from(errors))
     }
 }
 
@@ -71,7 +71,7 @@ pub fn load(inputs: &[String]) -> Result<Vec<Grammar>, ()> {
 fn resolve_inheritance<'a>(
     completed: &mut Vec<Loader<'a>>,
     to_resolve: &mut Vec<Loader<'a>>,
-    errors: &mut Vec<LoaderError>
+    errors: &mut Vec<Error>
 ) {
     loop {
         let mut modified = false;
@@ -98,57 +98,53 @@ fn resolve_inheritance<'a>(
 }
 
 /// Parses the specified input
-fn parse_input(input: &str) -> Result<ParseResult, ()> {
+fn parse_input(input: &str) -> Result<ParseResult, Errors> {
     println!("Reading {} ...", input);
-    let file = match fs::File::open(input) {
-        Ok(file) => file,
-        Err(error) => {
-            let msg_error = MessageError::from(error);
-            msg_error.print(0);
-            return Err(());
-        }
-    };
+    let file = fs::File::open(input)?;
     let mut reader = io::BufReader::new(file);
     let result = parser::parse_utf8(&mut reader);
-    let errors: Vec<LoaderError> = result
+    let errors: Vec<Error> = result
         .errors
         .errors
         .iter()
         .map(|error| {
             let position = error.get_position();
             let context = result.text.get_context_for(position, error.get_length());
-            LoaderError {
-                filename: input.to_string(),
-                position,
-                context,
-                message: error.get_message()
-            }
+            Error::Parsing(
+                InputReference {
+                    name: input.to_string(),
+                    position,
+                    context
+                },
+                error.get_message()
+            )
         })
         .collect();
-    print_errors(&errors);
     if errors.is_empty() {
         Ok(result)
     } else {
-        Err(())
+        Err(Errors::from(errors))
     }
 }
 
 /// Parses all inputs
-fn parse_inputs(inputs: &[String]) -> Result<Vec<ParseResult>, ()> {
+fn parse_inputs(inputs: &[String]) -> Result<Vec<ParseResult>, Errors> {
     let mut results = Vec::new();
     let mut has_errors = false;
+    let mut errors = Vec::new();
     for input in inputs.iter() {
         match parse_input(input) {
             Ok(result) => {
                 results.push(result);
             }
-            Err(_) => {
+            Err(mut sub_errors) => {
                 has_errors = true;
+                errors.append(&mut sub_errors.errors)
             }
         }
     }
     if has_errors {
-        Err(())
+        Err(Errors::from(errors))
     } else {
         Ok(results)
     }
@@ -170,7 +166,8 @@ struct Loader<'a> {
 
 impl<'a> Loader<'a> {
     /// Creates a new loader
-    fn new(resource: String, root: AstNode<'a>, errors: &mut Vec<LoaderError>) -> Loader<'a> {
+    fn new(resource: String, root: AstNode<'a>, errors: &mut Vec<Error>) -> Loader<'a> {
+        let input_ref = InputReference::from(&resource, root.children().at(0));
         let name = root.children().at(0).get_value().unwrap();
         let inherited = root
             .children()
@@ -183,7 +180,7 @@ impl<'a> Loader<'a> {
             resource,
             root,
             inherited,
-            grammar: Grammar::new(name),
+            grammar: Grammar::new(input_ref, name),
             case_insensitive: false
         };
         if loader.is_solved() {
@@ -193,19 +190,17 @@ impl<'a> Loader<'a> {
     }
 
     /// Prints errors for the unresolved inherited grammars
-    fn collect_errors(&self, unresolved: &[Loader], errors: &mut Vec<LoaderError>) {
+    fn collect_errors(&self, unresolved: &[Loader], errors: &mut Vec<Error>) {
         for node in self.root.children().at(1).children().iter() {
             let name = node.get_value().unwrap();
             if self.inherited.contains(&name) {
                 // was not resolved
                 if unresolved.iter().all(|l| l.grammar.name != name) {
                     // the dependency does not exist
-                    errors.push(LoaderError {
-                        filename: self.resource.clone(),
-                        position: node.get_position().unwrap(),
-                        context: node.get_context().unwrap(),
-                        message: format!("Grammar `{}` is not defined", &name)
-                    });
+                    errors.push(Error::GrammarNotDefined(
+                        InputReference::from(&self.resource, node),
+                        name
+                    ));
                 }
             }
         }
@@ -217,7 +212,7 @@ impl<'a> Loader<'a> {
     }
 
     /// Attempts to load data for the grammar
-    fn load(&mut self, completed: &[Loader], errors: &mut Vec<LoaderError>) -> bool {
+    fn load(&mut self, completed: &[Loader], errors: &mut Vec<Error>) -> bool {
         let mut modified = false;
         let grammar = &mut self.grammar;
         self.inherited.retain(|parent| {
@@ -237,7 +232,7 @@ impl<'a> Loader<'a> {
     }
 
     /// Loads the content of the grammar
-    fn load_content(&mut self, errors: &mut Vec<LoaderError>) {
+    fn load_content(&mut self, errors: &mut Vec<Error>) {
         println!("Loading grammar {} ...", self.grammar.name);
         for node in self.root.children().iter() {
             let id = node.get_symbol().id;
@@ -275,7 +270,7 @@ fn load_option<'a>(grammar: &mut Grammar, node: AstNode<'a>) {
 /// Loads the terminal blocks of a grammar
 fn load_terminals<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) {
@@ -301,7 +296,7 @@ fn load_terminals<'a>(
 /// Loads the terminal context in the given AST
 fn load_terminal_rule_context<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) {
@@ -315,7 +310,7 @@ fn load_terminal_rule_context<'a>(
 /// Loads the terminal rule in the given AST
 fn load_terminal_rule<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>,
     context: &str,
@@ -325,12 +320,10 @@ fn load_terminal_rule<'a>(
     let node_name = children.at(0);
     let name = node_name.get_value().unwrap();
     if grammar.get_terminal_for_name(&name).is_some() {
-        errors.push(LoaderError {
-            filename: filename.to_string(),
-            position: node_name.get_position().unwrap(),
-            context: node_name.get_context().unwrap(),
-            message: format!("Overriding the previous definition of `{}`", &name)
-        });
+        errors.push(Error::OverridingPreviousTerminal(
+            InputReference::from(filename, node_name),
+            name
+        ));
         return;
     }
     let nfa = load_nfa(filename, errors, grammar, children.at(1));
@@ -341,7 +334,7 @@ fn load_terminal_rule<'a>(
 /// Builds the NFA represented by the AST node
 fn load_nfa<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &Grammar,
     node: AstNode<'a>
 ) -> NFA {
@@ -448,22 +441,17 @@ fn load_nfa_simple_text(node: AstNode) -> NFA {
 }
 
 /// Builds a NFA from a unicode code point
-fn load_nfa_codepoint(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) -> NFA {
+fn load_nfa_codepoint(filename: &str, errors: &mut Vec<Error>, node: AstNode) -> NFA {
     // extract the code point value
     let value = node.get_value().unwrap();
     let value = u32::from_str_radix(&value[2..(value.len() - 1)], 16).unwrap();
     let value = match std::char::from_u32(value) {
         Some(v) => v,
         None => {
-            errors.push(LoaderError {
-                filename: filename.to_string(),
-                position: node.get_position().unwrap(),
-                context: node.get_context().unwrap(),
-                message: format!(
-                    "The value U+{:0X} is not a supported unicode code point",
-                    value
-                )
-            });
+            errors.push(Error::InvalidCodePoint(
+                InputReference::from(filename, node),
+                value
+            ));
             return NFA::new_minimal();
         }
     };
@@ -480,7 +468,7 @@ fn load_nfa_codepoint(filename: &str, errors: &mut Vec<LoaderError>, node: AstNo
 }
 
 /// Builds a NFA from a character class
-fn load_nfa_class(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) -> NFA {
+fn load_nfa_class(filename: &str, errors: &mut Vec<Error>, node: AstNode) -> NFA {
     // extract the value
     let node_value = node.get_value().unwrap();
     let value = &node_value[1..(node_value.len() - 1)];
@@ -498,15 +486,10 @@ fn load_nfa_class(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) 
         let b = b as usize;
         i += l;
         if b >= 0xFFFF {
-            errors.push(LoaderError {
-                filename: filename.to_string(),
-                position: node.get_position().unwrap(),
-                context: node.get_context().unwrap(),
-                message: format!(
-                    "Unsupported non-plane 0 Unicode character ({0}) in character class",
-                    b
-                )
-            });
+            errors.push(Error::UnsupportedNonPlane0InCharacterClass(
+                InputReference::from(filename, node.clone()),
+                b
+            ));
         }
         if i + 2 <= chars.len() && chars[i] == '-' {
             // this is range, match the -
@@ -514,15 +497,10 @@ fn load_nfa_class(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) 
             let (e, l2) = get_char_value(&chars, i);
             let e = e as usize;
             if b >= 0xFFFF {
-                errors.push(LoaderError {
-                    filename: filename.to_string(),
-                    position: node.get_position().unwrap(),
-                    context: node.get_context().unwrap(),
-                    message: format!(
-                        "Unsupported non-plane 0 Unicode character ({0}) in character class",
-                        e
-                    )
-                });
+                errors.push(Error::UnsupportedNonPlane0InCharacterClass(
+                    InputReference::from(filename, node.clone()),
+                    e
+                ));
             }
             i += l2;
             if b < 0x8D00 && e > 0xDFFF {
@@ -572,7 +550,7 @@ fn load_nfa_class(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) 
 }
 
 /// Builds a NFA from a unicode category
-fn load_nfa_unicode_category(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) -> NFA {
+fn load_nfa_unicode_category(filename: &str, errors: &mut Vec<Error>, node: AstNode) -> NFA {
     // extract the value
     let node_value = node.get_value().unwrap();
     let value = &node_value[3..(node_value.len() - 1)];
@@ -585,19 +563,17 @@ fn load_nfa_unicode_category(filename: &str, errors: &mut Vec<LoaderError>, node
             nfa
         }
         None => {
-            errors.push(LoaderError {
-                filename: filename.to_string(),
-                position: node.get_position().unwrap(),
-                context: node.get_context().unwrap(),
-                message: format!("Unknown unicode category: {}", value)
-            });
+            errors.push(Error::UnknownUnicodeCategory(
+                InputReference::from(filename, node),
+                value.to_string()
+            ));
             NFA::new_minimal()
         }
     }
 }
 
 /// Builds a NFA from a unicode block
-fn load_nfa_unicode_block(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) -> NFA {
+fn load_nfa_unicode_block(filename: &str, errors: &mut Vec<Error>, node: AstNode) -> NFA {
     // extract the value
     let node_value = node.get_value().unwrap();
     let value = &node_value[3..(node_value.len() - 1)];
@@ -608,19 +584,17 @@ fn load_nfa_unicode_block(filename: &str, errors: &mut Vec<LoaderError>, node: A
             nfa
         }
         None => {
-            errors.push(LoaderError {
-                filename: filename.to_string(),
-                position: node.get_position().unwrap(),
-                context: node.get_context().unwrap(),
-                message: format!("Unknown unicode block: {}", value)
-            });
+            errors.push(Error::UnknownUnicodeBlock(
+                InputReference::from(filename, node),
+                value.to_string()
+            ));
             NFA::new_minimal()
         }
     }
 }
 
 /// Builds a NFA from a unicode span
-fn load_nfa_unicode_span(filename: &str, errors: &mut Vec<LoaderError>, node: AstNode) -> NFA {
+fn load_nfa_unicode_span(filename: &str, errors: &mut Vec<Error>, node: AstNode) -> NFA {
     // extract the value
     let children = node.children();
     let begin = children.at(0).get_value().unwrap();
@@ -628,14 +602,9 @@ fn load_nfa_unicode_span(filename: &str, errors: &mut Vec<LoaderError>, node: As
     let end = children.at(1).get_value().unwrap();
     let end = u32::from_str_radix(&end[2..(end.len() - 1)], 16).unwrap();
     if begin > end {
-        errors.push(LoaderError {
-            filename: filename.to_string(),
-            position: node.get_position().unwrap(),
-            context: node.get_context().unwrap(),
-            message: String::from(
-                "Invalid unicode character span, the end is before the beginning"
-            )
-        });
+        errors.push(Error::InvalidCharacterSpan(InputReference::from(
+            filename, node
+        )));
         return NFA::new_minimal();
     }
     let mut nfa = NFA::new_minimal();
@@ -659,7 +628,7 @@ fn load_nfa_any() -> NFA {
 /// Builds a NFA from a referenced terminal
 fn load_nfa_reference(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &Grammar,
     node: AstNode
 ) -> NFA {
@@ -667,12 +636,10 @@ fn load_nfa_reference(
     match grammar.get_terminal_for_name(&value) {
         Some(terminal) => terminal.nfa.clone_no_finals(),
         None => {
-            errors.push(LoaderError {
-                filename: filename.to_string(),
-                position: node.get_position().unwrap(),
-                context: node.get_context().unwrap(),
-                message: format!("Reference to unknown terminal {}", &value)
-            });
+            errors.push(Error::SymbolNotFound(
+                InputReference::from(filename, node),
+                value
+            ));
             NFA::new_minimal()
         }
     }
@@ -716,7 +683,7 @@ fn add_unicode_span_to_nfa(nfa: &mut NFA, span: Span) {
 /// Loads the rules block of a grammar
 fn load_rules<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) {
@@ -757,12 +724,13 @@ fn load_rules<'a>(
 /// Loads the syntactic rule in the given AST
 fn load_simple_rule<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) {
     let name = node.children().at(0).get_value().unwrap();
-    let definitions = load_simple_rule_definitions(filename, errors, grammar, node);
+    let definitions =
+        load_simple_rule_definitions(filename, errors, grammar, node.children().at(1));
     let variable = grammar.add_variable(&name);
     for body in definitions.bodies.into_iter() {
         variable.add_rule(Rule::new(
@@ -777,7 +745,7 @@ fn load_simple_rule<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_simple_rule_definitions<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
@@ -815,7 +783,7 @@ fn load_simple_rule_definitions<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_simple_rule_context<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
@@ -840,7 +808,7 @@ fn load_simple_rule_context<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_simple_rule_sub_rule<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
@@ -863,7 +831,7 @@ fn load_simple_rule_sub_rule<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_simple_rule_optional<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
@@ -876,7 +844,7 @@ fn load_simple_rule_optional<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_simple_rule_zero_or_more<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
@@ -920,7 +888,7 @@ fn load_simple_rule_zero_or_more<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_simple_rule_one_or_more<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
@@ -961,7 +929,7 @@ fn load_simple_rule_one_or_more<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_simple_rule_union<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
@@ -973,7 +941,7 @@ fn load_simple_rule_union<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_simple_rule_tree_action_promote<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
@@ -986,7 +954,7 @@ fn load_simple_rule_tree_action_promote<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_simple_rule_tree_action_drop<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
@@ -999,7 +967,7 @@ fn load_simple_rule_tree_action_drop<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_simple_rule_concat<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
@@ -1018,7 +986,7 @@ fn load_simple_rule_empty_part() -> BodySet<RuleBody> {
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_simple_rule_atomic<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
@@ -1064,7 +1032,7 @@ fn load_simple_rule_atomic_virtual<'a>(
 /// Builds the set of rule definitions that represents a single reference to a simple variable
 fn load_simple_rule_atomic_simple_ref<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
@@ -1074,12 +1042,10 @@ fn load_simple_rule_atomic_simple_ref<'a>(
             bodies: vec![RuleBody::single(symbol_ref)]
         },
         None => {
-            errors.push(LoaderError {
-                filename: filename.to_string(),
-                position: node.children().at(0).get_position().unwrap(),
-                context: node.children().at(0).get_context().unwrap(),
-                message: String::from("Undefined symbol")
-            });
+            errors.push(Error::SymbolNotFound(
+                InputReference::from(filename, node.children().at(0)),
+                name
+            ));
             BodySet { bodies: Vec::new() }
         }
     }
@@ -1088,7 +1054,7 @@ fn load_simple_rule_atomic_simple_ref<'a>(
 /// Builds the set of rule definitions that represents a single reference to a template variable
 fn load_simple_rule_atomic_template_ref<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
@@ -1100,38 +1066,19 @@ fn load_simple_rule_atomic_template_ref<'a>(
         .iter()
         .map(|n| load_simple_rule_atomic(filename, errors, grammar, n).bodies[0].parts[0].symbol)
         .collect();
-    let arguments_count = arguments.len();
-    match grammar.instantiate_template_rule(&name, arguments) {
-        Ok(symbol_ref) => BodySet {
-            bodies: vec![RuleBody::single(symbol_ref)]
-        },
-        Err(GrammarError::TemplateRuleNotFound) => {
-            errors.push(LoaderError {
-                filename: filename.to_string(),
-                position: node.children().at(0).get_position().unwrap(),
-                context: node.children().at(0).get_context().unwrap(),
-                message: String::from("Undefined template rule")
-            });
-            BodySet { bodies: Vec::new() }
+    let symbol_ref = match grammar.instantiate_template_rule(
+        &name,
+        InputReference::from(filename, node.children().at(0)),
+        arguments
+    ) {
+        Ok(symbol_ref) => symbol_ref,
+        Err(err) => {
+            errors.push(err);
+            return BodySet { bodies: Vec::new() };
         }
-        Err(GrammarError::TemplateRuleWrongNumberOfArgs(expected)) => {
-            errors.push(LoaderError {
-                filename: filename.to_string(),
-                position: node.children().at(0).get_position().unwrap(),
-                context: node.children().at(0).get_context().unwrap(),
-                message: format!("Expected {} arguments, {} given", expected, arguments_count)
-            });
-            BodySet { bodies: Vec::new() }
-        }
-        Err(_) => {
-            errors.push(LoaderError {
-                filename: filename.to_string(),
-                position: node.children().at(0).get_position().unwrap(),
-                context: node.children().at(0).get_context().unwrap(),
-                message: String::from("Unknown error")
-            });
-            BodySet { bodies: Vec::new() }
-        }
+    };
+    BodySet {
+        bodies: vec![RuleBody::single(symbol_ref)]
     }
 }
 
@@ -1162,7 +1109,7 @@ fn load_simple_rule_atomic_inline_text<'a>(
 /// Loads the syntactic rule in the given AST
 fn load_template_rule<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) {
@@ -1173,14 +1120,20 @@ fn load_template_rule<'a>(
         .position(|r| r.name == name)
         .unwrap();
     let parameters = grammar.template_rules[template_index].parameters.clone();
-    let definitions = load_template_rule_definitions(filename, errors, grammar, &parameters, node);
+    let definitions = load_template_rule_definitions(
+        filename,
+        errors,
+        grammar,
+        &parameters,
+        node.children().at(2)
+    );
     grammar.template_rules[template_index].bodies = definitions.bodies;
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_template_rule_definitions<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
     node: AstNode<'a>
@@ -1221,7 +1174,7 @@ fn load_template_rule_definitions<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_template_rule_context<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
     node: AstNode<'a>
@@ -1256,7 +1209,7 @@ fn load_template_rule_context<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_template_rule_sub_rule<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
     node: AstNode<'a>
@@ -1287,7 +1240,7 @@ fn load_template_rule_sub_rule<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_template_rule_optional<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
     node: AstNode<'a>
@@ -1306,7 +1259,7 @@ fn load_template_rule_optional<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_template_rule_zero_or_more<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
     node: AstNode<'a>
@@ -1361,7 +1314,7 @@ fn load_template_rule_zero_or_more<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_template_rule_one_or_more<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
     node: AstNode<'a>
@@ -1415,7 +1368,7 @@ fn load_template_rule_one_or_more<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_template_rule_union<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
     node: AstNode<'a>
@@ -1440,7 +1393,7 @@ fn load_template_rule_union<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_template_rule_tree_action_promote<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
     node: AstNode<'a>
@@ -1459,7 +1412,7 @@ fn load_template_rule_tree_action_promote<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_template_rule_tree_action_drop<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
     node: AstNode<'a>
@@ -1478,7 +1431,7 @@ fn load_template_rule_tree_action_drop<'a>(
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_template_rule_concat<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
     node: AstNode<'a>
@@ -1510,7 +1463,7 @@ fn load_template_rule_empty_part() -> BodySet<TemplateRuleBody> {
 /// Builds the set of rule definitions that are represented by the given AST
 fn load_template_rule_atomic<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
     node: AstNode<'a>
@@ -1561,7 +1514,7 @@ fn load_template_rule_atomic_virtual<'a>(
 /// Builds the set of rule definitions that represents a single reference to a simple variable
 fn load_template_rule_atomic_simple_ref<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
     node: AstNode<'a>
@@ -1581,12 +1534,10 @@ fn load_template_rule_atomic_simple_ref<'a>(
             ))]
         },
         None => {
-            errors.push(LoaderError {
-                filename: filename.to_string(),
-                position: node.children().at(0).get_position().unwrap(),
-                context: node.children().at(0).get_context().unwrap(),
-                message: String::from("Undefined symbol")
-            });
+            errors.push(Error::SymbolNotFound(
+                InputReference::from(filename, node.children().at(0)),
+                name
+            ));
             BodySet { bodies: Vec::new() }
         }
     }
@@ -1595,7 +1546,7 @@ fn load_template_rule_atomic_simple_ref<'a>(
 /// Builds the set of rule definitions that represents a single reference to a template variable
 fn load_template_rule_atomic_template_ref<'a>(
     filename: &str,
-    errors: &mut Vec<LoaderError>,
+    errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
     node: AstNode<'a>
@@ -1608,12 +1559,10 @@ fn load_template_rule_atomic_template_ref<'a>(
     {
         Some(index) => index,
         None => {
-            errors.push(LoaderError {
-                filename: filename.to_string(),
-                position: node.children().at(0).get_position().unwrap(),
-                context: node.children().at(0).get_context().unwrap(),
-                message: String::from("Undefined template rule")
-            });
+            errors.push(Error::TemplateRuleNotFound(
+                InputReference::from(filename, node.children().at(0)),
+                String::from("Undefined template rule")
+            ));
             return BodySet { bodies: Vec::new() };
         }
     };
@@ -1637,16 +1586,11 @@ fn load_template_rule_atomic_template_ref<'a>(
         .collect();
     let expected_count = grammar.template_rules[template_index].parameters.len();
     if arguments.len() != expected_count {
-        errors.push(LoaderError {
-            filename: filename.to_string(),
-            position: node.children().at(0).get_position().unwrap(),
-            context: node.children().at(0).get_context().unwrap(),
-            message: format!(
-                "Expected {} arguments, {} given",
-                expected_count,
-                arguments.len()
-            )
-        });
+        errors.push(Error::TemplateRuleWrongNumberOfArgs(
+            InputReference::from(filename, node.children().at(0)),
+            expected_count,
+            arguments.len()
+        ));
         return BodySet { bodies: Vec::new() };
     }
     BodySet {

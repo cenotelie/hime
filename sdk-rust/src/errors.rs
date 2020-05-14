@@ -17,129 +17,250 @@
 
 //! Module for the management of errors in the SDK
 
+use crate::InputReference;
 use ansi_term::Colour::{Blue, Red};
 use ansi_term::Style;
-use hime_redist::text::TextContext;
-use hime_redist::text::TextPosition;
+use std::io;
 
-/// A generic error
-pub trait Error {
-    /// Get the width of the line number of this error in number of characters
-    fn line_number_width(&self) -> usize;
-
-    /// Prints this error
-    fn print(&self, max_width: usize);
+/// The global error type
+#[derive(Debug)]
+pub enum Error {
+    /// An IO error (file not found, etc.)
+    Io(io::Error),
+    /// A simple message
+    Msg(String),
+    /// Parsing error
+    Parsing(InputReference, String),
+    /// The specified grammar was not found
+    GrammarNotFound(String),
+    /// The grammar's axiom has not been specified in the options
+    AxiomNotSpecified(InputReference),
+    /// The grammar's axiom is not defined (does not exist)
+    AxiomNotDefined(InputReference),
+    /// The template rule could not be found
+    TemplateRuleNotFound(InputReference, String),
+    /// When instantiating a template rule, the wrong number of arguments were supplied (expected, supplied)
+    TemplateRuleWrongNumberOfArgs(InputReference, usize, usize),
+    /// The specifiec symbol was not found
+    SymbolNotFound(InputReference, String),
+    /// Invalid character span
+    InvalidCharacterSpan(InputReference),
+    /// The unicode block is not known
+    UnknownUnicodeBlock(InputReference, String),
+    /// The unicode category is not known
+    UnknownUnicodeCategory(InputReference, String),
+    /// A unicode character not in plane 0 was used in a character class, which is not supported
+    UnsupportedNonPlane0InCharacterClass(InputReference, usize),
+    /// The specified value is not a valid unicode code point
+    InvalidCodePoint(InputReference, u32),
+    /// A terminal override a previous definition
+    OverridingPreviousTerminal(InputReference, String),
+    /// The inherited grammar cannot be found
+    GrammarNotDefined(InputReference, String)
 }
 
-/// Prints the specified errors
-pub fn print_errors<T: Error>(errors: &[T]) {
-    if let Some(max_width) = errors.iter().map(|error| error.line_number_width()).max() {
-        for error in errors.iter() {
-            error.print(max_width);
-        }
+impl From<io::Error> for Error {
+    fn from(err: io::Error) -> Self {
+        Error::Io(err)
     }
 }
 
-/// A simple error with a message
-#[derive(Clone)]
-pub struct MessageError {
-    /// The error message
-    pub message: String
-}
+const MSG_AXIOM_NOT_SPECIFIED: &str = "Grammar axiom has not been specified";
+const MSG_AXIOM_NOT_DEFINED: &str = "Grammar axiom is not defined";
 
-impl<E> From<E> for MessageError
-where
-    E: ToString
-{
-    fn from(err: E) -> MessageError {
-        MessageError {
-            message: err.to_string()
-        }
-    }
-}
-
-impl Error for MessageError {
-    /// Get the width of the line number of this error in number of characters
-    fn line_number_width(&self) -> usize {
-        0
-    }
-
-    /// Prints this error
-    fn print(&self, _max_width: usize) {
-        eprintln!(
-            "{}{} {}",
-            Red.bold().paint("error"),
-            Style::new().bold().paint(":"),
-            Style::new().bold().paint(&self.message)
-        );
-        eprintln!("");
-    }
-}
-
-/// Represents an error for the loader
-#[derive(Clone)]
-pub struct LoaderError {
-    /// The name of the originating file
-    pub filename: String,
-    /// The position in the file
-    pub position: TextPosition,
-    /// The context for the error
-    pub context: TextContext,
-    /// The error message
-    pub message: String
-}
-
-impl Error for LoaderError {
-    /// Get the width of the line number of this error in number of characters
-    fn line_number_width(&self) -> usize {
-        if self.position.line < 10 {
-            1
-        } else if self.position.line < 100 {
-            2
-        } else if self.position.line < 1000 {
-            3
-        } else if self.position.line < 10_000 {
-            4
-        } else if self.position.line < 100_000 {
-            5
-        } else {
-            6
+impl Error {
+    /// Gets the length of the line number for this error
+    pub fn get_line_number_width(&self) -> usize {
+        match self {
+            Error::Io(_) => 0,
+            Error::Msg(_) => 0,
+            Error::Parsing(input, _) => input.get_line_number_width(),
+            Error::GrammarNotFound(_) => 0,
+            Error::AxiomNotSpecified(input) => input.get_line_number_width(),
+            Error::AxiomNotDefined(input) => input.get_line_number_width(),
+            Error::TemplateRuleNotFound(input, _) => input.get_line_number_width(),
+            Error::TemplateRuleWrongNumberOfArgs(input, _, _) => input.get_line_number_width(),
+            Error::SymbolNotFound(input, _) => input.get_line_number_width(),
+            Error::InvalidCharacterSpan(input) => input.get_line_number_width(),
+            Error::UnknownUnicodeBlock(input, _) => input.get_line_number_width(),
+            Error::UnknownUnicodeCategory(input, _) => input.get_line_number_width(),
+            Error::UnsupportedNonPlane0InCharacterClass(input, _) => input.get_line_number_width(),
+            Error::InvalidCodePoint(input, _) => input.get_line_number_width(),
+            Error::OverridingPreviousTerminal(input, _) => input.get_line_number_width(),
+            Error::GrammarNotDefined(input, _) => input.get_line_number_width()
         }
     }
 
     /// Prints this error
-    fn print(&self, max_width: usize) {
-        eprintln!(
-            "{}{} {}",
-            Red.bold().paint("error"),
-            Style::new().bold().paint(":"),
-            Style::new().bold().paint(&self.message)
-        );
-        let pad = String::from_utf8(vec![0x20; max_width]).unwrap();
-        eprintln!(
-            "{}{} {}:{}",
-            &pad,
-            Blue.bold().paint("-->"),
-            &self.filename,
-            self.position
-        );
-        let pad = String::from_utf8(vec![0x20; max_width + 1]).unwrap();
-        eprintln!("{}{}", &pad, Blue.bold().paint("|"));
-        let pad = String::from_utf8(vec![0x20; max_width + 1 - self.line_number_width()]).unwrap();
-        eprintln!(
-            "{}{}{}  {}",
-            Blue.bold().paint(format!("{}", self.position.line)),
-            &pad,
-            Blue.bold().paint("|"),
-            &self.context.content
-        );
-        let pad = String::from_utf8(vec![0x20; max_width + 1]).unwrap();
-        eprintln!(
-            "{}{}  {}",
-            &pad,
-            Blue.bold().paint("|"),
-            Red.bold().paint(&self.context.pointer)
-        );
-        eprintln!("");
+    pub fn print(&self, max_width: usize) {
+        match self {
+            Error::Io(err) => print_io(err),
+            Error::Msg(msg) => print_msg(msg.as_ref()),
+            Error::Parsing(input, msg) => print_msg_with_input_ref(max_width, input, msg),
+            Error::GrammarNotFound(name) => print_msg(&format!("Cannot find grammar `{}`", name)),
+            Error::AxiomNotSpecified(input) => {
+                print_msg_with_input_ref(max_width, input, MSG_AXIOM_NOT_SPECIFIED)
+            }
+            Error::AxiomNotDefined(input) => {
+                print_msg_with_input_ref(max_width, input, MSG_AXIOM_NOT_DEFINED)
+            }
+            Error::TemplateRuleNotFound(input, name) => print_msg_with_input_ref(
+                max_width,
+                input,
+                &format!("Cannot find template rule `{}`", name)
+            ),
+            Error::TemplateRuleWrongNumberOfArgs(input, expected, provided) => {
+                print_msg_with_input_ref(
+                    max_width,
+                    input,
+                    &format!(
+                        "Template expected {} arguments, {} given",
+                        expected, provided
+                    )
+                )
+            }
+            Error::SymbolNotFound(input, name) => print_msg_with_input_ref(
+                max_width,
+                input,
+                &format!("Cannot find symbol `{}`", name)
+            ),
+            Error::InvalidCharacterSpan(input) => print_msg_with_input_ref(
+                max_width,
+                input,
+                "Invalid character span, end is before begin"
+            ),
+            Error::UnknownUnicodeBlock(input, name) => print_msg_with_input_ref(
+                max_width,
+                input,
+                &format!("Unknown unicode block `{}`", name)
+            ),
+            Error::UnknownUnicodeCategory(input, name) => print_msg_with_input_ref(
+                max_width,
+                input,
+                &format!("Unknown unicode category `{}`", name)
+            ),
+            Error::UnsupportedNonPlane0InCharacterClass(input, c) => print_msg_with_input_ref(
+                max_width,
+                input,
+                &format!(
+                    "Unsupported non-plane 0 Unicode character ({0}) in character class",
+                    c
+                )
+            ),
+            Error::InvalidCodePoint(input, c) => print_msg_with_input_ref(
+                max_width,
+                input,
+                &format!("The value U+{:0X} is not a supported unicode code point", c)
+            ),
+            Error::OverridingPreviousTerminal(input, name) => print_msg_with_input_ref(
+                max_width,
+                input,
+                &format!("Overriding the previous definition of `{}`", name)
+            ),
+            Error::GrammarNotDefined(input, name) => print_msg_with_input_ref(
+                max_width,
+                input,
+                &format!("Grammar `{}` is not defined", name)
+            )
+        }
+    }
+}
+
+/// Prints an IO error message
+fn print_io(error: &io::Error) {
+    let message = error.to_string();
+    print_msg(&message);
+}
+
+/// Prints a simple message error
+fn print_msg(message: &str) {
+    eprintln!(
+        "{}{} {}",
+        Red.bold().paint("error"),
+        Style::new().bold().paint(":"),
+        Style::new().bold().paint(message)
+    );
+    eprintln!("");
+}
+
+/// Prints an error with a message and an input reference
+fn print_msg_with_input_ref(max_width: usize, input_ref: &InputReference, message: &str) {
+    eprintln!(
+        "{}{} {}",
+        Red.bold().paint("error"),
+        Style::new().bold().paint(":"),
+        Style::new().bold().paint(message)
+    );
+    let pad = String::from_utf8(vec![0x20; max_width]).unwrap();
+    eprintln!(
+        "{}{} {}:{}",
+        &pad,
+        Blue.bold().paint("-->"),
+        &input_ref.name,
+        input_ref.position
+    );
+    let pad = String::from_utf8(vec![0x20; max_width + 1]).unwrap();
+    eprintln!("{}{}", &pad, Blue.bold().paint("|"));
+    let pad = String::from_utf8(vec![
+        0x20;
+        max_width + 1 - input_ref.get_line_number_width()
+    ])
+    .unwrap();
+    eprintln!(
+        "{}{}{}  {}",
+        Blue.bold().paint(format!("{}", input_ref.position.line)),
+        &pad,
+        Blue.bold().paint("|"),
+        &input_ref.context.content
+    );
+    let pad = String::from_utf8(vec![0x20; max_width + 1]).unwrap();
+    eprintln!(
+        "{}{}  {}",
+        &pad,
+        Blue.bold().paint("|"),
+        Red.bold().paint(&input_ref.context.pointer)
+    );
+    eprintln!("");
+}
+
+/// A collection of errors
+#[derive(Debug, Default)]
+pub struct Errors {
+    /// The errors
+    pub errors: Vec<Error>
+}
+
+impl Errors {
+    /// Encapsulate the errors
+    pub fn from(errors: Vec<Error>) -> Errors {
+        Errors { errors }
+    }
+
+    /// Prints the errors
+    pub fn print(&self) {
+        if let Some(max_width) = self
+            .errors
+            .iter()
+            .map(|error| error.get_line_number_width())
+            .max()
+        {
+            for error in self.errors.iter() {
+                error.print(max_width);
+            }
+        }
+    }
+}
+
+impl From<Error> for Errors {
+    fn from(err: Error) -> Self {
+        Errors { errors: vec![err] }
+    }
+}
+
+impl From<io::Error> for Errors {
+    fn from(err: io::Error) -> Self {
+        Errors {
+            errors: vec![Error::Io(err)]
+        }
     }
 }

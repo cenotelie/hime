@@ -26,9 +26,14 @@ pub mod automata;
 pub mod errors;
 pub mod grammars;
 pub mod loaders;
+pub mod lr;
 pub mod output;
 pub mod unicode;
 
+use crate::errors::{Error, Errors};
+use hime_redist::ast::AstNode;
+use hime_redist::symbols::SemanticElementTrait;
+use hime_redist::text::{TextContext, TextPosition};
 use std::cmp::Ordering;
 
 /// Represents a range of characters
@@ -197,6 +202,46 @@ fn test_charspan_split() {
     );
 }
 
+/// Reference to an input
+#[derive(Debug, Clone)]
+pub struct InputReference {
+    /// The input's name (file name in general)
+    pub name: String,
+    /// The position in the input
+    pub position: TextPosition,
+    /// The input's context
+    pub context: TextContext
+}
+
+impl InputReference {
+    fn get_line_number_width(&self) -> usize {
+        if self.position.line < 10 {
+            1
+        } else if self.position.line < 100 {
+            2
+        } else if self.position.line < 1000 {
+            3
+        } else if self.position.line < 10_000 {
+            4
+        } else if self.position.line < 100_000 {
+            5
+        } else {
+            6
+        }
+    }
+}
+
+impl InputReference {
+    /// Build a reference from the specifiec input name and AST node
+    pub fn from<'a>(input_name: &str, node: AstNode<'a>) -> InputReference {
+        InputReference {
+            name: input_name.to_string(),
+            position: node.get_position().unwrap(),
+            context: node.get_context().unwrap()
+        }
+    }
+}
+
 /// Represents a parsing method
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum ParsingMethod {
@@ -287,11 +332,22 @@ impl Default for CompilationTask {
 
 impl CompilationTask {
     /// Executes this task
-    pub fn execute(&self) -> Result<(), ()> {
-        let _grammars = match loaders::load(&self.input_files) {
-            Ok(grammars) => grammars,
-            Err(_) => return Err(())
-        };
+    pub fn execute(&self) -> Result<(), Errors> {
+        let mut grammars = loaders::load(&self.input_files)?;
+        // select the grammars to build
+        match &self.grammar_name {
+            None => {}
+            Some(name) => {
+                grammars.retain(|g| &g.name == name);
+                if grammars.is_empty() {
+                    return Err(Error::GrammarNotFound(name.to_string()).into());
+                }
+            }
+        }
+        // prepare the grammars
+        for grammar in grammars.iter_mut() {
+            grammar.prepare()?;
+        }
         Ok(())
     }
 }

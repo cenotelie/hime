@@ -18,6 +18,8 @@
 //! Library for grammars
 
 use crate::automata::fa::{FinalItem, DFA, EPSILON, NFA};
+use crate::errors::Error;
+use crate::InputReference;
 use hime_redist::parsers::{TreeAction, TREE_ACTION_DROP, TREE_ACTION_NONE, TREE_ACTION_PROMOTE};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -91,7 +93,7 @@ impl PartialOrd for Terminal {
 }
 
 /// Represents a reference to a terminal-like
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum TerminalRef {
     /// Represents a fake terminal, used as a marker by LR-related algorithms
     Dummy,
@@ -131,10 +133,20 @@ impl PartialOrd for TerminalRef {
 }
 
 /// Represents a set of unique terminals (sorted by ID)
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Eq)]
 pub struct TerminalSet {
     /// The backing content
     pub content: Vec<TerminalRef>
+}
+
+impl PartialEq for TerminalSet {
+    fn eq(&self, other: &TerminalSet) -> bool {
+        self.content.len() == other.content.len()
+            && self
+                .content
+                .iter()
+                .all(|t_ref| other.content.contains(t_ref))
+    }
 }
 
 impl TerminalSet {
@@ -342,7 +354,7 @@ impl PartialEq for Variable {
 impl Eq for Variable {}
 
 /// Represents a reference to a grammar symbol
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum SymbolRef {
     /// Represents a fake terminal, used as a marker by LR-related algorithms
     Dummy,
@@ -944,21 +956,11 @@ fn generate_unique_id() -> String {
     format!("{:0X}", value)
 }
 
-/// Errors for grammars
-pub enum GrammarError {
-    /// The grammar's axiom has not been specified in the options
-    AxiomNotSpecified,
-    /// The grammar's axiom is not defined (does not exist)
-    AxiomNotDefined,
-    /// The template rule could not be found
-    TemplateRuleNotFound,
-    /// When instantiating a template rule, the wrong number of arguments were supplied
-    TemplateRuleWrongNumberOfArgs(usize)
-}
-
 /// Represents a grammar
 #[derive(Debug, Clone)]
 pub struct Grammar {
+    /// The reference in the input for this grammar
+    pub input_ref: InputReference,
     /// The grammar's name
     pub name: String,
     /// The next unique symbol identifier for this grammar
@@ -981,8 +983,9 @@ pub struct Grammar {
 
 impl Grammar {
     /// Initializes this grammar
-    pub fn new(name: String) -> Grammar {
+    pub fn new(input_ref: InputReference, name: String) -> Grammar {
         Grammar {
+            input_ref,
             name,
             next_sid: 3,
             options: HashMap::new(),
@@ -1192,15 +1195,18 @@ impl Grammar {
     pub fn instantiate_template_rule(
         &mut self,
         name: &str,
+        call_ref: InputReference,
         arguments: Vec<SymbolRef>
-    ) -> Result<SymbolRef, GrammarError> {
+    ) -> Result<SymbolRef, Error> {
         match self.template_rules.iter().position(|r| r.name == name) {
-            None => Err(GrammarError::TemplateRuleNotFound),
+            None => Err(Error::TemplateRuleNotFound(call_ref, name.to_string())),
             Some(index) => {
                 let rule = &self.template_rules[index];
                 if rule.parameters.len() != arguments.len() {
-                    Err(GrammarError::TemplateRuleWrongNumberOfArgs(
-                        rule.parameters.len()
+                    Err(Error::TemplateRuleWrongNumberOfArgs(
+                        call_ref,
+                        rule.parameters.len(),
+                        arguments.len()
                     ))
                 } else {
                     Ok(self.instantiate_template_rule_at(index, arguments))
@@ -1548,24 +1554,27 @@ impl Grammar {
 
     /// Prepares this grammar for code and data generation
     /// This methods inserts a new grammar rule as its axiom and computes the FIRSTS and FOLLOWERS sets
-    pub fn prepare(&mut self) -> Result<(), GrammarError> {
+    pub fn prepare(&mut self) -> Result<(), Error> {
         self.add_real_axiom()?;
+        for variable in self.variables.iter_mut() {
+            variable.compute_choices();
+        }
         self.compute_firsts();
         self.compute_followers();
         Ok(())
     }
 
     /// Adds the real axiom to this grammar
-    fn add_real_axiom(&mut self) -> Result<(), GrammarError> {
+    fn add_real_axiom(&mut self) -> Result<(), Error> {
         let axiom_name = self
             .options
             .get(OPTION_AXIOM)
-            .ok_or(GrammarError::AxiomNotSpecified)?;
+            .ok_or(Error::AxiomNotSpecified(self.input_ref.clone()))?;
         let axiom_id = self
             .variables
             .iter()
             .find(|v| &v.name == axiom_name)
-            .ok_or(GrammarError::AxiomNotDefined)?
+            .ok_or(Error::AxiomNotDefined(self.input_ref.clone()))?
             .id;
         // Create the real axiom rule variable and rule
         let real_axiom = self.add_variable(GENERATED_AXIOM);

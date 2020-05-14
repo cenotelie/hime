@@ -174,10 +174,12 @@ pub fn main() {
                 task.input_files.push(input.to_string());
             }
         }
-        if task.execute().is_ok() {
-            process::exit(0);
-        } else {
-            process::exit(1);
+        match task.execute() {
+            Ok(_) => process::exit(0),
+            Err(errors) => {
+                errors.print();
+                process::exit(1);
+            }
         }
     }
 }
