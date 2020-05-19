@@ -17,6 +17,7 @@
 
 //! Module for the management of errors in the SDK
 
+use crate::lr::{Conflict, ContextError, Phrase};
 use crate::InputReference;
 use ansi_term::Colour::{Blue, Red};
 use ansi_term::Style;
@@ -56,7 +57,11 @@ pub enum Error {
     /// A terminal override a previous definition
     OverridingPreviousTerminal(InputReference, String),
     /// The inherited grammar cannot be found
-    GrammarNotDefined(InputReference, String)
+    GrammarNotDefined(InputReference, String),
+    /// A conflict in a grammar
+    LrConflict(String, Conflict, Vec<Phrase>),
+    /// A contextual terminal is used outside of its context
+    TerminalOutsideContext(String, ContextError)
 }
 
 impl From<io::Error> for Error {
@@ -86,7 +91,9 @@ impl Error {
             Error::UnsupportedNonPlane0InCharacterClass(input, _) => input.get_line_number_width(),
             Error::InvalidCodePoint(input, _) => input.get_line_number_width(),
             Error::OverridingPreviousTerminal(input, _) => input.get_line_number_width(),
-            Error::GrammarNotDefined(input, _) => input.get_line_number_width()
+            Error::GrammarNotDefined(input, _) => input.get_line_number_width(),
+            Error::LrConflict(_, _, _) => 0,
+            Error::TerminalOutsideContext(_, _) => 0
         }
     }
 
@@ -162,7 +169,9 @@ impl Error {
                 max_width,
                 input,
                 &format!("Grammar `{}` is not defined", name)
-            )
+            ),
+            Error::LrConflict(_, _, _) => {}
+            Error::TerminalOutsideContext(_, _) => {}
         }
     }
 }

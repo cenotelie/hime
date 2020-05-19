@@ -1164,6 +1164,11 @@ impl Grammar {
         &mut self.terminals[index]
     }
 
+    /// Gets the terminal with the specified identifier
+    pub fn get_terminal(&self, sid: usize) -> Option<&Terminal> {
+        self.terminals.iter().find(|t| t.id == sid)
+    }
+
     /// Gets the terminal with the given name
     pub fn get_terminal_for_name(&self, name: &str) -> Option<&Terminal> {
         self.terminals.iter().find(|t| t.name == name)
@@ -1622,15 +1627,17 @@ impl Grammar {
         let axiom_option = self
             .options
             .get(OPTION_AXIOM)
-            .ok_or(Error::AxiomNotSpecified(self.input_ref.clone()))?;
+            .ok_or_else(|| Error::AxiomNotSpecified(self.input_ref.clone()))?;
         let axiom_id = self
             .variables
             .iter()
             .find(|v| v.name == axiom_option.value)
-            .ok_or(Error::AxiomNotDefined(
-                axiom_option.value_input_ref.clone(),
-                axiom_option.value.clone()
-            ))?
+            .ok_or_else(|| {
+                Error::AxiomNotDefined(
+                    axiom_option.value_input_ref.clone(),
+                    axiom_option.value.clone()
+                )
+            })?
             .id;
         // Create the real axiom rule variable and rule
         let real_axiom = self.add_variable(GENERATED_AXIOM);

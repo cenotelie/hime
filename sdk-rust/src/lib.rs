@@ -369,7 +369,7 @@ impl CompilationTask {
     fn execute_for_grammar(&self, grammar: &mut Grammar) -> Result<(), Errors> {
         grammar.prepare()?;
         let _dfa = grammar.build_dfa();
-        let (_graph, _conficts) = build_graph(grammar, self.method);
+        let _graph = build_graph(grammar, self.method)?;
         Ok(())
     }
 }

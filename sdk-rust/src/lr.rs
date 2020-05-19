@@ -17,8 +17,9 @@
 
 //! Module for LR automata
 
+use crate::errors::{Error, Errors};
 use crate::grammars::{
-    Grammar, Rule, RuleChoice, SymbolRef, TerminalRef, TerminalSet, GENERATED_AXIOM
+    Grammar, Rule, RuleChoice, SymbolRef, Terminal, TerminalRef, TerminalSet, GENERATED_AXIOM
 };
 use crate::ParsingMethod;
 use hime_redist::parsers::{LRActionCode, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT};
@@ -224,7 +225,7 @@ impl StateKernel {
         }
         State {
             kernel: self,
-            items: items,
+            items,
             children: HashMap::new(),
             opening_contexts: HashMap::new(),
             reductions: Vec::new()
@@ -524,6 +525,40 @@ impl PNode {
     }
 }
 
+/// The element of a path in a LR
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub struct PathElem {
+    /// The LR state at this step
+    pub state: usize,
+    /// The symbol to use as a transition
+    pub transition: Option<SymbolRef>
+}
+
+/// A path in a LR graph
+#[derive(Debug, Default, Clone)]
+pub struct Path(Vec<PathElem>);
+
+impl Path {
+    /// Gets the corresponding input phrase
+    pub fn get_phrase(&self, grammar: &Grammar) -> Phrase {
+        let mut phrase = Phrase::default();
+        for elem in self.0.iter() {
+            match elem.transition {
+                Some(SymbolRef::Variable(id)) => {
+                    let mut stack = Vec::new();
+                    phrase.build_input(grammar, id, &mut stack);
+                }
+                Some(SymbolRef::Terminal(id)) => {
+                    // easy, just add it to the sample
+                    phrase.append(TerminalRef::Terminal(id));
+                }
+                _ => { /* ignore */ }
+            }
+        }
+        phrase
+    }
+}
+
 impl InverseGraph {
     /// Builds the inverse graph
     pub fn from(graph: &Graph) -> InverseGraph {
@@ -542,7 +577,7 @@ impl InverseGraph {
     }
 
     /// Gets all the paths from state 0 to the specified one
-    fn get_paths_to(&self, target: usize) -> Vec<Vec<SymbolRef>> {
+    pub fn get_paths_to(&self, target: usize) -> Vec<Path> {
         let mut elements: Vec<PNode> = vec![PNode::new(target, None, None)];
         let mut visited: HashMap<usize, Vec<SymbolRef>> = HashMap::new();
         let mut queue: Vec<usize> = vec![0];
@@ -571,16 +606,17 @@ impl InverseGraph {
         goals
             .into_iter()
             .map(|goal| {
-                let mut path = Vec::new();
+                let mut parts = Vec::new();
                 let mut current = Some(goal);
                 while let Some(current_id) = current {
                     let node = &elements[current_id];
-                    if let Some(symbol) = node.transition {
-                        path.push(symbol);
-                    }
+                    parts.push(PathElem {
+                        state: node.state,
+                        transition: node.transition
+                    });
                     current = node.next;
                 }
-                path
+                Path(parts)
             })
             .collect()
     }
@@ -589,23 +625,7 @@ impl InverseGraph {
     pub fn get_inputs_for(&self, state: usize, grammar: &Grammar) -> Vec<Phrase> {
         self.get_paths_to(state)
             .into_iter()
-            .map(|path| {
-                let mut phrase = Phrase::default();
-                for symbol in path.into_iter() {
-                    match symbol {
-                        SymbolRef::Variable(id) => {
-                            let mut stack = Vec::new();
-                            phrase.build_input(grammar, id, &mut stack);
-                        }
-                        SymbolRef::Terminal(id) => {
-                            // easy, just add it to the sample
-                            phrase.append(TerminalRef::Terminal(id));
-                        }
-                        _ => { /* should not happen, ignore */ }
-                    }
-                }
-                phrase
-            })
+            .map(|path| path.get_phrase(grammar))
             .collect()
     }
 }
@@ -735,7 +755,7 @@ impl Conflicts {
             .items
             .iter()
             .filter(|item| item.get_next_symbol(grammar) == Some(lookahead.into()))
-            .map(|item| item.clone())
+            .cloned()
             .collect();
         items.push(reducing);
         self.0.push(Conflict {
@@ -775,6 +795,19 @@ impl Conflicts {
     pub fn aggregate(&mut self, mut other: Conflicts) {
         self.0.append(&mut other.0);
     }
+}
+
+/// Represents an error where a contextual terminal is expected but its context cannot be available at this point
+#[derive(Debug, Clone)]
+pub struct ContextError {
+    /// The state raising the error
+    pub state: usize,
+    /// The state's items that requires the terminal
+    pub items: Vec<Item>,
+    /// The problematic contextual terminal
+    pub terminal: TerminalRef,
+    /// The problematic phrase
+    pub phrase: Phrase
 }
 
 /// Gets the LR(0) graph
@@ -927,7 +960,7 @@ fn build_graph_lalr1_propagation_table(
 }
 
 /// Executes the propagation for a LALR(1) graph
-fn build_graph_lalr1_propagate(kernels: &mut Vec<StateKernel>, table: &Vec<Propagation>) {
+fn build_graph_lalr1_propagate(kernels: &mut Vec<StateKernel>, table: &[Propagation]) {
     let mut modifications = 1;
     while modifications != 0 {
         modifications = 0;
@@ -989,13 +1022,110 @@ pub fn build_graph_rnglalr1(grammar: &Grammar) -> (Graph, Conflicts) {
     (graph, conflicts)
 }
 
+/// Find the potential context errors in the graph
+fn find_context_errors(
+    graph: &Graph,
+    inverse: &InverseGraph,
+    grammar: &Grammar
+) -> Vec<ContextError> {
+    let mut errors = Vec::new();
+    for (state_id, state) in graph.states.iter().enumerate() {
+        for (symbol, _) in state.children.iter() {
+            if let SymbolRef::Terminal(tid) = *symbol {
+                let terminal = grammar.get_terminal(tid).unwrap();
+                if terminal.context == 0 {
+                    continue;
+                }
+                // this is a contextual terminal, can we reach this state without the right context being available
+                find_context_errors_in(graph, inverse, grammar, &mut errors, state_id, terminal)
+            }
+        }
+    }
+    errors
+}
+
+/// Find the potential context errors in the graph at a state
+fn find_context_errors_in(
+    graph: &Graph,
+    inverse: &InverseGraph,
+    grammar: &Grammar,
+    errors: &mut Vec<ContextError>,
+    state_id: usize,
+    terminal: &Terminal
+) {
+    let paths = inverse.get_paths_to(state_id);
+    for path in paths.into_iter() {
+        // path.push(state_id);
+        let mut found = false;
+        for i in 0..(path.0.len() - 1) {
+            for item in graph.states[path.0[i].state].items.iter() {
+                if item.position == 0 && item.rule.get_rule_in(grammar).context == terminal.context
+                {
+                    // this is the opening of a context only if we are not going to the next state using the associated variable
+                    let child_by_var = graph.states[state_id]
+                        .children
+                        .get(&SymbolRef::Variable(item.rule.variable));
+                    found |= child_by_var.is_none() || child_by_var != Some(&path.0[i + 1].state);
+                    break;
+                }
+            }
+            if found {
+                break;
+            }
+        }
+        for item in graph.states[state_id].items.iter() {
+            if item.position == 0 && item.rule.get_rule_in(grammar).context == terminal.context {
+                found = true;
+                break;
+            }
+        }
+        if !found {
+            // this is problematic path
+            let items: Vec<Item> = graph.states[state_id]
+                .items
+                .iter()
+                .filter(|item| {
+                    item.get_next_symbol(grammar) == Some(SymbolRef::Terminal(terminal.id))
+                })
+                .cloned()
+                .collect();
+            errors.push(ContextError {
+                state: state_id,
+                items,
+                terminal: TerminalRef::Terminal(terminal.id),
+                phrase: path.get_phrase(grammar)
+            });
+        }
+    }
+}
+
 /// Build the specified grammar
-pub fn build_graph(grammar: &Grammar, method: ParsingMethod) -> (Graph, Conflicts) {
-    match method {
+pub fn build_graph(grammar: &Grammar, method: ParsingMethod) -> Result<Graph, Errors> {
+    let (graph, conflicts) = match method {
         ParsingMethod::LR0 => build_graph_lr0(grammar),
         ParsingMethod::LR1 => build_graph_lr1(grammar),
         ParsingMethod::LALR1 => build_graph_lalr1(grammar),
         ParsingMethod::RNGLR1 => build_graph_rnglr1(grammar),
         ParsingMethod::RNGLALR1 => build_graph_rnglalr1(grammar)
+    };
+    if conflicts.0.is_empty() {
+        return Ok(graph);
     }
+    let inverse = graph.inverse();
+    let mut errors = Errors::from(
+        conflicts
+            .0
+            .into_iter()
+            .map(|conflict| {
+                let phrases = inverse.get_inputs_for(conflict.state, grammar);
+                Error::LrConflict(grammar.name.clone(), conflict, phrases)
+            })
+            .collect()
+    );
+    for error in find_context_errors(&graph, &inverse, grammar).into_iter() {
+        errors
+            .errors
+            .push(Error::TerminalOutsideContext(grammar.name.clone(), error));
+    }
+    Err(errors)
 }
