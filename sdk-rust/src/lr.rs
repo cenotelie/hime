@@ -491,11 +491,128 @@ impl Graph {
         }
         conflicts
     }
+
+    /// Gets the inverse graph
+    pub fn inverse(&self) -> InverseGraph {
+        InverseGraph::from(self)
+    }
+}
+
+/// An inverse LR graph
+#[derive(Debug, Clone, Default)]
+pub struct InverseGraph(HashMap<usize, HashMap<SymbolRef, Vec<usize>>>);
+
+/// Queue element for exploring paths in the LR graph
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+struct PNode {
+    /// The associated LR state
+    state: usize,
+    /// The transition to investigate
+    transition: Option<SymbolRef>,
+    /// The next element
+    next: Option<usize>
+}
+
+impl PNode {
+    /// Creates a new path element
+    fn new(state: usize, transition: Option<SymbolRef>, next: Option<usize>) -> PNode {
+        PNode {
+            state,
+            transition,
+            next
+        }
+    }
+}
+
+impl InverseGraph {
+    /// Builds the inverse graph
+    pub fn from(graph: &Graph) -> InverseGraph {
+        let mut transitions = HashMap::new();
+        for (id, state) in graph.states.iter().enumerate() {
+            for (terminal, child) in state.children.iter() {
+                transitions
+                    .entry(*child)
+                    .or_insert_with(HashMap::new)
+                    .entry(*terminal)
+                    .or_insert_with(Vec::new)
+                    .push(id);
+            }
+        }
+        InverseGraph(transitions)
+    }
+
+    /// Gets all the paths from state 0 to the specified one
+    fn get_paths_to(&self, target: usize) -> Vec<Vec<SymbolRef>> {
+        let mut elements: Vec<PNode> = vec![PNode::new(target, None, None)];
+        let mut visited: HashMap<usize, Vec<SymbolRef>> = HashMap::new();
+        let mut queue: Vec<usize> = vec![0];
+        let mut goals: Vec<usize> = Vec::new();
+        while !queue.is_empty() {
+            let current = queue.remove(0);
+            if let Some(transitions) = self.0.get(&elements[current].state) {
+                for (symbol, antecedents) in transitions.iter() {
+                    for previous in antecedents {
+                        let visited_with = visited.entry(*previous).or_insert_with(Vec::new);
+                        if visited_with.contains(symbol) {
+                            continue;
+                        }
+                        visited_with.push(*symbol);
+                        let index = elements.len();
+                        elements.push(PNode::new(*previous, Some(*symbol), Some(current)));
+                        if *previous == 0 {
+                            goals.push(*previous);
+                        } else {
+                            queue.push(index);
+                        }
+                    }
+                }
+            }
+        }
+        goals
+            .into_iter()
+            .map(|goal| {
+                let mut path = Vec::new();
+                let mut current = Some(goal);
+                while let Some(current_id) = current {
+                    let node = &elements[current_id];
+                    if let Some(symbol) = node.transition {
+                        path.push(symbol);
+                    }
+                    current = node.next;
+                }
+                path
+            })
+            .collect()
+    }
+
+    /// Gets possible inputs that allows for reaching the specified state from state 0
+    pub fn get_inputs_for(&self, state: usize, grammar: &Grammar) -> Vec<Phrase> {
+        self.get_paths_to(state)
+            .into_iter()
+            .map(|path| {
+                let mut phrase = Phrase::default();
+                for symbol in path.into_iter() {
+                    match symbol {
+                        SymbolRef::Variable(id) => {
+                            let mut stack = Vec::new();
+                            phrase.build_input(grammar, id, &mut stack);
+                        }
+                        SymbolRef::Terminal(id) => {
+                            // easy, just add it to the sample
+                            phrase.append(TerminalRef::Terminal(id));
+                        }
+                        _ => { /* should not happen, ignore */ }
+                    }
+                }
+                phrase
+            })
+            .collect()
+    }
 }
 
 /// Represents a phrase that can be produced by grammar.
 /// It is essentially a list of terminals
-#[derive(Debug, Clone, Eq)]
+#[derive(Debug, Default, Clone, Eq)]
 pub struct Phrase(Vec<TerminalRef>);
 
 impl PartialEq for Phrase {
@@ -508,6 +625,58 @@ impl Phrase {
     /// Appends a terminal to this phrase
     pub fn append(&mut self, terminal: TerminalRef) {
         self.0.push(terminal);
+    }
+
+    /// Builds the input by decomposing the given variable
+    /// This methods recursively triggers the production of encoutered variables to arrive to the terminal symbols.
+    /// The methods also tries do not go into an infinite loop by keeping track of the rule definitions that are currently used.
+    /// If a rule definition has already been used (is in the stack) the method avoids it
+    fn build_input(&mut self, grammar: &Grammar, variable: usize, stack: &mut Vec<RuleRef>) {
+        let variable = grammar.get_variable(variable).unwrap();
+        // if the variable to decompose is nullable (epsilon is in the FIRSTS state), stop here
+        if variable.firsts.content.contains(&TerminalRef::Epsilon) {
+            return;
+        }
+        let rule_index = match (0..(variable.rules.len())).find(|index| {
+            // if it is not in the stack of rule definition
+            !stack.contains(&RuleRef::new(variable.id, *index))
+        }) {
+            Some(index) => index,
+            // if all identified rule definitions are in the stack (currently in use)
+            None => 0
+        };
+
+        let elements = stack.clone();
+        // push the rule definition to use onto the stack
+        stack.push(RuleRef::new(variable.id, rule_index));
+        // walk the rule definition to build the sample
+        for element in variable.rules[rule_index].body.choices[0].parts.iter() {
+            match element.symbol {
+                SymbolRef::Variable(id) => {
+                    // TODO: cleanup this code, this is really not a nice patch!!
+                    // TODO: this is surely ineficient, but I don't understand the algorithm to do better yet
+                    // The idea is to try and avoid infinite recursive call by checking the symbol was not already processed before
+                    // This code checks whether the variable in this part is not already in one of the rule definition currently in the stack
+                    let found = elements.iter().any(|rule_ref| {
+                        rule_ref.get_rule_in(grammar).body.choices[0]
+                            .parts
+                            .iter()
+                            .any(|part| part.symbol == element.symbol)
+                    });
+                    // if part.Symbol is not the same as another part.symbol found in a previous definition
+                    if !found {
+                        self.build_input(grammar, id, stack);
+                    }
+                    // TODO: what do we do if the variable was found?
+                }
+                SymbolRef::Terminal(id) => {
+                    // easy, just add it to the sample
+                    self.append(TerminalRef::Terminal(id));
+                }
+                _ => { /* should not happen, ignore */ }
+            }
+        }
+        stack.pop();
     }
 }
 
