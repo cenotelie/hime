@@ -216,8 +216,7 @@ struct DFAPartition<'a> {
 
 impl DFA {
     /// Initializes this dfa as equivalent to the given nfa
-    pub fn from_nfa(nfa: NFA) -> DFA {
-        let mut nfa = nfa;
+    pub fn from_nfa(mut nfa: NFA) -> DFA {
         // Create the first NFA set, add the entry and close it
         let mut nfa_init = NFAStateSet::new();
         nfa_init.add_unique(nfa.entry);
@@ -228,6 +227,7 @@ impl DFA {
         // For each set in the list of the NFA states
         let mut i = 0;
         while i < nfa_sets.len() {
+            // println!("at state {:?}", &nfa_sets[i].states);
             // normalize transitions
             nfa_sets[i].normalize(&mut nfa);
             // Get the transitions for the set
@@ -1013,8 +1013,7 @@ impl NFAStateSet {
                 transitions
                     .entry(transition.value)
                     .or_insert_with(NFAStateSet::new)
-                    .states
-                    .push(nfa.states[transition.next].id);
+                    .add_unique(nfa.states[transition.next].id);
             }
         }
         // Close all children

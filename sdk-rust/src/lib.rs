@@ -31,10 +31,23 @@ pub mod output;
 pub mod unicode;
 
 use crate::errors::{Error, Errors};
+use crate::grammars::Grammar;
+use ansi_term::Colour::White;
+use ansi_term::Style;
 use hime_redist::ast::AstNode;
 use hime_redist::symbols::SemanticElementTrait;
 use hime_redist::text::{TextContext, TextPosition};
 use std::cmp::Ordering;
+
+/// Prints an info message
+pub fn print_info(message: &str) {
+    eprintln!(
+        "{}{} {}",
+        White.bold().paint("info"),
+        Style::new().bold().paint(":"),
+        Style::new().bold().paint(message)
+    );
+}
 
 /// Represents a range of characters
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
@@ -346,8 +359,15 @@ impl CompilationTask {
         }
         // prepare the grammars
         for grammar in grammars.iter_mut() {
-            grammar.prepare()?;
+            self.execute_for_grammar(grammar)?;
         }
+        Ok(())
+    }
+
+    /// Build and output artifacts for a grammar
+    fn execute_for_grammar(&self, grammar: &mut Grammar) -> Result<(), Errors> {
+        grammar.prepare()?;
+        let _dfa = grammar.build_dfa();
         Ok(())
     }
 }

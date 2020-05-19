@@ -150,6 +150,13 @@ impl PartialEq for TerminalSet {
 }
 
 impl TerminalSet {
+    /// Creates a set with a single element
+    pub fn single(terminal: TerminalRef) -> TerminalSet {
+        TerminalSet {
+            content: vec![terminal]
+        }
+    }
+
     /// Gets the number of states in this automaton
     pub fn len(&self) -> usize {
         self.content.len()
@@ -1162,6 +1169,11 @@ impl Grammar {
         let name = format!("{}{}", PREFIX_GENERATED_VARIABLE, sid);
         self.variables.push(Variable::new(sid, name));
         &mut self.variables[index]
+    }
+
+    /// Gets the variable with the specified identifier
+    pub fn get_variable(&self, sid: usize) -> Option<&Variable> {
+        self.variables.iter().find(|v| v.id == sid)
     }
 
     /// Adds a variable with the given name to this grammar

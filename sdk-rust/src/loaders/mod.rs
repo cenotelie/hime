@@ -26,8 +26,7 @@ use crate::grammars::{
     TemplateRuleSymbol, DEFAULT_CONTEXT_NAME
 };
 use crate::unicode::{Span, BLOCKS, CATEGORIES};
-use crate::CharSpan;
-use crate::InputReference;
+use crate::{print_info, CharSpan, InputReference};
 use hime_redist::ast::{Ast, AstFamily, AstNode};
 use hime_redist::errors::ParseErrorDataTrait;
 use hime_redist::lexers::DEFAULT_CONTEXT;
@@ -99,7 +98,7 @@ fn resolve_inheritance<'a>(
 
 /// Parses the specified input
 fn parse_input(input: &str) -> Result<ParseResult, Errors> {
-    println!("Reading {} ...", input);
+    print_info(&format!("Reading {} ...", input));
     let file = fs::File::open(input)?;
     let mut reader = io::BufReader::new(file);
     let result = parser::parse_utf8(&mut reader);
@@ -233,7 +232,7 @@ impl<'a> Loader<'a> {
 
     /// Loads the content of the grammar
     fn load_content(&mut self, errors: &mut Vec<Error>) {
-        println!("Loading grammar {} ...", self.grammar.name);
+        print_info(&format!("Loading grammar {} ...", self.grammar.name));
         for node in self.root.children().iter() {
             let id = node.get_symbol().id;
             if id == parser::ID_TERMINAL_BLOCK_OPTIONS {
