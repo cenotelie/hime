@@ -17,7 +17,9 @@
 
 //! Module for LR automata
 
-use crate::grammars::{Grammar, Rule, RuleChoice, SymbolRef, TerminalRef, TerminalSet};
+use crate::grammars::{
+    Grammar, Rule, RuleChoice, SymbolRef, TerminalRef, TerminalSet, GENERATED_AXIOM
+};
 use hime_redist::parsers::{LRActionCode, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT};
 use std::collections::HashMap;
 
@@ -257,6 +259,116 @@ pub struct State {
     pub reductions: Vec<Reduction>
 }
 
+impl State {
+    /// Builds reductions for this state
+    pub fn build_reductions_lr0(&mut self, id: usize, grammar: &Grammar) -> Conflicts {
+        let mut conflicts = Conflicts::default();
+        let mut reduce_index = None;
+        for (index, item) in self.items.iter().enumerate() {
+            if item.get_action(grammar) != LR_ACTION_CODE_REDUCE {
+                continue;
+            }
+            if !self.children.is_empty() {
+                // shift/reduce conflict
+                conflicts.raise_shift_reduce(
+                    self,
+                    id,
+                    grammar,
+                    item.clone(),
+                    TerminalRef::NullTerminal
+                );
+            }
+            if let Some(previous_index) = reduce_index {
+                // reduce/reduce conflict
+                let previous: &Item = &self.items[previous_index];
+                conflicts.raise_reduce_reduce(
+                    id,
+                    previous.clone(),
+                    item.clone(),
+                    TerminalRef::NullTerminal
+                );
+            } else {
+                reduce_index = Some(index);
+                self.reductions.push(Reduction {
+                    lookahead: TerminalRef::NullTerminal,
+                    rule: item.rule,
+                    length: item.position
+                });
+            }
+        }
+        conflicts
+    }
+
+    /// Builds reductions for this state
+    pub fn build_reductions_lr1(&mut self, id: usize, grammar: &Grammar) -> Conflicts {
+        let mut conflicts = Conflicts::default();
+        let mut reductions: HashMap<TerminalRef, usize> = HashMap::new();
+        for (index, item) in self.items.iter().enumerate() {
+            if item.get_action(grammar) != LR_ACTION_CODE_REDUCE {
+                continue;
+            }
+            for lookahead in item.lookaheads.content.iter() {
+                let symbol_ref: SymbolRef = (*lookahead).into();
+                if self.children.contains_key(&symbol_ref) {
+                    // There is already a shift action for the lookahead => conflict
+                    conflicts.raise_shift_reduce(self, id, grammar, item.clone(), *lookahead);
+                } else if let Some(previous_index) = reductions.get(lookahead) {
+                    // There is already a reduction action for the lookahead => conflict
+                    let previous: &Item = &self.items[*previous_index];
+                    conflicts.raise_reduce_reduce(id, previous.clone(), item.clone(), *lookahead);
+                } else {
+                    // no conflict
+                    reductions.insert(*lookahead, index);
+                    self.reductions.push(Reduction {
+                        lookahead: *lookahead,
+                        rule: item.rule,
+                        length: item.position
+                    });
+                }
+            }
+        }
+        conflicts
+    }
+
+    /// Builds reductions for this state
+    pub fn build_reductions_rnglr1(&mut self, id: usize, grammar: &Grammar) -> Conflicts {
+        let mut conflicts = Conflicts::default();
+        let mut reductions: HashMap<TerminalRef, usize> = HashMap::new();
+        for (index, item) in self.items.iter().enumerate() {
+            let rule = item.rule.get_rule_in(grammar);
+            if item.get_action(grammar) == LR_ACTION_CODE_SHIFT
+                && !rule.body.choices[item.position]
+                    .firsts
+                    .content
+                    .contains(&TerminalRef::Epsilon)
+            {
+                // item is shift action and is not nullable after the dot
+                continue;
+            }
+            for lookahead in item.lookaheads.content.iter() {
+                let symbol_ref: SymbolRef = (*lookahead).into();
+                if self.children.contains_key(&symbol_ref) {
+                    // There is already a shift action for the lookahead => conflict
+                    conflicts.raise_shift_reduce(self, id, grammar, item.clone(), *lookahead);
+                } else if let Some(previous_index) = reductions.get(lookahead) {
+                    // There is already a reduction action for the lookahead => conflict
+                    let previous: &Item = &self.items[*previous_index];
+                    conflicts.raise_reduce_reduce(id, previous.clone(), item.clone(), *lookahead);
+                } else {
+                    // no conflict
+                    reductions.insert(*lookahead, index);
+                    self.reductions.push(Reduction {
+                        lookahead: *lookahead,
+                        rule: item.rule,
+                        length: item.position
+                    });
+                }
+            }
+        }
+        conflicts
+    }
+}
+
 /// Represents a LR graph
 #[derive(Debug, Clone, Default)]
 pub struct Graph {
@@ -346,4 +458,195 @@ impl Graph {
         self.states.push(state);
         index
     }
+
+    /// Builds the reductions for this graph
+    pub fn build_reductions_lr0(&mut self, grammar: &Grammar) -> Conflicts {
+        let mut conflicts = Conflicts::default();
+        for (index, state) in self.states.iter_mut().enumerate() {
+            conflicts.aggregate(state.build_reductions_lr0(index, grammar));
+        }
+        conflicts
+    }
+
+    /// Builds the reductions for this graph
+    pub fn build_reductions_lr1(&mut self, grammar: &Grammar) -> Conflicts {
+        let mut conflicts = Conflicts::default();
+        for (index, state) in self.states.iter_mut().enumerate() {
+            conflicts.aggregate(state.build_reductions_lr1(index, grammar));
+        }
+        conflicts
+    }
+
+    /// Builds the reductions for this graph
+    pub fn build_reductions_rnglr1(&mut self, grammar: &Grammar) -> Conflicts {
+        let mut conflicts = Conflicts::default();
+        for (index, state) in self.states.iter_mut().enumerate() {
+            conflicts.aggregate(state.build_reductions_rnglr1(index, grammar));
+        }
+        conflicts
+    }
+}
+
+/// Represents a phrase that can be produced by grammar.
+/// It is essentially a list of terminals
+#[derive(Debug, Clone, Eq)]
+pub struct Phrase(Vec<TerminalRef>);
+
+impl PartialEq for Phrase {
+    fn eq(&self, other: &Phrase) -> bool {
+        self.0.len() == other.0.len() && self.0.iter().zip(other.0.iter()).all(|(x, y)| x == y)
+    }
+}
+
+impl Phrase {
+    /// Appends a terminal to this phrase
+    pub fn append(&mut self, terminal: TerminalRef) {
+        self.0.push(terminal);
+    }
+}
+
+/// The kinds of LR conflicts
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum ConflictKind {
+    /// Conflict between a shift action and a reduce action
+    ShiftReduce,
+    /// Conflict between two reduce actions
+    ReduceReduce
+}
+
+/// A conflict between items
+#[derive(Debug, Clone, Eq)]
+pub struct Conflict {
+    /// The state raising the conflict
+    pub state: usize,
+    /// The kind of conflict
+    pub kind: ConflictKind,
+    /// The items in the conflict
+    pub items: Vec<Item>,
+    /// The terminal that poses the conflict
+    pub lookahead: TerminalRef
+}
+
+impl PartialEq for Conflict {
+    fn eq(&self, other: &Conflict) -> bool {
+        self.state == other.state && self.kind == other.kind && self.lookahead == other.lookahead
+    }
+}
+
+/// A set of conflicts
+#[derive(Debug, Default, Clone)]
+pub struct Conflicts(Vec<Conflict>);
+
+impl Conflicts {
+    /// Raise a shift/reduce conflict
+    pub fn raise_shift_reduce(
+        &mut self,
+        state: &State,
+        state_id: usize,
+        grammar: &Grammar,
+        reducing: Item,
+        lookahead: TerminalRef
+    ) {
+        // look for previous conflict
+        for previous in self.0.iter_mut() {
+            if previous.kind == ConflictKind::ShiftReduce && previous.lookahead == lookahead {
+                // Previous conflict
+                previous.items.push(reducing);
+                return;
+            }
+        }
+        // No previous conflict was found
+        let mut items: Vec<Item> = state
+            .items
+            .iter()
+            .filter(|item| item.get_next_symbol(grammar) == Some(lookahead.into()))
+            .map(|item| item.clone())
+            .collect();
+        items.push(reducing);
+        self.0.push(Conflict {
+            state: state_id,
+            kind: ConflictKind::ShiftReduce,
+            items,
+            lookahead
+        });
+    }
+
+    /// Raise a reduce/reduce conflict
+    pub fn raise_reduce_reduce(
+        &mut self,
+        state_id: usize,
+        previous: Item,
+        reducing: Item,
+        lookahead: TerminalRef
+    ) {
+        // look for previous conflict
+        for previous in self.0.iter_mut() {
+            if previous.kind == ConflictKind::ReduceReduce && previous.lookahead == lookahead {
+                // Previous conflict
+                previous.items.push(reducing);
+                return;
+            }
+        }
+        // No previous conflict was found
+        self.0.push(Conflict {
+            state: state_id,
+            kind: ConflictKind::ReduceReduce,
+            items: vec![previous, reducing],
+            lookahead
+        });
+    }
+
+    /// Aggregate other conflicts into this collection
+    pub fn aggregate(&mut self, mut other: Conflicts) {
+        self.0.append(&mut other.0);
+    }
+}
+
+/// Gets the LR(0) graph
+fn get_graph_lr0(grammar: &Grammar) -> Graph {
+    // Create the base LR(0) graph
+    let axiom = grammar.get_variable_for_name(GENERATED_AXIOM).unwrap();
+    let item = Item {
+        rule: RuleRef::new(axiom.id, 0),
+        position: 0,
+        lookaheads: TerminalSet::default()
+    };
+    let kernel = StateKernel { items: vec![item] };
+    let state0 = kernel.into_state(grammar, LookaheadMode::LR0);
+    Graph::from(state0, grammar, LookaheadMode::LR0)
+}
+
+/// Builds a LR(0) graph
+pub fn build_graph_lr0(grammar: &Grammar) -> (Graph, Conflicts) {
+    let mut graph = get_graph_lr0(grammar);
+    let conflicts = graph.build_reductions_lr0(grammar);
+    (graph, conflicts)
+}
+
+/// Gets the LR(1) graph
+fn get_graph_lr1(grammar: &Grammar) -> Graph {
+    // Create the base LR(0) graph
+    let axiom = grammar.get_variable_for_name(GENERATED_AXIOM).unwrap();
+    let item = Item {
+        rule: RuleRef::new(axiom.id, 0),
+        position: 0,
+        lookaheads: TerminalSet::default()
+    };
+    let kernel = StateKernel { items: vec![item] };
+    let state0 = kernel.into_state(grammar, LookaheadMode::LR1);
+    Graph::from(state0, grammar, LookaheadMode::LR1)
+}
+
+/// Builds a LR(1) graph
+pub fn build_graph_lr1(grammar: &Grammar) -> (Graph, Conflicts) {
+    let mut graph = get_graph_lr1(grammar);
+    let conflicts = graph.build_reductions_lr1(grammar);
+    (graph, conflicts)
+}
+
+/// Builds a RNGLR(1) graph
+pub fn build_graph_rnglr1(grammar: &Grammar) -> (Graph, Conflicts) {
+    let mut graph = get_graph_lr1(grammar);
+    let conflicts = graph.build_reductions_rnglr1(grammar);
+    (graph, conflicts)
 }

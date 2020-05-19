@@ -36,7 +36,7 @@ namespace Hime.SDK.Grammars.LR
 		/// <summary>
 		///  Gets the type of action 
 		/// </summary>
-		public LRActionCode ActionType { get { return LRActionCode.Shift; } }
+		public LRActionCode ActionType { get { return LRActionCode.Reduce; } }
 
 		/// <summary>
 		///  Gets the trigger for the action 

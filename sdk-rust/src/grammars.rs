@@ -409,6 +409,18 @@ impl PartialOrd for SymbolRef {
     }
 }
 
+impl From<TerminalRef> for SymbolRef {
+    fn from(terminal: TerminalRef) -> Self {
+        match terminal {
+            TerminalRef::Dummy => SymbolRef::Dummy,
+            TerminalRef::Epsilon => SymbolRef::Epsilon,
+            TerminalRef::Dollar => SymbolRef::Dollar,
+            TerminalRef::NullTerminal => SymbolRef::NullTerminal,
+            TerminalRef::Terminal(id) => SymbolRef::Terminal(id)
+        }
+    }
+}
+
 /// Represents an element in the body of a grammar rule
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct RuleBodyElement {
@@ -1174,6 +1186,11 @@ impl Grammar {
     /// Gets the variable with the specified identifier
     pub fn get_variable(&self, sid: usize) -> Option<&Variable> {
         self.variables.iter().find(|v| v.id == sid)
+    }
+
+    /// Gets the variable with the specified name
+    pub fn get_variable_for_name(&self, name: &str) -> Option<&Variable> {
+        self.variables.iter().find(|v| v.name == name)
     }
 
     /// Adds a variable with the given name to this grammar
