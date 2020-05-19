@@ -650,3 +650,166 @@ pub fn build_graph_rnglr1(grammar: &Grammar) -> (Graph, Conflicts) {
     let conflicts = graph.build_reductions_rnglr1(grammar);
     (graph, conflicts)
 }
+
+/// Builds the kernels for a LALR(1) graph
+fn build_graph_lalr1_kernels(graph0: &Graph) -> Vec<StateKernel> {
+    // copy kernel without the lookaheads
+    let mut kernels: Vec<StateKernel> = graph0
+        .states
+        .iter()
+        .map(|state| StateKernel {
+            items: state
+                .kernel
+                .items
+                .iter()
+                .map(|item| Item {
+                    rule: item.rule,
+                    position: item.position,
+                    lookaheads: TerminalSet::default()
+                })
+                .collect()
+        })
+        .collect();
+    // set epsilon as lookahead on all items in kernel 0
+    for item in kernels[0].items.iter_mut() {
+        item.lookaheads.add(TerminalRef::Epsilon);
+    }
+    kernels
+}
+
+/// Item in a propagation table
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+struct Propagation {
+    from_state: usize,
+    from_item: usize,
+    to_state: usize,
+    to_item: usize
+}
+
+/// Builds the propagation table for a LALR(1) graph
+fn build_graph_lalr1_propagation_table(
+    graph0: &Graph,
+    grammar: &Grammar,
+    kernels: &mut Vec<StateKernel>
+) -> Vec<Propagation> {
+    let mut propagation = Vec::new();
+    for i in 0..kernels.len() {
+        // For each LALR(1) item in the kernel
+        // Only the kernel needs to be examined as the other items will be discovered and treated
+        // with the dummy closures
+        for item_id in 0..(kernels[i].items.len()) {
+            if kernels[i].items[item_id].get_action(grammar) == LR_ACTION_CODE_REDUCE {
+                // If item is of the form [A -> alpha .]
+                // => The closure will only contain the item itself
+                // => Cannot be used to generate or propagate lookaheads
+                continue;
+            }
+            // Item here is of the form [A -> alpha . beta]
+            // Create the corresponding dummy item : [A -> alpha . beta, dummy]
+            // This item is used to detect lookahead propagation
+            let dummy_state = StateKernel {
+                items: vec![Item {
+                    rule: kernels[i].items[item_id].rule,
+                    position: kernels[i].items[item_id].position,
+                    lookaheads: TerminalSet::single(TerminalRef::Dummy)
+                }]
+            }
+            .into_state(grammar, LookaheadMode::LALR1);
+            // For each item in the closure of the dummy item
+            for dummy_item in dummy_state.items.iter() {
+                if let Some(next_symbol) = dummy_item.get_next_symbol(grammar) {
+                    // not a reduction
+                    let dummy_child = dummy_item.get_child();
+                    // Get the child item in the child LALR(1) kernel
+                    let child_state = *graph0.states[i].children.get(&next_symbol).unwrap();
+                    let child_item = kernels[child_state]
+                        .items
+                        .iter()
+                        .position(|candidate| candidate.same_base(&dummy_child))
+                        .unwrap();
+                    // If the lookaheads of the item in the dummy set contains the dummy terminal
+                    if dummy_item.lookaheads.content.contains(&TerminalRef::Dummy) {
+                        // => Propagation from the parent item to the child
+                        propagation.push(Propagation {
+                            from_state: i,
+                            from_item: item_id,
+                            to_state: child_state,
+                            to_item: child_item
+                        });
+                    } else {
+                        // => Spontaneous generation of lookaheads
+                        for lookahead in dummy_item.lookaheads.content.iter() {
+                            kernels[child_state].items[child_item]
+                                .lookaheads
+                                .add(*lookahead);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    propagation
+}
+
+/// Executes the propagation for a LALR(1) graph
+fn build_graph_lalr1_propagate(kernels: &mut Vec<StateKernel>, table: &Vec<Propagation>) {
+    let mut modifications = 1;
+    while modifications != 0 {
+        modifications = 0;
+        for propagation in table.iter() {
+            let before = kernels[propagation.to_state].items[propagation.to_item]
+                .lookaheads
+                .content
+                .len();
+            let others = kernels[propagation.from_state].items[propagation.from_item]
+                .lookaheads
+                .clone();
+            kernels[propagation.to_state].items[propagation.to_item]
+                .lookaheads
+                .add_others(&others);
+            let after = kernels[propagation.to_state].items[propagation.to_item]
+                .lookaheads
+                .content
+                .len();
+            modifications += after - before;
+        }
+    }
+}
+
+/// Builds the complete LALR(1) graph
+fn build_graph_lalr1_graph(kernels: Vec<StateKernel>, graph0: &Graph, grammar: &Grammar) -> Graph {
+    // Build states
+    let mut states: Vec<State> = kernels
+        .into_iter()
+        .map(|kernel| kernel.into_state(grammar, LookaheadMode::LALR1))
+        .collect();
+    // Link for each LALR(1) set
+    for (state0, state1) in graph0.states.iter().zip(states.iter_mut()) {
+        state1.children = state0.children.clone();
+        state1.opening_contexts = state0.opening_contexts.clone();
+    }
+    Graph { states }
+}
+
+/// Gets the LALR(1) graph
+fn get_graph_lalr1(grammar: &Grammar) -> Graph {
+    let graph0 = get_graph_lr0(grammar);
+    let mut kernels = build_graph_lalr1_kernels(&graph0);
+    let propagation = build_graph_lalr1_propagation_table(&graph0, grammar, &mut kernels);
+    build_graph_lalr1_propagate(&mut kernels, &propagation);
+    build_graph_lalr1_graph(kernels, &graph0, grammar)
+}
+
+/// Builds a LALR(1) graph
+pub fn build_graph_lalr1(grammar: &Grammar) -> (Graph, Conflicts) {
+    let mut graph = get_graph_lalr1(grammar);
+    let conflicts = graph.build_reductions_lr1(grammar);
+    (graph, conflicts)
+}
+
+/// Builds a RNGLALR(1) graph
+pub fn build_graph_rnglalr1(grammar: &Grammar) -> (Graph, Conflicts) {
+    let mut graph = get_graph_lalr1(grammar);
+    let conflicts = graph.build_reductions_rnglr1(grammar);
+    (graph, conflicts)
+}
