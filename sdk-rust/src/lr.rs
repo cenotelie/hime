@@ -20,6 +20,7 @@
 use crate::grammars::{
     Grammar, Rule, RuleChoice, SymbolRef, TerminalRef, TerminalSet, GENERATED_AXIOM
 };
+use crate::ParsingMethod;
 use hime_redist::parsers::{LRActionCode, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT};
 use std::collections::HashMap;
 
@@ -40,7 +41,12 @@ impl RuleRef {
 
     /// Gets the referenced rule in the grammar
     pub fn get_rule_in<'s, 'g>(&'s self, grammar: &'g Grammar) -> &'g Rule {
-        &grammar.variables[self.variable].rules[self.index]
+        &grammar
+            .variables
+            .iter()
+            .find(|v| v.id == self.variable)
+            .unwrap()
+            .rules[self.index]
     }
 }
 
@@ -812,4 +818,15 @@ pub fn build_graph_rnglalr1(grammar: &Grammar) -> (Graph, Conflicts) {
     let mut graph = get_graph_lalr1(grammar);
     let conflicts = graph.build_reductions_rnglr1(grammar);
     (graph, conflicts)
+}
+
+/// Build the specified grammar
+pub fn build_graph(grammar: &Grammar, method: ParsingMethod) -> (Graph, Conflicts) {
+    match method {
+        ParsingMethod::LR0 => build_graph_lr0(grammar),
+        ParsingMethod::LR1 => build_graph_lr1(grammar),
+        ParsingMethod::LALR1 => build_graph_lalr1(grammar),
+        ParsingMethod::RNGLR1 => build_graph_rnglr1(grammar),
+        ParsingMethod::RNGLALR1 => build_graph_rnglalr1(grammar)
+    }
 }

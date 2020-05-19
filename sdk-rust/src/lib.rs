@@ -32,6 +32,7 @@ pub mod unicode;
 
 use crate::errors::{Error, Errors};
 use crate::grammars::Grammar;
+use crate::lr::build_graph;
 use ansi_term::Colour::White;
 use ansi_term::Style;
 use hime_redist::ast::AstNode;
@@ -368,6 +369,7 @@ impl CompilationTask {
     fn execute_for_grammar(&self, grammar: &mut Grammar) -> Result<(), Errors> {
         grammar.prepare()?;
         let _dfa = grammar.build_dfa();
+        let (_graph, _conficts) = build_graph(grammar, self.method);
         Ok(())
     }
 }
