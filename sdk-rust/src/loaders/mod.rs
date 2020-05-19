@@ -306,6 +306,7 @@ fn load_terminal_rule_context<'a>(
 ) {
     let children = node.children();
     let name = children.at(0).get_value().unwrap();
+    grammar.resolve_context(&name);
     for child in children.iter().skip(1) {
         load_terminal_rule(filename, errors, grammar, child, &name, false);
     }

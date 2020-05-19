@@ -536,7 +536,7 @@ pub struct PathElem {
 
 /// A path in a LR graph
 #[derive(Debug, Default, Clone)]
-pub struct Path(Vec<PathElem>);
+pub struct Path(pub Vec<PathElem>);
 
 impl Path {
     /// Gets the corresponding input phrase
@@ -633,7 +633,7 @@ impl InverseGraph {
 /// Represents a phrase that can be produced by grammar.
 /// It is essentially a list of terminals
 #[derive(Debug, Default, Clone, Eq)]
-pub struct Phrase(Vec<TerminalRef>);
+pub struct Phrase(pub Vec<TerminalRef>);
 
 impl PartialEq for Phrase {
     fn eq(&self, other: &Phrase) -> bool {
@@ -1108,9 +1108,6 @@ pub fn build_graph(grammar: &Grammar, method: ParsingMethod) -> Result<Graph, Er
         ParsingMethod::RNGLR1 => build_graph_rnglr1(grammar),
         ParsingMethod::RNGLALR1 => build_graph_rnglalr1(grammar)
     };
-    if conflicts.0.is_empty() {
-        return Ok(graph);
-    }
     let inverse = graph.inverse();
     let mut errors = Errors::from(
         conflicts
@@ -1118,14 +1115,15 @@ pub fn build_graph(grammar: &Grammar, method: ParsingMethod) -> Result<Graph, Er
             .into_iter()
             .map(|conflict| {
                 let phrases = inverse.get_inputs_for(conflict.state, grammar);
-                Error::LrConflict(grammar.name.clone(), conflict, phrases)
+                Error::LrConflict(conflict, phrases)
             })
             .collect()
     );
     for error in find_context_errors(&graph, &inverse, grammar).into_iter() {
-        errors
-            .errors
-            .push(Error::TerminalOutsideContext(grammar.name.clone(), error));
+        errors.errors.push(Error::TerminalOutsideContext(error));
+    }
+    if errors.errors.is_empty() {
+        return Ok(graph);
     }
     Err(errors)
 }

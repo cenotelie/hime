@@ -1109,6 +1109,40 @@ impl Grammar {
         }
     }
 
+    /// Gets the value of a symbol
+    pub fn get_symbol_value(&self, symbol: SymbolRef) -> &str {
+        match symbol {
+            SymbolRef::Dummy => "",
+            SymbolRef::Epsilon => "ε",
+            SymbolRef::Dollar => "$",
+            SymbolRef::NullTerminal => "",
+            SymbolRef::Terminal(id) => self
+                .terminals
+                .iter()
+                .find(|s| s.id == id)
+                .map(|s| &s.value)
+                .unwrap(),
+            SymbolRef::Variable(id) => self
+                .variables
+                .iter()
+                .find(|s| s.id == id)
+                .map(|s| &s.name)
+                .unwrap(),
+            SymbolRef::Virtual(id) => self
+                .virtuals
+                .iter()
+                .find(|s| s.id == id)
+                .map(|s| &s.name)
+                .unwrap(),
+            SymbolRef::Action(id) => self
+                .actions
+                .iter()
+                .find(|s| s.id == id)
+                .map(|s| &s.name)
+                .unwrap()
+        }
+    }
+
     /// Resolves the specified lexical context name for this grammar
     pub fn resolve_context(&mut self, name: &str) -> usize {
         match self.contexts.iter().position(|c| name == c) {

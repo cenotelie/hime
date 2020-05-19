@@ -177,7 +177,7 @@ pub fn main() {
         match task.execute() {
             Ok(_) => process::exit(0),
             Err(errors) => {
-                errors.print();
+                errors.print(None);
                 process::exit(1);
             }
         }
