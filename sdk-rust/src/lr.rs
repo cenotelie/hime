@@ -17,7 +17,7 @@
 
 //! Module for LR automata
 
-use crate::errors::{Error, Errors};
+use crate::errors::Error;
 use crate::grammars::{
     Grammar, RuleChoice, RuleRef, SymbolRef, Terminal, TerminalRef, TerminalSet, GENERATED_AXIOM
 };
@@ -717,7 +717,9 @@ pub struct Conflict {
     /// The items in the conflict
     pub items: Vec<Item>,
     /// The terminal that poses the conflict
-    pub lookahead: TerminalRef
+    pub lookahead: TerminalRef,
+    /// Example phrases for the conflict
+    pub phrases: Vec<Phrase>
 }
 
 impl PartialEq for Conflict {
@@ -760,7 +762,8 @@ impl Conflicts {
             state: state_id,
             kind: ConflictKind::ShiftReduce,
             items,
-            lookahead
+            lookahead,
+            phrases: Vec::new()
         });
     }
 
@@ -785,7 +788,8 @@ impl Conflicts {
             state: state_id,
             kind: ConflictKind::ReduceReduce,
             items: vec![previous, reducing],
-            lookahead
+            lookahead,
+            phrases: Vec::new()
         });
     }
 
@@ -1121,7 +1125,11 @@ fn find_context_errors_in(
 }
 
 /// Build the specified grammar
-pub fn build_graph(grammar: &Grammar, method: ParsingMethod) -> Result<Graph, Errors> {
+pub fn build_graph(
+    grammar: &Grammar,
+    grammar_index: usize,
+    method: ParsingMethod
+) -> Result<Graph, Vec<Error>> {
     let (graph, conflicts) = match method {
         ParsingMethod::LR0 => build_graph_lr0(grammar),
         ParsingMethod::LR1 => build_graph_lr1(grammar),
@@ -1130,20 +1138,18 @@ pub fn build_graph(grammar: &Grammar, method: ParsingMethod) -> Result<Graph, Er
         ParsingMethod::RNGLALR1 => build_graph_rnglalr1(grammar)
     };
     let inverse = graph.inverse();
-    let mut errors = Errors::from(
-        conflicts
-            .0
-            .into_iter()
-            .map(|conflict| {
-                let phrases = inverse.get_inputs_for(conflict.state, grammar);
-                Error::LrConflict(conflict, phrases)
-            })
-            .collect()
-    );
+    let mut errors: Vec<Error> = conflicts
+        .0
+        .into_iter()
+        .map(|mut conflict| {
+            conflict.phrases = inverse.get_inputs_for(conflict.state, grammar);
+            Error::LrConflict(grammar_index, conflict)
+        })
+        .collect();
     for error in find_context_errors(&graph, &inverse, grammar).into_iter() {
-        errors.errors.push(Error::TerminalOutsideContext(error));
+        errors.push(Error::TerminalOutsideContext(grammar_index, error));
     }
-    if errors.errors.is_empty() {
+    if errors.is_empty() {
         return Ok(graph);
     }
     Err(errors)

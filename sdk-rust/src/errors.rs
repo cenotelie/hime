@@ -19,7 +19,7 @@
 
 use crate::grammars::{Grammar, RuleRef, SymbolRef};
 use crate::lr::{Conflict, ConflictKind, ContextError, Item, Phrase};
-use crate::InputReference;
+use crate::{InputReference, LoadedData};
 use ansi_term::Colour::{Blue, Red};
 use ansi_term::Style;
 use std::io;
@@ -60,9 +60,9 @@ pub enum Error {
     /// The inherited grammar cannot be found
     GrammarNotDefined(InputReference, String),
     /// A conflict in a grammar
-    LrConflict(Conflict, Vec<Phrase>),
+    LrConflict(usize, Conflict),
     /// A contextual terminal is used outside of its context
-    TerminalOutsideContext(ContextError)
+    TerminalOutsideContext(usize, ContextError)
 }
 
 impl From<io::Error> for Error {
@@ -94,33 +94,36 @@ impl Error {
             Error::OverridingPreviousTerminal(input, _) => input.get_line_number_width(),
             Error::GrammarNotDefined(input, _) => input.get_line_number_width(),
             Error::LrConflict(_, _) => 0,
-            Error::TerminalOutsideContext(_) => 0
+            Error::TerminalOutsideContext(_, _) => 0
         }
     }
 
     /// Prints this error
-    pub fn print(&self, max_width: usize, grammar: Option<&Grammar>) {
+    pub fn print(&self, max_width: usize, data: &LoadedData) {
         match self {
             Error::Io(err) => print_io(err),
             Error::Msg(msg) => print_msg(msg.as_ref()),
-            Error::Parsing(input, msg) => print_msg_with_input_ref(max_width, input, msg),
+            Error::Parsing(input, msg) => print_msg_with_input_ref(max_width, data, input, msg),
             Error::GrammarNotFound(name) => print_msg(&format!("Cannot find grammar `{}`", name)),
             Error::AxiomNotSpecified(input) => {
-                print_msg_with_input_ref(max_width, input, MSG_AXIOM_NOT_SPECIFIED)
+                print_msg_with_input_ref(max_width, data, input, MSG_AXIOM_NOT_SPECIFIED)
             }
             Error::AxiomNotDefined(input, name) => print_msg_with_input_ref(
                 max_width,
+                data,
                 input,
                 &format!("Grammar axiom `{}` is not defined", name)
             ),
             Error::TemplateRuleNotFound(input, name) => print_msg_with_input_ref(
                 max_width,
+                data,
                 input,
                 &format!("Cannot find template rule `{}`", name)
             ),
             Error::TemplateRuleWrongNumberOfArgs(input, expected, provided) => {
                 print_msg_with_input_ref(
                     max_width,
+                    data,
                     input,
                     &format!(
                         "Template expected {} arguments, {} given",
@@ -130,26 +133,31 @@ impl Error {
             }
             Error::SymbolNotFound(input, name) => print_msg_with_input_ref(
                 max_width,
+                data,
                 input,
                 &format!("Cannot find symbol `{}`", name)
             ),
             Error::InvalidCharacterSpan(input) => print_msg_with_input_ref(
                 max_width,
+                data,
                 input,
                 "Invalid character span, end is before begin"
             ),
             Error::UnknownUnicodeBlock(input, name) => print_msg_with_input_ref(
                 max_width,
+                data,
                 input,
                 &format!("Unknown unicode block `{}`", name)
             ),
             Error::UnknownUnicodeCategory(input, name) => print_msg_with_input_ref(
                 max_width,
+                data,
                 input,
                 &format!("Unknown unicode category `{}`", name)
             ),
             Error::UnsupportedNonPlane0InCharacterClass(input, c) => print_msg_with_input_ref(
                 max_width,
+                data,
                 input,
                 &format!(
                     "Unsupported non-plane 0 Unicode character ({0}) in character class",
@@ -158,24 +166,27 @@ impl Error {
             ),
             Error::InvalidCodePoint(input, c) => print_msg_with_input_ref(
                 max_width,
+                data,
                 input,
                 &format!("The value U+{:0X} is not a supported unicode code point", c)
             ),
             Error::OverridingPreviousTerminal(input, name) => print_msg_with_input_ref(
                 max_width,
+                data,
                 input,
                 &format!("Overriding the previous definition of `{}`", name)
             ),
             Error::GrammarNotDefined(input, name) => print_msg_with_input_ref(
                 max_width,
+                data,
                 input,
                 &format!("Grammar `{}` is not defined", name)
             ),
-            Error::LrConflict(conflict, phrases) => {
-                print_lr_conflict(max_width, grammar.unwrap(), conflict, phrases)
+            Error::LrConflict(grammar_index, conflict) => {
+                print_lr_conflict(max_width, data, *grammar_index, conflict)
             }
-            Error::TerminalOutsideContext(error) => {
-                print_context_error(max_width, grammar.unwrap(), error)
+            Error::TerminalOutsideContext(grammar_index, error) => {
+                print_context_error(max_width, data, *grammar_index, error)
             }
         }
     }
@@ -199,7 +210,15 @@ fn print_msg(message: &str) {
 }
 
 /// Prints an error with a message and an input reference
-fn print_msg_with_input_ref(max_width: usize, input_ref: &InputReference, message: &str) {
+fn print_msg_with_input_ref(
+    max_width: usize,
+    data: &LoadedData,
+    input_ref: &InputReference,
+    message: &str
+) {
+    let context = data.inputs[input_ref.input_index]
+        .content
+        .get_context_for(input_ref.position, input_ref.length);
     eprintln!(
         "{}{} {}",
         Red.bold().paint("error"),
@@ -211,7 +230,7 @@ fn print_msg_with_input_ref(max_width: usize, input_ref: &InputReference, messag
         "{}{} {}:{}",
         &pad,
         Blue.bold().paint("-->"),
-        &input_ref.name,
+        &data.inputs[input_ref.input_index].name,
         input_ref.position
     );
     let pad = String::from_utf8(vec![0x20; max_width + 1]).unwrap();
@@ -226,20 +245,26 @@ fn print_msg_with_input_ref(max_width: usize, input_ref: &InputReference, messag
         Blue.bold().paint(format!("{}", input_ref.position.line)),
         &pad,
         Blue.bold().paint("|"),
-        &input_ref.context.content
+        &context.content
     );
     let pad = String::from_utf8(vec![0x20; max_width + 1]).unwrap();
     eprintln!(
         "{}{}  {}",
         &pad,
         Blue.bold().paint("|"),
-        Red.bold().paint(&input_ref.context.pointer)
+        Red.bold().paint(&context.pointer)
     );
     eprintln!("");
 }
 
 /// Prints a conflict error message
-fn print_lr_conflict(max_width: usize, grammar: &Grammar, conflict: &Conflict, phrases: &[Phrase]) {
+fn print_lr_conflict(
+    max_width: usize,
+    data: &LoadedData,
+    grammar_index: usize,
+    conflict: &Conflict
+) {
+    let grammar = &data.grammars[grammar_index];
     let terminal = grammar.get_terminal(conflict.lookahead.priority()).unwrap();
     eprintln!(
         "{}{} {}",
@@ -260,7 +285,7 @@ fn print_lr_conflict(max_width: usize, grammar: &Grammar, conflict: &Conflict, p
     for item in conflict.items.iter() {
         print_lr_item(&pad, grammar, item);
     }
-    if !phrases.is_empty() {
+    if !conflict.phrases.is_empty() {
         eprintln!(
             "{} {} {}: Examples of inputs that raise this conflict",
             &pad,
@@ -268,7 +293,7 @@ fn print_lr_conflict(max_width: usize, grammar: &Grammar, conflict: &Conflict, p
             Style::new().bold().paint("help")
         );
         eprintln!("{} {}", &pad, Blue.bold().paint("|"));
-        for phrase in phrases.iter() {
+        for phrase in conflict.phrases.iter() {
             print_phrase(&pad, grammar, phrase);
         }
     }
@@ -276,7 +301,13 @@ fn print_lr_conflict(max_width: usize, grammar: &Grammar, conflict: &Conflict, p
 }
 
 /// Prints a context error
-fn print_context_error(max_width: usize, grammar: &Grammar, error: &ContextError) {
+fn print_context_error(
+    max_width: usize,
+    data: &LoadedData,
+    grammar_index: usize,
+    error: &ContextError
+) {
+    let grammar = &data.grammars[grammar_index];
     let terminal = grammar.get_terminal(error.terminal.priority()).unwrap();
     eprintln!(
         "{}{} {}",
@@ -365,20 +396,22 @@ fn print_phrase(pad: &str, grammar: &Grammar, phrase: &Phrase) {
 }
 
 /// A collection of errors
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Errors {
+    /// The associated data
+    pub data: LoadedData,
     /// The errors
     pub errors: Vec<Error>
 }
 
 impl Errors {
     /// Encapsulate the errors
-    pub fn from(errors: Vec<Error>) -> Errors {
-        Errors { errors }
+    pub fn from(data: LoadedData, errors: Vec<Error>) -> Errors {
+        Errors { data, errors }
     }
 
     /// Prints the errors
-    pub fn print(&self, grammar: Option<&Grammar>) {
+    pub fn print(&self) {
         if let Some(max_width) = self
             .errors
             .iter()
@@ -386,22 +419,8 @@ impl Errors {
             .max()
         {
             for error in self.errors.iter() {
-                error.print(max_width, grammar);
+                error.print(max_width, &self.data)
             }
-        }
-    }
-}
-
-impl From<Error> for Errors {
-    fn from(err: Error) -> Self {
-        Errors { errors: vec![err] }
-    }
-}
-
-impl From<io::Error> for Errors {
-    fn from(err: io::Error) -> Self {
-        Errors {
-            errors: vec![Error::Io(err)]
         }
     }
 }

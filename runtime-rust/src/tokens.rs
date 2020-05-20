@@ -27,7 +27,7 @@ use crate::utils::biglist::BigList;
 use crate::utils::EitherMut;
 
 /// Represents the metadata of a token
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 struct TokenRepositoryCell {
     /// The terminal's index
     terminal: usize,

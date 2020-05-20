@@ -37,7 +37,7 @@ use ansi_term::Colour::White;
 use ansi_term::Style;
 use hime_redist::ast::AstNode;
 use hime_redist::symbols::SemanticElementTrait;
-use hime_redist::text::{TextContext, TextPosition};
+use hime_redist::text::{Text, TextPosition};
 use std::cmp::Ordering;
 
 /// Prints an info message
@@ -216,15 +216,33 @@ fn test_charspan_split() {
     );
 }
 
-/// Reference to an input
+/// The data for an input that has been loaded
 #[derive(Debug, Clone)]
-pub struct InputReference {
-    /// The input's name (file name in general)
+pub struct LoadedInput {
+    /// The input's name (file name)
     pub name: String,
+    /// The input's content (full text)
+    pub content: Text
+}
+
+/// The data resulting of loading inputs
+#[derive(Debug, Clone)]
+pub struct LoadedData {
+    /// The loaded inputs
+    pub inputs: Vec<LoadedInput>,
+    /// The loaded grammars
+    pub grammars: Vec<Grammar>
+}
+
+/// Reference to an input
+#[derive(Debug, Copy, Clone)]
+pub struct InputReference {
+    /// The input's index
+    pub input_index: usize,
     /// The position in the input
     pub position: TextPosition,
-    /// The input's context
-    pub context: TextContext
+    /// The length in the input
+    pub length: usize
 }
 
 impl InputReference {
@@ -247,11 +265,11 @@ impl InputReference {
 
 impl InputReference {
     /// Build a reference from the specifiec input name and AST node
-    pub fn from<'a>(input_name: &str, node: AstNode<'a>) -> InputReference {
+    pub fn from<'a>(input_index: usize, node: AstNode<'a>) -> InputReference {
         InputReference {
-            name: input_name.to_string(),
+            input_index,
             position: node.get_position().unwrap(),
-            context: node.get_context().unwrap()
+            length: node.get_span().unwrap().length
         }
     }
 }
@@ -346,36 +364,44 @@ impl Default for CompilationTask {
 
 impl CompilationTask {
     /// Executes this task
-    pub fn execute(&self) -> Result<(), Errors> {
-        let mut grammars = loaders::load(&self.input_files)?;
+    pub fn execute(&self) -> Result<LoadedData, Errors> {
+        let mut data = loaders::load(&self.input_files)?;
         // select the grammars to build
         match &self.grammar_name {
             None => {}
             Some(name) => {
-                grammars.retain(|g| &g.name == name);
-                if grammars.is_empty() {
-                    return Err(Error::GrammarNotFound(name.to_string()).into());
+                data.grammars.retain(|g| &g.name == name);
+                if data.grammars.is_empty() {
+                    let error = Error::GrammarNotFound(name.to_string());
+                    return Err(Errors::from(data, vec![error]));
                 }
             }
         }
+        let mut errors = Vec::new();
         // prepare the grammars
-        for grammar in grammars.iter_mut() {
-            self.execute_for_grammar(grammar)?;
+        for (index, grammar) in data.grammars.iter_mut().enumerate() {
+            if let Err(mut errs) = self.execute_for_grammar(grammar, index) {
+                errors.append(&mut errs);
+            }
         }
-        Ok(())
+        if !errors.is_empty() {
+            Err(Errors::from(data, errors))
+        } else {
+            Ok(data)
+        }
     }
 
     /// Build and output artifacts for a grammar
-    fn execute_for_grammar(&self, grammar: &mut Grammar) -> Result<(), Errors> {
-        grammar.prepare()?;
-        let _dfa = grammar.build_dfa();
-        let _graph = match build_graph(grammar, self.method) {
-            Ok(graph) => graph,
-            Err(errors) => {
-                errors.print(Some(grammar));
-                return Ok(());
-            }
+    fn execute_for_grammar(
+        &self,
+        grammar: &mut Grammar,
+        grammar_index: usize
+    ) -> Result<(), Vec<Error>> {
+        if let Err(error) = grammar.prepare() {
+            return Err(vec![error]);
         };
+        let _dfa = grammar.build_dfa();
+        let _graph = build_graph(grammar, grammar_index, self.method)?;
         Ok(())
     }
 }

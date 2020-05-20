@@ -56,7 +56,7 @@ impl From<usize> for TableType {
 }
 
 /// Represents a compact reference to an element in a table
-#[derive(Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct TableElemRef {
     /// The backend data
     data: usize
@@ -82,7 +82,7 @@ impl TableElemRef {
 }
 
 /// Represents a cell in an AST inner structure
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct AstCell {
     /// The node's label
     pub label: TableElemRef,
@@ -286,6 +286,85 @@ impl<'a> Ast<'a> {
         None
     }
 
+    /// Gets the total span of sub-tree given its root and its position
+    pub fn get_total_position_and_span(&self, node: usize) -> Option<(TextPosition, TextSpan)> {
+        let mut total_span = TextSpan {
+            index: std::usize::MAX,
+            length: 0
+        };
+        let mut position = TextPosition {
+            line: std::usize::MAX,
+            column: std::usize::MAX
+        };
+        self.traverse(node, |data, current| {
+            if let Some(p) = self.get_position_at(data, current) {
+                if p < position {
+                    position = p;
+                }
+            }
+            if let Some(span) = self.get_span_at(data, current) {
+                if span.index + span.length > total_span.index + total_span.length {
+                    let margin =
+                        (total_span.index + total_span.length) - (span.index + span.length);
+                    total_span.length += margin;
+                }
+                if span.index < total_span.index {
+                    let margin = total_span.index - span.index;
+                    total_span.length += margin;
+                    total_span.index -= margin;
+                }
+            }
+        });
+        if total_span.index != std::usize::MAX && position.line != std::usize::MAX {
+            Some((position, total_span))
+        } else {
+            None
+        }
+    }
+
+    /// Gets the total span of sub-tree given its root
+    pub fn get_total_span(&self, node: usize) -> Option<TextSpan> {
+        self.get_total_position_and_span(node).map(|(_, span)| span)
+    }
+
+    /// Traverses the AST from the specified node
+    fn traverse<F: FnMut(&AstImpl, usize)>(&self, from: usize, mut action: F) {
+        let data = self.data.get();
+        let mut stack = vec![from];
+        while !stack.is_empty() {
+            let current = stack.pop().unwrap();
+            let cell = data.nodes[current];
+            for i in (0..cell.count).rev() {
+                stack.push((cell.first + i) as usize);
+            }
+            action(data, current);
+        }
+    }
+
+    /// Get the span of the symbol on a node
+    fn get_span_at(&self, data: &AstImpl, node: usize) -> Option<TextSpan> {
+        let cell = data.nodes[node];
+        match cell.label.get_type() {
+            TableType::Token => {
+                let token = self.get_token(cell.label.get_index());
+                token.get_span()
+            }
+            _ => None
+        }
+    }
+
+    /// Get the position of the symbol on a node
+    fn get_position_at(&self, data: &AstImpl, node: usize) -> Option<TextPosition> {
+        let cell = data.nodes[node];
+        match cell.label.get_type() {
+            TableType::Token => {
+                let token = self.get_token(cell.label.get_index());
+                token.get_position()
+            }
+            _ => None
+        }
+    }
+
     /// Stores some children nodes in this AST
     pub fn store(&mut self, nodes: &[AstCell], index: usize, count: usize) -> usize {
         if count == 0 {
@@ -349,31 +428,27 @@ impl<'a> AstNode<'a> {
             parent: self.index
         }
     }
+
+    /// Gets the total span for the sub-tree at this node
+    pub fn get_total_span(&self) -> Option<TextSpan> {
+        self.tree.get_total_span(self.index)
+    }
+
+    /// Gets the total position and span for the sub-tree at this node
+    pub fn get_total_position_and_span(&self) -> Option<(TextPosition, TextSpan)> {
+        self.tree.get_total_position_and_span(self.index)
+    }
 }
 
 impl<'a> SemanticElementTrait for AstNode<'a> {
     /// Gets the position in the input text of this element
     fn get_position(&self) -> Option<TextPosition> {
-        let cell = self.tree.data.get().nodes[self.index];
-        match cell.label.get_type() {
-            TableType::Token => {
-                let token = self.tree.get_token(cell.label.get_index());
-                token.get_position()
-            }
-            _ => None
-        }
+        self.tree.get_position_at(self.tree.data.get(), self.index)
     }
 
     /// Gets the span in the input text of this element
     fn get_span(&self) -> Option<TextSpan> {
-        let cell = self.tree.data.get().nodes[self.index];
-        match cell.label.get_type() {
-            TableType::Token => {
-                let token = self.tree.get_token(cell.label.get_index());
-                token.get_span()
-            }
-            _ => None
-        }
+        self.tree.get_span_at(self.tree.data.get(), self.index)
     }
 
     /// Gets the context of this element in the input

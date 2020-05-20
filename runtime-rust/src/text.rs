@@ -17,6 +17,7 @@
 
 //! Module for text-handling APIs
 
+use std::cmp::{Ord, Ordering};
 use std::fmt::Display;
 use std::fmt::Error;
 use std::fmt::Formatter;
@@ -38,12 +39,28 @@ use crate::utils::biglist::BigList;
 pub type Utf16C = u16;
 
 /// Represents a span of text in an input as a starting index and length
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct TextSpan {
     /// The starting index
     pub index: usize,
     /// The length
     pub length: usize
+}
+
+impl PartialOrd for TextSpan {
+    fn partial_cmp(&self, other: &TextSpan) -> Option<Ordering> {
+        match self.index.cmp(&other.index) {
+            Ordering::Greater => Some(Ordering::Greater),
+            Ordering::Less => Some(Ordering::Less),
+            Ordering::Equal => Some(self.length.cmp(&other.length))
+        }
+    }
+}
+
+impl Ord for TextSpan {
+    fn cmp(&self, other: &TextSpan) -> Ordering {
+        self.partial_cmp(other).unwrap()
+    }
 }
 
 /// Implementation of `Display` for `TextSpan`
@@ -54,12 +71,28 @@ impl Display for TextSpan {
 }
 
 /// Represents a position in term of line and column in a text input
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct TextPosition {
     /// The line number
     pub line: usize,
     /// The column number
     pub column: usize
+}
+
+impl PartialOrd for TextPosition {
+    fn partial_cmp(&self, other: &TextPosition) -> Option<Ordering> {
+        match self.line.cmp(&other.line) {
+            Ordering::Greater => Some(Ordering::Greater),
+            Ordering::Less => Some(Ordering::Less),
+            Ordering::Equal => Some(self.column.cmp(&other.column))
+        }
+    }
+}
+
+impl Ord for TextPosition {
+    fn cmp(&self, other: &TextPosition) -> Ordering {
+        self.partial_cmp(other).unwrap()
+    }
 }
 
 /// Implementation of `Display` for `TextPosition`
@@ -94,6 +127,7 @@ pub struct TextContext {
 /// Represents the input of parser with some metadata for line endings
 /// All line numbers and column numbers are 1-based.
 /// Indices in the content are 0-based.
+#[derive(Debug, Clone)]
 pub struct Text {
     /// The full content of the input
     content: BigList<Utf16C>,

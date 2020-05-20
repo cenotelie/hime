@@ -202,7 +202,7 @@ impl RNGLRAutomaton {
 }
 
 /// Represents a label for a GSS edge
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 struct GSSLabel {
     /// The identifier of the SPPF node
     sppf_node: u32,
@@ -211,7 +211,7 @@ struct GSSLabel {
 }
 
 /// Represents an edge in a Graph-Structured Stack
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 struct GSSEdge {
     /// The index of the node from which this edge starts
     from: u32,
@@ -224,7 +224,7 @@ struct GSSEdge {
 /// Represents a generation in a Graph-Structured Stack
 /// Because GSS nodes and edges are always created sequentially,
 /// a generation basically describes a span in a buffer of GSS nodes or edges
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 struct GSSGeneration {
     /// The start index of this generation in the list of nodes
     start: usize,

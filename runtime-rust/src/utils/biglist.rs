@@ -17,6 +17,7 @@
 
 //! Module for the definition of `BigList`
 
+use std::fmt::{self, Debug, Formatter};
 use std::ops::Index;
 use std::ops::IndexMut;
 
@@ -31,7 +32,8 @@ const INIT_CHUNK_COUNT: usize = CHUNKS_SIZE;
 
 /// Represents a list of items that is efficient in storage and addition.
 /// Items cannot be neither be removed nor inserted.
-pub struct BigList<T: Copy> {
+#[derive(Clone)]
+pub struct BigList<T: Debug + Copy + Clone> {
     /// the neutral element
     neutral: T,
     /// The data
@@ -42,8 +44,14 @@ pub struct BigList<T: Copy> {
     cell_index: usize
 }
 
+impl<T: Debug + Copy + Clone> Debug for BigList<T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_struct("BigList").field("len", &self.len()).finish()
+    }
+}
+
 /// Implementation of BigList
-impl<T: Copy> BigList<T> {
+impl<T: Debug + Copy + Clone> BigList<T> {
     /// Creates a (empty) list
     pub fn new(neutral: T) -> BigList<T> {
         let mut my_chunks = Vec::with_capacity(INIT_CHUNK_COUNT);
@@ -98,7 +106,7 @@ impl<T: Copy> BigList<T> {
 }
 
 /// Implementation of the indexer operator for immutable BigList
-impl<T: Copy> Index<usize> for BigList<T> {
+impl<T: Debug + Copy + Clone> Index<usize> for BigList<T> {
     type Output = T;
     fn index(&self, index: usize) -> &T {
         &self.chunks[index >> UPPER_SHIFT][index & LOWER_MASK]
@@ -106,14 +114,14 @@ impl<T: Copy> Index<usize> for BigList<T> {
 }
 
 /// Implementation of the indexer [] operator for mutable BigList
-impl<T: Copy> IndexMut<usize> for BigList<T> {
+impl<T: Debug + Copy + Clone> IndexMut<usize> for BigList<T> {
     fn index_mut(&mut self, index: usize) -> &mut T {
         &mut self.chunks[index >> UPPER_SHIFT][index & LOWER_MASK]
     }
 }
 
 /// An iterator over a BigList
-pub struct BigListIterator<'a, T: 'a + Copy> {
+pub struct BigListIterator<'a, T: 'a + Debug + Copy + Clone> {
     /// The parent list
     list: &'a BigList<T>,
     /// The current index within the list
@@ -121,7 +129,7 @@ pub struct BigListIterator<'a, T: 'a + Copy> {
 }
 
 /// Implementation of the `Iterator` trait for `BigListIterator`
-impl<'a, T: 'a + Copy> Iterator for BigListIterator<'a, T> {
+impl<'a, T: 'a + Debug + Copy + Clone> Iterator for BigListIterator<'a, T> {
     type Item = T;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index >= self.list.len() {
