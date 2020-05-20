@@ -595,7 +595,7 @@ impl InverseGraph {
                         let index = elements.len();
                         elements.push(PNode::new(*previous, Some(*symbol), Some(current)));
                         if *previous == 0 {
-                            goals.push(*previous);
+                            goals.push(index);
                         } else {
                             queue.push(index);
                         }
@@ -798,7 +798,7 @@ impl Conflicts {
 }
 
 /// Represents an error where a contextual terminal is expected but its context cannot be available at this point
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq)]
 pub struct ContextError {
     /// The state raising the error
     pub state: usize,
@@ -806,8 +806,16 @@ pub struct ContextError {
     pub items: Vec<Item>,
     /// The problematic contextual terminal
     pub terminal: TerminalRef,
-    /// The problematic phrase
-    pub phrase: Phrase
+    /// The problematic phrases
+    pub phrases: Vec<Phrase>
+}
+
+impl PartialEq for ContextError {
+    fn eq(&self, other: &ContextError) -> bool {
+        self.terminal == other.terminal
+            && self.items.len() == other.items.len()
+            && self.items.iter().all(|item| other.items.contains(item))
+    }
 }
 
 /// Gets the LR(0) graph
@@ -1029,15 +1037,23 @@ fn find_context_errors(
     grammar: &Grammar
 ) -> Vec<ContextError> {
     let mut errors = Vec::new();
-    for (state_id, state) in graph.states.iter().enumerate() {
-        for (symbol, _) in state.children.iter() {
+    for (from_state, state) in graph.states.iter().enumerate() {
+        for (symbol, to_state) in state.children.iter() {
             if let SymbolRef::Terminal(tid) = *symbol {
                 let terminal = grammar.get_terminal(tid).unwrap();
                 if terminal.context == 0 {
                     continue;
                 }
                 // this is a contextual terminal, can we reach this state without the right context being available
-                find_context_errors_in(graph, inverse, grammar, &mut errors, state_id, terminal)
+                find_context_errors_in(
+                    graph,
+                    inverse,
+                    grammar,
+                    &mut errors,
+                    from_state,
+                    *to_state,
+                    terminal
+                )
             }
         }
     }
@@ -1050,19 +1066,25 @@ fn find_context_errors_in(
     inverse: &InverseGraph,
     grammar: &Grammar,
     errors: &mut Vec<ContextError>,
-    state_id: usize,
+    from_state: usize,
+    to_state: usize,
     terminal: &Terminal
 ) {
-    let paths = inverse.get_paths_to(state_id);
-    for path in paths.into_iter() {
-        // path.push(state_id);
+    let mut paths = inverse.get_paths_to(from_state);
+    for path in paths.iter_mut() {
+        path.0.push(PathElem {
+            state: to_state,
+            transition: Some(SymbolRef::Terminal(terminal.id))
+        });
+    }
+    paths.retain(|path| {
         let mut found = false;
         for i in 0..(path.0.len() - 1) {
             for item in graph.states[path.0[i].state].items.iter() {
                 if item.position == 0 && item.rule.get_rule_in(grammar).context == terminal.context
                 {
                     // this is the opening of a context only if we are not going to the next state using the associated variable
-                    let child_by_var = graph.states[state_id]
+                    let child_by_var = graph.states[to_state]
                         .children
                         .get(&SymbolRef::Variable(item.rule.variable));
                     found |= child_by_var.is_none() || child_by_var != Some(&path.0[i + 1].state);
@@ -1073,29 +1095,30 @@ fn find_context_errors_in(
                 break;
             }
         }
-        for item in graph.states[state_id].items.iter() {
+        for item in graph.states[to_state].items.iter() {
             if item.position == 0 && item.rule.get_rule_in(grammar).context == terminal.context {
                 found = true;
                 break;
             }
         }
-        if !found {
-            // this is problematic path
-            let items: Vec<Item> = graph.states[state_id]
-                .items
-                .iter()
-                .filter(|item| {
-                    item.get_next_symbol(grammar) == Some(SymbolRef::Terminal(terminal.id))
-                })
-                .cloned()
-                .collect();
-            errors.push(ContextError {
-                state: state_id,
-                items,
-                terminal: TerminalRef::Terminal(terminal.id),
-                phrase: path.get_phrase(grammar)
-            });
-        }
+        !found
+    });
+    if !paths.is_empty() {
+        let items: Vec<Item> = graph.states[from_state]
+            .items
+            .iter()
+            .filter(|item| item.get_next_symbol(grammar) == Some(SymbolRef::Terminal(terminal.id)))
+            .cloned()
+            .collect();
+        errors.push(ContextError {
+            state: from_state,
+            items,
+            terminal: TerminalRef::Terminal(terminal.id),
+            phrases: paths
+                .into_iter()
+                .map(|path| path.get_phrase(grammar))
+                .collect()
+        });
     }
 }
 

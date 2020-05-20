@@ -318,6 +318,10 @@ impl Variable {
         let mut modified = false;
         for rule in self.rules.iter_mut() {
             modified |= self.firsts.add_others(&rule.body.firsts);
+            modified |= firsts_for_var
+                .entry(self.id)
+                .or_insert_with(TerminalSet::default)
+                .add_others(&rule.body.firsts);
             modified |= rule.body.compute_firsts(firsts_for_var);
         }
         modified
@@ -1695,11 +1699,6 @@ impl Grammar {
             modified = false;
             for variable in self.variables.iter_mut() {
                 modified |= variable.compute_firsts(&mut firsts_for_var);
-            }
-        }
-        for variable in self.variables.iter_mut() {
-            if let Some(firsts) = firsts_for_var.remove(&variable.id) {
-                variable.firsts = firsts;
             }
         }
     }

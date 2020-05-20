@@ -260,15 +260,17 @@ fn print_lr_conflict(max_width: usize, grammar: &Grammar, conflict: &Conflict, p
     for item in conflict.items.iter() {
         print_lr_item(&pad, grammar, item);
     }
-    eprintln!(
-        "{} {} {}: Examples of inputs that raise this conflict",
-        &pad,
-        Blue.bold().paint("="),
-        Style::new().bold().paint("help")
-    );
-    eprintln!("{} {}", &pad, Blue.bold().paint("|"));
-    for phrase in phrases.iter() {
-        print_phrase(&pad, grammar, phrase);
+    if !phrases.is_empty() {
+        eprintln!(
+            "{} {} {}: Examples of inputs that raise this conflict",
+            &pad,
+            Blue.bold().paint("="),
+            Style::new().bold().paint("help")
+        );
+        eprintln!("{} {}", &pad, Blue.bold().paint("|"));
+        for phrase in phrases.iter() {
+            print_phrase(&pad, grammar, phrase);
+        }
     }
     eprintln!("");
 }
@@ -291,15 +293,19 @@ fn print_context_error(max_width: usize, grammar: &Grammar, error: &ContextError
     for item in error.items.iter() {
         print_lr_item(&pad, grammar, item);
     }
-    eprintln!(
-        "{} {} {}: Input that pose a problem",
-        &pad,
-        Blue.bold().paint("="),
-        Style::new().bold().paint("help")
-    );
-    eprintln!("{} {}", &pad, Blue.bold().paint("|"));
-    print_phrase(&pad, grammar, &error.phrase);
-    eprintln!("");
+    if !error.phrases.is_empty() {
+        eprintln!(
+            "{} {} {}: Examples of inputs that pose this problem",
+            &pad,
+            Blue.bold().paint("="),
+            Style::new().bold().paint("help")
+        );
+        eprintln!("{} {}", &pad, Blue.bold().paint("|"));
+        for phrase in error.phrases.iter() {
+            print_phrase(&pad, grammar, phrase);
+        }
+        eprintln!("");
+    }
 }
 
 /// Prints a LR item
