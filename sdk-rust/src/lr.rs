@@ -19,37 +19,11 @@
 
 use crate::errors::{Error, Errors};
 use crate::grammars::{
-    Grammar, Rule, RuleChoice, SymbolRef, Terminal, TerminalRef, TerminalSet, GENERATED_AXIOM
+    Grammar, RuleChoice, RuleRef, SymbolRef, Terminal, TerminalRef, TerminalSet, GENERATED_AXIOM
 };
 use crate::ParsingMethod;
 use hime_redist::parsers::{LRActionCode, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT};
 use std::collections::HashMap;
-
-/// A reference to a grammar rule
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub struct RuleRef {
-    /// The identifier of the variable
-    pub variable: usize,
-    /// The index of the rule for the variable
-    pub index: usize
-}
-
-impl RuleRef {
-    /// Creates a new rule reference
-    pub fn new(variable: usize, index: usize) -> RuleRef {
-        RuleRef { variable, index }
-    }
-
-    /// Gets the referenced rule in the grammar
-    pub fn get_rule_in<'s, 'g>(&'s self, grammar: &'g Grammar) -> &'g Rule {
-        &grammar
-            .variables
-            .iter()
-            .find(|v| v.id == self.variable)
-            .unwrap()
-            .rules[self.index]
-    }
-}
 
 /// The lookahead mode for LR items
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -197,6 +171,30 @@ impl Item {
     /// Gets whether the two items have the same base
     pub fn same_base(&self, other: &Item) -> bool {
         self.rule == other.rule && self.position == other.position
+    }
+
+    /// If this item uses a rule with a generated head,
+    /// recursively get the parent rule
+    pub fn get_origins(&self, grammar: &Grammar) -> Vec<RuleRef> {
+        let mut result = Vec::new();
+        let item_rule = self.rule.get_rule_in(grammar);
+        let mut current_var = grammar.get_variable(item_rule.head).unwrap();
+        while let Some(context) = current_var.generated_for {
+            let context_var = grammar.get_variable(context).unwrap();
+            for rule in context_var.rules.iter() {
+                if let Some(index) = rule
+                    .body
+                    .parts
+                    .iter()
+                    .position(|part| part.symbol == SymbolRef::Variable(current_var.id))
+                {
+                    result.push(RuleRef::new(context_var.id, index));
+                    break;
+                }
+            }
+            current_var = context_var;
+        }
+        result
     }
 }
 

@@ -17,7 +17,7 @@
 
 //! Module for the management of errors in the SDK
 
-use crate::grammars::{Grammar, SymbolRef};
+use crate::grammars::{Grammar, RuleRef, SymbolRef};
 use crate::lr::{Conflict, ConflictKind, ContextError, Item, Phrase};
 use crate::InputReference;
 use ansi_term::Colour::{Blue, Red};
@@ -310,6 +310,9 @@ fn print_context_error(max_width: usize, grammar: &Grammar, error: &ContextError
 
 /// Prints a LR item
 fn print_lr_item(pad: &str, grammar: &Grammar, item: &Item) {
+    for origin in item.get_origins(grammar).into_iter() {
+        print_rule(pad, grammar, origin);
+    }
     let rule = item.rule.get_rule_in(grammar);
     let mut prefix = 0;
     eprint!("{} {} ", pad, Blue.bold().paint("|"));
@@ -336,6 +339,19 @@ fn print_lr_item(pad: &str, grammar: &Grammar, item: &Item) {
         Red.bold().paint("^ at this position")
     );
     eprintln!("{} {} ", pad, Blue.bold().paint("|"));
+}
+
+/// Prints a rule
+fn print_rule(pad: &str, grammar: &Grammar, rule_ref: RuleRef) {
+    let rule = rule_ref.get_rule_in(grammar);
+    eprint!("{} {} ", pad, Blue.bold().paint("|"));
+    let head_name = grammar.get_symbol_value(SymbolRef::Variable(rule_ref.variable));
+    eprint!("{} ->", head_name);
+    for part in rule.body.parts.iter() {
+        let name = grammar.get_symbol_value(part.symbol);
+        eprint!(" {}", name);
+    }
+    eprintln!();
 }
 
 /// Prints an input phrase

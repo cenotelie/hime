@@ -734,8 +734,9 @@ fn load_simple_rule<'a>(
     node: AstNode<'a>
 ) {
     let name = node.children().at(0).get_value().unwrap();
+    let head_sid = grammar.add_variable(&name).id;
     let definitions =
-        load_simple_rule_definitions(filename, errors, grammar, node.children().at(1));
+        load_simple_rule_definitions(filename, errors, grammar, head_sid, node.children().at(1));
     let variable = grammar.add_variable(&name);
     for body in definitions.bodies.into_iter() {
         variable.add_rule(Rule::new(
@@ -752,34 +753,37 @@ fn load_simple_rule_definitions<'a>(
     filename: &str,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
+    head_sid: usize,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
     match node.get_symbol().id {
         parser::ID_VARIABLE_RULE_DEF_CONTEXT => {
-            load_simple_rule_context(filename, errors, grammar, node)
+            load_simple_rule_context(filename, errors, grammar, head_sid, node)
         }
         parser::ID_VARIABLE_RULE_DEF_SUB => {
-            load_simple_rule_sub_rule(filename, errors, grammar, node)
+            load_simple_rule_sub_rule(filename, errors, grammar, head_sid, node)
         }
         parser::ID_TERMINAL_OPERATOR_OPTIONAL => {
-            load_simple_rule_optional(filename, errors, grammar, node)
+            load_simple_rule_optional(filename, errors, grammar, head_sid, node)
         }
         parser::ID_TERMINAL_OPERATOR_ZEROMORE => {
-            load_simple_rule_zero_or_more(filename, errors, grammar, node)
+            load_simple_rule_zero_or_more(filename, errors, grammar, head_sid, node)
         }
         parser::ID_TERMINAL_OPERATOR_ONEMORE => {
-            load_simple_rule_one_or_more(filename, errors, grammar, node)
+            load_simple_rule_one_or_more(filename, errors, grammar, head_sid, node)
         }
         parser::ID_TERMINAL_OPERATOR_UNION => {
-            load_simple_rule_union(filename, errors, grammar, node)
+            load_simple_rule_union(filename, errors, grammar, head_sid, node)
         }
         parser::ID_TERMINAL_TREE_ACTION_PROMOTE => {
-            load_simple_rule_tree_action_promote(filename, errors, grammar, node)
+            load_simple_rule_tree_action_promote(filename, errors, grammar, head_sid, node)
         }
         parser::ID_TERMINAL_TREE_ACTION_DROP => {
-            load_simple_rule_tree_action_drop(filename, errors, grammar, node)
+            load_simple_rule_tree_action_drop(filename, errors, grammar, head_sid, node)
         }
-        parser::ID_VIRTUAL_CONCAT => load_simple_rule_concat(filename, errors, grammar, node),
+        parser::ID_VIRTUAL_CONCAT => {
+            load_simple_rule_concat(filename, errors, grammar, head_sid, node)
+        }
         parser::ID_VIRTUAL_EMPTYPART => load_simple_rule_empty_part(),
         _ => load_simple_rule_atomic(filename, errors, grammar, node)
     }
@@ -790,13 +794,14 @@ fn load_simple_rule_context<'a>(
     filename: &str,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
+    head_sid: usize,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
     let name = node.children().at(0).get_value().unwrap();
     let context_id = grammar.resolve_context(&name);
     let definitions =
-        load_simple_rule_definitions(filename, errors, grammar, node.children().at(1));
-    let sub_var = grammar.generate_variable();
+        load_simple_rule_definitions(filename, errors, grammar, head_sid, node.children().at(1));
+    let sub_var = grammar.generate_variable(head_sid);
     for body in definitions.bodies.into_iter() {
         sub_var.add_rule(Rule::new(
             sub_var.id,
@@ -815,11 +820,12 @@ fn load_simple_rule_sub_rule<'a>(
     filename: &str,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
+    head_sid: usize,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
     let definitions =
-        load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
-    let sub_var = grammar.generate_variable();
+        load_simple_rule_definitions(filename, errors, grammar, head_sid, node.children().at(0));
+    let sub_var = grammar.generate_variable(head_sid);
     for body in definitions.bodies.into_iter() {
         sub_var.add_rule(Rule::new(
             sub_var.id,
@@ -838,10 +844,11 @@ fn load_simple_rule_optional<'a>(
     filename: &str,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
+    head_sid: usize,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
     let mut definitions =
-        load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
+        load_simple_rule_definitions(filename, errors, grammar, head_sid, node.children().at(0));
     definitions.bodies.push(RuleBody::empty());
     definitions
 }
@@ -851,12 +858,14 @@ fn load_simple_rule_zero_or_more<'a>(
     filename: &str,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
+    head_sid: usize,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
     // get definitions
-    let set_inner = load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
+    let set_inner =
+        load_simple_rule_definitions(filename, errors, grammar, head_sid, node.children().at(0));
     // generate the sub variables
-    let sub_var = grammar.generate_variable();
+    let sub_var = grammar.generate_variable(head_sid);
     // build all rules
     // sub_var -> definition
     for body in set_inner.bodies.iter() {
@@ -895,12 +904,14 @@ fn load_simple_rule_one_or_more<'a>(
     filename: &str,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
+    head_sid: usize,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
     // get definitions
-    let set_inner = load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
+    let set_inner =
+        load_simple_rule_definitions(filename, errors, grammar, head_sid, node.children().at(0));
     // generate the sub variables
-    let sub_var = grammar.generate_variable();
+    let sub_var = grammar.generate_variable(head_sid);
     // build all rules
     // sub_var -> definition
     for body in set_inner.bodies.iter() {
@@ -936,10 +947,13 @@ fn load_simple_rule_union<'a>(
     filename: &str,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
+    head_sid: usize,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
-    let set_left = load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
-    let set_right = load_simple_rule_definitions(filename, errors, grammar, node.children().at(1));
+    let set_left =
+        load_simple_rule_definitions(filename, errors, grammar, head_sid, node.children().at(0));
+    let set_right =
+        load_simple_rule_definitions(filename, errors, grammar, head_sid, node.children().at(1));
     BodySet::union(set_left, set_right)
 }
 
@@ -948,10 +962,11 @@ fn load_simple_rule_tree_action_promote<'a>(
     filename: &str,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
+    head_sid: usize,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
     let mut set_inner =
-        load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
+        load_simple_rule_definitions(filename, errors, grammar, head_sid, node.children().at(0));
     set_inner.apply_action(TREE_ACTION_PROMOTE);
     set_inner
 }
@@ -961,10 +976,11 @@ fn load_simple_rule_tree_action_drop<'a>(
     filename: &str,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
+    head_sid: usize,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
     let mut set_inner =
-        load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
+        load_simple_rule_definitions(filename, errors, grammar, head_sid, node.children().at(0));
     set_inner.apply_action(TREE_ACTION_DROP);
     set_inner
 }
@@ -974,10 +990,13 @@ fn load_simple_rule_concat<'a>(
     filename: &str,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
+    head_sid: usize,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
-    let set_left = load_simple_rule_definitions(filename, errors, grammar, node.children().at(0));
-    let set_right = load_simple_rule_definitions(filename, errors, grammar, node.children().at(1));
+    let set_left =
+        load_simple_rule_definitions(filename, errors, grammar, head_sid, node.children().at(0));
+    let set_right =
+        load_simple_rule_definitions(filename, errors, grammar, head_sid, node.children().at(1));
     BodySet::product(set_left, set_right)
 }
 

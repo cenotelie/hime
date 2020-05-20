@@ -279,6 +279,8 @@ pub struct Variable {
     pub id: usize,
     /// The name of this symbol
     pub name: String,
+    /// If the variable was generated, the identifier of the variable in the context of which it was generated
+    pub generated_for: Option<usize>,
     /// The rules for this variable
     pub rules: Vec<Rule>,
     /// The FIRSTS set for this variable
@@ -289,10 +291,11 @@ pub struct Variable {
 
 impl Variable {
     /// Creates a new variable
-    pub fn new(id: usize, name: String) -> Variable {
+    pub fn new(id: usize, name: String, generated_for: Option<usize>) -> Variable {
         Variable {
             id,
             name,
+            generated_for,
             rules: Vec::new(),
             firsts: TerminalSet::default(),
             followers: TerminalSet::default()
@@ -802,6 +805,32 @@ impl PartialEq for Rule {
 
 impl Eq for Rule {}
 
+/// A reference to a grammar rule
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct RuleRef {
+    /// The identifier of the variable
+    pub variable: usize,
+    /// The index of the rule for the variable
+    pub index: usize
+}
+
+impl RuleRef {
+    /// Creates a new rule reference
+    pub fn new(variable: usize, index: usize) -> RuleRef {
+        RuleRef { variable, index }
+    }
+
+    /// Gets the referenced rule in the grammar
+    pub fn get_rule_in<'s, 'g>(&'s self, grammar: &'g Grammar) -> &'g Rule {
+        &grammar
+            .variables
+            .iter()
+            .find(|v| v.id == self.variable)
+            .unwrap()
+            .rules[self.index]
+    }
+}
+
 /// Reference to a template rule
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct TemplateRuleRef {
@@ -1116,34 +1145,13 @@ impl Grammar {
     /// Gets the value of a symbol
     pub fn get_symbol_value(&self, symbol: SymbolRef) -> &str {
         match symbol {
-            SymbolRef::Dummy => "",
-            SymbolRef::Epsilon => "ε",
-            SymbolRef::Dollar => "$",
-            SymbolRef::NullTerminal => "",
             SymbolRef::Terminal(id) => self
                 .terminals
                 .iter()
                 .find(|s| s.id == id)
                 .map(|s| &s.value)
                 .unwrap(),
-            SymbolRef::Variable(id) => self
-                .variables
-                .iter()
-                .find(|s| s.id == id)
-                .map(|s| &s.name)
-                .unwrap(),
-            SymbolRef::Virtual(id) => self
-                .virtuals
-                .iter()
-                .find(|s| s.id == id)
-                .map(|s| &s.name)
-                .unwrap(),
-            SymbolRef::Action(id) => self
-                .actions
-                .iter()
-                .find(|s| s.id == id)
-                .map(|s| &s.name)
-                .unwrap()
+            _ => self.get_symbol_name(symbol)
         }
     }
 
@@ -1218,11 +1226,12 @@ impl Grammar {
     }
 
     /// Generates a new variable
-    pub fn generate_variable(&mut self) -> &mut Variable {
+    pub fn generate_variable(&mut self, context_variable: usize) -> &mut Variable {
         let index = self.variables.len();
         let sid = self.get_next_sid();
         let name = format!("{}{}", PREFIX_GENERATED_VARIABLE, sid);
-        self.variables.push(Variable::new(sid, name));
+        self.variables
+            .push(Variable::new(sid, name, Some(context_variable)));
         &mut self.variables[index]
     }
 
@@ -1243,7 +1252,8 @@ impl Grammar {
         }
         let index = self.variables.len();
         let sid = self.get_next_sid();
-        self.variables.push(Variable::new(sid, name.to_string()));
+        self.variables
+            .push(Variable::new(sid, name.to_string(), None));
         &mut self.variables[index]
     }
 
