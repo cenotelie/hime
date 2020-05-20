@@ -17,8 +17,8 @@
 
 //! Library for grammars
 
-use crate::automata::fa::{FinalItem, DFA, EPSILON, NFA};
 use crate::errors::Error;
+use crate::finite::{FinalItem, DFA, EPSILON, NFA};
 use crate::InputReference;
 use hime_redist::parsers::{TreeAction, TREE_ACTION_DROP, TREE_ACTION_NONE, TREE_ACTION_PROMOTE};
 use std::cmp::Ordering;

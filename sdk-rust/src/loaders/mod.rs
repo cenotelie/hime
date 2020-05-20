@@ -19,8 +19,8 @@
 
 pub mod parser;
 
-use crate::automata::fa::{FinalItem, NFA};
 use crate::errors::{Error, Errors};
+use crate::finite::{FinalItem, NFA};
 use crate::grammars::{
     BodySet, Grammar, Rule, RuleBody, SymbolRef, TemplateRuleBody, TemplateRuleRef,
     TemplateRuleSymbol, DEFAULT_CONTEXT_NAME

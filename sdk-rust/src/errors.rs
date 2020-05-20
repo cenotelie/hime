@@ -17,7 +17,7 @@
 
 //! Module for the management of errors in the SDK
 
-use crate::grammars::{Grammar, SymbolRef, TerminalRef};
+use crate::grammars::{Grammar, SymbolRef};
 use crate::lr::{Conflict, ConflictKind, ContextError, Item, Phrase};
 use crate::InputReference;
 use ansi_term::Colour::{Blue, Red};
@@ -174,7 +174,9 @@ impl Error {
             Error::LrConflict(conflict, phrases) => {
                 print_lr_conflict(max_width, grammar.unwrap(), conflict, phrases)
             }
-            Error::TerminalOutsideContext(error) => print_context_error(grammar.unwrap(), error)
+            Error::TerminalOutsideContext(error) => {
+                print_context_error(max_width, grammar.unwrap(), error)
+            }
         }
     }
 }
@@ -271,6 +273,35 @@ fn print_lr_conflict(max_width: usize, grammar: &Grammar, conflict: &Conflict, p
     eprintln!("");
 }
 
+/// Prints a context error
+fn print_context_error(max_width: usize, grammar: &Grammar, error: &ContextError) {
+    let terminal = grammar.get_terminal(error.terminal.priority()).unwrap();
+    eprintln!(
+        "{}{} {}",
+        Red.bold().paint("error"),
+        Style::new().bold().paint(":"),
+        Style::new().bold().paint(format!(
+            "Contextual terminal `{}` is expected outside its context",
+            &terminal.value
+        ))
+    );
+    let pad = String::from_utf8(vec![0x20; max_width]).unwrap();
+    eprintln!("{}{} {}", &pad, Blue.bold().paint("-->"), &grammar.name);
+    eprintln!("{} {}", &pad, Blue.bold().paint("|"));
+    for item in error.items.iter() {
+        print_lr_item(&pad, grammar, item);
+    }
+    eprintln!(
+        "{} {} {}: Input that pose a problem",
+        &pad,
+        Blue.bold().paint("="),
+        Style::new().bold().paint("help")
+    );
+    eprintln!("{} {}", &pad, Blue.bold().paint("|"));
+    print_phrase(&pad, grammar, &error.phrase);
+    eprintln!("");
+}
+
 /// Prints a LR item
 fn print_lr_item(pad: &str, grammar: &Grammar, item: &Item) {
     let rule = item.rule.get_rule_in(grammar);
@@ -301,6 +332,7 @@ fn print_lr_item(pad: &str, grammar: &Grammar, item: &Item) {
     eprintln!("{} {} ", pad, Blue.bold().paint("|"));
 }
 
+/// Prints an input phrase
 fn print_phrase(pad: &str, grammar: &Grammar, phrase: &Phrase) {
     eprint!("{} {} ", pad, Blue.bold().paint("|"));
     for symbol in phrase.0.iter() {
@@ -309,9 +341,6 @@ fn print_phrase(pad: &str, grammar: &Grammar, phrase: &Phrase) {
     }
     eprintln!();
 }
-
-/// Prints a context error
-fn print_context_error(grammar: &Grammar, error: &ContextError) {}
 
 /// A collection of errors
 #[derive(Debug, Default)]

@@ -22,8 +22,8 @@ extern crate lazy_static;
 extern crate ansi_term;
 extern crate hime_redist;
 
-pub mod automata;
 pub mod errors;
+pub mod finite;
 pub mod grammars;
 pub mod loaders;
 pub mod lr;
