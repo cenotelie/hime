@@ -43,6 +43,8 @@ pub struct Terminal {
     pub name: String,
     /// The inline value of this terminal
     pub value: String,
+    /// The input reference for the definition
+    pub input_ref: InputReference,
     /// The NFA that is used to match this terminal
     pub nfa: NFA,
     /// The context of this terminal
@@ -1216,22 +1218,28 @@ impl Grammar {
     }
 
     /// Adds the given anonymous terminal to this grammar
-    pub fn add_terminal_anonymous(&mut self, value: String, nfa: NFA) -> &mut Terminal {
+    pub fn add_terminal_anonymous(
+        &mut self,
+        value: String,
+        input_ref: InputReference,
+        nfa: NFA
+    ) -> &mut Terminal {
         let name = format!("{}{}", PREFIX_GENERATED_TERMINAL, generate_unique_id());
-        self.add_terminal(name, value, nfa, 0, true, false)
+        self.add_terminal(name, value, input_ref, nfa, 0, true, false)
     }
 
     /// Adds the given named terminal to this grammar
     pub fn add_terminal_named(
         &mut self,
         name: String,
+        input_ref: InputReference,
         nfa: NFA,
         context: &str,
         is_fragment: bool
     ) -> &mut Terminal {
         let context = self.contexts.iter().position(|c| c == context).unwrap();
         let value = name.clone();
-        self.add_terminal(name, value, nfa, context, false, is_fragment)
+        self.add_terminal(name, value, input_ref, nfa, context, false, is_fragment)
     }
 
     /// Adds a terminal to the grammar
@@ -1239,6 +1247,7 @@ impl Grammar {
         &mut self,
         name: String,
         value: String,
+        input_ref: InputReference,
         nfa: NFA,
         context: usize,
         is_anonymous: bool,
@@ -1249,6 +1258,7 @@ impl Grammar {
             id: self.get_next_sid(),
             name,
             value,
+            input_ref,
             nfa,
             context,
             is_anonymous,
@@ -1485,6 +1495,7 @@ impl Grammar {
                     id: sid,
                     name: terminal.name.clone(),
                     value: terminal.value.clone(),
+                    input_ref: terminal.input_ref,
                     nfa,
                     context,
                     is_fragment: terminal.is_fragment,

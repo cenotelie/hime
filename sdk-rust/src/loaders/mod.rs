@@ -369,7 +369,13 @@ fn load_terminal_rule<'a>(
         return;
     }
     let nfa = load_nfa(input_index, errors, grammar, children.at(1));
-    let terminal = grammar.add_terminal_named(name, nfa, context, is_fragment);
+    let terminal = grammar.add_terminal_named(
+        name,
+        InputReference::from(input_index, &node_name),
+        nfa,
+        context,
+        is_fragment
+    );
     terminal.nfa.states[terminal.nfa.exit].add_item(FinalItem::Terminal(terminal.id));
 }
 
@@ -1261,7 +1267,9 @@ fn load_simple_rule_atomic_inline_text<'a>(
         None => {
             // Create the terminal
             let nfa = load_nfa_simple_text(&node);
-            grammar.add_terminal_anonymous(value, nfa).id
+            grammar
+                .add_terminal_anonymous(value, InputReference::from(input_index, &node), nfa)
+                .id
         }
         Some(terminal) => terminal.id
     };
@@ -1807,7 +1815,9 @@ fn load_template_rule_atomic_inline_text<'a>(
         None => {
             // Create the terminal
             let nfa = load_nfa_simple_text(&node);
-            grammar.add_terminal_anonymous(value, nfa).id
+            grammar
+                .add_terminal_anonymous(value, InputReference::from(input_index, &node), nfa)
+                .id
         }
         Some(terminal) => terminal.id
     };
