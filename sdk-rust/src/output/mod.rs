@@ -20,10 +20,15 @@
 pub mod helper;
 
 use crate::errors::Error;
-use crate::finite::{FinalItem, DFA};
+use crate::finite::{DFAState, FinalItem, DFA};
 use crate::grammars::{Grammar, TerminalRef, TerminalSet, OPTION_SEPARATOR};
 use crate::lr::build_graph;
+use crate::CharSpan;
 use crate::CompilationTask;
+use hime_redist::lexers::automaton::DEAD_STATE;
+use std::fs::File;
+use std::io::{self, Write};
+use std::path::PathBuf;
 
 /// Build and output artifacts for a grammar
 pub fn execute_for_grammar(
@@ -46,7 +51,7 @@ pub fn execute_for_grammar(
             })
             .collect());
     }
-    // Build the list of expected terminals
+    // Build the data for the lexer
     let expected = dfa.get_expected();
     let _separator = match get_separator(grammar, grammar_index, &expected, &dfa) {
         Ok(separator) => separator,
@@ -56,7 +61,18 @@ pub fn execute_for_grammar(
         Ok(method) => method,
         Err(error) => return Err(vec![error])
     };
+    // Build the data for the parser
     let _graph = build_graph(grammar, grammar_index, method)?;
+    // write data
+    if let Err(error) = write_lexer_data(
+        task.get_output_path_for(grammar),
+        format!("{}.bin", &grammar.name),
+        grammar,
+        &dfa,
+        &expected
+    ) {
+        return Err(vec![error]);
+    }
     Ok(())
 }
 
@@ -86,16 +102,20 @@ fn get_separator(
     }
     // the separator will not be produced by the lexer, try to investigate why
     let mut overriders = TerminalSet::default();
-    let separator_final = FinalItem::Terminal(terminal.id);
+    let separator_final = FinalItem::Terminal(terminal.id, 0);
     for state in dfa.states.iter() {
         if state.items.contains(&separator_final) {
             // separator is final of this state
-            for item in state.items.iter().rev() {
+            for item in state.items.iter() {
                 if item == &separator_final {
                     break;
                 }
-                // this final item has more priority than the separator
-                overriders.add(TerminalRef::Terminal(item.priority()));
+                if let FinalItem::Terminal(id, context) = item {
+                    if *context == 0 {
+                        // this final item has more priority than the separator
+                        overriders.add(TerminalRef::Terminal(*id));
+                    }
+                }
             }
         }
     }
@@ -104,4 +124,136 @@ fn get_separator(
         terminal_ref,
         overriders.content
     ))
+}
+
+/// Writes the lexer's data
+fn write_lexer_data(
+    path: Option<String>,
+    file_name: String,
+    grammar: &Grammar,
+    dfa: &DFA,
+    expected: &TerminalSet
+) -> Result<(), Error> {
+    let mut final_path = PathBuf::new();
+    if let Some(path) = path {
+        final_path.push(path);
+    }
+    final_path.push(file_name);
+    let file = File::create(final_path)?;
+    let mut writer = io::BufWriter::new(file);
+    // write number of states
+    write_u32(&mut writer, dfa.len() as u32)?;
+    // write the offsets to all the states
+    let mut offset: u32 = 0;
+    for state in dfa.states.iter() {
+        write_u32(&mut writer, offset)?;
+        // adds the length required by this state
+        offset += 3 + 256; // header + transitions for [0-255] characters
+        let mut current_contexts = Vec::new();
+        for item in state.items.iter() {
+            let terminal = grammar.get_terminal(item.priority()).unwrap();
+            if !current_contexts.contains(&terminal.context) {
+                current_contexts.push(terminal.context);
+                // context information
+                offset += 2;
+            }
+        }
+        for transition in state.transitions.keys() {
+            if transition.end >= 255 {
+                // transition outside the [0-255] range
+                offset += 3;
+            }
+        }
+    }
+    // write each state
+    for state in dfa.states.iter() {
+        write_lexer_data_state(&mut writer, grammar, expected, state)?;
+    }
+    Ok(())
+}
+
+/// Writes the lexer's data
+fn write_lexer_data_state(
+    writer: &mut dyn Write,
+    grammar: &Grammar,
+    expected: &TerminalSet,
+    state: &DFAState
+) -> Result<(), Error> {
+    let mut cache = [DEAD_STATE as u16; 256];
+    let mut cached: u16 = 0; // number of cached transitions
+    let mut slow = Vec::new();
+    for (span, next) in state.transitions.iter() {
+        if span.begin <= 255 {
+            cached += 1;
+            let end = if span.end >= 256 {
+                slow.push((CharSpan::new(256, span.end), *next));
+                256
+            } else {
+                span.end + 1
+            };
+            for i in span.begin..end {
+                cache[i as usize] = *next as u16;
+            }
+        } else {
+            slow.push((*span, *next));
+        }
+    }
+    let mut contexts = Vec::new();
+    let mut matched = Vec::new();
+    for item in state.items.iter() {
+        let terminal = grammar.get_terminal(item.priority()).unwrap();
+        if !contexts.contains(&terminal.context) {
+            // this is the first time this context is found in the current DFA state
+            // this is the terminal with the most priority for this context
+            contexts.push(terminal.context);
+            matched.push(
+                expected
+                    .content
+                    .iter()
+                    .position(|t| t.priority() == terminal.id)
+                    .unwrap()
+            )
+        }
+    }
+
+    // write the number of matched terminals
+    write_u16(writer, matched.len() as u16)?;
+    // write the total number of transitions
+    write_u16(writer, slow.len() as u16 + cached)?;
+    // write the number of non-cached transitions
+    write_u16(writer, slow.len() as u16)?;
+    // write the matched terminals
+    for (context, index) in contexts.into_iter().zip(matched.into_iter()) {
+        write_u16(writer, context as u16)?;
+        write_u16(writer, index as u16)?;
+    }
+    // write the cached transitions
+    for value in cache.iter() {
+        write_u16(writer, *value)?;
+    }
+    // write the non-cached transitions
+    slow.sort_by_key(|(span, _)| span.begin);
+    for (span, next) in slow.into_iter() {
+        write_u16(writer, span.begin)?;
+        write_u16(writer, span.end)?;
+        write_u16(writer, next as u16)?;
+    }
+    Ok(())
+}
+
+/// writes a u16 to a byte stream
+fn write_u16(writer: &mut dyn Write, value: u16) -> Result<(), io::Error> {
+    let buffer: [u8; 2] = [(value & 0xFF) as u8, (value >> 8) as u8];
+    writer.write_all(&buffer)
+}
+
+/// writes a u32 to a byte stream
+fn write_u32(writer: &mut dyn Write, value: u32) -> Result<(), io::Error> {
+    let buffer: [u8; 4] = [
+        (value & 0xFF) as u8,
+        ((value & 0x0000_FF00) >> 8) as u8,
+        ((value & 0x00FF_0000) >> 16) as u8,
+        (value >> 24) as u8
+    ];
+    writer.write_all(&buffer)
 }

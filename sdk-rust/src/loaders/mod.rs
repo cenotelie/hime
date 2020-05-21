@@ -376,7 +376,8 @@ fn load_terminal_rule<'a>(
         context,
         is_fragment
     );
-    terminal.nfa.states[terminal.nfa.exit].add_item(FinalItem::Terminal(terminal.id));
+    terminal.nfa.states[terminal.nfa.exit]
+        .add_item(FinalItem::Terminal(terminal.id, terminal.context));
 }
 
 /// Builds the NFA represented by the AST node

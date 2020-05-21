@@ -956,7 +956,7 @@ impl RuleBodyTrait for TemplateRuleBody {
         for element in right.elements.iter() {
             elements.push(element.clone());
         }
-        TemplateRuleBody { elements: elements }
+        TemplateRuleBody { elements }
     }
 
     fn apply_action(&mut self, action: TreeAction) {
@@ -1248,6 +1248,7 @@ impl Grammar {
     }
 
     /// Adds a terminal to the grammar
+    #[allow(clippy::too_many_arguments)]
     fn add_terminal(
         &mut self,
         name: String,
@@ -1493,9 +1494,11 @@ impl Grammar {
                 );
             } else {
                 let sid = self.get_next_sid();
-                let mut nfa = terminal.nfa.clone_no_finals();
-                nfa.states[nfa.exit].items.push(FinalItem::Terminal(sid));
                 let context = self.resolve_context(&other.contexts[terminal.context]);
+                let mut nfa = terminal.nfa.clone_no_finals();
+                nfa.states[nfa.exit]
+                    .items
+                    .push(FinalItem::Terminal(sid, context));
                 self.terminals.push(Terminal {
                     id: sid,
                     name: terminal.name.clone(),

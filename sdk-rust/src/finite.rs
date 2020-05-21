@@ -31,7 +31,7 @@ pub enum FinalItem {
     /// Represents a fake marker of a final state in an automaton
     Dummy,
     /// A terminal symbol in a grammar
-    Terminal(usize)
+    Terminal(usize, usize)
 }
 
 impl FinalItem {
@@ -39,14 +39,14 @@ impl FinalItem {
     pub fn priority(self) -> usize {
         match self {
             FinalItem::Dummy => 0,
-            FinalItem::Terminal(id) => id
+            FinalItem::Terminal(id, _) => id
         }
     }
 }
 
 impl Ord for FinalItem {
     fn cmp(&self, other: &FinalItem) -> Ordering {
-        self.priority().cmp(&other.priority())
+        other.priority().cmp(&self.priority())
     }
 }
 
@@ -80,11 +80,6 @@ impl DFAState {
     /// Gets whether this state is final (i.e. it is marked with final items)
     pub fn is_final(&self) -> bool {
         !self.items.is_empty()
-    }
-
-    /// Gets the final with the most priority on this state
-    pub fn get_final(&self) -> Option<FinalItem> {
-        self.items.last().copied()
     }
 
     /// Determines if the two states have the same marks
@@ -349,11 +344,14 @@ impl DFA {
         expected.add(TerminalRef::Epsilon);
         expected.add(TerminalRef::Dollar);
         for state in self.states.iter() {
-            match state.get_final() {
-                Some(FinalItem::Terminal(id)) => {
-                    expected.add(TerminalRef::Terminal(id));
+            let mut contexts = Vec::new();
+            for item in state.items.iter() {
+                if let FinalItem::Terminal(id, context) = item {
+                    if !contexts.contains(context) {
+                        contexts.push(*context);
+                        expected.add(TerminalRef::Terminal(*id));
+                    }
                 }
-                _ => {}
             }
         }
         expected.sort();
