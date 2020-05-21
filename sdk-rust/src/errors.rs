@@ -351,13 +351,13 @@ fn print_lr_item(pad: &str, grammar: &Grammar, item: &Item) {
     eprint!("{} ->", head_name);
     prefix += head_name.len() + 3;
     for i in 0..item.position {
-        let name = grammar.get_symbol_value(rule.body.choices[0].parts[i].symbol);
+        let name = grammar.get_symbol_value(rule.body.choices[0].elements[i].symbol);
         eprint!(" {}", name);
         prefix += name.len() + 1;
     }
     eprint!(" {}", Red.bold().paint("*"));
     for i in item.position..(rule.body.choices[0].len()) {
-        let name = grammar.get_symbol_value(rule.body.choices[0].parts[i].symbol);
+        let name = grammar.get_symbol_value(rule.body.choices[0].elements[i].symbol);
         eprint!(" {}", name);
     }
     eprintln!();
@@ -378,7 +378,7 @@ fn print_rule(pad: &str, grammar: &Grammar, rule_ref: RuleRef) {
     eprint!("{} {} ", pad, Blue.bold().paint("|"));
     let head_name = grammar.get_symbol_value(SymbolRef::Variable(rule_ref.variable));
     eprint!("{} ->", head_name);
-    for part in rule.body.parts.iter() {
+    for part in rule.body.elements.iter() {
         let name = grammar.get_symbol_value(part.symbol);
         eprint!(" {}", name);
     }

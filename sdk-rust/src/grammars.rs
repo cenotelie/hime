@@ -429,18 +429,43 @@ impl From<TerminalRef> for SymbolRef {
 }
 
 /// Represents an element in the body of a grammar rule
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone)]
 pub struct RuleBodyElement {
     /// The symbol of this element
     pub symbol: SymbolRef,
     /// The action applied on this element
-    pub action: TreeAction
+    pub action: TreeAction,
+    /// The reference to this body element in the input
+    pub input_ref: Option<InputReference>
+}
+
+impl PartialEq for RuleBodyElement {
+    fn eq(&self, other: &Self) -> bool {
+        self.symbol == other.symbol && self.action == other.action
+    }
 }
 
 impl RuleBodyElement {
     /// Creates a new body element
-    pub fn new(symbol: SymbolRef, action: TreeAction) -> RuleBodyElement {
-        RuleBodyElement { symbol, action }
+    pub fn new(
+        symbol: SymbolRef,
+        action: TreeAction,
+        input_ref: Option<InputReference>
+    ) -> RuleBodyElement {
+        RuleBodyElement {
+            symbol,
+            action,
+            input_ref
+        }
+    }
+
+    /// Gets a version of this element without the action
+    pub fn no_action(&self) -> RuleBodyElement {
+        RuleBodyElement {
+            symbol: self.symbol,
+            action: TREE_ACTION_NONE,
+            input_ref: None
+        }
     }
 }
 
@@ -448,24 +473,24 @@ impl RuleBodyElement {
 #[derive(Debug, Clone, Default)]
 pub struct RuleChoice {
     /// The elements in this body
-    pub parts: Vec<RuleBodyElement>,
+    pub elements: Vec<RuleBodyElement>,
     /// The FIRSTS set of terminals
     pub firsts: TerminalSet
 }
 
 impl RuleChoice {
     /// Creates a new choice from a single symbol
-    pub fn new(symbol: SymbolRef) -> RuleChoice {
+    pub fn from_single_part(element: &RuleBodyElement) -> RuleChoice {
         RuleChoice {
-            parts: vec![RuleBodyElement::new(symbol, TREE_ACTION_NONE)],
+            elements: vec![element.no_action()],
             firsts: TerminalSet::default()
         }
     }
 
-    /// Initializes this rule body from parts
-    pub fn from_parts(parts: Vec<RuleBodyElement>) -> RuleBody {
+    /// Initializes this rule body from elements
+    pub fn from_parts(elements: Vec<RuleBodyElement>) -> RuleBody {
         RuleBody {
-            parts,
+            elements,
             firsts: TerminalSet::default(),
             choices: Vec::new()
         }
@@ -473,24 +498,23 @@ impl RuleChoice {
 
     /// Gets the length of the rule choice
     pub fn len(&self) -> usize {
-        self.parts.len()
+        self.elements.len()
     }
 
     /// Gets wether the rule choice is empty
     pub fn is_empty(&self) -> bool {
-        self.parts.is_empty()
+        self.elements.is_empty()
     }
 
     /// Appends a single symbol to the choice
-    pub fn append_symbol(&mut self, symbol: SymbolRef) {
-        self.parts
-            .push(RuleBodyElement::new(symbol, TREE_ACTION_NONE));
+    pub fn append_part(&mut self, element: &RuleBodyElement) {
+        self.elements.push(element.no_action());
     }
 
     /// Appends the content of another choice to this one
     pub fn append_choice(&mut self, other: &RuleChoice) {
-        for element in other.parts.iter() {
-            self.parts.push(*element);
+        for element in other.elements.iter() {
+            self.elements.push(*element);
         }
     }
 
@@ -501,10 +525,10 @@ impl RuleChoice {
         firsts_for_var: &mut HashMap<usize, TerminalSet>
     ) -> bool {
         // If the choice is empty : Add the ε to the Firsts and return
-        if self.parts.is_empty() {
+        if self.elements.is_empty() {
             return self.firsts.add(TerminalRef::Epsilon);
         }
-        match self.parts[0].symbol {
+        match self.elements[0].symbol {
             SymbolRef::Variable(id) => {
                 let mut modified = false;
                 if let Some(var_firsts) = firsts_for_var.get(&id) {
@@ -533,11 +557,11 @@ impl RuleChoice {
 
 impl PartialEq for RuleChoice {
     fn eq(&self, other: &Self) -> bool {
-        self.parts.len() == other.parts.len()
+        self.elements.len() == other.elements.len()
             && self
-                .parts
+                .elements
                 .iter()
-                .zip(other.parts.iter())
+                .zip(other.elements.iter())
                 .all(|(e1, e2)| e1 == e2)
     }
 }
@@ -591,7 +615,7 @@ impl<T: RuleBodyTrait> BodySet<T> {
 #[derive(Debug, Clone, Default)]
 pub struct RuleBody {
     /// The elements in this body
-    pub parts: Vec<RuleBodyElement>,
+    pub elements: Vec<RuleBodyElement>,
     /// The FIRSTS set of terminals
     pub firsts: TerminalSet,
     /// The choices in this body
@@ -600,23 +624,23 @@ pub struct RuleBody {
 
 impl RuleBodyTrait for RuleBody {
     fn concatenate(left: &RuleBody, right: &RuleBody) -> RuleBody {
-        let mut parts = Vec::new();
-        for element in left.parts.iter() {
-            parts.push(*element);
+        let mut elements = Vec::new();
+        for element in left.elements.iter() {
+            elements.push(*element);
         }
-        for element in right.parts.iter() {
-            parts.push(*element);
+        for element in right.elements.iter() {
+            elements.push(*element);
         }
         RuleBody {
-            parts,
+            elements,
             firsts: TerminalSet::default(),
             choices: Vec::new()
         }
     }
 
     fn apply_action(&mut self, action: TreeAction) {
-        for part in self.parts.iter_mut() {
-            part.action = action;
+        for element in self.elements.iter_mut() {
+            element.action = action;
         }
     }
 }
@@ -625,25 +649,29 @@ impl RuleBody {
     /// Initializes this rule body
     pub fn empty() -> RuleBody {
         RuleBody {
-            parts: Vec::new(),
+            elements: Vec::new(),
             firsts: TerminalSet::default(),
             choices: Vec::new()
         }
     }
 
     /// Initializes this rule body
-    pub fn single(symbol: SymbolRef) -> RuleBody {
+    pub fn single(symbol: SymbolRef, input_ref: InputReference) -> RuleBody {
         RuleBody {
-            parts: vec![RuleBodyElement::new(symbol, TREE_ACTION_NONE)],
+            elements: vec![RuleBodyElement::new(
+                symbol,
+                TREE_ACTION_NONE,
+                Some(input_ref)
+            )],
             firsts: TerminalSet::default(),
             choices: Vec::new()
         }
     }
 
-    /// Initializes this rule body from parts
-    pub fn from_parts(parts: Vec<RuleBodyElement>) -> RuleBody {
+    /// Initializes this rule body from elements
+    pub fn from_parts(elements: Vec<RuleBodyElement>) -> RuleBody {
         RuleBody {
-            parts,
+            elements,
             firsts: TerminalSet::default(),
             choices: Vec::new()
         }
@@ -651,30 +679,30 @@ impl RuleBody {
 
     /// Gets the length of the rule choice
     pub fn len(&self) -> usize {
-        self.parts.len()
+        self.elements.len()
     }
 
     /// Gets wether the rule choice is empty
     pub fn is_empty(&self) -> bool {
-        self.parts.is_empty()
+        self.elements.is_empty()
     }
 
-    /// Appends a single symbol to the choice
+    /*/// Appends a single symbol to the choice
     pub fn append_symbol(&mut self, symbol: SymbolRef) {
-        self.parts
+        self.elements
             .push(RuleBodyElement::new(symbol, TREE_ACTION_NONE));
-    }
+    }*/
 
     /// Appends the content of another choice to this one
     pub fn append_choice(&mut self, other: &RuleChoice) {
-        for element in other.parts.iter() {
-            self.parts.push(*element);
+        for element in other.elements.iter() {
+            self.elements.push(*element);
         }
     }
 
     /// Applies the given action to all elements in this body
     pub fn apply_action(&mut self, action: TreeAction) {
-        for element in self.parts.iter_mut() {
+        for element in self.elements.iter_mut() {
             element.action = action;
         }
     }
@@ -697,18 +725,18 @@ impl RuleBody {
     /// Computes the choices for this rule body
     fn compute_choices(&mut self) {
         if self.choices.is_empty() {
-            // For each part of the definition which is not a virtual symbol nor an action symbol
-            for element in self.parts.iter() {
+            // For each element of the definition which is not a virtual symbol nor an action symbol
+            for element in self.elements.iter() {
                 match element.symbol {
                     SymbolRef::Virtual(_) => {}
                     SymbolRef::Action(_) => {}
                     _ => {
                         // Append the symbol to all the choices definition
                         for choice in self.choices.iter_mut() {
-                            choice.append_symbol(element.symbol);
+                            choice.append_part(element);
                         }
                         // Create a new choice with only the symbol
-                        self.choices.push(RuleChoice::new(element.symbol));
+                        self.choices.push(RuleChoice::from_single_part(element));
                     }
                 }
             }
@@ -722,7 +750,7 @@ impl RuleBody {
     pub fn compute_initial_follower(&self, followers: &mut HashMap<usize, TerminalSet>) {
         // For all choices but the last (empty)
         for (i, choice) in self.choices.iter().enumerate().take(self.choices.len() - 1) {
-            if let SymbolRef::Variable(id) = choice.parts[0].symbol {
+            if let SymbolRef::Variable(id) = choice.elements[0].symbol {
                 // add the FIRSTS set of the next choice to the variable followers except ε
                 for first in self.choices[i + 1].firsts.content.iter() {
                     if *first != TerminalRef::Epsilon {
@@ -742,7 +770,7 @@ impl RuleBody {
         let mut modified = false;
         // For all choices but the last (empty)
         for (i, choice) in self.choices.iter().enumerate().take(self.choices.len() - 1) {
-            if let SymbolRef::Variable(id) = choice.parts[0].symbol {
+            if let SymbolRef::Variable(id) = choice.elements[0].symbol {
                 // if the next choice FIRSTS set contains ε
                 // add the FOLLOWERS of the head variable to the FOLLOWERS of the found variable
                 if self.choices[i + 1]
@@ -761,11 +789,11 @@ impl RuleBody {
 
 impl PartialEq for RuleBody {
     fn eq(&self, other: &Self) -> bool {
-        self.parts.len() == other.parts.len()
+        self.elements.len() == other.elements.len()
             && self
-                .parts
+                .elements
                 .iter()
-                .zip(other.parts.iter())
+                .zip(other.elements.iter())
                 .all(|(e1, e2)| e1 == e2)
     }
 }
@@ -852,18 +880,34 @@ pub enum TemplateRuleSymbol {
 }
 
 /// An element in a template rule
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct TemplateRuleElement {
     /// The symbol of this element
     pub symbol: TemplateRuleSymbol,
     /// The action applied on this element
-    pub action: TreeAction
+    pub action: TreeAction,
+    /// The reference to this body element in the input
+    pub input_ref: InputReference
+}
+
+impl PartialEq for TemplateRuleElement {
+    fn eq(&self, other: &Self) -> bool {
+        self.symbol == other.symbol && self.action == other.action
+    }
 }
 
 impl TemplateRuleElement {
     /// Creates a new body element
-    pub fn new(symbol: TemplateRuleSymbol, action: TreeAction) -> TemplateRuleElement {
-        TemplateRuleElement { symbol, action }
+    pub fn new(
+        symbol: TemplateRuleSymbol,
+        action: TreeAction,
+        input_ref: InputReference
+    ) -> TemplateRuleElement {
+        TemplateRuleElement {
+            symbol,
+            action,
+            input_ref
+        }
     }
 }
 
@@ -898,14 +942,14 @@ pub struct TemplateRuleBody {
 
 impl RuleBodyTrait for TemplateRuleBody {
     fn concatenate(left: &TemplateRuleBody, right: &TemplateRuleBody) -> TemplateRuleBody {
-        let mut parts = Vec::new();
+        let mut elements = Vec::new();
         for element in left.elements.iter() {
-            parts.push(element.clone());
+            elements.push(element.clone());
         }
         for element in right.elements.iter() {
-            parts.push(element.clone());
+            elements.push(element.clone());
         }
-        TemplateRuleBody { elements: parts }
+        TemplateRuleBody { elements: elements }
     }
 
     fn apply_action(&mut self, action: TreeAction) {
@@ -924,9 +968,13 @@ impl TemplateRuleBody {
     }
 
     /// Initializes this rule body
-    pub fn single(symbol: TemplateRuleSymbol) -> TemplateRuleBody {
+    pub fn single(symbol: TemplateRuleSymbol, input_ref: InputReference) -> TemplateRuleBody {
         TemplateRuleBody {
-            elements: vec![TemplateRuleElement::new(symbol, TREE_ACTION_NONE)]
+            elements: vec![TemplateRuleElement::new(
+                symbol,
+                TREE_ACTION_NONE,
+                input_ref
+            )]
         }
     }
 }
@@ -1372,7 +1420,8 @@ impl Grammar {
                                 &new_instance.arguments,
                                 &element.symbol
                             ),
-                            action: element.action
+                            action: element.action,
+                            input_ref: Some(element.input_ref)
                         });
                     }
                     bodies.push(RuleBody::from_parts(elements));
@@ -1485,18 +1534,24 @@ impl Grammar {
                         .iter()
                         .position(|c| c == context_name)
                         .unwrap();
-                    let parts = rule
+                    let elements = rule
                         .body
-                        .parts
+                        .elements
                         .iter()
-                        .map(|part| {
+                        .map(|element| {
                             RuleBodyElement::new(
-                                self.map_symbol_ref(other, part.symbol),
-                                part.action
+                                self.map_symbol_ref(other, element.symbol),
+                                element.action,
+                                element.input_ref
                             )
                         })
                         .collect();
-                    Rule::new(head, rule.head_action, RuleBody::from_parts(parts), context)
+                    Rule::new(
+                        head,
+                        rule.head_action,
+                        RuleBody::from_parts(elements),
+                        context
+                    )
                 })
                 .collect();
             let head = self
@@ -1589,7 +1644,8 @@ impl Grammar {
                     let symbol = self.inherit_template_rule_symbol(other, &element.symbol);
                     elements.push(TemplateRuleElement {
                         symbol,
-                        action: element.action
+                        action: element.action,
+                        input_ref: element.input_ref
                     });
                 }
                 self.template_rules[index]
@@ -1693,8 +1749,8 @@ impl Grammar {
             real_axiom.id,
             TREE_ACTION_NONE,
             RuleBody::from_parts(vec![
-                RuleBodyElement::new(SymbolRef::Variable(axiom_id), TREE_ACTION_PROMOTE),
-                RuleBodyElement::new(SymbolRef::Dollar, TREE_ACTION_DROP),
+                RuleBodyElement::new(SymbolRef::Variable(axiom_id), TREE_ACTION_PROMOTE, None),
+                RuleBodyElement::new(SymbolRef::Dollar, TREE_ACTION_DROP, None),
             ]),
             0
         ));

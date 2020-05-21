@@ -288,10 +288,7 @@ impl<'a> Ast<'a> {
 
     /// Gets the total span of sub-tree given its root and its position
     pub fn get_total_position_and_span(&self, node: usize) -> Option<(TextPosition, TextSpan)> {
-        let mut total_span = TextSpan {
-            index: std::usize::MAX,
-            length: 0
-        };
+        let mut total_span: Option<TextSpan> = None;
         let mut position = TextPosition {
             line: std::usize::MAX,
             column: std::usize::MAX
@@ -302,7 +299,10 @@ impl<'a> Ast<'a> {
                     position = p;
                 }
             }
-            if let Some(span) = self.get_span_at(data, current) {
+            if total_span.is_none() {
+                total_span = self.get_span_at(data, current);
+            } else if let Some(span) = self.get_span_at(data, current) {
+                let total_span = total_span.as_mut().unwrap();
                 if span.index + span.length > total_span.index + total_span.length {
                     let margin =
                         (total_span.index + total_span.length) - (span.index + span.length);
@@ -315,11 +315,7 @@ impl<'a> Ast<'a> {
                 }
             }
         });
-        if total_span.index != std::usize::MAX && position.line != std::usize::MAX {
-            Some((position, total_span))
-        } else {
-            None
-        }
+        total_span.map(|span| (position, span))
     }
 
     /// Gets the total span of sub-tree given its root

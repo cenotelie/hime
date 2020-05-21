@@ -36,7 +36,6 @@ use crate::lr::build_graph;
 use ansi_term::Colour::White;
 use ansi_term::Style;
 use hime_redist::ast::AstNode;
-use hime_redist::symbols::SemanticElementTrait;
 use hime_redist::text::{Text, TextPosition};
 use std::cmp::Ordering;
 
@@ -265,11 +264,12 @@ impl InputReference {
 
 impl InputReference {
     /// Build a reference from the specifiec input name and AST node
-    pub fn from<'a>(input_index: usize, node: AstNode<'a>) -> InputReference {
+    pub fn from<'a>(input_index: usize, node: &AstNode<'a>) -> InputReference {
+        let (position, span) = node.get_total_position_and_span().unwrap();
         InputReference {
             input_index,
-            position: node.get_position().unwrap(),
-            length: node.get_span().unwrap().length
+            position,
+            length: span.length
         }
     }
 }

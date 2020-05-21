@@ -196,7 +196,7 @@ struct Loader<'a> {
 impl<'a> Loader<'a> {
     /// Creates a new loader
     fn new(input_index: usize, root: AstNode<'a>, errors: &mut Vec<Error>) -> Loader<'a> {
-        let input_ref = InputReference::from(input_index, root.children().at(0));
+        let input_ref = InputReference::from(input_index, &root.children().at(0));
         let name = root.children().at(0).get_value().unwrap();
         let inherited = root
             .children()
@@ -227,7 +227,7 @@ impl<'a> Loader<'a> {
                 if unresolved.iter().all(|l| l.grammar.name != name) {
                     // the dependency does not exist
                     errors.push(Error::GrammarNotDefined(
-                        InputReference::from(self.input_index, node),
+                        InputReference::from(self.input_index, &node),
                         name
                     ));
                 }
@@ -294,8 +294,8 @@ fn load_option<'a>(input_index: usize, grammar: &mut Grammar, node: AstNode<'a>)
     let value = replace_escapees(node.children().at(1).get_value().unwrap());
     let value = value[1..(value.len() - 1)].to_string();
     grammar.add_option(
-        InputReference::from(input_index, node.children().at(0)),
-        InputReference::from(input_index, node.children().at(1)),
+        InputReference::from(input_index, &node.children().at(0)),
+        InputReference::from(input_index, &node.children().at(1)),
         name,
         value
     );
@@ -363,7 +363,7 @@ fn load_terminal_rule<'a>(
     let name = node_name.get_value().unwrap();
     if grammar.get_terminal_for_name(&name).is_some() {
         errors.push(Error::OverridingPreviousTerminal(
-            InputReference::from(input_index, node_name),
+            InputReference::from(input_index, &node_name),
             name
         ));
         return;
@@ -381,7 +381,7 @@ fn load_nfa<'a>(
     node: AstNode<'a>
 ) -> NFA {
     match node.get_symbol().id {
-        parser::ID_TERMINAL_LITERAL_TEXT => load_nfa_simple_text(node),
+        parser::ID_TERMINAL_LITERAL_TEXT => load_nfa_simple_text(&node),
         parser::ID_TERMINAL_UNICODE_CODEPOINT => load_nfa_codepoint(input_index, errors, node),
         parser::ID_TERMINAL_LITERAL_CLASS => load_nfa_class(input_index, errors, node),
         parser::ID_TERMINAL_UNICODE_CATEGORY => {
@@ -444,7 +444,7 @@ fn load_nfa<'a>(
 }
 
 /// Builds a NFA from a piece of text
-fn load_nfa_simple_text(node: AstNode) -> NFA {
+fn load_nfa_simple_text(node: &AstNode) -> NFA {
     // build the raw piece of text
     let mut value = node.get_value().unwrap();
     let mut insensitive = false;
@@ -493,7 +493,7 @@ fn load_nfa_codepoint(input_index: usize, errors: &mut Vec<Error>, node: AstNode
         Some(v) => v,
         None => {
             errors.push(Error::InvalidCodePoint(
-                InputReference::from(input_index, node),
+                InputReference::from(input_index, &node),
                 value
             ));
             return NFA::new_minimal();
@@ -531,7 +531,7 @@ fn load_nfa_class(input_index: usize, errors: &mut Vec<Error>, node: AstNode) ->
         i += l;
         if b >= 0xFFFF {
             errors.push(Error::UnsupportedNonPlane0InCharacterClass(
-                InputReference::from(input_index, node.clone()),
+                InputReference::from(input_index, &node.clone()),
                 b
             ));
         }
@@ -542,7 +542,7 @@ fn load_nfa_class(input_index: usize, errors: &mut Vec<Error>, node: AstNode) ->
             let e = e as usize;
             if b >= 0xFFFF {
                 errors.push(Error::UnsupportedNonPlane0InCharacterClass(
-                    InputReference::from(input_index, node.clone()),
+                    InputReference::from(input_index, &node.clone()),
                     e
                 ));
             }
@@ -608,7 +608,7 @@ fn load_nfa_unicode_category(input_index: usize, errors: &mut Vec<Error>, node: 
         }
         None => {
             errors.push(Error::UnknownUnicodeCategory(
-                InputReference::from(input_index, node),
+                InputReference::from(input_index, &node),
                 value.to_string()
             ));
             NFA::new_minimal()
@@ -629,7 +629,7 @@ fn load_nfa_unicode_block(input_index: usize, errors: &mut Vec<Error>, node: Ast
         }
         None => {
             errors.push(Error::UnknownUnicodeBlock(
-                InputReference::from(input_index, node),
+                InputReference::from(input_index, &node),
                 value.to_string()
             ));
             NFA::new_minimal()
@@ -648,7 +648,7 @@ fn load_nfa_unicode_span(input_index: usize, errors: &mut Vec<Error>, node: AstN
     if begin > end {
         errors.push(Error::InvalidCharacterSpan(InputReference::from(
             input_index,
-            node
+            &node
         )));
         return NFA::new_minimal();
     }
@@ -682,7 +682,7 @@ fn load_nfa_reference(
         Some(terminal) => terminal.nfa.clone_no_finals(),
         None => {
             errors.push(Error::SymbolNotFound(
-                InputReference::from(input_index, node),
+                InputReference::from(input_index, &node),
                 value
             ));
             NFA::new_minimal()
@@ -861,7 +861,10 @@ fn load_simple_rule_context<'a>(
         ));
     }
     BodySet {
-        bodies: vec![RuleBody::single(SymbolRef::Variable(sub_var.id))]
+        bodies: vec![RuleBody::single(
+            SymbolRef::Variable(sub_var.id),
+            InputReference::from(input_index, &node)
+        )]
     }
 }
 
@@ -890,7 +893,10 @@ fn load_simple_rule_sub_rule<'a>(
         ));
     }
     BodySet {
-        bodies: vec![RuleBody::single(SymbolRef::Variable(sub_var.id))]
+        bodies: vec![RuleBody::single(
+            SymbolRef::Variable(sub_var.id),
+            InputReference::from(input_index, &node)
+        )]
     }
 }
 
@@ -943,7 +949,10 @@ fn load_simple_rule_zero_or_more<'a>(
     }
     // Produce single defition [sub_var]
     let set_var = BodySet {
-        bodies: vec![RuleBody::single(SymbolRef::Variable(sub_var.id))]
+        bodies: vec![RuleBody::single(
+            SymbolRef::Variable(sub_var.id),
+            InputReference::from(input_index, &node)
+        )]
     };
     let set_var = BodySet::product(set_var, set_inner);
     // build all rules
@@ -959,7 +968,10 @@ fn load_simple_rule_zero_or_more<'a>(
     BodySet {
         bodies: vec![
             RuleBody::empty(),
-            RuleBody::single(SymbolRef::Variable(sub_var.id)),
+            RuleBody::single(
+                SymbolRef::Variable(sub_var.id),
+                InputReference::from(input_index, &node)
+            ),
         ]
     }
 }
@@ -994,7 +1006,10 @@ fn load_simple_rule_one_or_more<'a>(
     }
     // Produce single defition [sub_var]
     let set_var = BodySet {
-        bodies: vec![RuleBody::single(SymbolRef::Variable(sub_var.id))]
+        bodies: vec![RuleBody::single(
+            SymbolRef::Variable(sub_var.id),
+            InputReference::from(input_index, &node)
+        )]
     };
     let set_var = BodySet::product(set_var, set_inner);
     // build all rules
@@ -1008,7 +1023,10 @@ fn load_simple_rule_one_or_more<'a>(
         ));
     }
     BodySet {
-        bodies: vec![RuleBody::single(SymbolRef::Variable(sub_var.id))]
+        bodies: vec![RuleBody::single(
+            SymbolRef::Variable(sub_var.id),
+            InputReference::from(input_index, &node)
+        )]
     }
 }
 
@@ -1115,33 +1133,44 @@ fn load_simple_rule_atomic<'a>(
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
     match node.get_symbol().id {
-        parser::ID_VARIABLE_RULE_SYM_ACTION => load_simple_rule_atomic_action(grammar, node),
-        parser::ID_VARIABLE_RULE_SYM_VIRTUAL => load_simple_rule_atomic_virtual(grammar, node),
+        parser::ID_VARIABLE_RULE_SYM_ACTION => {
+            load_simple_rule_atomic_action(input_index, grammar, node)
+        }
+        parser::ID_VARIABLE_RULE_SYM_VIRTUAL => {
+            load_simple_rule_atomic_virtual(input_index, grammar, node)
+        }
         parser::ID_VARIABLE_RULE_SYM_REF_SIMPLE => {
             load_simple_rule_atomic_simple_ref(input_index, errors, grammar, node)
         }
         parser::ID_VARIABLE_RULE_SYM_REF_TEMPLATE => {
             load_simple_rule_atomic_template_ref(input_index, errors, grammar, node)
         }
-        parser::ID_TERMINAL_LITERAL_TEXT => load_simple_rule_atomic_inline_text(grammar, node),
+        parser::ID_TERMINAL_LITERAL_TEXT => {
+            load_simple_rule_atomic_inline_text(input_index, grammar, node)
+        }
         _ => BodySet { bodies: Vec::new() }
     }
 }
 
 /// Builds the set of rule definitions that represents a single semantic action
 fn load_simple_rule_atomic_action<'a>(
+    input_index: usize,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
     let name = node.children().at(0).get_value().unwrap();
     let id = grammar.add_action(&name).id;
     BodySet {
-        bodies: vec![RuleBody::single(SymbolRef::Action(id))]
+        bodies: vec![RuleBody::single(
+            SymbolRef::Action(id),
+            InputReference::from(input_index, &node)
+        )]
     }
 }
 
 /// Builds the set of rule definitions that represents a single virtual symbol
 fn load_simple_rule_atomic_virtual<'a>(
+    input_index: usize,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
@@ -1149,7 +1178,10 @@ fn load_simple_rule_atomic_virtual<'a>(
     let name = replace_escapees(name[1..(name.len() - 1)].to_string());
     let id = grammar.add_virtual(&name).id;
     BodySet {
-        bodies: vec![RuleBody::single(SymbolRef::Virtual(id))]
+        bodies: vec![RuleBody::single(
+            SymbolRef::Virtual(id),
+            InputReference::from(input_index, &node)
+        )]
     }
 }
 
@@ -1163,11 +1195,14 @@ fn load_simple_rule_atomic_simple_ref<'a>(
     let name = node.children().at(0).get_value().unwrap();
     match grammar.get_symbol(&name) {
         Some(symbol_ref) => BodySet {
-            bodies: vec![RuleBody::single(symbol_ref)]
+            bodies: vec![RuleBody::single(
+                symbol_ref,
+                InputReference::from(input_index, &node)
+            )]
         },
         None => {
             errors.push(Error::SymbolNotFound(
-                InputReference::from(input_index, node.children().at(0)),
+                InputReference::from(input_index, &node.children().at(0)),
                 name
             ));
             BodySet { bodies: Vec::new() }
@@ -1188,11 +1223,13 @@ fn load_simple_rule_atomic_template_ref<'a>(
         .at(1)
         .children()
         .iter()
-        .map(|n| load_simple_rule_atomic(input_index, errors, grammar, n).bodies[0].parts[0].symbol)
+        .map(|n| {
+            load_simple_rule_atomic(input_index, errors, grammar, n).bodies[0].elements[0].symbol
+        })
         .collect();
     let symbol_ref = match grammar.instantiate_template_rule(
         &name,
-        InputReference::from(input_index, node.children().at(0)),
+        InputReference::from(input_index, &node.children().at(0)),
         arguments
     ) {
         Ok(symbol_ref) => symbol_ref,
@@ -1202,12 +1239,16 @@ fn load_simple_rule_atomic_template_ref<'a>(
         }
     };
     BodySet {
-        bodies: vec![RuleBody::single(symbol_ref)]
+        bodies: vec![RuleBody::single(
+            symbol_ref,
+            InputReference::from(input_index, &node)
+        )]
     }
 }
 
 /// Builds the set of rule definitions that represents a single inline piece of text
 fn load_simple_rule_atomic_inline_text<'a>(
+    input_index: usize,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
@@ -1219,14 +1260,17 @@ fn load_simple_rule_atomic_inline_text<'a>(
     let id = match grammar.get_terminal_for_name(&value) {
         None => {
             // Create the terminal
-            let nfa = load_nfa_simple_text(node);
+            let nfa = load_nfa_simple_text(&node);
             grammar.add_terminal_anonymous(value, nfa).id
         }
         Some(terminal) => terminal.id
     };
     // Create the definition set
     BodySet {
-        bodies: vec![RuleBody::single(SymbolRef::Terminal(id))]
+        bodies: vec![RuleBody::single(
+            SymbolRef::Terminal(id),
+            InputReference::from(input_index, &node)
+        )]
     }
 }
 
@@ -1319,14 +1363,15 @@ fn load_template_rule_context<'a>(
     sub_template.context = context_id;
     sub_template.bodies = definitions.bodies;
     BodySet {
-        bodies: vec![TemplateRuleBody::single(TemplateRuleSymbol::Template(
-            TemplateRuleRef {
+        bodies: vec![TemplateRuleBody::single(
+            TemplateRuleSymbol::Template(TemplateRuleRef {
                 template: template_index,
                 arguments: (0..parameters.len())
                     .map(TemplateRuleSymbol::Parameter)
                     .collect()
-            }
-        ))]
+            }),
+            InputReference::from(input_index, &node)
+        )]
     }
 }
 
@@ -1350,14 +1395,15 @@ fn load_template_rule_sub_rule<'a>(
     sub_template.head_action = TREE_ACTION_REPLACE_BY_EPSILON;
     sub_template.bodies = definitions.bodies;
     BodySet {
-        bodies: vec![TemplateRuleBody::single(TemplateRuleSymbol::Template(
-            TemplateRuleRef {
+        bodies: vec![TemplateRuleBody::single(
+            TemplateRuleSymbol::Template(TemplateRuleRef {
                 template: template_index,
                 arguments: (0..parameters.len())
                     .map(TemplateRuleSymbol::Parameter)
                     .collect()
-            }
-        ))]
+            }),
+            InputReference::from(input_index, &node)
+        )]
     }
 }
 
@@ -1407,14 +1453,15 @@ fn load_template_rule_zero_or_more<'a>(
     }
     // Produce single defition [sub_var]
     let set_var = BodySet {
-        bodies: vec![TemplateRuleBody::single(TemplateRuleSymbol::Template(
-            TemplateRuleRef {
+        bodies: vec![TemplateRuleBody::single(
+            TemplateRuleSymbol::Template(TemplateRuleRef {
                 template: template_index,
                 arguments: (0..parameters.len())
                     .map(TemplateRuleSymbol::Parameter)
                     .collect()
-            }
-        ))]
+            }),
+            InputReference::from(input_index, &node)
+        )]
     };
     let set_var = BodySet::product(set_var, set_inner);
     // build all rules
@@ -1425,12 +1472,15 @@ fn load_template_rule_zero_or_more<'a>(
     BodySet {
         bodies: vec![
             TemplateRuleBody::empty(),
-            TemplateRuleBody::single(TemplateRuleSymbol::Template(TemplateRuleRef {
-                template: template_index,
-                arguments: (0..parameters.len())
-                    .map(TemplateRuleSymbol::Parameter)
-                    .collect()
-            })),
+            TemplateRuleBody::single(
+                TemplateRuleSymbol::Template(TemplateRuleRef {
+                    template: template_index,
+                    arguments: (0..parameters.len())
+                        .map(TemplateRuleSymbol::Parameter)
+                        .collect()
+                }),
+                InputReference::from(input_index, &node)
+            ),
         ]
     }
 }
@@ -1462,14 +1512,15 @@ fn load_template_rule_one_or_more<'a>(
     }
     // Produce single defition [sub_var]
     let set_var = BodySet {
-        bodies: vec![TemplateRuleBody::single(TemplateRuleSymbol::Template(
-            TemplateRuleRef {
+        bodies: vec![TemplateRuleBody::single(
+            TemplateRuleSymbol::Template(TemplateRuleRef {
                 template: template_index,
                 arguments: (0..parameters.len())
                     .map(TemplateRuleSymbol::Parameter)
                     .collect()
-            }
-        ))]
+            }),
+            InputReference::from(input_index, &node)
+        )]
     };
     let set_var = BodySet::product(set_var, set_inner);
     // build all rules
@@ -1478,14 +1529,15 @@ fn load_template_rule_one_or_more<'a>(
         sub_template.bodies.push(body);
     }
     BodySet {
-        bodies: vec![TemplateRuleBody::single(TemplateRuleSymbol::Template(
-            TemplateRuleRef {
+        bodies: vec![TemplateRuleBody::single(
+            TemplateRuleSymbol::Template(TemplateRuleRef {
                 template: template_index,
                 arguments: (0..parameters.len())
                     .map(TemplateRuleSymbol::Parameter)
                     .collect()
-            }
-        ))]
+            }),
+            InputReference::from(input_index, &node)
+        )]
     }
 }
 
@@ -1593,35 +1645,44 @@ fn load_template_rule_atomic<'a>(
     node: AstNode<'a>
 ) -> BodySet<TemplateRuleBody> {
     match node.get_symbol().id {
-        parser::ID_VARIABLE_RULE_SYM_ACTION => load_template_rule_atomic_action(grammar, node),
-        parser::ID_VARIABLE_RULE_SYM_VIRTUAL => load_template_rule_atomic_virtual(grammar, node),
+        parser::ID_VARIABLE_RULE_SYM_ACTION => {
+            load_template_rule_atomic_action(input_index, grammar, node)
+        }
+        parser::ID_VARIABLE_RULE_SYM_VIRTUAL => {
+            load_template_rule_atomic_virtual(input_index, grammar, node)
+        }
         parser::ID_VARIABLE_RULE_SYM_REF_SIMPLE => {
             load_template_rule_atomic_simple_ref(input_index, errors, grammar, parameters, node)
         }
         parser::ID_VARIABLE_RULE_SYM_REF_TEMPLATE => {
             load_template_rule_atomic_template_ref(input_index, errors, grammar, parameters, node)
         }
-        parser::ID_TERMINAL_LITERAL_TEXT => load_template_rule_atomic_inline_text(grammar, node),
+        parser::ID_TERMINAL_LITERAL_TEXT => {
+            load_template_rule_atomic_inline_text(input_index, grammar, node)
+        }
         _ => BodySet { bodies: Vec::new() }
     }
 }
 
 /// Builds the set of rule definitions that represents a single semantic action
 fn load_template_rule_atomic_action<'a>(
+    input_index: usize,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<TemplateRuleBody> {
     let name = node.children().at(0).get_value().unwrap();
     let id = grammar.add_action(&name).id;
     BodySet {
-        bodies: vec![TemplateRuleBody::single(TemplateRuleSymbol::Symbol(
-            SymbolRef::Action(id)
-        ))]
+        bodies: vec![TemplateRuleBody::single(
+            TemplateRuleSymbol::Symbol(SymbolRef::Action(id)),
+            InputReference::from(input_index, &node)
+        )]
     }
 }
 
 /// Builds the set of rule definitions that represents a single virtual symbol
 fn load_template_rule_atomic_virtual<'a>(
+    input_index: usize,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<TemplateRuleBody> {
@@ -1629,9 +1690,10 @@ fn load_template_rule_atomic_virtual<'a>(
     let name = replace_escapees(name[1..(name.len() - 1)].to_string());
     let id = grammar.add_virtual(&name).id;
     BodySet {
-        bodies: vec![TemplateRuleBody::single(TemplateRuleSymbol::Symbol(
-            SymbolRef::Virtual(id)
-        ))]
+        bodies: vec![TemplateRuleBody::single(
+            TemplateRuleSymbol::Symbol(SymbolRef::Virtual(id)),
+            InputReference::from(input_index, &node)
+        )]
     }
 }
 
@@ -1646,20 +1708,22 @@ fn load_template_rule_atomic_simple_ref<'a>(
     let name = node.children().at(0).get_value().unwrap();
     if let Some(index) = parameters.iter().position(|p| p == &name) {
         return BodySet {
-            bodies: vec![TemplateRuleBody::single(TemplateRuleSymbol::Parameter(
-                index
-            ))]
+            bodies: vec![TemplateRuleBody::single(
+                TemplateRuleSymbol::Parameter(index),
+                InputReference::from(input_index, &node)
+            )]
         };
     }
     match grammar.get_symbol(&name) {
         Some(symbol_ref) => BodySet {
-            bodies: vec![TemplateRuleBody::single(TemplateRuleSymbol::Symbol(
-                symbol_ref
-            ))]
+            bodies: vec![TemplateRuleBody::single(
+                TemplateRuleSymbol::Symbol(symbol_ref),
+                InputReference::from(input_index, &node)
+            )]
         },
         None => {
             errors.push(Error::SymbolNotFound(
-                InputReference::from(input_index, node.children().at(0)),
+                InputReference::from(input_index, &node.children().at(0)),
                 name
             ));
             BodySet { bodies: Vec::new() }
@@ -1684,7 +1748,7 @@ fn load_template_rule_atomic_template_ref<'a>(
         Some(index) => index,
         None => {
             errors.push(Error::TemplateRuleNotFound(
-                InputReference::from(input_index, node.children().at(0)),
+                InputReference::from(input_index, &node.children().at(0)),
                 String::from("Undefined template rule")
             ));
             return BodySet { bodies: Vec::new() };
@@ -1711,24 +1775,26 @@ fn load_template_rule_atomic_template_ref<'a>(
     let expected_count = grammar.template_rules[template_index].parameters.len();
     if arguments.len() != expected_count {
         errors.push(Error::TemplateRuleWrongNumberOfArgs(
-            InputReference::from(input_index, node.children().at(0)),
+            InputReference::from(input_index, &node.children().at(0)),
             expected_count,
             arguments.len()
         ));
         return BodySet { bodies: Vec::new() };
     }
     BodySet {
-        bodies: vec![TemplateRuleBody::single(TemplateRuleSymbol::Template(
-            TemplateRuleRef {
+        bodies: vec![TemplateRuleBody::single(
+            TemplateRuleSymbol::Template(TemplateRuleRef {
                 template: template_index,
                 arguments
-            }
-        ))]
+            }),
+            InputReference::from(input_index, &node)
+        )]
     }
 }
 
 /// Builds the set of rule definitions that represents a single inline piece of text
 fn load_template_rule_atomic_inline_text<'a>(
+    input_index: usize,
     grammar: &mut Grammar,
     node: AstNode<'a>
 ) -> BodySet<TemplateRuleBody> {
@@ -1740,16 +1806,17 @@ fn load_template_rule_atomic_inline_text<'a>(
     let id = match grammar.get_terminal_for_name(&value) {
         None => {
             // Create the terminal
-            let nfa = load_nfa_simple_text(node);
+            let nfa = load_nfa_simple_text(&node);
             grammar.add_terminal_anonymous(value, nfa).id
         }
         Some(terminal) => terminal.id
     };
     // Create the definition set
     BodySet {
-        bodies: vec![TemplateRuleBody::single(TemplateRuleSymbol::Symbol(
-            SymbolRef::Terminal(id)
-        ))]
+        bodies: vec![TemplateRuleBody::single(
+            TemplateRuleSymbol::Symbol(SymbolRef::Terminal(id)),
+            InputReference::from(input_index, &node)
+        )]
     }
 }
 

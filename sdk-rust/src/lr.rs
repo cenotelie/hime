@@ -51,7 +51,7 @@ impl Item {
     /// Gets the action for this item
     pub fn get_action(&self, grammar: &Grammar) -> LRActionCode {
         let rule = self.rule.get_rule_in(grammar);
-        if self.position >= rule.body.choices[0].parts.len() {
+        if self.position >= rule.body.choices[0].elements.len() {
             LR_ACTION_CODE_REDUCE
         } else {
             LR_ACTION_CODE_SHIFT
@@ -61,17 +61,17 @@ impl Item {
     /// Gets the symbol following the dot in this item
     pub fn get_next_symbol(&self, grammar: &Grammar) -> Option<SymbolRef> {
         let rule = self.rule.get_rule_in(grammar);
-        if self.position >= rule.body.choices[0].parts.len() {
+        if self.position >= rule.body.choices[0].elements.len() {
             None
         } else {
-            Some(rule.body.choices[0].parts[self.position].symbol)
+            Some(rule.body.choices[0].elements[self.position].symbol)
         }
     }
 
     /// Gets rule choice following the dot in this item
     pub fn get_next_choice<'s, 'g>(&'s self, grammar: &'g Grammar) -> Option<&'g RuleChoice> {
         let rule = self.rule.get_rule_in(grammar);
-        if self.position >= rule.body.choices[0].parts.len() {
+        if self.position >= rule.body.choices[0].elements.len() {
             None
         } else {
             Some(&rule.body.choices[self.position + 1])
@@ -95,7 +95,7 @@ impl Item {
             return None;
         }
         let rule = self.rule.get_rule_in(grammar);
-        if self.position < rule.body.choices[0].parts.len() && rule.context != 0 {
+        if self.position < rule.body.choices[0].elements.len() && rule.context != 0 {
             // this is a shift to a symbol with a context
             Some(rule.context)
         } else {
@@ -184,7 +184,7 @@ impl Item {
             for rule in context_var.rules.iter() {
                 if let Some(index) = rule
                     .body
-                    .parts
+                    .elements
                     .iter()
                     .position(|part| part.symbol == SymbolRef::Variable(current_var.id))
                 {
@@ -668,7 +668,7 @@ impl Phrase {
         // push the rule definition to use onto the stack
         stack.push(RuleRef::new(variable.id, rule_index));
         // walk the rule definition to build the sample
-        for element in variable.rules[rule_index].body.choices[0].parts.iter() {
+        for element in variable.rules[rule_index].body.choices[0].elements.iter() {
             match element.symbol {
                 SymbolRef::Variable(id) => {
                     // TODO: cleanup this code, this is really not a nice patch!!
@@ -677,7 +677,7 @@ impl Phrase {
                     // This code checks whether the variable in this part is not already in one of the rule definition currently in the stack
                     let found = elements.iter().any(|rule_ref| {
                         rule_ref.get_rule_in(grammar).body.choices[0]
-                            .parts
+                            .elements
                             .iter()
                             .any(|part| part.symbol == element.symbol)
                     });
