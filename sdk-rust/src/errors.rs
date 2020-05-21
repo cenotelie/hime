@@ -36,6 +36,9 @@ pub enum Error {
     Parsing(InputReference, String),
     /// The specified grammar was not found
     GrammarNotFound(String),
+    /// The value for the option is invalid
+    /// (grammar_index, option_name, valid_options)
+    InvalidOption(usize, String, Vec<String>),
     /// The grammar's axiom has not been specified in the options
     /// (grammar_index)
     AxiomNotSpecified(usize),
@@ -129,6 +132,9 @@ impl Error {
             Error::Msg(_) => 0,
             Error::Parsing(input, _) => input.get_line_number_width(),
             Error::GrammarNotFound(_) => 0,
+            Error::InvalidOption(grammar_index, name, _) => {
+                line_number_width_option_value(data, *grammar_index, name)
+            }
             Error::AxiomNotSpecified(grammar_index) => data.grammars[*grammar_index]
                 .input_ref
                 .get_line_number_width(),
@@ -177,6 +183,26 @@ impl Error {
             Error::Msg(msg) => print_msg(msg.as_ref()),
             Error::Parsing(input, msg) => print_msg_with_input_ref(max_width, data, input, msg),
             Error::GrammarNotFound(name) => print_msg(&format!("Cannot find grammar `{}`", name)),
+            Error::InvalidOption(grammar_index, name, valid) => {
+                let option = data.grammars[*grammar_index].get_option(name).unwrap();
+                if valid.is_empty() {
+                    print_msg_with_input_ref(
+                        max_width,
+                        data,
+                        &option.value_input_ref,
+                        &format!("Invalid value for grammar option `{}`", name)
+                    );
+                } else {
+                    let sub_message = format!("expected one of: {}", valid.join(", "));
+                    print_msg_with_input_ref_with_sub(
+                        max_width,
+                        data,
+                        &option.value_input_ref,
+                        &format!("Invalid value for grammar option `{}`", name),
+                        &sub_message
+                    );
+                }
+            }
             Error::AxiomNotSpecified(grammar_index) => print_msg_with_input_ref(
                 max_width,
                 data,
@@ -343,7 +369,13 @@ fn print_msg(message: &str) {
 }
 
 /// Prints input using a reference
-fn print_input(max_width: usize, data: &LoadedData, input_ref: &InputReference, pad: &str) {
+fn print_input(
+    max_width: usize,
+    data: &LoadedData,
+    input_ref: &InputReference,
+    pad: &str,
+    sub_message: Option<&str>
+) {
     let context = context_for(data, input_ref);
     let pad2 = spaces(max_width + 1 - input_ref.get_line_number_width());
     eprintln!(
@@ -353,11 +385,17 @@ fn print_input(max_width: usize, data: &LoadedData, input_ref: &InputReference, 
         Blue.bold().paint("|"),
         &context.content
     );
+    let trailer = if let Some(sub) = sub_message {
+        format!("help: {}", sub)
+    } else {
+        String::new()
+    };
     eprintln!(
-        "{} {}  {}",
+        "{} {}  {} {}",
         pad,
         Blue.bold().paint("|"),
-        Red.bold().paint(&context.pointer)
+        Red.bold().paint(&context.pointer),
+        Blue.paint(&trailer)
     );
 }
 
@@ -366,7 +404,8 @@ fn print_msg_with_input_ref_naked(
     max_width: usize,
     data: &LoadedData,
     input_ref: &InputReference,
-    message: &str
+    message: &str,
+    sub_message: Option<&str>
 ) {
     eprintln!(
         "{}{} {}",
@@ -383,7 +422,7 @@ fn print_msg_with_input_ref_naked(
         input_ref.position
     );
     eprintln!("{} {}", &pad, Blue.bold().paint("|"));
-    print_input(max_width, data, input_ref, &pad);
+    print_input(max_width, data, input_ref, &pad, sub_message);
 }
 
 /// Prints an error with a message and an input reference
@@ -393,7 +432,19 @@ fn print_msg_with_input_ref(
     input_ref: &InputReference,
     message: &str
 ) {
-    print_msg_with_input_ref_naked(max_width, data, input_ref, message);
+    print_msg_with_input_ref_naked(max_width, data, input_ref, message, None);
+    eprintln!("");
+}
+
+/// Prints an error with a message and an input reference
+fn print_msg_with_input_ref_with_sub(
+    max_width: usize,
+    data: &LoadedData,
+    input_ref: &InputReference,
+    message: &str,
+    sub_message: &str
+) {
+    print_msg_with_input_ref_naked(max_width, data, input_ref, message, Some(sub_message));
     eprintln!("");
 }
 
@@ -415,7 +466,8 @@ fn print_separator_not_matched(
         &format!(
             "Grammar separator token `{}` cannot be matched",
             &separator.name
-        )
+        ),
+        None
     );
     if !overriders.is_empty() {
         let pad = spaces(max_width);
@@ -431,7 +483,7 @@ fn print_separator_not_matched(
             let terminal = data.grammars[grammar_index]
                 .get_terminal(overrider.priority())
                 .unwrap();
-            print_input(max_width, data, &terminal.input_ref, &pad);
+            print_input(max_width, data, &terminal.input_ref, &pad, None);
         }
     }
     eprintln!("");

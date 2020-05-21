@@ -1041,16 +1041,16 @@ pub const OPTION_AXIOM: &str = "Axiom";
 pub const OPTION_SEPARATOR: &str = "Separator";
 /// The output path for compilation artifacts
 pub const OPTION_OUTPUT_PATH: &str = "OutputPath";
-/// The compilation mode to use, defaults to Source
-pub const OPTION_COMPILATION_MODE: &str = "CompilationMode";
 /// The parser type to generate, defaults to LALR1
-pub const OPTION_PARSER_TYPE: &str = "ParserType";
+pub const OPTION_METHOD: &str = "Method";
 /// The runtime to target, defaults to Net
 pub const OPTION_RUNTIME: &str = "Runtime";
+/// The compilation mode, defaults to Sources
+pub const OPTION_MODE: &str = "Mode";
 /// The namespace to use for the generated code
 pub const OPTION_NAMESPACE: &str = "Namespace";
 /// The access mode for the generated code, defaults to Internal
-pub const OPTION_ACCESS_MODIFIER: &str = "AccessModifier";
+pub const OPTION_ACCESS_MODIFIER: &str = "Modifier";
 /// The name of the default lexical context
 pub const DEFAULT_CONTEXT_NAME: &str = "__default";
 

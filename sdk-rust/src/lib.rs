@@ -31,7 +31,10 @@ pub mod output;
 pub mod unicode;
 
 use crate::errors::{Error, Errors};
-use crate::grammars::Grammar;
+use crate::grammars::{
+    Grammar, OPTION_ACCESS_MODIFIER, OPTION_METHOD, OPTION_MODE, OPTION_NAMESPACE,
+    OPTION_OUTPUT_PATH, OPTION_RUNTIME
+};
 use ansi_term::Colour::White;
 use ansi_term::Style;
 use hime_redist::ast::AstNode;
@@ -288,17 +291,28 @@ pub enum ParsingMethod {
     RNGLALR1
 }
 
+impl ParsingMethod {
+    /// Gets whether conflicts shall be raised for this method
+    pub fn raise_conflict(self) -> bool {
+        match self {
+            ParsingMethod::LR0 => true,
+            ParsingMethod::LR1 => true,
+            ParsingMethod::LALR1 => true,
+            ParsingMethod::RNGLR1 => false,
+            ParsingMethod::RNGLALR1 => false
+        }
+    }
+}
+
 /// Represents a grammar's compilation mode
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum Mode {
     /// Generates the source code for the lexer and parser
-    Source,
+    Sources,
     /// Generates the compiled assembly of the lexer and parser
     Assembly,
     /// Generates the source code for the lexer and parser and the compiled assembly
-    SourceAndAssembly,
-    /// Generates the source code for the lexer and parser, as well as the debug data
-    Debug
+    SourcesAndAssembly
 }
 
 /// Represents the target runtime to compile for
@@ -322,16 +336,16 @@ pub enum Modifier {
 }
 
 /// Represents a compilation task for the generation of lexers and parsers from grammars
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct CompilationTask {
     /// The input file names
     pub input_files: Vec<String>,
     /// The name of the grammar to compile in the case where several grammars are loaded.
     pub grammar_name: Option<String>,
     /// The compiler's output mode
-    pub mode: Mode,
+    pub mode: Option<Mode>,
     /// The target runtime
-    pub output_target: Runtime,
+    pub output_target: Option<Runtime>,
     /// The path to a local Rust target runtime
     pub output_rust_runtime: Option<String>,
     /// The path for the compiler's output
@@ -339,29 +353,141 @@ pub struct CompilationTask {
     /// The namespace for the generated code
     pub output_namespace: Option<String>,
     /// The access modifier for the generated code
-    pub output_modifier: Modifier,
+    pub output_modifier: Option<Modifier>,
     /// The parsing method use
-    pub method: ParsingMethod
-}
-
-impl Default for CompilationTask {
-    /// Creates a new task with default values
-    fn default() -> CompilationTask {
-        CompilationTask {
-            input_files: Vec::new(),
-            grammar_name: None,
-            mode: Mode::Source,
-            output_target: Runtime::Net,
-            output_rust_runtime: None,
-            output_path: None,
-            output_namespace: None,
-            output_modifier: Modifier::Internal,
-            method: ParsingMethod::LALR1
-        }
-    }
+    pub method: Option<ParsingMethod>
 }
 
 impl CompilationTask {
+    /// Gets the compiler's output mode for the grammar
+    pub fn get_mode_for(&self, grammar: &Grammar, grammar_index: usize) -> Result<Mode, Error> {
+        match self.mode {
+            Some(mode) => Ok(mode),
+            None => match grammar.get_option(OPTION_MODE) {
+                Some(option) => match option.value.as_ref() {
+                    "sources" => Ok(Mode::Sources),
+                    "all" => Ok(Mode::SourcesAndAssembly),
+                    "assembly" => Ok(Mode::Assembly),
+                    _ => Err(Error::InvalidOption(
+                        grammar_index,
+                        OPTION_MODE.to_string(),
+                        vec![
+                            String::from("sources"),
+                            String::from("all"),
+                            String::from("assembly"),
+                        ]
+                    ))
+                },
+                None => Ok(Mode::Sources)
+            }
+        }
+    }
+
+    /// Gets the target runtime for the grammar
+    pub fn get_output_target_for(
+        &self,
+        grammar: &Grammar,
+        grammar_index: usize
+    ) -> Result<Runtime, Error> {
+        match self.output_target {
+            Some(target) => Ok(target),
+            None => match grammar.get_option(OPTION_RUNTIME) {
+                Some(option) => match option.value.as_ref() {
+                    "net" => Ok(Runtime::Net),
+                    "java" => Ok(Runtime::Java),
+                    "rust" => Ok(Runtime::Rust),
+                    _ => Err(Error::InvalidOption(
+                        grammar_index,
+                        OPTION_RUNTIME.to_string(),
+                        vec![
+                            String::from("net"),
+                            String::from("java"),
+                            String::from("rust"),
+                        ]
+                    ))
+                },
+                None => Ok(Runtime::Net)
+            }
+        }
+    }
+
+    /// Gets the path for the compiler's output
+    pub fn get_output_path_for(&self, grammar: &Grammar) -> Option<String> {
+        match self.output_path.as_ref() {
+            Some(path) => Some(path.clone()),
+            None => match grammar.get_option(OPTION_OUTPUT_PATH) {
+                Some(path) => Some(path.value.clone()),
+                None => None
+            }
+        }
+    }
+
+    /// Gets the namespace for the generated code
+    pub fn get_output_namespace(&self, grammar: &Grammar) -> Option<String> {
+        match self.output_path.as_ref() {
+            Some(path) => Some(path.clone()),
+            None => match grammar.get_option(OPTION_NAMESPACE) {
+                Some(path) => Some(path.value.clone()),
+                None => None
+            }
+        }
+    }
+
+    /// Gets the access modifier for the generated code
+    pub fn get_output_modified_for(
+        &self,
+        grammar: &Grammar,
+        grammar_index: usize
+    ) -> Result<Modifier, Error> {
+        match self.output_modifier {
+            Some(modifier) => Ok(modifier),
+            None => match grammar.get_option(OPTION_ACCESS_MODIFIER) {
+                Some(option) => match option.value.as_ref() {
+                    "internal" => Ok(Modifier::Internal),
+                    "public" => Ok(Modifier::Public),
+                    _ => Err(Error::InvalidOption(
+                        grammar_index,
+                        OPTION_ACCESS_MODIFIER.to_string(),
+                        vec![String::from("internal"), String::from("public")]
+                    ))
+                },
+                None => Ok(Modifier::Internal)
+            }
+        }
+    }
+
+    /// Gets the parsing method
+    pub fn get_parsing_method(
+        &self,
+        grammar: &Grammar,
+        grammar_index: usize
+    ) -> Result<ParsingMethod, Error> {
+        match self.method {
+            Some(method) => Ok(method),
+            None => match grammar.get_option(OPTION_METHOD) {
+                Some(option) => match option.value.as_ref() {
+                    "lr0" => Ok(ParsingMethod::LR0),
+                    "lr1" => Ok(ParsingMethod::LR1),
+                    "lalr1" => Ok(ParsingMethod::LALR1),
+                    "rnglr1" => Ok(ParsingMethod::RNGLR1),
+                    "rnglalr1" => Ok(ParsingMethod::RNGLALR1),
+                    _ => Err(Error::InvalidOption(
+                        grammar_index,
+                        OPTION_METHOD.to_string(),
+                        vec![
+                            String::from("lr0"),
+                            String::from("lr1"),
+                            String::from("lalr1"),
+                            String::from("rnglr1"),
+                            String::from("rnglalr1"),
+                        ]
+                    ))
+                },
+                None => Ok(ParsingMethod::LALR1)
+            }
+        }
+    }
+
     /// Executes this task
     pub fn execute(&self) -> Result<LoadedData, Errors> {
         let mut data = loaders::load(&self.input_files)?;

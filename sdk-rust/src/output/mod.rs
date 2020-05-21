@@ -52,7 +52,11 @@ pub fn execute_for_grammar(
         Ok(separator) => separator,
         Err(error) => return Err(vec![error])
     };
-    let _graph = build_graph(grammar, grammar_index, task.method)?;
+    let method = match task.get_parsing_method(grammar, grammar_index) {
+        Ok(method) => method,
+        Err(error) => return Err(vec![error])
+    };
+    let _graph = build_graph(grammar, grammar_index, method)?;
     Ok(())
 }
 

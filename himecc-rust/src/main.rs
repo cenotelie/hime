@@ -57,7 +57,7 @@ pub fn main() {
                 .possible_values(&[
                     "sources",
                     "assembly",
-                    "debug"
+                    "all"
                 ])
         )
         .arg(
@@ -115,10 +115,13 @@ pub fn main() {
                 .help("The parsing method to use.")
                 .takes_value(true)
                 .required(false)
-                .default_value("lalr")
+                .default_value("lalr1")
                 .possible_values(&[
-                    "lalr",
-                    "rnglr"
+                    "lr0",
+                    "lr1",
+                    "lalr1",
+                    "rnglr1",
+                    "rnglalr1"
                 ])
         )
         .arg(
@@ -145,27 +148,30 @@ pub fn main() {
     } else {
         let mut task = CompilationTask::default();
         match matches.value_of("output_mode") {
-            Some("sources") => task.mode = Mode::Source,
-            Some("assembly") => task.mode = Mode::Assembly,
-            Some("debug") => task.mode = Mode::Debug,
+            Some("sources") => task.mode = Some(Mode::Sources),
+            Some("assembly") => task.mode = Some(Mode::Assembly),
+            Some("all") => task.mode = Some(Mode::SourcesAndAssembly),
             _ => {}
         }
         match matches.value_of("output_target") {
-            Some("net") => task.output_target = Runtime::Net,
-            Some("java") => task.output_target = Runtime::Java,
-            Some("rust") => task.output_target = Runtime::Rust,
+            Some("net") => task.output_target = Some(Runtime::Net),
+            Some("java") => task.output_target = Some(Runtime::Java),
+            Some("rust") => task.output_target = Some(Runtime::Rust),
             _ => {}
         }
         task.output_path = matches.value_of("output_path").map(|v| v.to_string());
         match matches.value_of("output_access") {
-            Some("internal") => task.output_modifier = Modifier::Internal,
-            Some("public") => task.output_modifier = Modifier::Public,
+            Some("internal") => task.output_modifier = Some(Modifier::Internal),
+            Some("public") => task.output_modifier = Some(Modifier::Public),
             _ => {}
         }
         task.output_namespace = matches.value_of("output_namespace").map(|v| v.to_string());
         match matches.value_of("parsing_method") {
-            Some("lalr") => task.method = ParsingMethod::LALR1,
-            Some("rnglr") => task.method = ParsingMethod::RNGLALR1,
+            Some("lr0") => task.method = Some(ParsingMethod::LR0),
+            Some("lr1") => task.method = Some(ParsingMethod::LR1),
+            Some("lalr1") => task.method = Some(ParsingMethod::LALR1),
+            Some("rnglr1") => task.method = Some(ParsingMethod::RNGLR1),
+            Some("rnglalr1") => task.method = Some(ParsingMethod::RNGLALR1),
             _ => {}
         }
         task.grammar_name = matches.value_of("grammar_name").map(|v| v.to_string());

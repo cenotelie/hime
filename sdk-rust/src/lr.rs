@@ -1138,14 +1138,13 @@ pub fn build_graph(
         ParsingMethod::RNGLALR1 => build_graph_rnglalr1(grammar)
     };
     let inverse = graph.inverse();
-    let mut errors: Vec<Error> = conflicts
-        .0
-        .into_iter()
-        .map(|mut conflict| {
+    let mut errors = Vec::new();
+    if method.raise_conflict() {
+        for mut conflict in conflicts.0.into_iter() {
             conflict.phrases = inverse.get_inputs_for(conflict.state, grammar);
-            Error::LrConflict(grammar_index, conflict)
-        })
-        .collect();
+            errors.push(Error::LrConflict(grammar_index, conflict));
+        }
+    }
     for error in find_context_errors(&graph, &inverse, grammar).into_iter() {
         errors.push(Error::TerminalOutsideContext(grammar_index, error));
     }
