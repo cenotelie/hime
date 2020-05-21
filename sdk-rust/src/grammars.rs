@@ -200,6 +200,11 @@ impl TerminalSet {
     pub fn clear(&mut self) {
         self.content.clear();
     }
+
+    /// Sorts this set by priority
+    pub fn sort(&mut self) {
+        self.content.sort();
+    }
 }
 
 /// Represents a virtual symbol in a grammar
@@ -1727,8 +1732,8 @@ impl Grammar {
 
     /// Prepares this grammar for code and data generation
     /// This methods inserts a new grammar rule as its axiom and computes the FIRSTS and FOLLOWERS sets
-    pub fn prepare(&mut self) -> Result<(), Error> {
-        self.add_real_axiom()?;
+    pub fn prepare(&mut self, grammar_index: usize) -> Result<(), Error> {
+        self.add_real_axiom(grammar_index)?;
         for variable in self.variables.iter_mut() {
             variable.compute_choices();
         }
@@ -1738,21 +1743,16 @@ impl Grammar {
     }
 
     /// Adds the real axiom to this grammar
-    fn add_real_axiom(&mut self) -> Result<(), Error> {
+    fn add_real_axiom(&mut self, grammar_index: usize) -> Result<(), Error> {
         let axiom_option = self
             .options
             .get(OPTION_AXIOM)
-            .ok_or_else(|| Error::AxiomNotSpecified(self.input_ref.clone()))?;
+            .ok_or_else(|| Error::AxiomNotSpecified(grammar_index))?;
         let axiom_id = self
             .variables
             .iter()
             .find(|v| v.name == axiom_option.value)
-            .ok_or_else(|| {
-                Error::AxiomNotDefined(
-                    axiom_option.value_input_ref.clone(),
-                    axiom_option.value.clone()
-                )
-            })?
+            .ok_or_else(|| Error::AxiomNotDefined(grammar_index))?
             .id;
         // Create the real axiom rule variable and rule
         let real_axiom = self.add_variable(GENERATED_AXIOM);

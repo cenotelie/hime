@@ -17,6 +17,7 @@
 
 //! Finite automata
 
+use crate::grammars::{TerminalRef, TerminalSet};
 use crate::{CharSpan, CHARSPAN_INVALID};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -79,6 +80,11 @@ impl DFAState {
     /// Gets whether this state is final (i.e. it is marked with final items)
     pub fn is_final(&self) -> bool {
         !self.items.is_empty()
+    }
+
+    /// Gets the final with the most priority on this state
+    pub fn get_final(&self) -> Option<FinalItem> {
+        self.items.last().copied()
     }
 
     /// Determines if the two states have the same marks
@@ -336,6 +342,23 @@ impl DFA {
             states: current.into_dfa_states(self)
         }
     }
+
+    /// Gets the expected terminals in the DFA
+    pub fn get_expected(&self) -> TerminalSet {
+        let mut expected = TerminalSet::default();
+        expected.add(TerminalRef::Epsilon);
+        expected.add(TerminalRef::Dollar);
+        for state in self.states.iter() {
+            match state.get_final() {
+                Some(FinalItem::Terminal(id)) => {
+                    expected.add(TerminalRef::Terminal(id));
+                }
+                _ => {}
+            }
+        }
+        expected.sort();
+        expected
+    }
 }
 
 impl DFAInverse {
@@ -535,6 +558,7 @@ impl<'a> DFAPartition<'a> {
                 for item in group.states[0].items.iter() {
                     state.items.push(*item);
                 }
+                state.items.sort();
                 state
             })
             .collect();

@@ -17,11 +17,12 @@
 
 //! Module for the management of errors in the SDK
 
-use crate::grammars::{Grammar, RuleRef, SymbolRef};
+use crate::grammars::{Grammar, RuleRef, SymbolRef, TerminalRef, OPTION_AXIOM, OPTION_SEPARATOR};
 use crate::lr::{Conflict, ConflictKind, ContextError, Item, Phrase};
 use crate::{InputReference, LoadedData};
 use ansi_term::Colour::{Blue, Red};
 use ansi_term::Style;
+use hime_redist::text::TextContext;
 use std::io;
 
 /// The global error type
@@ -36,9 +37,20 @@ pub enum Error {
     /// The specified grammar was not found
     GrammarNotFound(String),
     /// The grammar's axiom has not been specified in the options
-    AxiomNotSpecified(InputReference),
+    /// (grammar_index)
+    AxiomNotSpecified(usize),
     /// The grammar's axiom is not defined (does not exist)
-    AxiomNotDefined(InputReference, String),
+    /// (grammar_index)
+    AxiomNotDefined(usize),
+    /// The separator token specified by a grammar is not defined
+    /// (grammar_index)
+    SeparatorNotDefined(usize),
+    /// The separator token is contextual
+    /// (grammar_index, separator)
+    SeparatorIsContextual(usize, TerminalRef),
+    /// The separator token cannot be matched, it may be overriden by others
+    /// (grammar_index, separator, overriders)
+    SeparatorCannotBeMatched(usize, TerminalRef, Vec<TerminalRef>),
     /// The template rule could not be found
     TemplateRuleNotFound(InputReference, String),
     /// When instantiating a template rule, the wrong number of arguments were supplied (expected, supplied)
@@ -62,7 +74,10 @@ pub enum Error {
     /// A conflict in a grammar
     LrConflict(usize, Conflict),
     /// A contextual terminal is used outside of its context
-    TerminalOutsideContext(usize, ContextError)
+    TerminalOutsideContext(usize, ContextError),
+    /// A terminal matches the empty string
+    /// (grammar_index, terminal)
+    TerminalMatchesEmpty(usize, TerminalRef)
 }
 
 impl From<io::Error> for Error {
@@ -73,16 +88,70 @@ impl From<io::Error> for Error {
 
 const MSG_AXIOM_NOT_SPECIFIED: &str = "Grammar axiom has not been specified";
 
+/// Gets the length of the line number for a reference to the value of a grammar option
+fn line_number_width_option_value(
+    data: &LoadedData,
+    grammar_index: usize,
+    option_name: &str
+) -> usize {
+    data.grammars[grammar_index]
+        .get_option(option_name)
+        .unwrap()
+        .value_input_ref
+        .get_line_number_width()
+}
+
+/// Gets the length of the line number for a reference to the definition of a terminal
+fn line_number_width_terminal(
+    data: &LoadedData,
+    grammar_index: usize,
+    terminal_ref: TerminalRef
+) -> usize {
+    data.grammars[grammar_index]
+        .get_terminal(terminal_ref.priority())
+        .unwrap()
+        .input_ref
+        .get_line_number_width()
+}
+
+/// Gets the context for an input reference
+fn context_for(data: &LoadedData, input_ref: &InputReference) -> TextContext {
+    data.inputs[input_ref.input_index]
+        .content
+        .get_context_for(input_ref.position, input_ref.length)
+}
+
 impl Error {
     /// Gets the length of the line number for this error
-    pub fn get_line_number_width(&self) -> usize {
+    pub fn get_line_number_width(&self, data: &LoadedData) -> usize {
         match self {
             Error::Io(_) => 0,
             Error::Msg(_) => 0,
             Error::Parsing(input, _) => input.get_line_number_width(),
             Error::GrammarNotFound(_) => 0,
-            Error::AxiomNotSpecified(input) => input.get_line_number_width(),
-            Error::AxiomNotDefined(input, _) => input.get_line_number_width(),
+            Error::AxiomNotSpecified(grammar_index) => data.grammars[*grammar_index]
+                .input_ref
+                .get_line_number_width(),
+            Error::AxiomNotDefined(grammar_index) => {
+                line_number_width_option_value(data, *grammar_index, OPTION_AXIOM)
+            }
+            Error::SeparatorNotDefined(grammar_index) => {
+                line_number_width_option_value(data, *grammar_index, OPTION_SEPARATOR)
+            }
+            Error::SeparatorIsContextual(grammar_index, terminal_ref) => {
+                line_number_width_terminal(data, *grammar_index, *terminal_ref)
+            }
+            Error::SeparatorCannotBeMatched(grammar_index, terminal_ref, overriders) => {
+                line_number_width_terminal(data, *grammar_index, *terminal_ref).max(
+                    overriders
+                        .iter()
+                        .map(|overrider| {
+                            line_number_width_terminal(data, *grammar_index, *overrider)
+                        })
+                        .max()
+                        .unwrap_or(0)
+                )
+            }
             Error::TemplateRuleNotFound(input, _) => input.get_line_number_width(),
             Error::TemplateRuleWrongNumberOfArgs(input, _, _) => input.get_line_number_width(),
             Error::SymbolNotFound(input, _) => input.get_line_number_width(),
@@ -94,7 +163,10 @@ impl Error {
             Error::OverridingPreviousTerminal(input, _) => input.get_line_number_width(),
             Error::GrammarNotDefined(input, _) => input.get_line_number_width(),
             Error::LrConflict(_, _) => 0,
-            Error::TerminalOutsideContext(_, _) => 0
+            Error::TerminalOutsideContext(_, _) => 0,
+            Error::TerminalMatchesEmpty(grammar_index, terminal_ref) => {
+                line_number_width_terminal(data, *grammar_index, *terminal_ref)
+            }
         }
     }
 
@@ -105,15 +177,57 @@ impl Error {
             Error::Msg(msg) => print_msg(msg.as_ref()),
             Error::Parsing(input, msg) => print_msg_with_input_ref(max_width, data, input, msg),
             Error::GrammarNotFound(name) => print_msg(&format!("Cannot find grammar `{}`", name)),
-            Error::AxiomNotSpecified(input) => {
-                print_msg_with_input_ref(max_width, data, input, MSG_AXIOM_NOT_SPECIFIED)
-            }
-            Error::AxiomNotDefined(input, name) => print_msg_with_input_ref(
+            Error::AxiomNotSpecified(grammar_index) => print_msg_with_input_ref(
                 max_width,
                 data,
-                input,
-                &format!("Grammar axiom `{}` is not defined", name)
+                &data.grammars[*grammar_index].input_ref,
+                MSG_AXIOM_NOT_SPECIFIED
             ),
+            Error::AxiomNotDefined(grammar_index) => {
+                let option = data.grammars[*grammar_index]
+                    .get_option(OPTION_AXIOM)
+                    .unwrap();
+                print_msg_with_input_ref(
+                    max_width,
+                    data,
+                    &option.value_input_ref,
+                    &format!("Grammar axiom `{}` is not defined", &option.value)
+                )
+            }
+            Error::SeparatorNotDefined(grammar_index) => {
+                let option = data.grammars[*grammar_index]
+                    .get_option(OPTION_SEPARATOR)
+                    .unwrap();
+                print_msg_with_input_ref(
+                    max_width,
+                    data,
+                    &option.value_input_ref,
+                    &format!("Grammar separator token `{}` is not defined", &option.value)
+                )
+            }
+            Error::SeparatorIsContextual(grammar_index, terminal_ref) => {
+                let separator = data.grammars[*grammar_index]
+                    .get_terminal(terminal_ref.priority())
+                    .unwrap();
+                print_msg_with_input_ref(
+                    max_width,
+                    data,
+                    &separator.input_ref,
+                    &format!(
+                        "Grammar separator token `{}` is only defined for context `{}`",
+                        &separator.name, &data.grammars[*grammar_index].contexts[separator.context]
+                    )
+                )
+            }
+            Error::SeparatorCannotBeMatched(grammar_index, terminal_ref, overriders) => {
+                print_separator_not_matched(
+                    max_width,
+                    data,
+                    *grammar_index,
+                    *terminal_ref,
+                    overriders
+                )
+            }
             Error::TemplateRuleNotFound(input, name) => print_msg_with_input_ref(
                 max_width,
                 data,
@@ -188,8 +302,27 @@ impl Error {
             Error::TerminalOutsideContext(grammar_index, error) => {
                 print_context_error(max_width, data, *grammar_index, error)
             }
+            Error::TerminalMatchesEmpty(grammar_index, terminal_ref) => {
+                let terminal = data.grammars[*grammar_index]
+                    .get_terminal(terminal_ref.priority())
+                    .unwrap();
+                print_msg_with_input_ref(
+                    max_width,
+                    data,
+                    &terminal.input_ref,
+                    &format!(
+                        "Terminal `{}` matches empty string, which is not allowed",
+                        &terminal.name
+                    )
+                )
+            }
         }
     }
+}
+
+/// Produces a string of spaces of the specified length
+fn spaces(length: usize) -> String {
+    String::from_utf8(vec![0x20; length]).unwrap()
 }
 
 /// Prints an IO error message
@@ -209,23 +342,39 @@ fn print_msg(message: &str) {
     eprintln!("");
 }
 
+/// Prints input using a reference
+fn print_input(max_width: usize, data: &LoadedData, input_ref: &InputReference, pad: &str) {
+    let context = context_for(data, input_ref);
+    let pad2 = spaces(max_width + 1 - input_ref.get_line_number_width());
+    eprintln!(
+        "{}{}{}  {}",
+        Blue.bold().paint(format!("{}", input_ref.position.line)),
+        &pad2,
+        Blue.bold().paint("|"),
+        &context.content
+    );
+    eprintln!(
+        "{} {}  {}",
+        pad,
+        Blue.bold().paint("|"),
+        Red.bold().paint(&context.pointer)
+    );
+}
+
 /// Prints an error with a message and an input reference
-fn print_msg_with_input_ref(
+fn print_msg_with_input_ref_naked(
     max_width: usize,
     data: &LoadedData,
     input_ref: &InputReference,
     message: &str
 ) {
-    let context = data.inputs[input_ref.input_index]
-        .content
-        .get_context_for(input_ref.position, input_ref.length);
     eprintln!(
         "{}{} {}",
         Red.bold().paint("error"),
         Style::new().bold().paint(":"),
         Style::new().bold().paint(message)
     );
-    let pad = String::from_utf8(vec![0x20; max_width]).unwrap();
+    let pad = spaces(max_width);
     eprintln!(
         "{}{} {}:{}",
         &pad,
@@ -233,27 +382,58 @@ fn print_msg_with_input_ref(
         &data.inputs[input_ref.input_index].name,
         input_ref.position
     );
-    let pad = String::from_utf8(vec![0x20; max_width + 1]).unwrap();
-    eprintln!("{}{}", &pad, Blue.bold().paint("|"));
-    let pad = String::from_utf8(vec![
-        0x20;
-        max_width + 1 - input_ref.get_line_number_width()
-    ])
-    .unwrap();
-    eprintln!(
-        "{}{}{}  {}",
-        Blue.bold().paint(format!("{}", input_ref.position.line)),
-        &pad,
-        Blue.bold().paint("|"),
-        &context.content
+    eprintln!("{} {}", &pad, Blue.bold().paint("|"));
+    print_input(max_width, data, input_ref, &pad);
+}
+
+/// Prints an error with a message and an input reference
+fn print_msg_with_input_ref(
+    max_width: usize,
+    data: &LoadedData,
+    input_ref: &InputReference,
+    message: &str
+) {
+    print_msg_with_input_ref_naked(max_width, data, input_ref, message);
+    eprintln!("");
+}
+
+/// Prints the error of a separator token that canot be matched
+fn print_separator_not_matched(
+    max_width: usize,
+    data: &LoadedData,
+    grammar_index: usize,
+    separator: TerminalRef,
+    overriders: &[TerminalRef]
+) {
+    let separator = data.grammars[grammar_index]
+        .get_terminal(separator.priority())
+        .unwrap();
+    print_msg_with_input_ref_naked(
+        max_width,
+        data,
+        &separator.input_ref,
+        &format!(
+            "Grammar separator token `{}` cannot be matched",
+            &separator.name
+        )
     );
-    let pad = String::from_utf8(vec![0x20; max_width + 1]).unwrap();
-    eprintln!(
-        "{}{}  {}",
-        &pad,
-        Blue.bold().paint("|"),
-        Red.bold().paint(&context.pointer)
-    );
+    if !overriders.is_empty() {
+        let pad = spaces(max_width);
+        eprintln!("{} {}", &pad, Blue.bold().paint("|"));
+        eprintln!(
+            "{} {} {}: The separator can be overriden by the following terminals",
+            &pad,
+            Blue.bold().paint("="),
+            Style::new().bold().paint("help")
+        );
+        eprintln!("{} {}", &pad, Blue.bold().paint("|"));
+        for overrider in overriders {
+            let terminal = data.grammars[grammar_index]
+                .get_terminal(overrider.priority())
+                .unwrap();
+            print_input(max_width, data, &terminal.input_ref, &pad);
+        }
+    }
     eprintln!("");
 }
 
@@ -415,7 +595,7 @@ impl Errors {
         if let Some(max_width) = self
             .errors
             .iter()
-            .map(|error| error.get_line_number_width())
+            .map(|error| error.get_line_number_width(&self.data))
             .max()
         {
             for error in self.errors.iter() {

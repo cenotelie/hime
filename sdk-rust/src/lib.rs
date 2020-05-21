@@ -32,7 +32,6 @@ pub mod unicode;
 
 use crate::errors::{Error, Errors};
 use crate::grammars::Grammar;
-use crate::lr::build_graph;
 use ansi_term::Colour::White;
 use ansi_term::Style;
 use hime_redist::ast::AstNode;
@@ -380,7 +379,7 @@ impl CompilationTask {
         let mut errors = Vec::new();
         // prepare the grammars
         for (index, grammar) in data.grammars.iter_mut().enumerate() {
-            if let Err(mut errs) = self.execute_for_grammar(grammar, index) {
+            if let Err(mut errs) = output::execute_for_grammar(self, grammar, index) {
                 errors.append(&mut errs);
             }
         }
@@ -389,19 +388,5 @@ impl CompilationTask {
         } else {
             Ok(data)
         }
-    }
-
-    /// Build and output artifacts for a grammar
-    fn execute_for_grammar(
-        &self,
-        grammar: &mut Grammar,
-        grammar_index: usize
-    ) -> Result<(), Vec<Error>> {
-        if let Err(error) = grammar.prepare() {
-            return Err(vec![error]);
-        };
-        let _dfa = grammar.build_dfa();
-        let _graph = build_graph(grammar, grammar_index, self.method)?;
-        Ok(())
     }
 }
