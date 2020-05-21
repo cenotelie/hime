@@ -768,7 +768,7 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     );
     db.insert(
         "SupplementaryPrivateUseArea-B",
-        Block::new("SupplementaryPrivateUseArea-B", 0x100000, 0x10FFFF)
+        Block::new("SupplementaryPrivateUseArea-B", 0x10_0000, 0x10_FFFF)
     );
     db
 }

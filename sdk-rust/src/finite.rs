@@ -228,7 +228,6 @@ impl DFA {
         // For each set in the list of the NFA states
         let mut i = 0;
         while i < nfa_sets.len() {
-            // println!("at state {:?}", &nfa_sets[i].states);
             // normalize transitions
             nfa_sets[i].normalize(&mut nfa);
             // Get the transitions for the set

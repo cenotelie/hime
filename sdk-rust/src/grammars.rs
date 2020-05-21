@@ -694,12 +694,6 @@ impl RuleBody {
         self.elements.is_empty()
     }
 
-    /*/// Appends a single symbol to the choice
-    pub fn append_symbol(&mut self, symbol: SymbolRef) {
-        self.elements
-            .push(RuleBodyElement::new(symbol, TREE_ACTION_NONE));
-    }*/
-
     /// Appends the content of another choice to this one
     pub fn append_choice(&mut self, other: &RuleChoice) {
         for element in other.elements.iter() {
@@ -1482,17 +1476,12 @@ impl Grammar {
     /// Inherits the terminals from the parent grammar
     fn inherit_terminals(&mut self, other: &Grammar) {
         for terminal in other.terminals.iter() {
-            if let Some(redefined) = self
+            if self
                 .terminals
                 .iter()
-                .find(|t| t.name == terminal.name || t.value == terminal.value)
+                .all(|t| t.name != terminal.name && t.value != terminal.value)
             {
-                // is a redefinition
-                println!(
-                    "In grammar {}, ignored redefined terminal {} from {}",
-                    &self.name, &redefined.name, &other.name
-                );
-            } else {
+                // not already defined in this grammar
                 let sid = self.get_next_sid();
                 let context = self.resolve_context(&other.contexts[terminal.context]);
                 let mut nfa = terminal.nfa.clone_no_finals();

@@ -2890,7 +2890,7 @@ pub fn get_categories() -> HashMap<&'static str, Category> {
     cat_zl.add_span(0x2028, 0x2028);
     let mut cat_co = Category::new("Co");
     cat_co.add_span(0xE000, 0xF8FF);
-    cat_co.add_span(0xF0000, 0x10FFFD);
+    cat_co.add_span(0xF0000, 0x10_FFFD);
     let mut cat_m = Category::new("M");
     cat_m.aggregate(&cat_mc);
     cat_m.aggregate(&cat_me);
