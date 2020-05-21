@@ -19,8 +19,8 @@
 
 pub mod helper;
 
-use crate::errors::Error;
-use crate::finite::{DFAState, FinalItem, DFA};
+use crate::errors::{Error, UnmatchableTokenError};
+use crate::finite::{DFAState, DFA};
 use crate::grammars::{Grammar, TerminalRef, TerminalSet, OPTION_SEPARATOR};
 use crate::lr::build_graph;
 use crate::CharSpan;
@@ -62,7 +62,7 @@ pub fn execute_for_grammar(
         Err(error) => return Err(vec![error])
     };
     // Build the data for the parser
-    let _graph = build_graph(grammar, grammar_index, method)?;
+    let _graph = build_graph(grammar, grammar_index, &expected, &dfa, method)?;
     // write data
     if let Err(error) = write_lexer_data(
         task.get_output_path_for(grammar),
@@ -101,28 +101,13 @@ fn get_separator(
         return Ok(Some(terminal_ref));
     }
     // the separator will not be produced by the lexer, try to investigate why
-    let mut overriders = TerminalSet::default();
-    let separator_final = FinalItem::Terminal(terminal.id, 0);
-    for state in dfa.states.iter() {
-        if state.items.contains(&separator_final) {
-            // separator is final of this state
-            for item in state.items.iter() {
-                if item == &separator_final {
-                    break;
-                }
-                if let FinalItem::Terminal(id, context) = item {
-                    if *context == 0 {
-                        // this final item has more priority than the separator
-                        overriders.add(TerminalRef::Terminal(*id));
-                    }
-                }
-            }
-        }
-    }
+    let overriders = dfa.get_overriders(terminal_ref, 0);
     Err(Error::SeparatorCannotBeMatched(
         grammar_index,
-        terminal_ref,
-        overriders.content
+        UnmatchableTokenError {
+            terminal: terminal_ref,
+            overriders
+        }
     ))
 }
 

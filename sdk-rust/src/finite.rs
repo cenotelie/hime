@@ -356,6 +356,29 @@ impl DFA {
         expected.sort();
         expected
     }
+
+    /// Gets all the terminals that override the given one in final states
+    pub fn get_overriders(&self, terminal: TerminalRef, context: usize) -> Vec<TerminalRef> {
+        let mut overriders = TerminalSet::default();
+        let terminal_final = FinalItem::Terminal(terminal.priority(), context);
+        for state in self.states.iter() {
+            if state.items.contains(&terminal_final) {
+                // separator is final of this state
+                for item in state.items.iter() {
+                    if item == &terminal_final {
+                        break;
+                    }
+                    if let FinalItem::Terminal(id, c) = item {
+                        if *c == context {
+                            // this final item has more priority than the separator
+                            overriders.add(TerminalRef::Terminal(*id));
+                        }
+                    }
+                }
+            }
+        }
+        overriders.content
+    }
 }
 
 impl DFAInverse {

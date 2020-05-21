@@ -1264,13 +1264,18 @@ fn load_simple_rule_atomic_inline_text<'a>(
     let start = if value.starts_with('~') { 2 } else { 1 };
     let value = replace_escapees(value[start..(value.len() - 1)].to_string());
     // Check for previous instance in the grammar
-    let id = match grammar.get_terminal_for_name(&value) {
+    let id = match grammar.get_terminal_for_value(&value) {
         None => {
             // Create the terminal
             let nfa = load_nfa_simple_text(&node);
-            grammar
-                .add_terminal_anonymous(value, InputReference::from(input_index, &node), nfa)
-                .id
+            let terminal = grammar.add_terminal_anonymous(
+                value,
+                InputReference::from(input_index, &node),
+                nfa
+            );
+            terminal.nfa.states[terminal.nfa.exit]
+                .add_item(FinalItem::Terminal(terminal.id, terminal.context));
+            terminal.id
         }
         Some(terminal) => terminal.id
     };
@@ -1812,13 +1817,18 @@ fn load_template_rule_atomic_inline_text<'a>(
     let start = if value.starts_with('~') { 2 } else { 1 };
     let value = replace_escapees(value[start..(value.len() - 1)].to_string());
     // Check for previous instance in the grammar
-    let id = match grammar.get_terminal_for_name(&value) {
+    let id = match grammar.get_terminal_for_value(&value) {
         None => {
             // Create the terminal
             let nfa = load_nfa_simple_text(&node);
-            grammar
-                .add_terminal_anonymous(value, InputReference::from(input_index, &node), nfa)
-                .id
+            let terminal = grammar.add_terminal_anonymous(
+                value,
+                InputReference::from(input_index, &node),
+                nfa
+            );
+            terminal.nfa.states[terminal.nfa.exit]
+                .add_item(FinalItem::Terminal(terminal.id, terminal.context));
+            terminal.id
         }
         Some(terminal) => terminal.id
     };

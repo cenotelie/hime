@@ -25,6 +25,15 @@ use ansi_term::Style;
 use hime_redist::text::TextContext;
 use std::io;
 
+/// Represents an error where a token is used by cannot be produced by the lexer
+#[derive(Debug, Clone)]
+pub struct UnmatchableTokenError {
+    /// The problematic terminal
+    pub terminal: TerminalRef,
+    /// The terminals that override the problematic one
+    pub overriders: Vec<TerminalRef>
+}
+
 /// The global error type
 #[derive(Debug)]
 pub enum Error {
@@ -53,7 +62,7 @@ pub enum Error {
     SeparatorIsContextual(usize, TerminalRef),
     /// The separator token cannot be matched, it may be overriden by others
     /// (grammar_index, separator, overriders)
-    SeparatorCannotBeMatched(usize, TerminalRef, Vec<TerminalRef>),
+    SeparatorCannotBeMatched(usize, UnmatchableTokenError),
     /// The template rule could not be found
     TemplateRuleNotFound(InputReference, String),
     /// When instantiating a template rule, the wrong number of arguments were supplied (expected, supplied)
@@ -78,6 +87,8 @@ pub enum Error {
     LrConflict(usize, Conflict),
     /// A contextual terminal is used outside of its context
     TerminalOutsideContext(usize, ContextError),
+    /// A terminal is used by the parser but cannot be produced by the lexer
+    TerminalCannotBeMatched(usize, UnmatchableTokenError),
     /// A terminal matches the empty string
     /// (grammar_index, terminal)
     TerminalMatchesEmpty(usize, TerminalRef)
@@ -147,9 +158,10 @@ impl Error {
             Error::SeparatorIsContextual(grammar_index, terminal_ref) => {
                 line_number_width_terminal(data, *grammar_index, *terminal_ref)
             }
-            Error::SeparatorCannotBeMatched(grammar_index, terminal_ref, overriders) => {
-                line_number_width_terminal(data, *grammar_index, *terminal_ref).max(
-                    overriders
+            Error::SeparatorCannotBeMatched(grammar_index, error) => {
+                line_number_width_terminal(data, *grammar_index, error.terminal).max(
+                    error
+                        .overriders
                         .iter()
                         .map(|overrider| {
                             line_number_width_terminal(data, *grammar_index, *overrider)
@@ -170,6 +182,18 @@ impl Error {
             Error::GrammarNotDefined(input, _) => input.get_line_number_width(),
             Error::LrConflict(_, _) => 0,
             Error::TerminalOutsideContext(_, _) => 0,
+            Error::TerminalCannotBeMatched(grammar_index, error) => {
+                line_number_width_terminal(data, *grammar_index, error.terminal).max(
+                    error
+                        .overriders
+                        .iter()
+                        .map(|overrider| {
+                            line_number_width_terminal(data, *grammar_index, *overrider)
+                        })
+                        .max()
+                        .unwrap_or(0)
+                )
+            }
             Error::TerminalMatchesEmpty(grammar_index, terminal_ref) => {
                 line_number_width_terminal(data, *grammar_index, *terminal_ref)
             }
@@ -245,14 +269,8 @@ impl Error {
                     )
                 )
             }
-            Error::SeparatorCannotBeMatched(grammar_index, terminal_ref, overriders) => {
-                print_separator_not_matched(
-                    max_width,
-                    data,
-                    *grammar_index,
-                    *terminal_ref,
-                    overriders
-                )
+            Error::SeparatorCannotBeMatched(grammar_index, error) => {
+                print_token_not_matched(max_width, data, *grammar_index, error)
             }
             Error::TemplateRuleNotFound(input, name) => print_msg_with_input_ref(
                 max_width,
@@ -327,6 +345,9 @@ impl Error {
             }
             Error::TerminalOutsideContext(grammar_index, error) => {
                 print_context_error(max_width, data, *grammar_index, error)
+            }
+            Error::TerminalCannotBeMatched(grammar_index, error) => {
+                print_token_not_matched(max_width, data, *grammar_index, error)
             }
             Error::TerminalMatchesEmpty(grammar_index, terminal_ref) => {
                 let terminal = data.grammars[*grammar_index]
@@ -448,38 +469,38 @@ fn print_msg_with_input_ref_with_sub(
     eprintln!("");
 }
 
-/// Prints the error of a separator token that canot be matched
-fn print_separator_not_matched(
+/// Prints the error of a token that canot be matched
+fn print_token_not_matched(
     max_width: usize,
     data: &LoadedData,
     grammar_index: usize,
-    separator: TerminalRef,
-    overriders: &[TerminalRef]
+    error: &UnmatchableTokenError
 ) {
-    let separator = data.grammars[grammar_index]
-        .get_terminal(separator.priority())
+    let terminal = data.grammars[grammar_index]
+        .get_terminal(error.terminal.priority())
         .unwrap();
     print_msg_with_input_ref_naked(
         max_width,
         data,
-        &separator.input_ref,
+        &terminal.input_ref,
         &format!(
-            "Grammar separator token `{}` cannot be matched",
-            &separator.name
+            "Token `{}` is expected but can never be matched",
+            &terminal.value
         ),
         None
     );
-    if !overriders.is_empty() {
+    if !error.overriders.is_empty() {
         let pad = spaces(max_width);
         eprintln!("{} {}", &pad, Blue.bold().paint("|"));
         eprintln!(
-            "{} {} {}: The separator can be overriden by the following terminals",
+            "{} {} {}: Token `{}` can be overriden by the following terminals",
             &pad,
             Blue.bold().paint("="),
-            Style::new().bold().paint("help")
+            Style::new().bold().paint("help"),
+            &terminal.value
         );
         eprintln!("{} {}", &pad, Blue.bold().paint("|"));
-        for overrider in overriders {
+        for overrider in error.overriders.iter() {
             let terminal = data.grammars[grammar_index]
                 .get_terminal(overrider.priority())
                 .unwrap();
@@ -519,7 +540,7 @@ fn print_lr_conflict(
     }
     if !conflict.phrases.is_empty() {
         eprintln!(
-            "{} {} {}: Examples of inputs that raise this conflict",
+            "{} {} {}: Examples of inputs that are ambiguous",
             &pad,
             Blue.bold().paint("="),
             Style::new().bold().paint("help")

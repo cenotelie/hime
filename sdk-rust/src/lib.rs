@@ -236,7 +236,7 @@ pub struct LoadedData {
 }
 
 /// Reference to an input
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct InputReference {
     /// The input's index
     pub input_index: usize,

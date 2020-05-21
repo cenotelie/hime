@@ -17,7 +17,8 @@
 
 //! Module for LR automata
 
-use crate::errors::Error;
+use crate::errors::{Error, UnmatchableTokenError};
+use crate::finite::DFA;
 use crate::grammars::{
     Grammar, RuleChoice, RuleRef, SymbolRef, Terminal, TerminalRef, TerminalSet, GENERATED_AXIOM
 };
@@ -1124,10 +1125,39 @@ fn find_context_errors_in(
     }
 }
 
+/// Find the errors where a token is used but cannot be produced by the parser
+fn find_unmatchable_tokens(
+    graph: &Graph,
+    grammar: &Grammar,
+    expected: &TerminalSet
+) -> TerminalSet {
+    let mut unexpected = TerminalSet::default();
+    for state in graph.states.iter() {
+        for item in state.items.iter() {
+            let rule = item.rule.get_rule_in(grammar);
+            if item.position < rule.body.choices[0].elements.len() {
+                // looking at a symbol
+                let element = &rule.body.choices[0].elements[item.position];
+                if let SymbolRef::Terminal(id) = element.symbol {
+                    // looking at a terminal
+                    let terminal_ref = TerminalRef::Terminal(id);
+                    if !expected.content.contains(&terminal_ref) {
+                        // the terminal is not expected
+                        unexpected.add(terminal_ref);
+                    }
+                }
+            }
+        }
+    }
+    unexpected
+}
+
 /// Build the specified grammar
 pub fn build_graph(
     grammar: &Grammar,
     grammar_index: usize,
+    expected: &TerminalSet,
+    dfa: &DFA,
     method: ParsingMethod
 ) -> Result<Graph, Vec<Error>> {
     let (graph, conflicts) = match method {
@@ -1147,6 +1177,16 @@ pub fn build_graph(
     }
     for error in find_context_errors(&graph, &inverse, grammar).into_iter() {
         errors.push(Error::TerminalOutsideContext(grammar_index, error));
+    }
+    for unexpected in find_unmatchable_tokens(&graph, grammar, expected).content {
+        let terminal = grammar.get_terminal(unexpected.priority()).unwrap();
+        errors.push(Error::TerminalCannotBeMatched(
+            grammar_index,
+            UnmatchableTokenError {
+                terminal: unexpected,
+                overriders: dfa.get_overriders(unexpected, terminal.context)
+            }
+        ));
     }
     if errors.is_empty() {
         return Ok(graph);
