@@ -373,6 +373,13 @@ impl State {
         }
         conflicts
     }
+
+    /// Gets the reduction for the specified terminal
+    pub fn get_reduction_for(&self, terminal: TerminalRef) -> Option<&Reduction> {
+        self.reductions
+            .iter()
+            .find(|reduction| reduction.lookahead == terminal)
+    }
 }
 
 /// Represents a LR graph

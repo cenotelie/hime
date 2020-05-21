@@ -21,11 +21,16 @@ pub mod helper;
 
 use crate::errors::{Error, UnmatchableTokenError};
 use crate::finite::{DFAState, DFA};
-use crate::grammars::{Grammar, TerminalRef, TerminalSet, OPTION_SEPARATOR};
-use crate::lr::build_graph;
-use crate::CharSpan;
-use crate::CompilationTask;
+use crate::grammars::{
+    Grammar, Rule, RuleRef, SymbolRef, TerminalRef, TerminalSet, OPTION_SEPARATOR
+};
+use crate::lr::{self, Graph, State};
+use crate::{CharSpan, CompilationTask, ParsingMethod};
 use hime_redist::lexers::automaton::DEAD_STATE;
+use hime_redist::parsers::{
+    LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_NONE, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT,
+    LR_OP_CODE_BASE_ADD_VIRTUAL, LR_OP_CODE_BASE_POP_STACK, LR_OP_CODE_BASE_SEMANTIC_ACTION
+};
 use std::fs::File;
 use std::io::{self, Write};
 use std::path::PathBuf;
@@ -62,15 +67,55 @@ pub fn execute_for_grammar(
         Err(error) => return Err(vec![error])
     };
     // Build the data for the parser
-    let _graph = build_graph(grammar, grammar_index, &expected, &dfa, method)?;
+    let graph = lr::build_graph(grammar, grammar_index, &expected, &dfa, method)?;
     // write data
+    let output_path = task.get_output_path_for(grammar);
     if let Err(error) = write_lexer_data(
-        task.get_output_path_for(grammar),
-        format!("{}.bin", &grammar.name),
+        output_path.as_ref(),
+        format!("{}Lexer.bin", &grammar.name),
         grammar,
         &dfa,
         &expected
     ) {
+        return Err(vec![error]);
+    }
+    if let Err(error) = match method {
+        ParsingMethod::LR0 => write_parser_lrk_data(
+            output_path.as_ref(),
+            format!("{}Parser.bin", &grammar.name),
+            grammar,
+            &expected,
+            &graph
+        ),
+        ParsingMethod::LR1 => write_parser_lrk_data(
+            output_path.as_ref(),
+            format!("{}Parser.bin", &grammar.name),
+            grammar,
+            &expected,
+            &graph
+        ),
+        ParsingMethod::LALR1 => write_parser_lrk_data(
+            output_path.as_ref(),
+            format!("{}Parser.bin", &grammar.name),
+            grammar,
+            &expected,
+            &graph
+        ),
+        ParsingMethod::RNGLR1 => write_parser_rnglr_data(
+            output_path.as_ref(),
+            format!("{}Parser.bin", &grammar.name),
+            grammar,
+            &expected,
+            &graph
+        ),
+        ParsingMethod::RNGLALR1 => write_parser_rnglr_data(
+            output_path.as_ref(),
+            format!("{}Parser.bin", &grammar.name),
+            grammar,
+            &expected,
+            &graph
+        )
+    } {
         return Err(vec![error]);
     }
     Ok(())
@@ -113,7 +158,7 @@ fn get_separator(
 
 /// Writes the lexer's data
 fn write_lexer_data(
-    path: Option<String>,
+    path: Option<&String>,
     file_name: String,
     grammar: &Grammar,
     dfa: &DFA,
@@ -223,6 +268,194 @@ fn write_lexer_data_state(
         write_u16(writer, span.end)?;
         write_u16(writer, next as u16)?;
     }
+    Ok(())
+}
+
+/// Writes the data for a LR(k) parser
+fn write_parser_lrk_data(
+    path: Option<&String>,
+    file_name: String,
+    grammar: &Grammar,
+    expected: &TerminalSet,
+    graph: &Graph
+) -> Result<(), Error> {
+    let mut final_path = PathBuf::new();
+    if let Some(path) = path {
+        final_path.push(path);
+    }
+    final_path.push(file_name);
+    let file = File::create(final_path)?;
+    let mut writer = io::BufWriter::new(file);
+    let mut rules = Vec::new();
+    for variable in grammar.variables.iter() {
+        for i in 0..variable.rules.len() {
+            rules.push(RuleRef::new(variable.id, i));
+        }
+    }
+    // number of columns
+    write_u16(
+        &mut writer,
+        (expected.len() + grammar.variables.len()) as u16
+    )?;
+    // number of states
+    write_u16(&mut writer, graph.states.len() as u16)?;
+    // number of rules
+    write_u16(&mut writer, rules.len() as u16)?;
+    // writes the columns's id
+    for terminal_ref in expected.content.iter() {
+        write_u16(&mut writer, terminal_ref.priority() as u16)?;
+    }
+    for variable in grammar.variables.iter() {
+        write_u16(&mut writer, variable.id as u16)?;
+    }
+    // write context openings for each state
+    for state in graph.states.iter() {
+        let count: usize = state
+            .opening_contexts
+            .iter()
+            .map(|(_, contexts)| contexts.len())
+            .sum();
+        write_u16(&mut writer, count as u16)?;
+        for (terminal, contexts) in state.opening_contexts.iter() {
+            for context in contexts.iter() {
+                write_u16(&mut writer, terminal.priority() as u16)?;
+                write_u16(&mut writer, *context as u16)?;
+            }
+        }
+    }
+    // write the LR table
+    for state in graph.states.iter() {
+        write_parser_lrk_data_state(&mut writer, grammar, expected, &rules, state)?;
+    }
+    // write production rules
+    for variable in grammar.variables.iter() {
+        for rule in variable.rules.iter() {
+            write_parser_lrk_data_rule(&mut writer, grammar, rule)?;
+        }
+    }
+    Ok(())
+}
+
+/// Generates the parser's binary data for the provided LR state
+fn write_parser_lrk_data_state(
+    writer: &mut dyn Write,
+    grammar: &Grammar,
+    expected: &TerminalSet,
+    rules: &[RuleRef],
+    state: &State
+) -> Result<(), Error> {
+    // write action on epsilon
+    if let Some(_) = state.get_reduction_for(TerminalRef::Epsilon) {
+        write_u16(writer, LR_ACTION_CODE_ACCEPT)?;
+    } else if let Some(_) = state.get_reduction_for(TerminalRef::Epsilon) {
+        write_u16(writer, LR_ACTION_CODE_ACCEPT)?;
+    } else {
+        write_u16(writer, LR_ACTION_CODE_NONE)?;
+    }
+    // write actions for terminals
+    for terminal in expected.content.iter().skip(1) {
+        let terminal = *terminal;
+        if let Some(next) = state.children.get(&terminal.into()) {
+            write_u16(writer, LR_ACTION_CODE_SHIFT)?;
+            write_u16(writer, *next as u16)?;
+        } else if let Some(reduction) = state.get_reduction_for(terminal) {
+            let index = rules
+                .iter()
+                .position(|rule| rule == &reduction.rule)
+                .unwrap();
+            write_u16(writer, LR_ACTION_CODE_REDUCE)?;
+            write_u16(writer, index as u16)?;
+        } else if let Some(reduction) = state.get_reduction_for(TerminalRef::NullTerminal) {
+            let index = rules
+                .iter()
+                .position(|rule| rule == &reduction.rule)
+                .unwrap();
+            write_u16(writer, LR_ACTION_CODE_REDUCE)?;
+            write_u16(writer, index as u16)?;
+        } else {
+            write_u16(writer, LR_ACTION_CODE_NONE)?;
+            write_u16(writer, LR_ACTION_CODE_NONE)?;
+        }
+    }
+    // write actions for terminals
+    for variable in grammar.variables.iter() {
+        if let Some(next) = state.children.get(&SymbolRef::Variable(variable.id)) {
+            write_u16(writer, LR_ACTION_CODE_SHIFT)?;
+            write_u16(writer, *next as u16)?;
+        } else {
+            write_u16(writer, LR_ACTION_CODE_NONE)?;
+            write_u16(writer, LR_ACTION_CODE_NONE)?;
+        }
+    }
+    Ok(())
+}
+
+/// Generates the parser's binary representation of a rule production
+fn write_parser_lrk_data_rule(
+    writer: &mut dyn Write,
+    grammar: &Grammar,
+    rule: &Rule
+) -> Result<(), Error> {
+    let head_index = grammar
+        .variables
+        .iter()
+        .position(|variable| variable.id == rule.head)
+        .unwrap();
+    write_u16(writer, head_index as u16)?;
+    write_u16(writer, rule.head_action)?;
+    write_u16(writer, rule.body.choices[0].len() as u16)?;
+    let mut length = 0;
+    for element in rule.body.elements.iter() {
+        length += match element.symbol {
+            SymbolRef::Virtual(_) => 2,
+            SymbolRef::Action(_) => 2,
+            _ => 1
+        };
+    }
+    write_u16(writer, length)?;
+    for element in rule.body.elements.iter() {
+        match element.symbol {
+            SymbolRef::Virtual(id) => {
+                let index = grammar
+                    .virtuals
+                    .iter()
+                    .position(|symbol| symbol.id == id)
+                    .unwrap();
+                write_u16(writer, LR_OP_CODE_BASE_ADD_VIRTUAL | element.action)?;
+                write_u16(writer, index as u16)?;
+            }
+            SymbolRef::Action(id) => {
+                let index = grammar
+                    .actions
+                    .iter()
+                    .position(|symbol| symbol.id == id)
+                    .unwrap();
+                write_u16(writer, LR_OP_CODE_BASE_SEMANTIC_ACTION)?;
+                write_u16(writer, index as u16)?;
+            }
+            _ => {
+                write_u16(writer, LR_OP_CODE_BASE_POP_STACK | element.action)?;
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Writes the data for a RNGLR parser
+fn write_parser_rnglr_data(
+    path: Option<&String>,
+    file_name: String,
+    grammar: &Grammar,
+    expected: &TerminalSet,
+    graph: &Graph
+) -> Result<(), Error> {
+    let mut final_path = PathBuf::new();
+    if let Some(path) = path {
+        final_path.push(path);
+    }
+    final_path.push(file_name);
+    let file = File::create(final_path)?;
+    let mut writer = io::BufWriter::new(file);
     Ok(())
 }
 
