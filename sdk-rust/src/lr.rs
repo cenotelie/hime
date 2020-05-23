@@ -584,6 +584,10 @@ impl InverseGraph {
 
     /// Gets all the paths from state 0 to the specified one
     pub fn get_paths_to(&self, target: usize) -> Vec<Path> {
+        if target == 0 {
+            // for the first state, a single path that is empty
+            return vec![Path(Vec::new())];
+        }
         let mut elements: Vec<PNode> = vec![PNode::new(target, None, None)];
         let mut visited: HashMap<usize, Vec<SymbolRef>> = HashMap::new();
         let mut queue: Vec<usize> = vec![0];
@@ -722,8 +726,10 @@ pub struct Conflict {
     pub state: usize,
     /// The kind of conflict
     pub kind: ConflictKind,
-    /// The items in the conflict
-    pub items: Vec<Item>,
+    /// The shift items in the conflict
+    pub shift_items: Vec<Item>,
+    /// The reducing items in the conflict
+    pub reduce_items: Vec<Item>,
     /// The terminal that poses the conflict
     pub lookahead: TerminalRef,
     /// Example phrases for the conflict
@@ -754,22 +760,28 @@ impl Conflicts {
         for previous in self.0.iter_mut() {
             if previous.kind == ConflictKind::ShiftReduce && previous.lookahead == lookahead {
                 // Previous conflict
-                previous.items.push(reducing);
+                previous.reduce_items.push(reducing);
                 return;
             }
         }
         // No previous conflict was found
-        let mut items: Vec<Item> = state
-            .items
-            .iter()
-            .filter(|item| item.get_next_symbol(grammar) == Some(lookahead.into()))
-            .cloned()
-            .collect();
-        items.push(reducing);
+        let next_symbol = Some(lookahead.into());
+        let mut shift_items = Vec::new();
+        for item in state.items.iter() {
+            if item.get_next_symbol(grammar) == next_symbol {
+                if shift_items
+                    .iter()
+                    .all(|candidate: &Item| !candidate.same_base(item))
+                {
+                    shift_items.push(item.clone());
+                }
+            }
+        }
         self.0.push(Conflict {
             state: state_id,
             kind: ConflictKind::ShiftReduce,
-            items,
+            shift_items,
+            reduce_items: vec![reducing],
             lookahead,
             phrases: Vec::new()
         });
@@ -787,7 +799,7 @@ impl Conflicts {
         for previous in self.0.iter_mut() {
             if previous.kind == ConflictKind::ReduceReduce && previous.lookahead == lookahead {
                 // Previous conflict
-                previous.items.push(reducing);
+                previous.reduce_items.push(reducing);
                 return;
             }
         }
@@ -795,7 +807,8 @@ impl Conflicts {
         self.0.push(Conflict {
             state: state_id,
             kind: ConflictKind::ReduceReduce,
-            items: vec![previous, reducing],
+            shift_items: Vec::new(),
+            reduce_items: vec![previous, reducing],
             lookahead,
             phrases: Vec::new()
         });
@@ -1114,12 +1127,18 @@ fn find_context_errors_in(
         !found
     });
     if !paths.is_empty() {
-        let items: Vec<Item> = graph.states[from_state]
-            .items
-            .iter()
-            .filter(|item| item.get_next_symbol(grammar) == Some(SymbolRef::Terminal(terminal.id)))
-            .cloned()
-            .collect();
+        let next_symbol = Some(SymbolRef::Terminal(terminal.id));
+        let mut items = Vec::new();
+        for item in graph.states[from_state].items.iter() {
+            if item.get_next_symbol(grammar) == next_symbol {
+                if items
+                    .iter()
+                    .all(|candidate: &Item| !candidate.same_base(item))
+                {
+                    items.push(item.clone());
+                }
+            }
+        }
         errors.push(ContextError {
             state: from_state,
             items,

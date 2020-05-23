@@ -471,7 +471,7 @@ impl RuleBodyElement {
         RuleBodyElement {
             symbol: self.symbol,
             action: TREE_ACTION_NONE,
-            input_ref: None
+            input_ref: self.input_ref
         }
     }
 }

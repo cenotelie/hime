@@ -180,7 +180,43 @@ impl Error {
             Error::InvalidCodePoint(input, _) => input.get_line_number_width(),
             Error::OverridingPreviousTerminal(input, _) => input.get_line_number_width(),
             Error::GrammarNotDefined(input, _) => input.get_line_number_width(),
-            Error::LrConflict(_, _) => 0,
+            Error::LrConflict(grammar_index, conflict) => {
+                let max_shift = conflict
+                    .shift_items
+                    .iter()
+                    .map(|item| {
+                        let rule = item.rule.get_rule_in(&data.grammars[*grammar_index]);
+                        let choice = &rule.body.choices[0];
+                        choice.elements[item.position]
+                            .input_ref
+                            .unwrap()
+                            .get_line_number_width()
+                    })
+                    .max()
+                    .unwrap_or(0);
+                let max_reduce = conflict
+                    .reduce_items
+                    .iter()
+                    .map(|item| {
+                        let rule = item.rule.get_rule_in(&data.grammars[*grammar_index]);
+                        let choice = &rule.body.choices[0];
+                        if item.position >= choice.elements.len() {
+                            // at the end
+                            choice.elements[choice.elements.len() - 1]
+                                .input_ref
+                                .unwrap()
+                                .get_line_number_width()
+                        } else {
+                            choice.elements[item.position]
+                                .input_ref
+                                .unwrap()
+                                .get_line_number_width()
+                        }
+                    })
+                    .max()
+                    .unwrap_or(0);
+                max_shift.max(max_reduce)
+            }
             Error::TerminalOutsideContext(_, _) => 0,
             Error::TerminalCannotBeMatched(grammar_index, error) => {
                 line_number_width_terminal(data, *grammar_index, error.terminal).max(
@@ -416,7 +452,7 @@ fn print_input(
         pad,
         Blue.bold().paint("|"),
         Red.bold().paint(&context.pointer),
-        Blue.paint(&trailer)
+        Red.paint(&trailer)
     );
 }
 
@@ -535,8 +571,11 @@ fn print_lr_conflict(
     let pad = String::from_utf8(vec![0x20; max_width]).unwrap();
     eprintln!("{}{} {}", &pad, Blue.bold().paint("-->"), &grammar.name);
     eprintln!("{} {}", &pad, Blue.bold().paint("|"));
-    for item in conflict.items.iter() {
-        print_lr_item(&pad, grammar, item);
+    for item in conflict.shift_items.iter() {
+        print_lr_conflict_item_shift(max_width, data, &pad, grammar, item);
+    }
+    for item in conflict.reduce_items.iter() {
+        print_lr_conflict_item_reduce(max_width, data, &pad, grammar, item);
     }
     if !conflict.phrases.is_empty() {
         eprintln!(
@@ -551,6 +590,72 @@ fn print_lr_conflict(
         }
     }
     eprintln!("");
+}
+
+/// Prints a LR item
+fn print_lr_conflict_item_shift(
+    max_width: usize,
+    data: &LoadedData,
+    pad: &str,
+    grammar: &Grammar,
+    item: &Item
+) {
+    let rule = item.rule.get_rule_in(grammar);
+    let choice = &rule.body.choices[0];
+    let input_ref = choice.elements[item.position].input_ref.unwrap();
+    print_input(
+        max_width,
+        data,
+        &input_ref,
+        pad,
+        Some("Shifting for this symbol")
+    );
+    eprintln!("{} {} ", pad, Blue.bold().paint("|"));
+}
+
+/// Prints a LR item
+fn print_lr_conflict_item_reduce(
+    max_width: usize,
+    data: &LoadedData,
+    pad: &str,
+    grammar: &Grammar,
+    item: &Item
+) {
+    let rule = item.rule.get_rule_in(grammar);
+    let choice = &rule.body.choices[0];
+    if item.position >= choice.elements.len() {
+        let input_ref = choice.elements[choice.elements.len() - 1]
+            .input_ref
+            .unwrap();
+        let context = context_for(data, &input_ref);
+        let pad2 = spaces(max_width + 1 - input_ref.get_line_number_width());
+        eprintln!(
+            "{}{}{}  {}",
+            Blue.bold().paint(format!("{}", input_ref.position.line)),
+            &pad2,
+            Blue.bold().paint("|"),
+            &context.content
+        );
+        let pad3 = spaces(context.pointer.len());
+        eprintln!(
+            "{} {}  {} {} {}",
+            pad,
+            Blue.bold().paint("|"),
+            &pad3,
+            Red.bold().paint("^"),
+            Red.paint("help: Reducing at the rule's end")
+        );
+    } else {
+        let input_ref = choice.elements[item.position].input_ref.unwrap();
+        print_input(
+            max_width,
+            data,
+            &input_ref,
+            pad,
+            Some("Reducing before this nullable part")
+        );
+    }
+    eprintln!("{} {} ", pad, Blue.bold().paint("|"));
 }
 
 /// Prints a context error
@@ -575,7 +680,7 @@ fn print_context_error(
     eprintln!("{}{} {}", &pad, Blue.bold().paint("-->"), &grammar.name);
     eprintln!("{} {}", &pad, Blue.bold().paint("|"));
     for item in error.items.iter() {
-        print_lr_item(&pad, grammar, item);
+        print_context_error_item(max_width, data, &pad, grammar, item);
     }
     if !error.phrases.is_empty() {
         eprintln!(
@@ -593,40 +698,28 @@ fn print_context_error(
 }
 
 /// Prints a LR item
-fn print_lr_item(pad: &str, grammar: &Grammar, item: &Item) {
-    for origin in item.get_origins(grammar).into_iter() {
-        print_rule(pad, grammar, origin);
-    }
+fn print_context_error_item(
+    max_width: usize,
+    data: &LoadedData,
+    pad: &str,
+    grammar: &Grammar,
+    item: &Item
+) {
     let rule = item.rule.get_rule_in(grammar);
-    let mut prefix = 0;
-    eprint!("{} {} ", pad, Blue.bold().paint("|"));
-    let head_name = grammar.get_symbol_value(SymbolRef::Variable(item.rule.variable));
-    eprint!("{} ->", head_name);
-    prefix += head_name.len() + 3;
-    for i in 0..item.position {
-        let name = grammar.get_symbol_value(rule.body.choices[0].elements[i].symbol);
-        eprint!(" {}", name);
-        prefix += name.len() + 1;
-    }
-    eprint!(" {}", Red.bold().paint("*"));
-    for i in item.position..(rule.body.choices[0].len()) {
-        let name = grammar.get_symbol_value(rule.body.choices[0].elements[i].symbol);
-        eprint!(" {}", name);
-    }
-    eprintln!();
-    let pad2 = String::from_utf8(vec![0x20; prefix]).unwrap();
-    eprintln!(
-        "{} {} {} {}",
+    let choice = &rule.body.choices[0];
+    let input_ref = choice.elements[item.position].input_ref.unwrap();
+    print_input(
+        max_width,
+        data,
+        &input_ref,
         pad,
-        Blue.bold().paint("|"),
-        &pad2,
-        Red.bold().paint("^ at this position")
+        Some("Used outside required context")
     );
     eprintln!("{} {} ", pad, Blue.bold().paint("|"));
 }
 
 /// Prints a rule
-fn print_rule(pad: &str, grammar: &Grammar, rule_ref: RuleRef) {
+fn _print_rule(pad: &str, grammar: &Grammar, rule_ref: RuleRef) {
     let rule = rule_ref.get_rule_in(grammar);
     eprint!("{} {} ", pad, Blue.bold().paint("|"));
     let head_name = grammar.get_symbol_value(SymbolRef::Variable(rule_ref.variable));
