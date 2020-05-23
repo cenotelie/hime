@@ -1333,6 +1333,9 @@ pub fn build_graph(
     if method.raise_conflict() {
         for mut conflict in conflicts.0.into_iter() {
             conflict.phrases = inverse.get_inputs_for(conflict.state, grammar);
+            for phrase in conflict.phrases.iter_mut() {
+                phrase.append(conflict.lookahead.terminal);
+            }
             errors.push(Error::LrConflict(grammar_index, conflict));
         }
     }
