@@ -110,8 +110,8 @@ pub enum TerminalRef {
 }
 
 impl TerminalRef {
-    /// Gets the terminal priority
-    pub fn priority(self) -> usize {
+    /// Gets the symbol id for the terminal
+    pub fn sid(self) -> usize {
         match self {
             TerminalRef::Dummy => 0,
             TerminalRef::Epsilon => 1,
@@ -119,6 +119,11 @@ impl TerminalRef {
             TerminalRef::NullTerminal => 0,
             TerminalRef::Terminal(id) => id
         }
+    }
+
+    /// Gets the terminal priority
+    pub fn priority(self) -> usize {
+        self.sid()
     }
 }
 
@@ -1281,6 +1286,17 @@ impl Grammar {
     /// Gets the terminal with the given name
     pub fn get_terminal_for_value(&self, value: &str) -> Option<&Terminal> {
         self.terminals.iter().find(|t| t.value == value)
+    }
+
+    /// Gets the context for a terminal
+    pub fn get_terminal_context(&self, terminal: TerminalRef) -> usize {
+        match terminal {
+            TerminalRef::Dummy => 0,
+            TerminalRef::Epsilon => 0,
+            TerminalRef::Dollar => 0,
+            TerminalRef::NullTerminal => 0,
+            TerminalRef::Terminal(id) => self.terminals.iter().find(|t| t.id == id).unwrap().context
+        }
     }
 
     /// Generates a new variable

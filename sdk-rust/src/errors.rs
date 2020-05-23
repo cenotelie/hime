@@ -122,7 +122,7 @@ fn line_number_width_terminal(
     terminal_ref: TerminalRef
 ) -> usize {
     data.grammars[grammar_index]
-        .get_terminal(terminal_ref.priority())
+        .get_terminal(terminal_ref.sid())
         .unwrap()
         .input_ref
         .get_line_number_width()
@@ -293,7 +293,7 @@ impl Error {
             }
             Error::SeparatorIsContextual(grammar_index, terminal_ref) => {
                 let separator = data.grammars[*grammar_index]
-                    .get_terminal(terminal_ref.priority())
+                    .get_terminal(terminal_ref.sid())
                     .unwrap();
                 print_msg_with_input_ref(
                     max_width,
@@ -387,7 +387,7 @@ impl Error {
             }
             Error::TerminalMatchesEmpty(grammar_index, terminal_ref) => {
                 let terminal = data.grammars[*grammar_index]
-                    .get_terminal(terminal_ref.priority())
+                    .get_terminal(terminal_ref.sid())
                     .unwrap();
                 print_msg_with_input_ref(
                     max_width,
@@ -513,7 +513,7 @@ fn print_token_not_matched(
     error: &UnmatchableTokenError
 ) {
     let terminal = data.grammars[grammar_index]
-        .get_terminal(error.terminal.priority())
+        .get_terminal(error.terminal.sid())
         .unwrap();
     print_msg_with_input_ref_naked(
         max_width,
@@ -538,7 +538,7 @@ fn print_token_not_matched(
         eprintln!("{} {}", &pad, Blue.bold().paint("|"));
         for overrider in error.overriders.iter() {
             let terminal = data.grammars[grammar_index]
-                .get_terminal(overrider.priority())
+                .get_terminal(overrider.sid())
                 .unwrap();
             print_input(max_width, data, &terminal.input_ref, &pad, None);
         }
@@ -554,7 +554,7 @@ fn print_lr_conflict(
     conflict: &Conflict
 ) {
     let grammar = &data.grammars[grammar_index];
-    let terminal = grammar.get_terminal(conflict.lookahead.priority()).unwrap();
+    let terminal = grammar.get_symbol_value(conflict.lookahead.into());
     eprintln!(
         "{}{} {}",
         Red.bold().paint("error"),
@@ -565,7 +565,7 @@ fn print_lr_conflict(
                 ConflictKind::ShiftReduce => "Shift/Reduce",
                 ConflictKind::ReduceReduce => "Reduce/Reduce"
             },
-            &terminal.value
+            terminal
         ))
     );
     let pad = String::from_utf8(vec![0x20; max_width]).unwrap();
@@ -666,14 +666,14 @@ fn print_context_error(
     error: &ContextError
 ) {
     let grammar = &data.grammars[grammar_index];
-    let terminal = grammar.get_terminal(error.terminal.priority()).unwrap();
+    let terminal = grammar.get_symbol_value(error.terminal.into());
     eprintln!(
         "{}{} {}",
         Red.bold().paint("error"),
         Style::new().bold().paint(":"),
         Style::new().bold().paint(format!(
             "Contextual terminal `{}` is expected outside its context",
-            &terminal.value
+            terminal
         ))
     );
     let pad = String::from_utf8(vec![0x20; max_width]).unwrap();
@@ -735,8 +735,8 @@ fn _print_rule(pad: &str, grammar: &Grammar, rule_ref: RuleRef) {
 fn print_phrase(pad: &str, grammar: &Grammar, phrase: &Phrase) {
     eprint!("{} {} ", pad, Blue.bold().paint("|"));
     for symbol in phrase.0.iter() {
-        let terminal = grammar.get_terminal(symbol.priority()).unwrap();
-        eprint!(" {}", &terminal.value);
+        let terminal = grammar.get_symbol_value((*symbol).into());
+        eprint!(" {}", terminal);
     }
     eprintln!();
 }

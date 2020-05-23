@@ -35,11 +35,29 @@ pub enum FinalItem {
 }
 
 impl FinalItem {
+    /// Gets the sid for the referenced item
+    pub fn sid(self) -> usize {
+        if let FinalItem::Terminal(id, _) = self {
+            id
+        } else {
+            panic!("This final item does not reference a terminal")
+        }
+    }
+
     /// Gets the priority of this item
     pub fn priority(self) -> usize {
         match self {
             FinalItem::Dummy => 0,
             FinalItem::Terminal(id, _) => id
+        }
+    }
+
+    /// Get the final item from the terminal reference
+    pub fn from(terminal: TerminalRef, context: usize) -> FinalItem {
+        match terminal {
+            TerminalRef::Dummy => FinalItem::Dummy,
+            TerminalRef::Terminal(id) => FinalItem::Terminal(id, context),
+            _ => panic!("Cannot turn this terminal into a DFA final item")
         }
     }
 }
@@ -53,6 +71,15 @@ impl Ord for FinalItem {
 impl PartialOrd for FinalItem {
     fn partial_cmp(&self, other: &FinalItem) -> Option<Ordering> {
         Some(self.cmp(other))
+    }
+}
+
+impl From<FinalItem> for TerminalRef {
+    fn from(final_item: FinalItem) -> Self {
+        match final_item {
+            FinalItem::Dummy => TerminalRef::Dummy,
+            FinalItem::Terminal(id, _) => TerminalRef::Terminal(id)
+        }
     }
 }
 
@@ -360,7 +387,7 @@ impl DFA {
     /// Gets all the terminals that override the given one in final states
     pub fn get_overriders(&self, terminal: TerminalRef, context: usize) -> Vec<TerminalRef> {
         let mut overriders = TerminalSet::default();
-        let terminal_final = FinalItem::Terminal(terminal.priority(), context);
+        let terminal_final = FinalItem::from(terminal, context);
         for state in self.states.iter() {
             if state.items.contains(&terminal_final) {
                 // separator is final of this state

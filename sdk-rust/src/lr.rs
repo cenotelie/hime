@@ -1208,12 +1208,12 @@ pub fn build_graph(
         errors.push(Error::TerminalOutsideContext(grammar_index, error));
     }
     for unexpected in find_unmatchable_tokens(&graph, grammar, expected).content {
-        let terminal = grammar.get_terminal(unexpected.priority()).unwrap();
+        let context = grammar.get_terminal_context(unexpected);
         errors.push(Error::TerminalCannotBeMatched(
             grammar_index,
             UnmatchableTokenError {
                 terminal: unexpected,
-                overriders: dfa.get_overriders(unexpected, terminal.context)
+                overriders: dfa.get_overriders(unexpected, context)
             }
         ));
     }

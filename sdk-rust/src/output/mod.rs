@@ -51,9 +51,7 @@ pub fn execute_for_grammar(
         return Err(dfa.states[0]
             .items
             .iter()
-            .map(|item| {
-                Error::TerminalMatchesEmpty(grammar_index, TerminalRef::Terminal(item.priority()))
-            })
+            .map(|item| Error::TerminalMatchesEmpty(grammar_index, (*item).into()))
             .collect());
     }
     // Build the data for the lexer
@@ -181,9 +179,9 @@ fn write_lexer_data(
         offset += 3 + 256; // header + transitions for [0-255] characters
         let mut current_contexts = Vec::new();
         for item in state.items.iter() {
-            let terminal = grammar.get_terminal(item.priority()).unwrap();
-            if !current_contexts.contains(&terminal.context) {
-                current_contexts.push(terminal.context);
+            let context = grammar.get_terminal_context((*item).into());
+            if !current_contexts.contains(&context) {
+                current_contexts.push(context);
                 // context information
                 offset += 2;
             }
@@ -231,7 +229,8 @@ fn write_lexer_data_state(
     let mut contexts = Vec::new();
     let mut matched = Vec::new();
     for item in state.items.iter() {
-        let terminal = grammar.get_terminal(item.priority()).unwrap();
+        let terminal = grammar.get_terminal(item.sid()).unwrap();
+        let terminal_ref = TerminalRef::Terminal(terminal.id);
         if !contexts.contains(&terminal.context) {
             // this is the first time this context is found in the current DFA state
             // this is the terminal with the most priority for this context
@@ -240,7 +239,7 @@ fn write_lexer_data_state(
                 expected
                     .content
                     .iter()
-                    .position(|t| t.priority() == terminal.id)
+                    .position(|t| t == &terminal_ref)
                     .unwrap()
             )
         }
@@ -303,7 +302,7 @@ fn write_parser_lrk_data(
     write_u16(&mut writer, rules.len() as u16)?;
     // writes the columns's id
     for terminal_ref in expected.content.iter() {
-        write_u16(&mut writer, terminal_ref.priority() as u16)?;
+        write_u16(&mut writer, terminal_ref.sid() as u16)?;
     }
     for variable in grammar.variables.iter() {
         write_u16(&mut writer, variable.id as u16)?;
@@ -318,7 +317,7 @@ fn write_parser_lrk_data(
         write_u16(&mut writer, count as u16)?;
         for (terminal, contexts) in state.opening_contexts.iter() {
             for context in contexts.iter() {
-                write_u16(&mut writer, terminal.priority() as u16)?;
+                write_u16(&mut writer, terminal.sid() as u16)?;
                 write_u16(&mut writer, *context as u16)?;
             }
         }
