@@ -586,7 +586,10 @@ impl InverseGraph {
     pub fn get_paths_to(&self, target: usize) -> Vec<Path> {
         if target == 0 {
             // for the first state, a single path that is empty
-            return vec![Path(Vec::new())];
+            return vec![Path(vec![PathElem {
+                state: 0,
+                transition: None
+            }])];
         }
         let mut elements: Vec<PNode> = vec![PNode::new(target, None, None)];
         let mut visited: HashMap<usize, Vec<SymbolRef>> = HashMap::new();
