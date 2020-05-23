@@ -865,6 +865,25 @@ impl RuleRef {
     }
 }
 
+/// A reference to a choice in a grammar rule
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct RuleChoiceRef {
+    /// The associated rule
+    pub rule: RuleRef,
+    /// The position within the rule
+    pub position: usize
+}
+
+impl RuleChoiceRef {
+    /// Creates a new choice reference
+    pub fn new(variable: usize, index: usize, position: usize) -> RuleChoiceRef {
+        RuleChoiceRef {
+            rule: RuleRef::new(variable, index),
+            position
+        }
+    }
+}
+
 /// Reference to a template rule
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct TemplateRuleRef {

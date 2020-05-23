@@ -18,7 +18,7 @@
 //! Module for the management of errors in the SDK
 
 use crate::grammars::{Grammar, RuleRef, SymbolRef, TerminalRef, OPTION_AXIOM, OPTION_SEPARATOR};
-use crate::lr::{Conflict, ConflictKind, ContextError, Item, Phrase};
+use crate::lr::{Conflict, ConflictKind, ContextError, Item, LookaheadOrigin, Phrase};
 use crate::{InputReference, LoadedData};
 use ansi_term::Colour::{Blue, Red};
 use ansi_term::Style;
@@ -442,17 +442,13 @@ fn print_input(
         Blue.bold().paint("|"),
         &context.content
     );
-    let trailer = if let Some(sub) = sub_message {
-        format!("help: {}", sub)
-    } else {
-        String::new()
-    };
+    let trailer = if let Some(sub) = sub_message { sub } else { "" };
     eprintln!(
         "{} {}  {} {}",
         pad,
         Blue.bold().paint("|"),
         Red.bold().paint(&context.pointer),
-        Red.paint(&trailer)
+        Red.paint(trailer)
     );
 }
 
@@ -554,7 +550,7 @@ fn print_lr_conflict(
     conflict: &Conflict
 ) {
     let grammar = &data.grammars[grammar_index];
-    let terminal = grammar.get_symbol_value(conflict.lookahead.into());
+    let terminal = grammar.get_symbol_value(conflict.lookahead.terminal.into());
     eprintln!(
         "{}{} {}",
         Red.bold().paint("error"),
@@ -575,7 +571,14 @@ fn print_lr_conflict(
         print_lr_conflict_item_shift(max_width, data, &pad, grammar, item);
     }
     for item in conflict.reduce_items.iter() {
-        print_lr_conflict_item_reduce(max_width, data, &pad, grammar, item);
+        print_lr_conflict_item_reduce(
+            max_width,
+            data,
+            &pad,
+            grammar,
+            item,
+            conflict.lookahead.terminal
+        );
     }
     if !conflict.phrases.is_empty() {
         eprintln!(
@@ -619,7 +622,8 @@ fn print_lr_conflict_item_reduce(
     data: &LoadedData,
     pad: &str,
     grammar: &Grammar,
-    item: &Item
+    item: &Item,
+    terminal: TerminalRef
 ) {
     let rule = item.rule.get_rule_in(grammar);
     let choice = &rule.body.choices[0];
@@ -643,7 +647,7 @@ fn print_lr_conflict_item_reduce(
             Blue.bold().paint("|"),
             &pad3,
             Red.bold().paint("^"),
-            Red.paint("help: Reducing at the rule's end")
+            Red.paint("Reducing at the rule's end")
         );
     } else {
         let input_ref = choice.elements[item.position].input_ref.unwrap();
@@ -653,6 +657,24 @@ fn print_lr_conflict_item_reduce(
             &input_ref,
             pad,
             Some("Reducing before this nullable part")
+        );
+    }
+    let lookahead = item.lookaheads.get(terminal).unwrap();
+    let value = grammar.get_symbol_value(terminal.into());
+    for origin in lookahead.origins.iter() {
+        let LookaheadOrigin::FirstOf(choice_ref) = origin;
+        let rule = choice_ref.rule.get_rule_in(grammar);
+        let choice = &rule.body.choices[0];
+        let input_ref = choice.elements[choice_ref.position].input_ref.unwrap();
+        print_input(
+            max_width,
+            data,
+            &input_ref,
+            pad,
+            Some(&format!(
+                "Lookahead `{}` is a first terminal looking from here",
+                value
+            ))
         );
     }
     eprintln!("{} {} ", pad, Blue.bold().paint("|"));

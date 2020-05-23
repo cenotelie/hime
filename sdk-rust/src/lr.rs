@@ -20,7 +20,8 @@
 use crate::errors::{Error, UnmatchableTokenError};
 use crate::finite::DFA;
 use crate::grammars::{
-    Grammar, RuleChoice, RuleRef, SymbolRef, Terminal, TerminalRef, TerminalSet, GENERATED_AXIOM
+    Grammar, RuleChoice, RuleChoiceRef, RuleRef, SymbolRef, Terminal, TerminalRef, TerminalSet,
+    GENERATED_AXIOM
 };
 use crate::ParsingMethod;
 use hime_redist::parsers::{LRActionCode, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT};
@@ -37,6 +38,113 @@ pub enum LookaheadMode {
     LALR1
 }
 
+/// The possible origin of a lookahead
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum LookaheadOrigin {
+    /// From the FIRSTS set of a rule choice
+    FirstOf(RuleChoiceRef)
+}
+
+/// A lookahead in a LR automaton
+#[derive(Debug, Clone, Eq)]
+pub struct Lookahead {
+    /// The terminal
+    pub terminal: TerminalRef,
+    /// Its origin
+    pub origins: Vec<LookaheadOrigin>
+}
+
+impl PartialEq for Lookahead {
+    fn eq(&self, other: &Lookahead) -> bool {
+        self.terminal == other.terminal
+    }
+}
+
+impl Lookahead {
+    /// Create a lookahead
+    pub fn new(terminal: TerminalRef, origins: Vec<LookaheadOrigin>) -> Lookahead {
+        Lookahead { terminal, origins }
+    }
+
+    /// Creates a lookahead without origin
+    pub fn from(terminal: TerminalRef) -> Lookahead {
+        Lookahead {
+            terminal,
+            origins: Vec::new()
+        }
+    }
+}
+
+/// A set of lookahead in a LR graph
+#[derive(Debug, Clone, Default, Eq)]
+pub struct Lookaheads(Vec<Lookahead>);
+
+impl PartialEq for Lookaheads {
+    fn eq(&self, other: &Lookaheads) -> bool {
+        self.0.iter().all(|lookahead| other.0.contains(lookahead))
+    }
+}
+
+impl Lookaheads {
+    /// Gets the lookahead with the specified terminal
+    pub fn get(&self, terminal: TerminalRef) -> Option<&Lookahead> {
+        self.0
+            .iter()
+            .find(|lookahead| lookahead.terminal == terminal)
+    }
+
+    /// Adds a new lookahead
+    fn add(&mut self, lookahead: Lookahead) {
+        if let Some(previous) = self.0.iter_mut().find(|candidate| candidate == &&lookahead) {
+            for origin in lookahead.origins.into_iter() {
+                if !previous.origins.contains(&origin) {
+                    previous.origins.push(origin);
+                }
+            }
+        } else {
+            self.0.push(lookahead);
+        }
+    }
+
+    /// Adds new terminals
+    pub fn add_others(&mut self, others: &Lookaheads) {
+        for other in others.0.iter() {
+            self.add(other.clone());
+        }
+    }
+
+    /// Gets whether the specified terminal is present as a lookahead
+    pub fn contains(&self, terminal: TerminalRef) -> bool {
+        self.0
+            .iter()
+            .any(|candidate| candidate.terminal == terminal)
+    }
+
+    /// Removes the specified terminal
+    pub fn remove(&mut self, terminal: TerminalRef) {
+        self.0.retain(|candidate| candidate.terminal != terminal);
+    }
+
+    /// Builds this lookahead sets from a set of FIRSTS
+    pub fn from_firsts(firsts: &TerminalSet, choice: RuleChoiceRef) -> Lookaheads {
+        Lookaheads(
+            firsts
+                .content
+                .iter()
+                .map(|terminal| Lookahead {
+                    terminal: *terminal,
+                    origins: vec![LookaheadOrigin::FirstOf(choice)]
+                })
+                .collect()
+        )
+    }
+
+    /// Builds this set from a single lookahead
+    pub fn from_single(lookahead: Lookahead) -> Lookaheads {
+        Lookaheads(vec![lookahead])
+    }
+}
+
 /// Represents a base LR item
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Item {
@@ -45,7 +153,7 @@ pub struct Item {
     /// The position in the grammar rule
     pub position: usize,
     /// The lookaheads for this item
-    pub lookaheads: TerminalSet
+    pub lookaheads: Lookaheads
 }
 
 impl Item {
@@ -112,15 +220,17 @@ impl Item {
             // Firsts is a copy of the Firsts set for beta (next choice)
             // Firsts will contains symbols that may follow Next
             // Firsts will therefore be the lookahead for child items
-            let mut firsts = self.get_next_choice(grammar).unwrap().firsts.clone();
+            let mut firsts = Lookaheads::from_firsts(
+                &self.get_next_choice(grammar).unwrap().firsts,
+                RuleChoiceRef {
+                    rule: self.rule,
+                    position: self.position + 1
+                }
+            );
             // If beta is nullifiable (contains ε) :
-            if let Some(eps_index) = firsts
-                .content
-                .iter()
-                .position(|x| *x == TerminalRef::Epsilon)
-            {
+            if firsts.contains(TerminalRef::Epsilon) {
                 // Remove ε
-                firsts.content.remove(eps_index);
+                firsts.remove(TerminalRef::Epsilon);
                 // Add the item's lookaheads
                 firsts.add_others(&self.lookaheads);
             }
@@ -139,11 +249,11 @@ impl Item {
                         }
                     }
                     LookaheadMode::LR1 => {
-                        for terminal in firsts.clone().content.into_iter() {
+                        for lookahead in firsts.clone().0.into_iter() {
                             let candidate = Item {
                                 rule: RuleRef::new(sid, index),
                                 position: 0,
-                                lookaheads: TerminalSet::single(terminal)
+                                lookaheads: Lookaheads::from_single(lookahead)
                             };
                             if !closure.contains(&candidate) {
                                 closure.push(candidate);
@@ -240,10 +350,10 @@ impl StateKernel {
 }
 
 /// Represents a reduction action in a LR state
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Reduction {
     /// The lookahead to reduce on
-    pub lookahead: TerminalRef,
+    pub lookahead: Lookahead,
     /// The rule to reduce with
     pub rule: RuleRef,
     /// The length of the reduction for RNGLR parsers
@@ -281,7 +391,7 @@ impl State {
                     id,
                     grammar,
                     item.clone(),
-                    TerminalRef::NullTerminal
+                    Lookahead::from(TerminalRef::NullTerminal)
                 );
             }
             if let Some(previous_index) = reduce_index {
@@ -291,12 +401,12 @@ impl State {
                     id,
                     previous.clone(),
                     item.clone(),
-                    TerminalRef::NullTerminal
+                    Lookahead::from(TerminalRef::NullTerminal)
                 );
             } else {
                 reduce_index = Some(index);
                 self.reductions.push(Reduction {
-                    lookahead: TerminalRef::NullTerminal,
+                    lookahead: Lookahead::from(TerminalRef::NullTerminal),
                     rule: item.rule,
                     length: item.position
                 });
@@ -313,20 +423,31 @@ impl State {
             if item.get_action(grammar) != LR_ACTION_CODE_REDUCE {
                 continue;
             }
-            for lookahead in item.lookaheads.content.iter() {
-                let symbol_ref: SymbolRef = (*lookahead).into();
+            for lookahead in item.lookaheads.0.iter() {
+                let symbol_ref: SymbolRef = lookahead.terminal.into();
                 if self.children.contains_key(&symbol_ref) {
                     // There is already a shift action for the lookahead => conflict
-                    conflicts.raise_shift_reduce(self, id, grammar, item.clone(), *lookahead);
-                } else if let Some(previous_index) = reductions.get(lookahead) {
+                    conflicts.raise_shift_reduce(
+                        self,
+                        id,
+                        grammar,
+                        item.clone(),
+                        lookahead.clone()
+                    );
+                } else if let Some(previous_index) = reductions.get(&lookahead.terminal) {
                     // There is already a reduction action for the lookahead => conflict
                     let previous: &Item = &self.items[*previous_index];
-                    conflicts.raise_reduce_reduce(id, previous.clone(), item.clone(), *lookahead);
+                    conflicts.raise_reduce_reduce(
+                        id,
+                        previous.clone(),
+                        item.clone(),
+                        lookahead.clone()
+                    );
                 } else {
                     // no conflict
-                    reductions.insert(*lookahead, index);
+                    reductions.insert(lookahead.terminal, index);
                     self.reductions.push(Reduction {
-                        lookahead: *lookahead,
+                        lookahead: lookahead.clone(),
                         rule: item.rule,
                         length: item.position
                     });
@@ -351,20 +472,31 @@ impl State {
                 // item is shift action and is not nullable after the dot
                 continue;
             }
-            for lookahead in item.lookaheads.content.iter() {
-                let symbol_ref: SymbolRef = (*lookahead).into();
+            for lookahead in item.lookaheads.0.iter() {
+                let symbol_ref: SymbolRef = lookahead.terminal.into();
                 if self.children.contains_key(&symbol_ref) {
                     // There is already a shift action for the lookahead => conflict
-                    conflicts.raise_shift_reduce(self, id, grammar, item.clone(), *lookahead);
-                } else if let Some(previous_index) = reductions.get(lookahead) {
+                    conflicts.raise_shift_reduce(
+                        self,
+                        id,
+                        grammar,
+                        item.clone(),
+                        lookahead.clone()
+                    );
+                } else if let Some(previous_index) = reductions.get(&lookahead.terminal) {
                     // There is already a reduction action for the lookahead => conflict
                     let previous: &Item = &self.items[*previous_index];
-                    conflicts.raise_reduce_reduce(id, previous.clone(), item.clone(), *lookahead);
+                    conflicts.raise_reduce_reduce(
+                        id,
+                        previous.clone(),
+                        item.clone(),
+                        lookahead.clone()
+                    );
                 } else {
                     // no conflict
-                    reductions.insert(*lookahead, index);
+                    reductions.insert(lookahead.terminal, index);
                     self.reductions.push(Reduction {
-                        lookahead: *lookahead,
+                        lookahead: lookahead.clone(),
                         rule: item.rule,
                         length: item.position
                     });
@@ -378,7 +510,7 @@ impl State {
     pub fn get_reduction_for(&self, terminal: TerminalRef) -> Option<&Reduction> {
         self.reductions
             .iter()
-            .find(|reduction| reduction.lookahead == terminal)
+            .find(|reduction| reduction.lookahead.terminal == terminal)
     }
 }
 
@@ -734,7 +866,7 @@ pub struct Conflict {
     /// The reducing items in the conflict
     pub reduce_items: Vec<Item>,
     /// The terminal that poses the conflict
-    pub lookahead: TerminalRef,
+    pub lookahead: Lookahead,
     /// Example phrases for the conflict
     pub phrases: Vec<Phrase>
 }
@@ -757,7 +889,7 @@ impl Conflicts {
         state_id: usize,
         grammar: &Grammar,
         reducing: Item,
-        lookahead: TerminalRef
+        lookahead: Lookahead
     ) {
         // look for previous conflict
         for previous in self.0.iter_mut() {
@@ -768,7 +900,7 @@ impl Conflicts {
             }
         }
         // No previous conflict was found
-        let next_symbol = Some(lookahead.into());
+        let next_symbol = Some(lookahead.terminal.into());
         let mut shift_items = Vec::new();
         for item in state.items.iter() {
             if item.get_next_symbol(grammar) == next_symbol {
@@ -796,7 +928,7 @@ impl Conflicts {
         state_id: usize,
         previous: Item,
         reducing: Item,
-        lookahead: TerminalRef
+        lookahead: Lookahead
     ) {
         // look for previous conflict
         for previous in self.0.iter_mut() {
@@ -851,7 +983,7 @@ fn get_graph_lr0(grammar: &Grammar) -> Graph {
     let item = Item {
         rule: RuleRef::new(axiom.id, 0),
         position: 0,
-        lookaheads: TerminalSet::default()
+        lookaheads: Lookaheads::default()
     };
     let kernel = StateKernel { items: vec![item] };
     let state0 = kernel.into_state(grammar, LookaheadMode::LR0);
@@ -872,7 +1004,7 @@ fn get_graph_lr1(grammar: &Grammar) -> Graph {
     let item = Item {
         rule: RuleRef::new(axiom.id, 0),
         position: 0,
-        lookaheads: TerminalSet::default()
+        lookaheads: Lookaheads::default()
     };
     let kernel = StateKernel { items: vec![item] };
     let state0 = kernel.into_state(grammar, LookaheadMode::LR1);
@@ -907,14 +1039,14 @@ fn build_graph_lalr1_kernels(graph0: &Graph) -> Vec<StateKernel> {
                 .map(|item| Item {
                     rule: item.rule,
                     position: item.position,
-                    lookaheads: TerminalSet::default()
+                    lookaheads: Lookaheads::default()
                 })
                 .collect()
         })
         .collect();
     // set epsilon as lookahead on all items in kernel 0
     for item in kernels[0].items.iter_mut() {
-        item.lookaheads.add(TerminalRef::Epsilon);
+        item.lookaheads.add(Lookahead::from(TerminalRef::Epsilon));
     }
     kernels
 }
@@ -953,7 +1085,7 @@ fn build_graph_lalr1_propagation_table(
                 items: vec![Item {
                     rule: kernels[i].items[item_id].rule,
                     position: kernels[i].items[item_id].position,
-                    lookaheads: TerminalSet::single(TerminalRef::Dummy)
+                    lookaheads: Lookaheads::from_single(Lookahead::from(TerminalRef::Dummy))
                 }]
             }
             .into_state(grammar, LookaheadMode::LALR1);
@@ -970,7 +1102,7 @@ fn build_graph_lalr1_propagation_table(
                         .position(|candidate| candidate.same_base(&dummy_child))
                         .unwrap();
                     // If the lookaheads of the item in the dummy set contains the dummy terminal
-                    if dummy_item.lookaheads.content.contains(&TerminalRef::Dummy) {
+                    if dummy_item.lookaheads.contains(TerminalRef::Dummy) {
                         // => Propagation from the parent item to the child
                         propagation.push(Propagation {
                             from_state: i,
@@ -980,10 +1112,10 @@ fn build_graph_lalr1_propagation_table(
                         });
                     } else {
                         // => Spontaneous generation of lookaheads
-                        for lookahead in dummy_item.lookaheads.content.iter() {
+                        for lookahead in dummy_item.lookaheads.0.iter() {
                             kernels[child_state].items[child_item]
                                 .lookaheads
-                                .add(*lookahead);
+                                .add(lookahead.clone());
                         }
                     }
                 }
@@ -1001,7 +1133,7 @@ fn build_graph_lalr1_propagate(kernels: &mut Vec<StateKernel>, table: &[Propagat
         for propagation in table.iter() {
             let before = kernels[propagation.to_state].items[propagation.to_item]
                 .lookaheads
-                .content
+                .0
                 .len();
             let others = kernels[propagation.from_state].items[propagation.from_item]
                 .lookaheads
@@ -1011,7 +1143,7 @@ fn build_graph_lalr1_propagate(kernels: &mut Vec<StateKernel>, table: &[Propagat
                 .add_others(&others);
             let after = kernels[propagation.to_state].items[propagation.to_item]
                 .lookaheads
-                .content
+                .0
                 .len();
             modifications += after - before;
         }
