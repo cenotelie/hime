@@ -903,13 +903,12 @@ impl Conflicts {
         let next_symbol = Some(lookahead.terminal.into());
         let mut shift_items = Vec::new();
         for item in state.items.iter() {
-            if item.get_next_symbol(grammar) == next_symbol {
-                if shift_items
+            if item.get_next_symbol(grammar) == next_symbol
+                && shift_items
                     .iter()
                     .all(|candidate: &Item| !candidate.same_base(item))
-                {
-                    shift_items.push(item.clone());
-                }
+            {
+                shift_items.push(item.clone());
             }
         }
         self.0.push(Conflict {
@@ -1265,13 +1264,12 @@ fn find_context_errors_in(
         let next_symbol = Some(SymbolRef::Terminal(terminal.id));
         let mut items = Vec::new();
         for item in graph.states[from_state].items.iter() {
-            if item.get_next_symbol(grammar) == next_symbol {
-                if items
+            if item.get_next_symbol(grammar) == next_symbol
+                && items
                     .iter()
                     .all(|candidate: &Item| !candidate.same_base(item))
-                {
-                    items.push(item.clone());
-                }
+            {
+                items.push(item.clone());
             }
         }
         errors.push(ContextError {

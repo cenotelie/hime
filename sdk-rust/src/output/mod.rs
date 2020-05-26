@@ -364,9 +364,9 @@ fn write_parser_lrk_data_state(
     state: &State
 ) -> Result<(), Error> {
     // write action on epsilon
-    if let Some(_) = state.get_reduction_for(TerminalRef::Epsilon) {
-        write_u16(writer, LR_ACTION_CODE_ACCEPT)?;
-    } else if let Some(_) = state.get_reduction_for(TerminalRef::NullTerminal) {
+    if state.get_reduction_for(TerminalRef::Epsilon).is_some()
+        || state.get_reduction_for(TerminalRef::NullTerminal).is_some()
+    {
         write_u16(writer, LR_ACTION_CODE_ACCEPT)?;
     } else {
         write_u16(writer, LR_ACTION_CODE_NONE)?;
@@ -535,7 +535,7 @@ fn write_parser_rnglr_data(
     let axiom_index = grammar
         .variables
         .iter()
-        .position(|variable| &variable.name == GENERATED_AXIOM)
+        .position(|variable| variable.name == GENERATED_AXIOM)
         .unwrap();
 
     let mut final_path = PathBuf::new();
@@ -640,7 +640,7 @@ fn write_parser_rnglr_data_action_table(
     rules: &[(RuleRef, usize)],
     state: &State
 ) -> Result<(), Error> {
-    if let Some(_) = state.get_reduction_for(TerminalRef::Epsilon) {
+    if state.get_reduction_for(TerminalRef::Epsilon).is_some() {
         // There can be only one reduction on epsilon
         write_u16(writer, LR_ACTION_CODE_ACCEPT)?;
         write_u16(writer, LR_ACTION_CODE_NONE)?;
