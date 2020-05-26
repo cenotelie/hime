@@ -665,17 +665,18 @@ fn print_lr_conflict_item_reduce(
         let LookaheadOrigin::FirstOf(choice_ref) = origin;
         let rule = choice_ref.rule.get_rule_in(grammar);
         let choice = &rule.body.choices[0];
-        let input_ref = choice.elements[choice_ref.position].input_ref.unwrap();
-        print_input(
-            max_width,
-            data,
-            &input_ref,
-            pad,
-            Some(&format!(
-                "Lookahead `{}` is a first terminal looking from here",
-                value
-            ))
-        );
+        if let Some(input_ref) = choice.elements[choice_ref.position].input_ref {
+            print_input(
+                max_width,
+                data,
+                &input_ref,
+                pad,
+                Some(&format!(
+                    "Lookahead `{}` is a first terminal looking from here",
+                    value
+                ))
+            );
+        }
     }
     eprintln!("{} {} ", pad, Blue.bold().paint("|"));
 }
