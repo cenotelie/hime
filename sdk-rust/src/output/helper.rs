@@ -17,6 +17,8 @@
 
 //! Module for the helpers API for the emitters
 
+use std::io::{self, Write};
+
 const UPPER_A: u8 = 0x41;
 const UPPER_Z: u8 = 0x5A;
 const LOWER_A: u8 = 0x61;
@@ -218,4 +220,21 @@ fn test_snake_case() {
     assert_eq!("snake_case", to_snake_case("SnakeCase"));
     assert_eq!("snake_case", to_snake_case("snakeCase"));
     assert_eq!("snake_case", to_snake_case("Snake Case"));
+}
+
+/// writes a u16 to a byte stream
+pub fn write_u16(writer: &mut dyn Write, value: u16) -> Result<(), io::Error> {
+    let buffer: [u8; 2] = [(value & 0xFF) as u8, (value >> 8) as u8];
+    writer.write_all(&buffer)
+}
+
+/// writes a u32 to a byte stream
+pub fn write_u32(writer: &mut dyn Write, value: u32) -> Result<(), io::Error> {
+    let buffer: [u8; 4] = [
+        (value & 0xFF) as u8,
+        ((value & 0x0000_FF00) >> 8) as u8,
+        ((value & 0x00FF_0000) >> 16) as u8,
+        (value >> 24) as u8
+    ];
+    writer.write_all(&buffer)
 }
