@@ -19,13 +19,14 @@
 
 pub mod helper;
 pub mod lexer_data;
+pub mod lexer_net;
 pub mod parser_data;
 
 use crate::errors::{Error, UnmatchableTokenError};
 use crate::finite::DFA;
 use crate::grammars::{Grammar, TerminalRef, TerminalSet, OPTION_SEPARATOR};
 use crate::lr;
-use crate::{CompilationTask, ParsingMethod};
+use crate::{CompilationTask, ParsingMethod, Runtime};
 
 /// Build and output artifacts for a grammar
 pub fn execute_for_grammar(
@@ -35,6 +36,18 @@ pub fn execute_for_grammar(
 ) -> Result<(), Vec<Error>> {
     if let Err(error) = grammar.prepare(grammar_index) {
         return Err(vec![error]);
+    };
+    let runtime = match task.get_output_target_for(grammar, grammar_index) {
+        Ok(runtime) => runtime,
+        Err(error) => return Err(vec![error])
+    };
+    let nmspace = match task.get_output_namespace(grammar) {
+        Some(nmspace) => nmspace,
+        None => grammar.name.clone()
+    };
+    let modifier = match task.get_output_modifier_for(grammar, grammar_index) {
+        Ok(modifier) => modifier,
+        Err(error) => return Err(vec![error])
     };
     // Build DFA
     let dfa = grammar.build_dfa();
@@ -48,7 +61,7 @@ pub fn execute_for_grammar(
     }
     // Build the data for the lexer
     let expected = dfa.get_expected();
-    let _separator = match get_separator(grammar, grammar_index, &expected, &dfa) {
+    let separator = match get_separator(grammar, grammar_index, &expected, &dfa) {
         Ok(separator) => separator,
         Err(error) => return Err(vec![error])
     };
@@ -62,7 +75,7 @@ pub fn execute_for_grammar(
     let output_path = task.get_output_path_for(grammar);
     if let Err(error) = lexer_data::write_lexer_data(
         output_path.as_ref(),
-        format!("{}Lexer.bin", &grammar.name),
+        get_lexer_bin_name(grammar, runtime),
         grammar,
         &dfa,
         &expected
@@ -72,41 +85,59 @@ pub fn execute_for_grammar(
     if let Err(error) = match method {
         ParsingMethod::LR0 => parser_data::write_parser_lrk_data(
             output_path.as_ref(),
-            format!("{}Parser.bin", &grammar.name),
+            get_parser_bin_name(grammar, runtime),
             grammar,
             &expected,
             &graph
         ),
         ParsingMethod::LR1 => parser_data::write_parser_lrk_data(
             output_path.as_ref(),
-            format!("{}Parser.bin", &grammar.name),
+            get_parser_bin_name(grammar, runtime),
             grammar,
             &expected,
             &graph
         ),
         ParsingMethod::LALR1 => parser_data::write_parser_lrk_data(
             output_path.as_ref(),
-            format!("{}Parser.bin", &grammar.name),
+            get_parser_bin_name(grammar, runtime),
             grammar,
             &expected,
             &graph
         ),
         ParsingMethod::RNGLR1 => parser_data::write_parser_rnglr_data(
             output_path.as_ref(),
-            format!("{}Parser.bin", &grammar.name),
+            get_parser_bin_name(grammar, runtime),
             grammar,
             &expected,
             &graph
         ),
         ParsingMethod::RNGLALR1 => parser_data::write_parser_rnglr_data(
             output_path.as_ref(),
-            format!("{}Parser.bin", &grammar.name),
+            get_parser_bin_name(grammar, runtime),
             grammar,
             &expected,
             &graph
         )
     } {
         return Err(vec![error]);
+    }
+    // write code
+    match runtime {
+        Runtime::Net => {
+            if let Err(error) = lexer_net::write(
+                output_path.as_ref(),
+                format!("{}Lexer.cs", helper::to_upper_camel_case(&grammar.name)),
+                grammar,
+                &expected,
+                separator,
+                &nmspace,
+                modifier
+            ) {
+                return Err(vec![error]);
+            }
+        }
+        Runtime::Java => {}
+        Runtime::Rust => {}
     }
     Ok(())
 }
@@ -144,4 +175,52 @@ fn get_separator(
             overriders
         }
     ))
+}
+
+/// Gets the name of the file for the lexer automaton
+pub fn get_lexer_bin_name(grammar: &Grammar, runtime: Runtime) -> String {
+    match runtime {
+        Runtime::Net => get_lexer_bin_name_net(grammar),
+        Runtime::Java => get_lexer_bin_name_java(grammar),
+        Runtime::Rust => get_lexer_bin_name_rust(grammar)
+    }
+}
+
+/// Gets the name of the file for the lexer automaton in .Net
+pub fn get_lexer_bin_name_net(grammar: &Grammar) -> String {
+    format!("{}Lexer.bin", helper::to_upper_camel_case(&grammar.name))
+}
+
+/// Gets the name of the file for the lexer automaton in Java
+pub fn get_lexer_bin_name_java(grammar: &Grammar) -> String {
+    format!("{}Lexer.bin", helper::to_upper_camel_case(&grammar.name))
+}
+
+/// Gets the name of the file for the lexer automaton in Rust
+pub fn get_lexer_bin_name_rust(grammar: &Grammar) -> String {
+    format!("{}_lexer.bin", helper::to_snake_case(&grammar.name))
+}
+
+/// Gets the name of the file for the parser automaton
+pub fn get_parser_bin_name(grammar: &Grammar, runtime: Runtime) -> String {
+    match runtime {
+        Runtime::Net => get_parser_bin_name_net(grammar),
+        Runtime::Java => get_parser_bin_name_java(grammar),
+        Runtime::Rust => get_parser_bin_name_rust(grammar)
+    }
+}
+
+/// Gets the name of the file for the parser automaton in .Net
+pub fn get_parser_bin_name_net(grammar: &Grammar) -> String {
+    format!("{}Parser.bin", helper::to_upper_camel_case(&grammar.name))
+}
+
+/// Gets the name of the file for the parser automaton in Java
+pub fn get_parser_bin_name_java(grammar: &Grammar) -> String {
+    format!("{}Parser.bin", helper::to_upper_camel_case(&grammar.name))
+}
+
+/// Gets the name of the file for the parser automaton in Rust
+pub fn get_parser_bin_name_rust(grammar: &Grammar) -> String {
+    format!("{}_parser.bin", helper::to_snake_case(&grammar.name))
 }

@@ -41,6 +41,9 @@ use hime_redist::ast::AstNode;
 use hime_redist::text::{Text, TextPosition};
 use std::cmp::Ordering;
 
+/// The version of this program
+pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
+
 /// Prints an info message
 pub fn print_info(message: &str) {
     eprintln!(
@@ -434,7 +437,7 @@ impl CompilationTask {
     }
 
     /// Gets the access modifier for the generated code
-    pub fn get_output_modified_for(
+    pub fn get_output_modifier_for(
         &self,
         grammar: &Grammar,
         grammar_index: usize
