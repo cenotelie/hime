@@ -297,12 +297,17 @@ pub enum ParsingMethod {
 impl ParsingMethod {
     /// Gets whether conflicts shall be raised for this method
     pub fn raise_conflict(self) -> bool {
+        !self.is_rnglr()
+    }
+
+    /// Gets whether this method uses RNGLR
+    pub fn is_rnglr(self) -> bool {
         match self {
-            ParsingMethod::LR0 => true,
-            ParsingMethod::LR1 => true,
-            ParsingMethod::LALR1 => true,
-            ParsingMethod::RNGLR1 => false,
-            ParsingMethod::RNGLALR1 => false
+            ParsingMethod::LR0 => false,
+            ParsingMethod::LR1 => false,
+            ParsingMethod::LALR1 => false,
+            ParsingMethod::RNGLR1 => true,
+            ParsingMethod::RNGLALR1 => true
         }
     }
 }
@@ -427,8 +432,8 @@ impl CompilationTask {
 
     /// Gets the namespace for the generated code
     pub fn get_output_namespace(&self, grammar: &Grammar) -> Option<String> {
-        match self.output_path.as_ref() {
-            Some(path) => Some(path.clone()),
+        match self.output_namespace.as_ref() {
+            Some(nmspace) => Some(nmspace.clone()),
             None => match grammar.get_option(OPTION_NAMESPACE) {
                 Some(path) => Some(path.value.clone()),
                 None => None

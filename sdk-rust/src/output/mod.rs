@@ -19,7 +19,9 @@
 
 pub mod helper;
 pub mod lexer_data;
+pub mod lexer_java;
 pub mod lexer_net;
+pub mod lexer_rust;
 pub mod parser_data;
 
 use crate::errors::{Error, UnmatchableTokenError};
@@ -44,6 +46,11 @@ pub fn execute_for_grammar(
     let nmspace = match task.get_output_namespace(grammar) {
         Some(nmspace) => nmspace,
         None => grammar.name.clone()
+    };
+    let nmspace = match runtime {
+        Runtime::Net => helper::get_namespace_net(&nmspace),
+        Runtime::Java => helper::get_namespace_java(&nmspace),
+        Runtime::Rust => helper::get_namespace_rust(&nmspace)
     };
     let modifier = match task.get_output_modifier_for(grammar, grammar_index) {
         Ok(modifier) => modifier,
@@ -136,8 +143,31 @@ pub fn execute_for_grammar(
                 return Err(vec![error]);
             }
         }
-        Runtime::Java => {}
-        Runtime::Rust => {}
+        Runtime::Java => {
+            if let Err(error) = lexer_java::write(
+                output_path.as_ref(),
+                format!("{}Lexer.java", helper::to_upper_camel_case(&grammar.name)),
+                grammar,
+                &expected,
+                separator,
+                &nmspace,
+                modifier
+            ) {
+                return Err(vec![error]);
+            }
+        }
+        Runtime::Rust => {
+            if let Err(error) = lexer_rust::write(
+                output_path.as_ref(),
+                format!("{}.rs", helper::to_snake_case(&grammar.name)),
+                grammar,
+                &expected,
+                separator,
+                method.is_rnglr()
+            ) {
+                return Err(vec![error]);
+            }
+        }
     }
     Ok(())
 }
@@ -178,7 +208,7 @@ fn get_separator(
 }
 
 /// Gets the name of the file for the lexer automaton
-pub fn get_lexer_bin_name(grammar: &Grammar, runtime: Runtime) -> String {
+fn get_lexer_bin_name(grammar: &Grammar, runtime: Runtime) -> String {
     match runtime {
         Runtime::Net => get_lexer_bin_name_net(grammar),
         Runtime::Java => get_lexer_bin_name_java(grammar),
@@ -187,22 +217,22 @@ pub fn get_lexer_bin_name(grammar: &Grammar, runtime: Runtime) -> String {
 }
 
 /// Gets the name of the file for the lexer automaton in .Net
-pub fn get_lexer_bin_name_net(grammar: &Grammar) -> String {
+fn get_lexer_bin_name_net(grammar: &Grammar) -> String {
     format!("{}Lexer.bin", helper::to_upper_camel_case(&grammar.name))
 }
 
 /// Gets the name of the file for the lexer automaton in Java
-pub fn get_lexer_bin_name_java(grammar: &Grammar) -> String {
+fn get_lexer_bin_name_java(grammar: &Grammar) -> String {
     format!("{}Lexer.bin", helper::to_upper_camel_case(&grammar.name))
 }
 
 /// Gets the name of the file for the lexer automaton in Rust
-pub fn get_lexer_bin_name_rust(grammar: &Grammar) -> String {
+fn get_lexer_bin_name_rust(grammar: &Grammar) -> String {
     format!("{}_lexer.bin", helper::to_snake_case(&grammar.name))
 }
 
 /// Gets the name of the file for the parser automaton
-pub fn get_parser_bin_name(grammar: &Grammar, runtime: Runtime) -> String {
+fn get_parser_bin_name(grammar: &Grammar, runtime: Runtime) -> String {
     match runtime {
         Runtime::Net => get_parser_bin_name_net(grammar),
         Runtime::Java => get_parser_bin_name_java(grammar),
@@ -211,16 +241,16 @@ pub fn get_parser_bin_name(grammar: &Grammar, runtime: Runtime) -> String {
 }
 
 /// Gets the name of the file for the parser automaton in .Net
-pub fn get_parser_bin_name_net(grammar: &Grammar) -> String {
+fn get_parser_bin_name_net(grammar: &Grammar) -> String {
     format!("{}Parser.bin", helper::to_upper_camel_case(&grammar.name))
 }
 
 /// Gets the name of the file for the parser automaton in Java
-pub fn get_parser_bin_name_java(grammar: &Grammar) -> String {
+fn get_parser_bin_name_java(grammar: &Grammar) -> String {
     format!("{}Parser.bin", helper::to_upper_camel_case(&grammar.name))
 }
 
 /// Gets the name of the file for the parser automaton in Rust
-pub fn get_parser_bin_name_rust(grammar: &Grammar) -> String {
+fn get_parser_bin_name_rust(grammar: &Grammar) -> String {
     format!("{}_parser.bin", helper::to_snake_case(&grammar.name))
 }

@@ -222,6 +222,69 @@ fn test_snake_case() {
     assert_eq!("snake_case", to_snake_case("Snake Case"));
 }
 
+/// Gets the C# compatible name for the specified namespace
+pub fn get_namespace_net(input: &str) -> String {
+    if input.contains("::") {
+        input
+            .split("::")
+            .filter(|part| part.is_empty())
+            .map(|part| to_upper_camel_case(part))
+            .collect::<Vec<String>>()
+            .join(".")
+    } else if input.contains(".") {
+        input
+            .split(".")
+            .filter(|part| part.is_empty())
+            .map(|part| to_upper_camel_case(part))
+            .collect::<Vec<String>>()
+            .join(".")
+    } else {
+        to_upper_camel_case(input)
+    }
+}
+
+/// Gets the Java compatible name for the specified namespace
+pub fn get_namespace_java(input: &str) -> String {
+    if input.contains("::") {
+        input
+            .split("::")
+            .filter(|part| part.is_empty())
+            .map(|part| to_snake_case(part))
+            .collect::<Vec<String>>()
+            .join(".")
+    } else if input.contains(".") {
+        input
+            .split(".")
+            .filter(|part| part.is_empty())
+            .map(|part| to_snake_case(part))
+            .collect::<Vec<String>>()
+            .join(".")
+    } else {
+        to_snake_case(input)
+    }
+}
+
+/// Gets the Rust compatible name for the specified namespace
+pub fn get_namespace_rust(input: &str) -> String {
+    if input.contains("::") {
+        input
+            .split("::")
+            .filter(|part| part.is_empty())
+            .map(|part| to_snake_case(part))
+            .collect::<Vec<String>>()
+            .join("::")
+    } else if input.contains(".") {
+        input
+            .split(".")
+            .filter(|part| part.is_empty())
+            .map(|part| to_snake_case(part))
+            .collect::<Vec<String>>()
+            .join("::")
+    } else {
+        to_snake_case(input)
+    }
+}
+
 /// writes a u16 to a byte stream
 pub fn write_u16(writer: &mut dyn Write, value: u16) -> Result<(), io::Error> {
     let buffer: [u8; 2] = [(value & 0xFF) as u8, (value >> 8) as u8];

@@ -70,7 +70,7 @@ pub fn write(
     };
 
     write_header(&mut writer)?;
-
+    writeln!(writer)?;
     writeln!(writer, "using System.CodeDom.Compiler;")?;
     writeln!(writer, "using System.Collections.Generic;")?;
     writeln!(writer, "using System.IO;")?;
@@ -154,7 +154,7 @@ pub fn write(
     )?;
     writeln!(writer, "\t\t\t/// </summary>")?;
     writeln!(writer, "\t\t\tpublic const int Default = 0;")?;
-    for (index, context) in grammar.contexts.iter().enumerate() {
+    for (index, context) in grammar.contexts.iter().enumerate().skip(1) {
         writeln!(writer, "\t\t\t/// <summary>")?;
         writeln!(
             writer,
