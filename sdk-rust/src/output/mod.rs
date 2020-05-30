@@ -153,6 +153,7 @@ pub fn execute_for_grammar(
                 output_path.as_ref(),
                 format!("{}Parser.cs", helper::to_upper_camel_case(&grammar.name)),
                 grammar,
+                &expected,
                 method,
                 &nmspace,
                 modifier
@@ -176,6 +177,7 @@ pub fn execute_for_grammar(
                 output_path.as_ref(),
                 format!("{}Parser.java", helper::to_upper_camel_case(&grammar.name)),
                 grammar,
+                &expected,
                 method,
                 &nmspace,
                 modifier
@@ -198,6 +200,7 @@ pub fn execute_for_grammar(
                 output_path.as_ref(),
                 format!("{}.rs", helper::to_snake_case(&grammar.name)),
                 grammar,
+                &expected,
                 method,
                 &nmspace,
                 mode.output_assembly()

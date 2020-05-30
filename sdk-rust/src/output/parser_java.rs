@@ -18,7 +18,7 @@
 //! Module for generating parser code in Java
 
 use crate::errors::Error;
-use crate::grammars::{Grammar, PREFIX_GENERATED_TERMINAL, PREFIX_GENERATED_VARIABLE};
+use crate::grammars::{Grammar, TerminalSet, PREFIX_GENERATED_TERMINAL, PREFIX_GENERATED_VARIABLE};
 use crate::output::get_parser_bin_name_java;
 use crate::output::helper::{to_lower_camel_case, to_upper_camel_case, to_upper_case};
 use crate::{Modifier, ParsingMethod, CRATE_VERSION};
@@ -31,6 +31,7 @@ pub fn write(
     path: Option<&String>,
     file_name: String,
     grammar: &Grammar,
+    expected: &TerminalSet,
     method: ParsingMethod,
     nmespace: &str,
     modifier: Modifier
@@ -109,7 +110,7 @@ pub fn write(
     write_code_virtuals(&mut writer, grammar)?;
     write_code_actions(&mut writer, grammar)?;
     write_code_constructors(&mut writer, grammar, method)?;
-    write_code_visitor(&mut writer, grammar)?;
+    write_code_visitor(&mut writer, grammar, expected)?;
 
     writeln!(writer, "}}")?;
     Ok(())
@@ -393,14 +394,22 @@ fn write_code_constructors(
 }
 
 /// Generates the visitor for the parse result
-fn write_code_visitor(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), Error> {
+fn write_code_visitor(
+    writer: &mut dyn Write,
+    grammar: &Grammar,
+    expected: &TerminalSet
+) -> Result<(), Error> {
     writeln!(writer)?;
     writeln!(writer, "    /*")?;
     writeln!(writer, "     * Visitor interface")?;
     writeln!(writer, "     */")?;
     writeln!(writer, "    public static class Visitor {{")?;
-    for terminal in grammar.terminals.iter() {
-        if terminal.id <= 2 || terminal.name.starts_with(PREFIX_GENERATED_TERMINAL) {
+    for terminal_ref in expected.content.iter() {
+        let terminal = match grammar.get_terminal(terminal_ref.sid()) {
+            Some(terminal) => terminal,
+            None => continue
+        };
+        if terminal.name.starts_with(PREFIX_GENERATED_TERMINAL) {
             continue;
         }
         writeln!(
@@ -457,8 +466,12 @@ fn write_code_visitor(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
     writeln!(writer, "        for (ASTNode child : node.getChildren())")?;
     writeln!(writer, "            visitASTNode(child, visitor);")?;
     writeln!(writer, "        switch(node.getSymbol().getID()) {{")?;
-    for terminal in grammar.terminals.iter() {
-        if terminal.id <= 2 || terminal.name.starts_with(PREFIX_GENERATED_TERMINAL) {
+    for terminal_ref in expected.content.iter() {
+        let terminal = match grammar.get_terminal(terminal_ref.sid()) {
+            Some(terminal) => terminal,
+            None => continue
+        };
+        if terminal.name.starts_with(PREFIX_GENERATED_TERMINAL) {
             continue;
         }
         writeln!(
