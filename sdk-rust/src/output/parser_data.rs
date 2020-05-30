@@ -132,6 +132,7 @@ fn write_parser_lrk_data_state(
     } else {
         write_u16(writer, LR_ACTION_CODE_NONE)?;
     }
+    write_u16(writer, LR_ACTION_CODE_NONE)?;
     // write actions for terminals
     for terminal in expected.content.iter().skip(1) {
         let terminal = *terminal;
