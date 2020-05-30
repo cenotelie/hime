@@ -17,7 +17,7 @@
 
 //! Loading facilities for grammars
 
-pub mod parser;
+pub mod hime_grammar;
 
 use crate::errors::{Error, Errors};
 use crate::finite::{FinalItem, NFA};
@@ -36,6 +36,7 @@ use hime_redist::parsers::{
 };
 use hime_redist::result::ParseResult;
 use hime_redist::symbols::SemanticElementTrait;
+use hime_redist::text::Text;
 use std::fs;
 use std::io;
 
@@ -110,15 +111,26 @@ fn resolve_inheritance<'a>(
 }
 
 /// Parses the specified input
-fn parse_input(file_name: &str, input_index: usize) -> Result<ParseResult, Vec<Error>> {
+fn parse_input(
+    file_name: &str,
+    input_index: usize
+) -> Result<ParseResult, (ParseResult, Vec<Error>)> {
     let file = match fs::File::open(file_name) {
         Ok(f) => f,
         Err(err) => {
-            return Err(vec![Error::Io(err)]);
+            return Err((
+                ParseResult::new(
+                    &hime_grammar::TERMINALS,
+                    &hime_grammar::VARIABLES,
+                    &hime_grammar::VIRTUALS,
+                    Text::new("")
+                ),
+                vec![Error::Io(err)]
+            ));
         }
     };
     let mut reader = io::BufReader::new(file);
-    let result = parser::parse_utf8(&mut reader);
+    let result = hime_grammar::parse_utf8(&mut reader);
     let errors: Vec<Error> = result
         .errors
         .errors
@@ -138,7 +150,7 @@ fn parse_input(file_name: &str, input_index: usize) -> Result<ParseResult, Vec<E
     if errors.is_empty() {
         Ok(result)
     } else {
-        Err(errors)
+        Err((result, errors))
     }
 }
 
@@ -152,7 +164,8 @@ fn parse_inputs(inputs: &[String]) -> Result<Vec<ParseResult>, Errors> {
             Ok(result) => {
                 results.push(result);
             }
-            Err(mut sub_errors) => {
+            Err((result, mut sub_errors)) => {
+                results.push(result);
                 has_errors = true;
                 errors.append(&mut sub_errors)
             }
@@ -263,16 +276,16 @@ impl<'a> Loader<'a> {
     fn load_content(&mut self, errors: &mut Vec<Error>) {
         for node in self.root.children().iter() {
             let id = node.get_symbol().id;
-            if id == parser::ID_TERMINAL_BLOCK_OPTIONS {
+            if id == hime_grammar::ID_TERMINAL_BLOCK_OPTIONS {
                 load_options(self.input_index, &mut self.grammar, node);
                 if let Some(option) = self.grammar.options.get("CaseSensitive") {
                     if &option.value == "false" {
                         self.case_insensitive = true;
                     }
                 }
-            } else if id == parser::ID_TERMINAL_BLOCK_TERMINALS {
+            } else if id == hime_grammar::ID_TERMINAL_BLOCK_TERMINALS {
                 load_terminals(self.input_index, errors, &mut self.grammar, node);
-            } else if id == parser::ID_TERMINAL_BLOCK_RULES {
+            } else if id == hime_grammar::ID_TERMINAL_BLOCK_RULES {
                 load_rules(self.input_index, errors, &mut self.grammar, node);
             }
         }
@@ -308,9 +321,9 @@ fn load_terminals<'a>(
 ) {
     for child in node.children().iter() {
         let id = child.get_symbol().id;
-        if id == parser::ID_TERMINAL_BLOCK_CONTEXT {
+        if id == hime_grammar::ID_TERMINAL_BLOCK_CONTEXT {
             load_terminal_rule_context(input_index, errors, grammar, child);
-        } else if id == parser::ID_VARIABLE_TERMINAL_FRAGMENT {
+        } else if id == hime_grammar::ID_VARIABLE_TERMINAL_FRAGMENT {
             load_terminal_rule(
                 input_index,
                 errors,
@@ -319,7 +332,7 @@ fn load_terminals<'a>(
                 DEFAULT_CONTEXT_NAME,
                 true
             );
-        } else if id == parser::ID_VARIABLE_TERMINAL_RULE {
+        } else if id == hime_grammar::ID_VARIABLE_TERMINAL_RULE {
             load_terminal_rule(
                 input_index,
                 errors,
@@ -386,39 +399,45 @@ fn load_nfa<'a>(
     node: AstNode<'a>
 ) -> NFA {
     match node.get_symbol().id {
-        parser::ID_TERMINAL_LITERAL_TEXT => load_nfa_simple_text(&node),
-        parser::ID_TERMINAL_UNICODE_CODEPOINT => load_nfa_codepoint(input_index, errors, node),
-        parser::ID_TERMINAL_LITERAL_CLASS => load_nfa_class(input_index, errors, node),
-        parser::ID_TERMINAL_UNICODE_CATEGORY => {
+        hime_grammar::ID_TERMINAL_LITERAL_TEXT => load_nfa_simple_text(&node),
+        hime_grammar::ID_TERMINAL_UNICODE_CODEPOINT => {
+            load_nfa_codepoint(input_index, errors, node)
+        }
+        hime_grammar::ID_TERMINAL_LITERAL_CLASS => load_nfa_class(input_index, errors, node),
+        hime_grammar::ID_TERMINAL_UNICODE_CATEGORY => {
             load_nfa_unicode_category(input_index, errors, node)
         }
-        parser::ID_TERMINAL_UNICODE_BLOCK => load_nfa_unicode_block(input_index, errors, node),
-        parser::ID_TERMINAL_UNICODE_SPAN_MARKER => load_nfa_unicode_span(input_index, errors, node),
-        parser::ID_TERMINAL_LITERAL_ANY => load_nfa_any(),
-        parser::ID_TERMINAL_NAME => load_nfa_reference(input_index, errors, grammar, node),
-        parser::ID_TERMINAL_OPERATOR_OPTIONAL => {
+        hime_grammar::ID_TERMINAL_UNICODE_BLOCK => {
+            load_nfa_unicode_block(input_index, errors, node)
+        }
+        hime_grammar::ID_TERMINAL_UNICODE_SPAN_MARKER => {
+            load_nfa_unicode_span(input_index, errors, node)
+        }
+        hime_grammar::ID_TERMINAL_LITERAL_ANY => load_nfa_any(),
+        hime_grammar::ID_TERMINAL_NAME => load_nfa_reference(input_index, errors, grammar, node),
+        hime_grammar::ID_TERMINAL_OPERATOR_OPTIONAL => {
             let inner = load_nfa(input_index, errors, grammar, node.children().at(0));
             inner.into_optional()
         }
-        parser::ID_TERMINAL_OPERATOR_ZEROMORE => {
+        hime_grammar::ID_TERMINAL_OPERATOR_ZEROMORE => {
             let inner = load_nfa(input_index, errors, grammar, node.children().at(0));
             inner.into_zero_or_more()
         }
-        parser::ID_TERMINAL_OPERATOR_ONEMORE => {
+        hime_grammar::ID_TERMINAL_OPERATOR_ONEMORE => {
             let inner = load_nfa(input_index, errors, grammar, node.children().at(0));
             inner.into_one_or_more()
         }
-        parser::ID_TERMINAL_OPERATOR_UNION => {
+        hime_grammar::ID_TERMINAL_OPERATOR_UNION => {
             let left = load_nfa(input_index, errors, grammar, node.children().at(0));
             let right = load_nfa(input_index, errors, grammar, node.children().at(1));
             left.into_union_with(right)
         }
-        parser::ID_TERMINAL_OPERATOR_DIFFERENCE => {
+        hime_grammar::ID_TERMINAL_OPERATOR_DIFFERENCE => {
             let left = load_nfa(input_index, errors, grammar, node.children().at(0));
             let right = load_nfa(input_index, errors, grammar, node.children().at(1));
             left.into_difference(right)
         }
-        parser::ID_VIRTUAL_RANGE => {
+        hime_grammar::ID_VIRTUAL_RANGE => {
             let inner = load_nfa(input_index, errors, grammar, node.children().at(0));
             let children = node.children();
             let min = children
@@ -439,7 +458,7 @@ fn load_nfa<'a>(
             };
             inner.into_repeat_range(min, max)
         }
-        parser::ID_VIRTUAL_CONCAT => {
+        hime_grammar::ID_VIRTUAL_CONCAT => {
             let left = load_nfa(input_index, errors, grammar, node.children().at(0));
             let right = load_nfa(input_index, errors, grammar, node.children().at(1));
             left.into_concatenation(right)
@@ -740,10 +759,10 @@ fn load_rules<'a>(
     // load new variables for the rule's head
     for child in node.children().iter() {
         let id = child.get_symbol().id;
-        if id == parser::ID_VARIABLE_CF_RULE_SIMPLE {
+        if id == hime_grammar::ID_VARIABLE_CF_RULE_SIMPLE {
             let name = child.children().at(0).get_value().unwrap();
             grammar.add_variable(&name);
-        } else if id == parser::ID_VARIABLE_CF_RULE_TEMPLATE {
+        } else if id == hime_grammar::ID_VARIABLE_CF_RULE_TEMPLATE {
             let name = child.children().at(0).get_value().unwrap();
             let arguments: Vec<String> = child
                 .children()
@@ -758,14 +777,14 @@ fn load_rules<'a>(
     // load template rules
     for child in node.children().iter() {
         let id = child.get_symbol().id;
-        if id == parser::ID_VARIABLE_CF_RULE_TEMPLATE {
+        if id == hime_grammar::ID_VARIABLE_CF_RULE_TEMPLATE {
             load_template_rule(input_index, errors, grammar, child);
         }
     }
     // load simple rules
     for child in node.children().iter() {
         let id = child.get_symbol().id;
-        if id == parser::ID_VARIABLE_CF_RULE_SIMPLE {
+        if id == hime_grammar::ID_VARIABLE_CF_RULE_SIMPLE {
             load_simple_rule(input_index, errors, grammar, child);
         }
     }
@@ -807,34 +826,34 @@ fn load_simple_rule_definitions<'a>(
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
     match node.get_symbol().id {
-        parser::ID_VARIABLE_RULE_DEF_CONTEXT => {
+        hime_grammar::ID_VARIABLE_RULE_DEF_CONTEXT => {
             load_simple_rule_context(input_index, errors, grammar, head_sid, node)
         }
-        parser::ID_VARIABLE_RULE_DEF_SUB => {
+        hime_grammar::ID_VARIABLE_RULE_DEF_SUB => {
             load_simple_rule_sub_rule(input_index, errors, grammar, head_sid, node)
         }
-        parser::ID_TERMINAL_OPERATOR_OPTIONAL => {
+        hime_grammar::ID_TERMINAL_OPERATOR_OPTIONAL => {
             load_simple_rule_optional(input_index, errors, grammar, head_sid, node)
         }
-        parser::ID_TERMINAL_OPERATOR_ZEROMORE => {
+        hime_grammar::ID_TERMINAL_OPERATOR_ZEROMORE => {
             load_simple_rule_zero_or_more(input_index, errors, grammar, head_sid, node)
         }
-        parser::ID_TERMINAL_OPERATOR_ONEMORE => {
+        hime_grammar::ID_TERMINAL_OPERATOR_ONEMORE => {
             load_simple_rule_one_or_more(input_index, errors, grammar, head_sid, node)
         }
-        parser::ID_TERMINAL_OPERATOR_UNION => {
+        hime_grammar::ID_TERMINAL_OPERATOR_UNION => {
             load_simple_rule_union(input_index, errors, grammar, head_sid, node)
         }
-        parser::ID_TERMINAL_TREE_ACTION_PROMOTE => {
+        hime_grammar::ID_TERMINAL_TREE_ACTION_PROMOTE => {
             load_simple_rule_tree_action_promote(input_index, errors, grammar, head_sid, node)
         }
-        parser::ID_TERMINAL_TREE_ACTION_DROP => {
+        hime_grammar::ID_TERMINAL_TREE_ACTION_DROP => {
             load_simple_rule_tree_action_drop(input_index, errors, grammar, head_sid, node)
         }
-        parser::ID_VIRTUAL_CONCAT => {
+        hime_grammar::ID_VIRTUAL_CONCAT => {
             load_simple_rule_concat(input_index, errors, grammar, head_sid, node)
         }
-        parser::ID_VIRTUAL_EMPTYPART => load_simple_rule_empty_part(),
+        hime_grammar::ID_VIRTUAL_EMPTYPART => load_simple_rule_empty_part(),
         _ => load_simple_rule_atomic(input_index, errors, grammar, node)
     }
 }
@@ -1138,19 +1157,19 @@ fn load_simple_rule_atomic<'a>(
     node: AstNode<'a>
 ) -> BodySet<RuleBody> {
     match node.get_symbol().id {
-        parser::ID_VARIABLE_RULE_SYM_ACTION => {
+        hime_grammar::ID_VARIABLE_RULE_SYM_ACTION => {
             load_simple_rule_atomic_action(input_index, grammar, node)
         }
-        parser::ID_VARIABLE_RULE_SYM_VIRTUAL => {
+        hime_grammar::ID_VARIABLE_RULE_SYM_VIRTUAL => {
             load_simple_rule_atomic_virtual(input_index, grammar, node)
         }
-        parser::ID_VARIABLE_RULE_SYM_REF_SIMPLE => {
+        hime_grammar::ID_VARIABLE_RULE_SYM_REF_SIMPLE => {
             load_simple_rule_atomic_simple_ref(input_index, errors, grammar, node)
         }
-        parser::ID_VARIABLE_RULE_SYM_REF_TEMPLATE => {
+        hime_grammar::ID_VARIABLE_RULE_SYM_REF_TEMPLATE => {
             load_simple_rule_atomic_template_ref(input_index, errors, grammar, node)
         }
-        parser::ID_TERMINAL_LITERAL_TEXT => {
+        hime_grammar::ID_TERMINAL_LITERAL_TEXT => {
             load_simple_rule_atomic_inline_text(input_index, grammar, node)
         }
         _ => BodySet { bodies: Vec::new() }
@@ -1319,34 +1338,34 @@ fn load_template_rule_definitions<'a>(
     node: AstNode<'a>
 ) -> BodySet<TemplateRuleBody> {
     match node.get_symbol().id {
-        parser::ID_VARIABLE_RULE_DEF_CONTEXT => {
+        hime_grammar::ID_VARIABLE_RULE_DEF_CONTEXT => {
             load_template_rule_context(input_index, errors, grammar, parameters, node)
         }
-        parser::ID_VARIABLE_RULE_DEF_SUB => {
+        hime_grammar::ID_VARIABLE_RULE_DEF_SUB => {
             load_template_rule_sub_rule(input_index, errors, grammar, parameters, node)
         }
-        parser::ID_TERMINAL_OPERATOR_OPTIONAL => {
+        hime_grammar::ID_TERMINAL_OPERATOR_OPTIONAL => {
             load_template_rule_optional(input_index, errors, grammar, parameters, node)
         }
-        parser::ID_TERMINAL_OPERATOR_ZEROMORE => {
+        hime_grammar::ID_TERMINAL_OPERATOR_ZEROMORE => {
             load_template_rule_zero_or_more(input_index, errors, grammar, parameters, node)
         }
-        parser::ID_TERMINAL_OPERATOR_ONEMORE => {
+        hime_grammar::ID_TERMINAL_OPERATOR_ONEMORE => {
             load_template_rule_one_or_more(input_index, errors, grammar, parameters, node)
         }
-        parser::ID_TERMINAL_OPERATOR_UNION => {
+        hime_grammar::ID_TERMINAL_OPERATOR_UNION => {
             load_template_rule_union(input_index, errors, grammar, parameters, node)
         }
-        parser::ID_TERMINAL_TREE_ACTION_PROMOTE => {
+        hime_grammar::ID_TERMINAL_TREE_ACTION_PROMOTE => {
             load_template_rule_tree_action_promote(input_index, errors, grammar, parameters, node)
         }
-        parser::ID_TERMINAL_TREE_ACTION_DROP => {
+        hime_grammar::ID_TERMINAL_TREE_ACTION_DROP => {
             load_template_rule_tree_action_drop(input_index, errors, grammar, parameters, node)
         }
-        parser::ID_VIRTUAL_CONCAT => {
+        hime_grammar::ID_VIRTUAL_CONCAT => {
             load_template_rule_concat(input_index, errors, grammar, parameters, node)
         }
-        parser::ID_VIRTUAL_EMPTYPART => load_template_rule_empty_part(),
+        hime_grammar::ID_VIRTUAL_EMPTYPART => load_template_rule_empty_part(),
         _ => load_template_rule_atomic(input_index, errors, grammar, parameters, node)
     }
 }
@@ -1657,19 +1676,19 @@ fn load_template_rule_atomic<'a>(
     node: AstNode<'a>
 ) -> BodySet<TemplateRuleBody> {
     match node.get_symbol().id {
-        parser::ID_VARIABLE_RULE_SYM_ACTION => {
+        hime_grammar::ID_VARIABLE_RULE_SYM_ACTION => {
             load_template_rule_atomic_action(input_index, grammar, node)
         }
-        parser::ID_VARIABLE_RULE_SYM_VIRTUAL => {
+        hime_grammar::ID_VARIABLE_RULE_SYM_VIRTUAL => {
             load_template_rule_atomic_virtual(input_index, grammar, node)
         }
-        parser::ID_VARIABLE_RULE_SYM_REF_SIMPLE => {
+        hime_grammar::ID_VARIABLE_RULE_SYM_REF_SIMPLE => {
             load_template_rule_atomic_simple_ref(input_index, errors, grammar, parameters, node)
         }
-        parser::ID_VARIABLE_RULE_SYM_REF_TEMPLATE => {
+        hime_grammar::ID_VARIABLE_RULE_SYM_REF_TEMPLATE => {
             load_template_rule_atomic_template_ref(input_index, errors, grammar, parameters, node)
         }
-        parser::ID_TERMINAL_LITERAL_TEXT => {
+        hime_grammar::ID_TERMINAL_LITERAL_TEXT => {
             load_template_rule_atomic_inline_text(input_index, grammar, node)
         }
         _ => BodySet { bodies: Vec::new() }

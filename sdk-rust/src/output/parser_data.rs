@@ -22,7 +22,7 @@ use crate::grammars::{
     Grammar, Rule, RuleRef, SymbolRef, TerminalRef, TerminalSet, GENERATED_AXIOM
 };
 use crate::lr::{Graph, State};
-use crate::output::helper::{write_u16, write_u32};
+use crate::output::helper::{write_u16, write_u32, write_u8};
 use hime_redist::parsers::{
     LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_NONE, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT,
     LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE, LR_OP_CODE_BASE_ADD_VIRTUAL, LR_OP_CODE_BASE_POP_STACK,
@@ -182,8 +182,8 @@ fn write_parser_lrk_data_rule(
         .position(|variable| variable.id == rule.head)
         .unwrap();
     write_u16(writer, head_index as u16)?;
-    write_u16(writer, rule.head_action)?;
-    write_u16(writer, rule.body.choices[0].len() as u16)?;
+    write_u8(writer, rule.head_action as u8)?;
+    write_u8(writer, rule.body.choices[0].len() as u8)?;
     let mut length = 0;
     for element in rule.body.elements.iter() {
         length += match element.symbol {
@@ -448,8 +448,8 @@ fn write_parser_rnglr_data_rule(
         .position(|variable| variable.id == rule.head)
         .unwrap();
     write_u16(writer, head_index as u16)?;
-    write_u16(writer, rule.head_action)?;
-    write_u16(writer, length as u16)?;
+    write_u8(writer, rule.head_action as u8)?;
+    write_u8(writer, length as u8)?;
     let mut length = 0;
     let mut pop = 0;
     for element in rule.body.elements.iter() {

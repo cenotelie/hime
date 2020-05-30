@@ -286,6 +286,12 @@ pub fn get_namespace_rust(input: &str) -> String {
 }
 
 /// writes a u16 to a byte stream
+pub fn write_u8(writer: &mut dyn Write, value: u8) -> Result<(), io::Error> {
+    let buffer: [u8; 1] = [value];
+    writer.write_all(&buffer)
+}
+
+/// writes a u16 to a byte stream
 pub fn write_u16(writer: &mut dyn Write, value: u16) -> Result<(), io::Error> {
     let buffer: [u8; 2] = [(value & 0xFF) as u8, (value >> 8) as u8];
     writer.write_all(&buffer)
