@@ -88,7 +88,7 @@ pub fn write(
     writeln!(writer, "\t\t/// </summary>")?;
     writeln!(
         writer,
-        "\t\tprivate static readonly {} commonAutomaton = {}.Find(typeof({}Parser), \"{}\")?;",
+        "\t\tprivate static readonly {} commonAutomaton = {}.Find(typeof({}Parser), \"{}\");",
         automaton_type, automaton_type, &name, &bin_name
     )?;
 
@@ -211,8 +211,8 @@ fn write_code_virtuals(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), 
         if index > 0 {
             writeln!(writer, ", ")?;
         }
-        writeln!(writer, "\t\t\t")?;
-        writeln!(
+        write!(writer, "\t\t\t")?;
+        write!(
             writer,
             "new Symbol(0x{:04X}, \"{}\")",
             symbol.id, &symbol.name
@@ -250,7 +250,7 @@ fn write_code_actions(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
             to_upper_camel_case(&action.name)
         )?;
     }
-    writeln!(writer,)?;
+    writeln!(writer)?;
     writeln!(writer, "\t\t}}")?;
 
     writeln!(writer, "\t\t/// <summary>")?;
@@ -261,7 +261,7 @@ fn write_code_actions(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
     writeln!(writer, "\t\t/// </summary>")?;
     writeln!(
         writer,
-        "\t\tprivate static readonly Actions noActions = new Actions()?;"
+        "\t\tprivate static readonly Actions noActions = new Actions();"
     )?;
 
     writeln!(writer, "\t\t/// <summary>")?;

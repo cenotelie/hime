@@ -23,7 +23,9 @@ mod lexer_java;
 mod lexer_net;
 mod lexer_rust;
 mod parser_data;
+mod parser_java;
 mod parser_net;
+mod parser_rust;
 
 use crate::errors::{Error, UnmatchableTokenError};
 use crate::finite::DFA;
@@ -39,6 +41,10 @@ pub fn execute_for_grammar(
 ) -> Result<(), Vec<Error>> {
     if let Err(error) = grammar.prepare(grammar_index) {
         return Err(vec![error]);
+    };
+    let mode = match task.get_mode_for(grammar, grammar_index) {
+        Ok(mode) => mode,
+        Err(error) => return Err(vec![error])
     };
     let runtime = match task.get_output_target_for(grammar, grammar_index) {
         Ok(runtime) => runtime,
@@ -166,6 +172,16 @@ pub fn execute_for_grammar(
             ) {
                 return Err(vec![error]);
             }
+            if let Err(error) = parser_java::write(
+                output_path.as_ref(),
+                format!("{}Parser.java", helper::to_upper_camel_case(&grammar.name)),
+                grammar,
+                method,
+                &nmspace,
+                modifier
+            ) {
+                return Err(vec![error]);
+            }
         }
         Runtime::Rust => {
             if let Err(error) = lexer_rust::write(
@@ -175,6 +191,16 @@ pub fn execute_for_grammar(
                 &expected,
                 separator,
                 method.is_rnglr()
+            ) {
+                return Err(vec![error]);
+            }
+            if let Err(error) = parser_rust::write(
+                output_path.as_ref(),
+                format!("{}.rs", helper::to_snake_case(&grammar.name)),
+                grammar,
+                method,
+                &nmspace,
+                mode.output_assembly()
             ) {
                 return Err(vec![error]);
             }

@@ -323,6 +323,17 @@ pub enum Mode {
     SourcesAndAssembly
 }
 
+impl Mode {
+    /// Gets whether a mode requires assembly output
+    pub fn output_assembly(self) -> bool {
+        match self {
+            Mode::Sources => false,
+            Mode::Assembly => true,
+            Mode::SourcesAndAssembly => true
+        }
+    }
+}
+
 /// Represents the target runtime to compile for
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum Runtime {
