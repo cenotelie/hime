@@ -18,11 +18,12 @@
 //! Module for producing output
 
 pub mod helper;
-pub mod lexer_data;
-pub mod lexer_java;
-pub mod lexer_net;
-pub mod lexer_rust;
-pub mod parser_data;
+mod lexer_data;
+mod lexer_java;
+mod lexer_net;
+mod lexer_rust;
+mod parser_data;
+mod parser_net;
 
 use crate::errors::{Error, UnmatchableTokenError};
 use crate::finite::DFA;
@@ -137,6 +138,16 @@ pub fn execute_for_grammar(
                 grammar,
                 &expected,
                 separator,
+                &nmspace,
+                modifier
+            ) {
+                return Err(vec![error]);
+            }
+            if let Err(error) = parser_net::write(
+                output_path.as_ref(),
+                format!("{}Parser.cs", helper::to_upper_camel_case(&grammar.name)),
+                grammar,
+                method,
                 &nmspace,
                 modifier
             ) {
