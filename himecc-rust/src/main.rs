@@ -22,6 +22,8 @@ extern crate clap;
 extern crate hime_redist;
 extern crate hime_sdk;
 
+mod errors;
+
 use clap::{App, Arg};
 use hime_sdk::{CompilationTask, Mode, Modifier, ParsingMethod, Runtime};
 use std::env;
@@ -182,8 +184,8 @@ pub fn main() {
         }
         match task.execute() {
             Ok(_) => process::exit(0),
-            Err(errors) => {
-                errors.print();
+            Err(errs) => {
+                errors::print_errors(&errs);
                 process::exit(1);
             }
         }

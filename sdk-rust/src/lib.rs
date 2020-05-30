@@ -19,7 +19,6 @@
 
 #[macro_use]
 extern crate lazy_static;
-extern crate ansi_term;
 extern crate hime_redist;
 
 pub mod errors;
@@ -35,24 +34,12 @@ use crate::grammars::{
     Grammar, OPTION_ACCESS_MODIFIER, OPTION_METHOD, OPTION_MODE, OPTION_NAMESPACE,
     OPTION_OUTPUT_PATH, OPTION_RUNTIME
 };
-use ansi_term::Colour::White;
-use ansi_term::Style;
 use hime_redist::ast::AstNode;
 use hime_redist::text::{Text, TextPosition};
 use std::cmp::Ordering;
 
 /// The version of this program
 pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
-
-/// Prints an info message
-pub fn print_info(message: &str) {
-    eprintln!(
-        "{}{} {}",
-        White.bold().paint("info"),
-        Style::new().bold().paint(":"),
-        Style::new().bold().paint(message)
-    );
-}
 
 /// Represents a range of characters
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
@@ -250,7 +237,7 @@ pub struct InputReference {
 }
 
 impl InputReference {
-    fn get_line_number_width(&self) -> usize {
+    pub fn get_line_number_width(&self) -> usize {
         if self.position.line < 10 {
             1
         } else if self.position.line < 100 {
