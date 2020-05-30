@@ -72,7 +72,7 @@ pub const CONTEXT_DEFAULT: u16 = 0;
 /// The collection of terminals matched by this lexer
 /// The terminals are in an order consistent with the automaton,
 /// so that terminal indices in the automaton can be used to retrieve the terminals in this table
-const TERMINALS: &[Symbol] = &[
+pub const TERMINALS: &[Symbol] = &[
     Symbol {
         id: 0x0001,
         name: "ε"
@@ -326,7 +326,7 @@ pub const ID_VIRTUAL_EMPTYPART: u32 = 0x0058;
 /// The collection of variables matched by this parser
 /// The variables are in an order consistent with the automaton,
 /// so that variable indices in the automaton can be used to retrieve the variables in this table
-const VARIABLES: &[Symbol] = &[
+pub const VARIABLES: &[Symbol] = &[
     Symbol {
         id: 0x001F,
         name: "option"
@@ -532,7 +532,7 @@ const VARIABLES: &[Symbol] = &[
 /// The collection of virtuals matched by this parser
 /// The virtuals are in an order consistent with the automaton,
 /// so that virtual indices in the automaton can be used to retrieve the virtuals in this table
-const VIRTUALS: &[Symbol] = &[
+pub const VIRTUALS: &[Symbol] = &[
     Symbol {
         id: 0x0047,
         name: "range"

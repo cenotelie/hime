@@ -133,7 +133,7 @@ pub fn write(
         "/// The terminals are in an order consistent with the automaton,"
     )?;
     writeln!(writer, "/// so that terminal indices in the automaton can be used to retrieve the terminals in this table")?;
-    writeln!(writer, "const TERMINALS: &[Symbol] = &[")?;
+    writeln!(writer, "pub const TERMINALS: &[Symbol] = &[")?;
     writeln!(writer, "    Symbol {{ id: 0x0001, name: \"ε\" }},")?;
     write!(writer, "    Symbol {{ id: 0x0002, name: \"$\" }}")?;
     for terminal_ref in expected.content.iter().skip(2) {

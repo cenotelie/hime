@@ -127,7 +127,7 @@ fn write_code_variables(writer: &mut dyn Write, grammar: &Grammar) -> Result<(),
         "/// The variables are in an order consistent with the automaton,"
     )?;
     writeln!(writer, "/// so that variable indices in the automaton can be used to retrieve the variables in this table")?;
-    writeln!(writer, "const VARIABLES: &[Symbol] = &[")?;
+    writeln!(writer, "pub const VARIABLES: &[Symbol] = &[")?;
     for (index, variable) in grammar.variables.iter().enumerate() {
         if index > 0 {
             writeln!(writer, ", ")?;
@@ -154,7 +154,7 @@ fn write_code_virtuals(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), 
         "/// The virtuals are in an order consistent with the automaton,"
     )?;
     writeln!(writer, "/// so that virtual indices in the automaton can be used to retrieve the virtuals in this table")?;
-    writeln!(writer, "const VIRTUALS: &[Symbol] = &[")?;
+    writeln!(writer, "pub const VIRTUALS: &[Symbol] = &[")?;
     for (index, symbol) in grammar.virtuals.iter().enumerate() {
         if index > 0 {
             writeln!(writer, ", ")?;
