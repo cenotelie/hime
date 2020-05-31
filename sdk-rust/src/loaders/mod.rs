@@ -512,7 +512,7 @@ fn load_nfa_simple_text(node: &AstNode) -> NFA {
 fn load_nfa_codepoint(input_index: usize, errors: &mut Vec<Error>, node: AstNode) -> NFA {
     // extract the code point value
     let value = node.get_value().unwrap();
-    let value = u32::from_str_radix(&value[2..(value.len() - 1)], 16).unwrap();
+    let value = u32::from_str_radix(&value[2..(value.len())], 16).unwrap();
     let value = match std::char::from_u32(value) {
         Some(v) => v,
         None => {

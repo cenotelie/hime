@@ -60,7 +60,7 @@ pub fn write_lexer_data(
             }
         }
         for transition in state.transitions.keys() {
-            if transition.end >= 255 {
+            if transition.end >= 256 {
                 // transition outside the [0-255] range
                 offset += 3;
             }
