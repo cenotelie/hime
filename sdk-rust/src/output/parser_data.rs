@@ -185,15 +185,17 @@ fn write_parser_lrk_data_rule(
     write_u16(writer, head_index as u16)?;
     write_u8(writer, rule.head_action as u8)?;
     write_u8(writer, rule.body.choices[0].len() as u8)?;
-    let mut length = 0;
-    for element in rule.body.elements.iter() {
-        length += match element.symbol {
+    let length = rule
+        .body
+        .elements
+        .iter()
+        .map(|element| match element.symbol {
             SymbolRef::Virtual(_) => 2,
             SymbolRef::Action(_) => 2,
             _ => 1
-        };
-    }
-    write_u16(writer, length)?;
+        })
+        .fold(0, |acc, v| acc + v);
+    write_u8(writer, length)?;
     for element in rule.body.elements.iter() {
         match element.symbol {
             SymbolRef::Virtual(id) => {
@@ -471,7 +473,7 @@ fn write_parser_rnglr_data_rule(
             }
         };
     }
-    write_u16(writer, length)?;
+    write_u8(writer, length)?;
     pop = 0;
     for element in rule.body.elements.iter() {
         match element.symbol {
