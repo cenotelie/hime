@@ -63,13 +63,7 @@ fn do_parse(input: &mut dyn io::Read, lib_name: &str, parser_module: &str) -> St
 
 /// Reads the arguments
 fn read_args() -> Vec<String> {
-    let mut args = Vec::new();
-    for argument in env::args().enumerate() {
-        if argument.0 != 0 {
-            args.push(argument.1);
-        }
-    }
-    args
+    env::args().skip(1).collect()
 }
 
 /// Prints the help screen for this program

@@ -194,7 +194,7 @@ fn write_parser_lrk_data_rule(
             SymbolRef::Action(_) => 2,
             _ => 1
         })
-        .fold(0, |acc, v| acc + v);
+        .sum();
     write_u8(writer, length)?;
     for element in rule.body.elements.iter() {
         match element.symbol {

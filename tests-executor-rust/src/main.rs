@@ -75,13 +75,13 @@ fn test_single() {
 }
 
 /// Gets the name of the shared parser library
-#[cfg(any(linux, unix))]
+#[cfg(target_os = "linux")]
 fn get_parser_library_name(my_path: &path::Path) -> path::PathBuf {
     my_path.join("parsers-rust.so")
 }
 
 /// Gets the name of the shared parser library
-#[cfg(macos)]
+#[cfg(target_os = "macos")]
 fn get_parser_library_name(my_path: &path::Path) -> path::PathBuf {
     my_path.join("parsers-rust.dylib")
 }
