@@ -636,7 +636,7 @@ pub struct RuleBody {
 
 impl RuleBodyTrait for RuleBody {
     fn concatenate(left: &RuleBody, right: &RuleBody) -> RuleBody {
-        let mut elements = Vec::new();
+        let mut elements = Vec::with_capacity(left.elements.len() + right.elements.len());
         for element in left.elements.iter() {
             elements.push(*element);
         }
@@ -967,7 +967,7 @@ pub struct TemplateRuleBody {
 
 impl RuleBodyTrait for TemplateRuleBody {
     fn concatenate(left: &TemplateRuleBody, right: &TemplateRuleBody) -> TemplateRuleBody {
-        let mut elements = Vec::new();
+        let mut elements = Vec::with_capacity(left.elements.len() + right.elements.len());
         for element in left.elements.iter() {
             elements.push(element.clone());
         }
