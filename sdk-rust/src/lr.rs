@@ -242,7 +242,7 @@ impl Item {
                         let candidate = Item {
                             rule: RuleRef::new(sid, index),
                             position: 0,
-                            lookaheads: firsts.clone()
+                            lookaheads: Lookaheads::default()
                         };
                         if !closure.contains(&candidate) {
                             closure.push(candidate);
