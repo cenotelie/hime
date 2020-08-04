@@ -1747,7 +1747,7 @@ impl Grammar {
     /// Builds the complete DFA that matches the terminals in this grammar
     pub fn build_dfa(&self) -> DFA {
         let mut nfa = NFA::new_minimal();
-        for terminal in self.terminals.iter() {
+        for terminal in self.terminals.iter().filter(|t| !t.is_fragment) {
             let (entry, _) = nfa.insert_sub_nfa(&terminal.nfa);
             nfa.add_transition(nfa.entry, EPSILON, entry);
         }
