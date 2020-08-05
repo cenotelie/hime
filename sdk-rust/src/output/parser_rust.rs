@@ -139,7 +139,7 @@ fn write_code_variables(writer: &mut dyn Write, grammar: &Grammar) -> Result<(),
         writeln!(writer, "        name: \"{}\"", &variable.name)?;
         write!(writer, "    }}")?;
     }
-    writeln!(writer, "")?;
+    writeln!(writer)?;
     writeln!(writer, "];")?;
     writeln!(writer)?;
     Ok(())
@@ -166,7 +166,7 @@ fn write_code_virtuals(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), 
         writeln!(writer, "        name: \"{}\"", &symbol.name)?;
         write!(writer, "    }}")?;
     }
-    writeln!(writer, "")?;
+    writeln!(writer)?;
     writeln!(writer, "];")?;
     writeln!(writer)?;
     Ok(())

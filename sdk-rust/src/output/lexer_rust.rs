@@ -154,7 +154,7 @@ pub fn write(
         )?;
         write!(writer, "    }}")?;
     }
-    writeln!(writer, "")?;
+    writeln!(writer)?;
     writeln!(writer, "];")?;
     writeln!(writer)?;
 
