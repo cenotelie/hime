@@ -573,12 +573,6 @@ impl<'a> DFAPartition<'a> {
             let mut temp_partition = self.split(dfa, group);
             new_partition.groups.append(&mut temp_partition.groups);
         }
-        let first_group = new_partition
-            .groups
-            .iter()
-            .position(|g| g.states.iter().any(|s| s.id == 0))
-            .unwrap();
-        new_partition.groups.swap(0, first_group);
         new_partition
     }
 
@@ -592,7 +586,14 @@ impl<'a> DFAPartition<'a> {
     }
 
     /// Gets the new dfa states produced by this partition
-    fn into_dfa_states(self, dfa: &DFA) -> Vec<DFAState> {
+    fn into_dfa_states(mut self, dfa: &DFA) -> Vec<DFAState> {
+        // move froup with state 0 as first group
+        let first_group = self
+            .groups
+            .iter()
+            .position(|g| g.states.iter().any(|s| s.id == 0))
+            .unwrap();
+        self.groups.swap(0, first_group);
         // For each group in the partition
         // Create the corresponding state and add the finals
         let mut states: Vec<DFAState> = self
@@ -702,9 +703,7 @@ impl NFAState {
         while i < self.transitions.len() {
             let mut j = i + 1;
             while j < self.transitions.len() {
-                if self.normalize_split(i, self.transitions[j].value) {
-                    modified = true;
-                }
+                modified |= self.normalize_split(i, self.transitions[j].value);
                 j += 1;
             }
             i += 1;
@@ -718,9 +717,7 @@ impl NFAState {
         let mut i = 0;
         while i < self.transitions.len() {
             for transition in others.iter() {
-                if self.normalize_split(i, transition.value) {
-                    modified = true;
-                }
+                modified |= self.normalize_split(i, transition.value);
             }
             i += 1;
         }
@@ -1052,10 +1049,12 @@ impl NFAStateSet {
         // remove the states immediately reached with epsilon from the positive state
         if let (Some(state_positive), Some(_)) = (state_positive, state_negative) {
             self.states.retain(|s| {
+                // all transitions from the positive state are
+                // not to s with an EPSION
                 nfa.states[state_positive]
                     .transitions
                     .iter()
-                    .all(|t| t.next != *s)
+                    .all(|t| t.value != EPSILON || t.next != *s)
             });
         }
     }
@@ -1072,7 +1071,7 @@ impl NFAStateSet {
     }
 
     /// Builds transitions from this set to other sets
-    fn get_transitions(&self, nfa: &NFA) -> HashMap<CharSpan, NFAStateSet> {
+    fn get_transitions(&self, nfa: &NFA) -> Vec<(CharSpan, NFAStateSet)> {
         let mut transitions = HashMap::new();
         for state in self.states.iter() {
             for transition in nfa.states[*state].transitions.iter() {
@@ -1091,6 +1090,8 @@ impl NFAStateSet {
         for (_, set) in transitions.iter_mut() {
             set.close_with_marks(nfa);
         }
+        let mut transitions: Vec<(CharSpan, NFAStateSet)> = transitions.into_iter().collect();
+        transitions.sort_by_key(|(span, _)| span.begin);
         transitions
     }
 
@@ -1104,20 +1105,15 @@ impl NFAStateSet {
         let mut modified = false;
         let nb_states = self.states.len();
         let mut s1 = 0;
+        // For each NFA state in the set
         while s1 < nb_states {
-            if nfa.states[self.states[s1]].normalize_self() {
-                modified = true;
-            }
+            modified |= nfa.states[self.states[s1]].normalize_self();
             let mut s2 = s1 + 1;
             while s2 < nb_states {
                 let transitions = nfa.states[self.states[s2]].transitions.clone();
-                if nfa.states[self.states[s1]].normalize_with_other(transitions) {
-                    modified = true;
-                }
+                modified |= nfa.states[self.states[s1]].normalize_with_other(transitions);
                 let transitions = nfa.states[self.states[s1]].transitions.clone();
-                if nfa.states[self.states[s2]].normalize_with_other(transitions) {
-                    modified = true;
-                }
+                modified |= nfa.states[self.states[s2]].normalize_with_other(transitions);
                 s2 += 1;
             }
             s1 += 1;
