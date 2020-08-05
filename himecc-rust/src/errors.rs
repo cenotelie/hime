@@ -707,7 +707,7 @@ pub fn print_errors(errors: &Errors) {
         .max()
     {
         for error in errors.errors.iter() {
-            print_error(error, max_width, &errors.data)
+            print_error(error, max_width + 1, &errors.data)
         }
     }
 }
