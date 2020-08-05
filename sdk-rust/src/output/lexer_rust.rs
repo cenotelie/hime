@@ -65,7 +65,6 @@ pub fn write(
     writeln!(writer, "use hime_redist::errors::ParseErrors;")?;
     writeln!(writer, "use hime_redist::lexers::automaton::Automaton;")?;
     writeln!(writer, "use hime_redist::lexers::impls::{};", base_lexer)?;
-    writeln!(writer, "use hime_redist::parsers::Parser;")?;
     if is_rnglr {
         writeln!(writer, "use hime_redist::parsers::rnglr::RNGLRAutomaton;")?;
         writeln!(writer, "use hime_redist::parsers::rnglr::RNGLRParser;")?;
@@ -73,6 +72,7 @@ pub fn write(
         writeln!(writer, "use hime_redist::parsers::lrk::LRkAutomaton;")?;
         writeln!(writer, "use hime_redist::parsers::lrk::LRkParser;")?;
     }
+    writeln!(writer, "use hime_redist::parsers::Parser;")?;
     writeln!(writer, "use hime_redist::result::ParseResult;")?;
     writeln!(writer, "use hime_redist::symbols::SemanticBody;")?;
     writeln!(writer, "use hime_redist::symbols::SemanticElementTrait;")?;
@@ -134,18 +134,27 @@ pub fn write(
     )?;
     writeln!(writer, "/// so that terminal indices in the automaton can be used to retrieve the terminals in this table")?;
     writeln!(writer, "pub const TERMINALS: &[Symbol] = &[")?;
-    writeln!(writer, "    Symbol {{ id: 0x0001, name: \"ε\" }},")?;
-    write!(writer, "    Symbol {{ id: 0x0002, name: \"$\" }}")?;
+    writeln!(writer, "    Symbol {{")?;
+    writeln!(writer, "        id: 0x0001,")?;
+    writeln!(writer, "        name: \"ε\"")?;
+    writeln!(writer, "    }},")?;
+    writeln!(writer, "    Symbol {{")?;
+    writeln!(writer, "        id: 0x0002,")?;
+    writeln!(writer, "        name: \"$\"")?;
+    write!(writer, "    }}")?;
     for terminal_ref in expected.content.iter().skip(2) {
         let terminal = grammar.get_terminal(terminal_ref.sid()).unwrap();
         writeln!(writer, ",")?;
-        write!(
+        writeln!(writer, "    Symbol {{")?;
+        writeln!(writer, "        id: 0x{:04X},", terminal.id)?;
+        writeln!(
             writer,
-            "    Symbol {{ id: 0x{:04X}, name: \"{}\" }}",
-            terminal.id,
+            "        name: \"{}\"",
             terminal.value.replace("\"", "\\\"")
         )?;
+        write!(writer, "    }}")?;
     }
+    writeln!(writer, "")?;
     writeln!(writer, "];")?;
     writeln!(writer)?;
 

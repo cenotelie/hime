@@ -100,6 +100,7 @@ fn write_code_symbols(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
             variable.id
         )?;
     }
+    writeln!(writer)?;
     for symbol in grammar.virtuals.iter() {
         writeln!(
             writer,
@@ -131,14 +132,14 @@ fn write_code_variables(writer: &mut dyn Write, grammar: &Grammar) -> Result<(),
     writeln!(writer, "pub const VARIABLES: &[Symbol] = &[")?;
     for (index, variable) in grammar.variables.iter().enumerate() {
         if index > 0 {
-            writeln!(writer, ", ")?;
+            writeln!(writer, ",")?;
         }
-        write!(
-            writer,
-            "    Symbol {{ id: 0x{:04X}, name: \"{}\" }}",
-            variable.id, &variable.name
-        )?;
+        writeln!(writer, "    Symbol {{")?;
+        writeln!(writer, "        id: 0x{:04X},", variable.id)?;
+        writeln!(writer, "        name: \"{}\"", &variable.name)?;
+        write!(writer, "    }}")?;
     }
+    writeln!(writer, "")?;
     writeln!(writer, "];")?;
     writeln!(writer)?;
     Ok(())
@@ -158,14 +159,14 @@ fn write_code_virtuals(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), 
     writeln!(writer, "pub const VIRTUALS: &[Symbol] = &[")?;
     for (index, symbol) in grammar.virtuals.iter().enumerate() {
         if index > 0 {
-            writeln!(writer, ", ")?;
+            writeln!(writer, ",")?;
         }
-        write!(
-            writer,
-            "    Symbol {{ id: 0x{:04X}, name: \"{}\" }}",
-            symbol.id, &symbol.name
-        )?;
+        writeln!(writer, "    Symbol {{")?;
+        writeln!(writer, "        id: 0x{:04X},", symbol.id)?;
+        writeln!(writer, "        name: \"{}\"", &symbol.name)?;
+        write!(writer, "    }}")?;
     }
+    writeln!(writer, "")?;
     writeln!(writer, "];")?;
     writeln!(writer)?;
     Ok(())
