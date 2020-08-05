@@ -548,6 +548,8 @@ impl Graph {
             }
         }
         // Close the children and add them to the graph
+        let mut shifts: Vec<(SymbolRef, StateKernel)> = shifts.into_iter().collect();
+        shifts.sort_by_key(|(s, _)| *s);
         for (next, kernel) in shifts.into_iter() {
             let child_index = match self.get_state_for(&kernel) {
                 Some(child_index) => child_index,
