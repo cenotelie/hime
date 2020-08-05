@@ -478,7 +478,7 @@ fn print_lr_conflict(
         Red.bold().paint("error"),
         Style::new().bold().paint(":"),
         Style::new().bold().paint(format!(
-            "{} conflict on lookahead `{}`",
+            "{} conflict, cannot decide what to do facing `{}`",
             match conflict.kind {
                 ConflictKind::ShiftReduce => "Shift/Reduce",
                 ConflictKind::ReduceReduce => "Reduce/Reduce"
@@ -490,7 +490,14 @@ fn print_lr_conflict(
     eprintln!("{}{} {}", &pad, Blue.bold().paint("-->"), &grammar.name);
     eprintln!("{} {}", &pad, Blue.bold().paint("|"));
     for item in conflict.shift_items.iter() {
-        print_lr_conflict_item_shift(max_width, data, &pad, grammar, item);
+        print_lr_conflict_item_shift(
+            max_width,
+            data,
+            &pad,
+            grammar,
+            item,
+            conflict.lookahead.terminal
+        );
     }
     for item in conflict.reduce_items.iter() {
         print_lr_conflict_item_reduce(
@@ -523,17 +530,19 @@ fn print_lr_conflict_item_shift(
     data: &LoadedData,
     pad: &str,
     grammar: &Grammar,
-    item: &Item
+    item: &Item,
+    terminal: TerminalRef
 ) {
     let rule = item.rule.get_rule_in(grammar);
     let choice = &rule.body.choices[0];
+    let value = grammar.get_symbol_value(terminal.into());
     let input_ref = choice.elements[item.position].input_ref.unwrap();
     print_input(
         max_width,
         data,
         &input_ref,
         pad,
-        Some("Shifting for this symbol")
+        Some(&format!("Could consume `{}` at this point", value))
     );
     eprintln!("{} {} ", pad, Blue.bold().paint("|"));
 }
@@ -549,6 +558,8 @@ fn print_lr_conflict_item_reduce(
 ) {
     let rule = item.rule.get_rule_in(grammar);
     let choice = &rule.body.choices[0];
+    let lookahead = item.lookaheads.get(terminal).unwrap();
+    let value = grammar.get_symbol_value(terminal.into());
     if item.position >= choice.elements.len() {
         let input_ref = choice.elements[choice.elements.len() - 1]
             .input_ref
@@ -569,7 +580,10 @@ fn print_lr_conflict_item_reduce(
             Blue.bold().paint("|"),
             &pad3,
             Red.bold().paint("^"),
-            Red.paint("Reducing at the rule's end")
+            Red.paint(&format!(
+                "Could match the rule ending here when looking ahead to `{}`",
+                value
+            ))
         );
     } else {
         let input_ref = choice.elements[item.position].input_ref.unwrap();
@@ -578,11 +592,12 @@ fn print_lr_conflict_item_reduce(
             data,
             &input_ref,
             pad,
-            Some("Reducing before this nullable part")
+            Some(&format!(
+                "Could match the partial rule ending here when looking ahead to `{}`",
+                value
+            ))
         );
     }
-    let lookahead = item.lookaheads.get(terminal).unwrap();
-    let value = grammar.get_symbol_value(terminal.into());
     for origin in lookahead.origins.iter() {
         let LookaheadOrigin::FirstOf(choice_ref) = origin;
         let rule = choice_ref.rule.get_rule_in(grammar);
@@ -593,10 +608,7 @@ fn print_lr_conflict_item_reduce(
                 data,
                 &input_ref,
                 pad,
-                Some(&format!(
-                    "Lookahead `{}` is a first terminal looking from here",
-                    value
-                ))
+                Some(&format!("`{}` can be expected, looking from here", value))
             );
         }
     }
