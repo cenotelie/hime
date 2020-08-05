@@ -1030,18 +1030,7 @@ fn build_graph_lalr1_kernels(graph0: &Graph) -> Vec<StateKernel> {
     let mut kernels: Vec<StateKernel> = graph0
         .states
         .iter()
-        .map(|state| StateKernel {
-            items: state
-                .kernel
-                .items
-                .iter()
-                .map(|item| Item {
-                    rule: item.rule,
-                    position: item.position,
-                    lookaheads: Lookaheads::default()
-                })
-                .collect()
-        })
+        .map(|state| state.kernel.clone())
         .collect();
     // set epsilon as lookahead on all items in kernel 0
     for item in kernels[0].items.iter_mut() {
@@ -1087,7 +1076,7 @@ fn build_graph_lalr1_propagation_table(
                     lookaheads: Lookaheads::from_single(Lookahead::from(TerminalRef::Dummy))
                 }]
             }
-            .into_state(grammar, LookaheadMode::LALR1);
+            .into_state(grammar, LookaheadMode::LR1);
             // For each item in the closure of the dummy item
             for dummy_item in dummy_state.items.iter() {
                 if let Some(next_symbol) = dummy_item.get_next_symbol(grammar) {
@@ -1111,11 +1100,9 @@ fn build_graph_lalr1_propagation_table(
                         });
                     } else {
                         // => Spontaneous generation of lookaheads
-                        for lookahead in dummy_item.lookaheads.0.iter() {
-                            kernels[child_state].items[child_item]
-                                .lookaheads
-                                .add(lookahead.clone());
-                        }
+                        kernels[child_state].items[child_item]
+                            .lookaheads
+                            .add_others(&dummy_item.lookaheads);
                     }
                 }
             }
