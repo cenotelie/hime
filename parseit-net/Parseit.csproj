@@ -13,7 +13,6 @@
     <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
     <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/../.releng/hime.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
-    <PublicSign>True</PublicSign>
     <Version>3.5.1</Version>
   </PropertyGroup>
   <PropertyGroup>
