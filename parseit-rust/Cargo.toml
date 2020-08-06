@@ -1,6 +1,6 @@
 [package]
 name = "parseit"
-version = "3.5.1"
+version = "3.5.2"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Command line to parse a piece of input using a packaged parser."
 homepage = "https://cenotelie.fr/projects/hime"
@@ -11,5 +11,5 @@ license = "LGPL-3.0"
 edition = "2018"
 
 [dependencies]
-hime_redist = "3.5.1"
+hime_redist = "3.5.2"
 libloading = "0.4.3"
