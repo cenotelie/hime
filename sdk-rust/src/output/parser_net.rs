@@ -65,7 +65,7 @@ pub fn write(
     writeln!(writer, "using System.Collections.Generic;")?;
     writeln!(writer, "using System.IO;")?;
     writeln!(writer, "using Hime.Redist;")?;
-    writeln!(writer, "using Hime.Redist.Lexer;")?;
+    writeln!(writer, "using Hime.Redist.Parsers;")?;
     writeln!(writer)?;
     writeln!(writer, "namespace {}", nmespace)?;
     writeln!(writer, "{{")?;

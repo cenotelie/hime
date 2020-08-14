@@ -17,6 +17,7 @@
 
 //! Module for producing output
 
+mod assembly_net;
 pub mod helper;
 mod lexer_data;
 mod lexer_java;
@@ -32,6 +33,12 @@ use crate::finite::DFA;
 use crate::grammars::{Grammar, TerminalRef, TerminalSet, OPTION_SEPARATOR};
 use crate::lr;
 use crate::{CompilationTask, ParsingMethod, Runtime};
+use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
+use std::env;
+use std::fs::File;
+use std::io::{self, Write};
+use std::path::PathBuf;
 
 /// Build and output artifacts for a grammar
 pub fn execute_for_grammar(
@@ -212,6 +219,73 @@ pub fn execute_for_grammar(
     Ok(())
 }
 
+/// Gets the list of sources to produce for a grammar
+pub fn get_sources(
+    task: &CompilationTask,
+    grammar: &Grammar,
+    grammar_index: usize
+) -> Result<Vec<PathBuf>, Error> {
+    let runtime = task.get_output_target_for(grammar, grammar_index)?;
+    let output_path = task.get_output_path_for(grammar);
+    Ok(match runtime {
+        Runtime::Net => vec![
+            build_file(
+                output_path.as_ref(),
+                format!("{}Lexer.cs", helper::to_upper_camel_case(&grammar.name))
+            ),
+            build_file(
+                output_path.as_ref(),
+                format!("{}Parser.cs", helper::to_upper_camel_case(&grammar.name))
+            ),
+            build_file(output_path.as_ref(), get_lexer_bin_name_net(grammar)),
+            build_file(output_path.as_ref(), get_parser_bin_name_net(grammar)),
+        ],
+        Runtime::Java => vec![
+            build_file(
+                output_path.as_ref(),
+                format!("{}Lexer.java", helper::to_upper_camel_case(&grammar.name))
+            ),
+            build_file(
+                output_path.as_ref(),
+                format!("{}Parser.java", helper::to_upper_camel_case(&grammar.name))
+            ),
+            build_file(output_path.as_ref(), get_lexer_bin_name_java(grammar)),
+            build_file(output_path.as_ref(), get_parser_bin_name_java(grammar)),
+        ],
+        Runtime::Rust => vec![
+            build_file(
+                output_path.as_ref(),
+                format!("{}.rs", helper::to_snake_case(&grammar.name))
+            ),
+            build_file(output_path.as_ref(), get_lexer_bin_name_rust(grammar)),
+            build_file(output_path.as_ref(), get_parser_bin_name_rust(grammar)),
+        ]
+    })
+}
+
+/// Build a path buf for an output file
+fn build_file(path: Option<&String>, file_name: String) -> PathBuf {
+    let mut final_path = PathBuf::new();
+    if let Some(path) = path {
+        final_path.push(path);
+    }
+    final_path.push(file_name);
+    final_path
+}
+
+/// Builds an assembly for a runtime
+pub fn build_assembly(
+    task: &CompilationTask,
+    units: &[(usize, &Grammar)],
+    runtime: Runtime
+) -> Result<(), Error> {
+    match runtime {
+        Runtime::Net => assembly_net::build(task, units),
+        Runtime::Java => Ok(()),
+        Runtime::Rust => Ok(())
+    }
+}
+
 /// Gets the separator for the grammar
 fn get_separator(
     grammar: &mut Grammar,
@@ -293,4 +367,22 @@ fn get_parser_bin_name_java(grammar: &Grammar) -> String {
 /// Gets the name of the file for the parser automaton in Rust
 fn get_parser_bin_name_rust(grammar: &Grammar) -> String {
     format!("{}_parser.bin", helper::to_snake_case(&grammar.name))
+}
+
+/// Creates a temp folder
+fn temporary_folder() -> PathBuf {
+    let mut result = env::temp_dir();
+    let name: String = thread_rng().sample_iter(&Alphanumeric).take(10).collect();
+    result.push(name);
+    result
+}
+
+/// Export a resource a target file
+fn export_resource(folder: &PathBuf, file_name: &str, content: &[u8]) -> Result<(), Error> {
+    let mut target = folder.clone();
+    target.push(file_name);
+    let file = File::create(target)?;
+    let mut writer = io::BufWriter::new(file);
+    writer.write_all(content)?;
+    Ok(())
 }

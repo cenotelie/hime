@@ -20,6 +20,7 @@
 #[macro_use]
 extern crate lazy_static;
 extern crate hime_redist;
+extern crate rand;
 
 pub mod errors;
 pub mod finite;
@@ -515,10 +516,97 @@ impl CompilationTask {
                 errors.append(&mut errs);
             }
         }
+        // output assemblies
+        self.execute_output_assembly(&data, Runtime::Net, &mut errors);
+        self.execute_output_assembly(&data, Runtime::Java, &mut errors);
+        self.execute_output_assembly(&data, Runtime::Rust, &mut errors);
         if !errors.is_empty() {
             Err(Errors::from(data, errors))
         } else {
             Ok(data)
+        }
+    }
+
+    /// Build an assembly for the relevant grammars
+    fn execute_output_assembly(&self, data: &LoadedData, target: Runtime, errors: &mut Vec<Error>) {
+        // aggregate all targets for assembly
+        let units = self.gather_grammars_for_assembly(data, target, errors);
+        if units.is_empty() {
+            return;
+        }
+        if let Err(error) = output::build_assembly(self, &units, target) {
+            errors.push(error);
+            return;
+        }
+        // cleanup the sources for assembly only grammars
+        self.delete_sources(&units, errors);
+    }
+
+    /// Gather the grammars for build an assembly for a target
+    fn gather_grammars_for_assembly<'a>(
+        &self,
+        data: &'a LoadedData,
+        target: Runtime,
+        errors: &mut Vec<Error>
+    ) -> Vec<(usize, &'a Grammar)> {
+        data.grammars
+            .iter()
+            .enumerate()
+            .filter(|(index, grammar)| {
+                match self.get_output_target_for(grammar, *index) {
+                    Err(error) => {
+                        errors.push(error);
+                        return false;
+                    }
+                    Ok(runtime) => {
+                        if runtime != target {
+                            return false;
+                        }
+                    }
+                };
+                match self.get_mode_for(grammar, *index) {
+                    Ok(Mode::Assembly) => true,
+                    Ok(Mode::SourcesAndAssembly) => true,
+                    Ok(Mode::Sources) => false,
+                    Err(error) => {
+                        errors.push(error);
+                        false
+                    }
+                }
+            })
+            .collect()
+    }
+
+    /// Delete the sources for appropriate units
+    fn delete_sources(&self, units: &[(usize, &Grammar)], errors: &mut Vec<Error>) {
+        // gather all source files
+        let mut all_files = Vec::new();
+        for (index, grammar) in units.iter() {
+            match self.get_mode_for(grammar, *index) {
+                Ok(Mode::Sources) => {
+                    return;
+                }
+                Ok(Mode::SourcesAndAssembly) => {
+                    return;
+                }
+                Ok(Mode::Assembly) => {}
+                Err(error) => {
+                    errors.push(error);
+                    return;
+                }
+            }
+            match output::get_sources(self, grammar, *index) {
+                Ok(mut sources) => all_files.append(&mut sources),
+                Err(error) => {
+                    errors.push(error);
+                }
+            }
+        }
+        // cleanup output for source only targets
+        for file in all_files.into_iter() {
+            if let Err(error) = std::fs::remove_file(file) {
+                errors.push(Error::from(error));
+            }
         }
     }
 }
