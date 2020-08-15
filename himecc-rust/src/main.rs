@@ -40,14 +40,6 @@ pub fn main() {
         .author("Association Cénotélie <contact@cenotelie.fr>")
         .about("Generator of lexers and parsers for the Hime runtime.")
         .arg(
-            Arg::with_name("regenerate")
-                .short("r")
-                .long("regenerate")
-                .help("Regenerate the parser for Hime grammars")
-                .takes_value(false)
-                .required(false)
-        )
-        .arg(
             Arg::with_name("output_mode")
                 .value_name("MODE")
                 .short("o")
@@ -76,6 +68,15 @@ pub fn main() {
                     "java",
                     "rust"
                 ])
+        )
+        .arg(
+            Arg::with_name("output_target_runtime_path")
+                .value_name("RUNTIME")
+                .short("r")
+                .long("runtime")
+                .help("The path to a specific target runtime.")
+                .takes_value(true)
+                .required(false)
         )
         .arg(
             Arg::with_name("output_path")
@@ -145,49 +146,48 @@ pub fn main() {
         )
         .get_matches();
 
-    if matches.value_of("regenerate").is_some() {
-        // TODO: regenerate
-    } else {
-        let mut task = CompilationTask::default();
-        match matches.value_of("output_mode") {
-            Some("sources") => task.mode = Some(Mode::Sources),
-            Some("assembly") => task.mode = Some(Mode::Assembly),
-            Some("all") => task.mode = Some(Mode::SourcesAndAssembly),
-            _ => {}
+    let mut task = CompilationTask::default();
+    match matches.value_of("output_mode") {
+        Some("sources") => task.mode = Some(Mode::Sources),
+        Some("assembly") => task.mode = Some(Mode::Assembly),
+        Some("all") => task.mode = Some(Mode::SourcesAndAssembly),
+        _ => {}
+    }
+    match matches.value_of("output_target") {
+        Some("net") => task.output_target = Some(Runtime::Net),
+        Some("java") => task.output_target = Some(Runtime::Java),
+        Some("rust") => task.output_target = Some(Runtime::Rust),
+        _ => {}
+    }
+    task.output_target_runtime_path = matches
+        .value_of("output_target_runtime_path")
+        .map(|v| v.to_string());
+    task.output_path = matches.value_of("output_path").map(|v| v.to_string());
+    match matches.value_of("output_access") {
+        Some("internal") => task.output_modifier = Some(Modifier::Internal),
+        Some("public") => task.output_modifier = Some(Modifier::Public),
+        _ => {}
+    }
+    task.output_namespace = matches.value_of("output_namespace").map(|v| v.to_string());
+    match matches.value_of("parsing_method") {
+        Some("lr0") => task.method = Some(ParsingMethod::LR0),
+        Some("lr1") => task.method = Some(ParsingMethod::LR1),
+        Some("lalr1") => task.method = Some(ParsingMethod::LALR1),
+        Some("rnglr1") => task.method = Some(ParsingMethod::RNGLR1),
+        Some("rnglalr1") => task.method = Some(ParsingMethod::RNGLALR1),
+        _ => {}
+    }
+    task.grammar_name = matches.value_of("grammar_name").map(|v| v.to_string());
+    if let Some(inputs) = matches.values_of("inputs") {
+        for input in inputs {
+            task.input_files.push(input.to_string());
         }
-        match matches.value_of("output_target") {
-            Some("net") => task.output_target = Some(Runtime::Net),
-            Some("java") => task.output_target = Some(Runtime::Java),
-            Some("rust") => task.output_target = Some(Runtime::Rust),
-            _ => {}
-        }
-        task.output_path = matches.value_of("output_path").map(|v| v.to_string());
-        match matches.value_of("output_access") {
-            Some("internal") => task.output_modifier = Some(Modifier::Internal),
-            Some("public") => task.output_modifier = Some(Modifier::Public),
-            _ => {}
-        }
-        task.output_namespace = matches.value_of("output_namespace").map(|v| v.to_string());
-        match matches.value_of("parsing_method") {
-            Some("lr0") => task.method = Some(ParsingMethod::LR0),
-            Some("lr1") => task.method = Some(ParsingMethod::LR1),
-            Some("lalr1") => task.method = Some(ParsingMethod::LALR1),
-            Some("rnglr1") => task.method = Some(ParsingMethod::RNGLR1),
-            Some("rnglalr1") => task.method = Some(ParsingMethod::RNGLALR1),
-            _ => {}
-        }
-        task.grammar_name = matches.value_of("grammar_name").map(|v| v.to_string());
-        if let Some(inputs) = matches.values_of("inputs") {
-            for input in inputs {
-                task.input_files.push(input.to_string());
-            }
-        }
-        match task.execute() {
-            Ok(_) => process::exit(0),
-            Err(errs) => {
-                errors::print_errors(&errs);
-                process::exit(1);
-            }
+    }
+    match task.execute() {
+        Ok(_) => process::exit(0),
+        Err(errs) => {
+            errors::print_errors(&errs);
+            process::exit(1);
         }
     }
 }

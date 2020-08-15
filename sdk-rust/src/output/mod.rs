@@ -18,6 +18,7 @@
 //! Module for producing output
 
 mod assembly_net;
+mod assembly_rust;
 pub mod helper;
 mod lexer_data;
 mod lexer_java;
@@ -282,7 +283,7 @@ pub fn build_assembly(
     match runtime {
         Runtime::Net => assembly_net::build(task, units),
         Runtime::Java => Ok(()),
-        Runtime::Rust => Ok(())
+        Runtime::Rust => assembly_rust::build(task, units)
     }
 }
 

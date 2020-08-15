@@ -353,8 +353,8 @@ pub struct CompilationTask {
     pub mode: Option<Mode>,
     /// The target runtime
     pub output_target: Option<Runtime>,
-    /// The path to a local Rust target runtime
-    pub output_rust_runtime: Option<String>,
+    /// The path to a local target runtime overriding the one specified in the project manifest
+    pub output_target_runtime_path: Option<String>,
     /// The path for the compiler's output
     pub output_path: Option<String>,
     /// The namespace for the generated code
