@@ -159,10 +159,10 @@ pub fn write(
     writeln!(writer)?;
 
     writeln!(writer, "/// Creates a new lexer")?;
-    writeln!(writer, "fn new_lexer<'a>(")?;
-    writeln!(writer, "    repository: TokenRepository<'a>,")?;
-    writeln!(writer, "    errors: &'a mut ParseErrors")?;
-    writeln!(writer, ") -> {}<'a> {{", base_lexer)?;
+    writeln!(writer, "fn new_lexer<'a: 'b, 'b, 'c>(")?;
+    writeln!(writer, "    repository: TokenRepository<'a, 'b, 'c>,")?;
+    writeln!(writer, "    errors: &'b mut ParseErrors<'a>")?;
+    writeln!(writer, ") -> {}<'a, 'b, 'c> {{", base_lexer)?;
     writeln!(
         writer,
         "    let automaton = Automaton::new(LEXER_AUTOMATON);"

@@ -47,7 +47,6 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
     output_file2.push("package");
     output_file2 = output_file2
         .read_dir()?
-        .into_iter()
         .find(|entry| match entry.as_ref() {
             Err(_) => false,
             Ok(entry) => {

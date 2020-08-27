@@ -97,7 +97,8 @@ fn execute_dotnet_command(
         .arg(project_folder.as_os_str())
         .args(args)
         .output()?;
-    for line in BufReader::<&[u8]>::new(output.stderr.as_ref()).lines() {
+    let mut lines = BufReader::<&[u8]>::new(output.stderr.as_ref()).lines();
+    if let Some(line) = lines.next() {
         return Err(Error::Msg(line?));
     }
     for line in BufReader::<&[u8]>::new(output.stdout.as_ref()).lines() {

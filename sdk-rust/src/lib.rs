@@ -257,7 +257,10 @@ impl InputReference {
 
 impl InputReference {
     /// Build a reference from the specifiec input name and AST node
-    pub fn from<'a>(input_index: usize, node: &AstNode<'a>) -> InputReference {
+    pub fn from<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd>(
+        input_index: usize,
+        node: &AstNode<'a, 'b, 'c, 'd>
+    ) -> InputReference {
         let (position, span) = node.get_total_position_and_span().unwrap();
         InputReference {
             input_index,

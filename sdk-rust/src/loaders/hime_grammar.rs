@@ -232,10 +232,10 @@ pub const TERMINALS: &[Symbol] = &[
 ];
 
 /// Creates a new lexer
-fn new_lexer<'a>(
-    repository: TokenRepository<'a>,
-    errors: &'a mut ParseErrors
-) -> ContextFreeLexer<'a> {
+fn new_lexer<'a: 'b, 'b, 'c>(
+    repository: TokenRepository<'a, 'b, 'c>,
+    errors: &'b mut ParseErrors<'a>
+) -> ContextFreeLexer<'a, 'b, 'c> {
     let automaton = Automaton::new(LEXER_AUTOMATON);
     ContextFreeLexer::new(repository, errors, automaton, 0x0007)
 }
@@ -547,27 +547,37 @@ pub const VIRTUALS: &[Symbol] = &[
 ];
 
 /// Parses the specified string with this parser
-pub fn parse_string(input: &str) -> ParseResult {
+pub fn parse_string(input: &str) -> ParseResult<'static, 'static> {
     let text = Text::new(input);
     parse_text(text)
 }
 
 /// Parses the specified stream of UTF-16 with this parser
-pub fn parse_utf16(input: &mut dyn Read, big_endian: bool) -> ParseResult {
+pub fn parse_utf16(input: &mut dyn Read, big_endian: bool) -> ParseResult<'static, 'static> {
     let text = Text::from_utf16_stream(input, big_endian);
     parse_text(text)
 }
 
 /// Parses the specified stream of UTF-16 with this parser
-pub fn parse_utf8(input: &mut dyn Read) -> ParseResult {
+pub fn parse_utf8(input: &mut dyn Read) -> ParseResult<'static, 'static> {
     let text = Text::from_utf8_stream(input);
     parse_text(text)
 }
 
 /// Parses the specified text with this parser
-fn parse_text(text: Text) -> ParseResult {
+fn parse_text(text: Text) -> ParseResult<'static, 'static> {
+    parse_text_with(text, TERMINALS, VARIABLES, VIRTUALS)
+}
+
+/// Parses the specified text with this parser
+fn parse_text_with<'a: 'b, 'b>(
+    text: Text,
+    terminals: &'b [Symbol<'a>],
+    variables: &'b [Symbol<'a>],
+    virtuals: &'b [Symbol<'a>]
+) -> ParseResult<'a, 'b> {
     let mut my_actions = |_index: usize, _head: Symbol, _body: &dyn SemanticBody| ();
-    let mut result = ParseResult::new(TERMINALS, VARIABLES, VIRTUALS, text);
+    let mut result = ParseResult::new(terminals, variables, virtuals, text);
     {
         let data = result.get_parsing_data();
         let mut lexer = new_lexer(data.0, data.1);
@@ -651,7 +661,7 @@ pub fn visit(result: &ParseResult, visitor: &dyn Visitor) {
 }
 
 /// Walk the sub-AST from the specified node using a visitor
-pub fn visit_ast_node<'a>(node: AstNode<'a>, visitor: &dyn Visitor) {
+pub fn visit_ast_node(node: AstNode, visitor: &dyn Visitor) {
     let children = node.children();
     for child in children.iter() {
         visit_ast_node(child, visitor);

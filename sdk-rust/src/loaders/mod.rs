@@ -81,9 +81,9 @@ pub fn load(inputs: &[String]) -> Result<LoadedData, Errors> {
 }
 
 /// Resolves inheritance and load grammars
-fn resolve_inheritance<'a>(
-    completed: &mut Vec<Loader<'a>>,
-    to_resolve: &mut Vec<Loader<'a>>,
+fn resolve_inheritance<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd>(
+    completed: &mut Vec<Loader<'a, 'b, 'c, 'd>>,
+    to_resolve: &mut Vec<Loader<'a, 'b, 'c, 'd>>,
     errors: &mut Vec<Error>
 ) {
     loop {
@@ -114,7 +114,7 @@ fn resolve_inheritance<'a>(
 fn parse_input(
     file_name: &str,
     input_index: usize
-) -> Result<ParseResult, (ParseResult, Vec<Error>)> {
+) -> Result<ParseResult<'static, 'static>, (ParseResult<'static, 'static>, Vec<Error>)> {
     let file = match fs::File::open(file_name) {
         Ok(f) => f,
         Err(err) => {
@@ -155,7 +155,7 @@ fn parse_input(
 }
 
 /// Parses all inputs
-fn parse_inputs(inputs: &[String]) -> Result<Vec<ParseResult>, Errors> {
+fn parse_inputs(inputs: &[String]) -> Result<Vec<ParseResult<'static, 'static>>, Errors> {
     let mut results = Vec::new();
     let mut has_errors = false;
     let mut errors = Vec::new();
@@ -192,11 +192,11 @@ fn parse_inputs(inputs: &[String]) -> Result<Vec<ParseResult>, Errors> {
 }
 
 /// Represents a loader for a grammar
-struct Loader<'a> {
+struct Loader<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> {
     /// index of the input
     input_index: usize,
     /// The parse result
-    root: AstNode<'a>,
+    root: AstNode<'a, 'b, 'c, 'd>,
     /// Lists of the inherited grammars
     inherited: Vec<String>,
     /// The resulting grammar
@@ -205,9 +205,13 @@ struct Loader<'a> {
     case_insensitive: bool
 }
 
-impl<'a> Loader<'a> {
+impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Loader<'a, 'b, 'c, 'd> {
     /// Creates a new loader
-    fn new(input_index: usize, root: AstNode<'a>, errors: &mut Vec<Error>) -> Loader<'a> {
+    fn new(
+        input_index: usize,
+        root: AstNode<'a, 'b, 'c, 'd>,
+        errors: &mut Vec<Error>
+    ) -> Loader<'a, 'b, 'c, 'd> {
         let input_ref = InputReference::from(input_index, &root.children().at(0));
         let name = root.children().at(0).get_value().unwrap();
         let inherited = root
@@ -293,14 +297,14 @@ impl<'a> Loader<'a> {
 }
 
 /// Loads the options block of a grammar
-fn load_options<'a>(input_index: usize, grammar: &mut Grammar, node: AstNode<'a>) {
+fn load_options(input_index: usize, grammar: &mut Grammar, node: AstNode) {
     for child in node.children().iter() {
         load_option(input_index, grammar, child);
     }
 }
 
 /// Loads the grammar option in the given AST
-fn load_option<'a>(input_index: usize, grammar: &mut Grammar, node: AstNode<'a>) {
+fn load_option(input_index: usize, grammar: &mut Grammar, node: AstNode) {
     let name = node.children().at(0).get_value().unwrap();
     let value = replace_escapees(node.children().at(1).get_value().unwrap());
     let value = value[1..(value.len() - 1)].to_string();
@@ -313,11 +317,11 @@ fn load_option<'a>(input_index: usize, grammar: &mut Grammar, node: AstNode<'a>)
 }
 
 /// Loads the terminal blocks of a grammar
-fn load_terminals<'a>(
+fn load_terminals(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
-    node: AstNode<'a>
+    node: AstNode
 ) {
     for child in node.children().iter() {
         let id = child.get_symbol().id;
@@ -346,11 +350,11 @@ fn load_terminals<'a>(
 }
 
 /// Loads the terminal context in the given AST
-fn load_terminal_rule_context<'a>(
+fn load_terminal_rule_context(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
-    node: AstNode<'a>
+    node: AstNode
 ) {
     let children = node.children();
     let name = children.at(0).get_value().unwrap();
@@ -361,11 +365,11 @@ fn load_terminal_rule_context<'a>(
 }
 
 /// Loads the terminal rule in the given AST
-fn load_terminal_rule<'a>(
+fn load_terminal_rule(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
-    node: AstNode<'a>,
+    node: AstNode,
     context: &str,
     is_fragment: bool
 ) {
@@ -392,12 +396,7 @@ fn load_terminal_rule<'a>(
 }
 
 /// Builds the NFA represented by the AST node
-fn load_nfa<'a>(
-    input_index: usize,
-    errors: &mut Vec<Error>,
-    grammar: &Grammar,
-    node: AstNode<'a>
-) -> NFA {
+fn load_nfa(input_index: usize, errors: &mut Vec<Error>, grammar: &Grammar, node: AstNode) -> NFA {
     match node.get_symbol().id {
         hime_grammar::ID_TERMINAL_LITERAL_TEXT => load_nfa_simple_text(&node),
         hime_grammar::ID_TERMINAL_UNICODE_CODEPOINT => {
@@ -750,12 +749,7 @@ fn add_unicode_span_to_nfa(nfa: &mut NFA, span: Span) {
 }
 
 /// Loads the rules block of a grammar
-fn load_rules<'a>(
-    input_index: usize,
-    errors: &mut Vec<Error>,
-    grammar: &mut Grammar,
-    node: AstNode<'a>
-) {
+fn load_rules(input_index: usize, errors: &mut Vec<Error>, grammar: &mut Grammar, node: AstNode) {
     // load new variables for the rule's head
     for child in node.children().iter() {
         let id = child.get_symbol().id;
@@ -791,11 +785,11 @@ fn load_rules<'a>(
 }
 
 /// Loads the syntactic rule in the given AST
-fn load_simple_rule<'a>(
+fn load_simple_rule(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
-    node: AstNode<'a>
+    node: AstNode
 ) {
     let name = node.children().at(0).get_value().unwrap();
     let head_sid = grammar.add_variable(&name).id;
@@ -818,12 +812,12 @@ fn load_simple_rule<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_simple_rule_definitions<'a>(
+fn load_simple_rule_definitions(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     head_sid: usize,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     match node.get_symbol().id {
         hime_grammar::ID_VARIABLE_RULE_DEF_CONTEXT => {
@@ -859,12 +853,12 @@ fn load_simple_rule_definitions<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_simple_rule_context<'a>(
+fn load_simple_rule_context(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     head_sid: usize,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     let name = node.children().at(0).get_value().unwrap();
     let context_id = grammar.resolve_context(&name);
@@ -893,12 +887,12 @@ fn load_simple_rule_context<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_simple_rule_sub_rule<'a>(
+fn load_simple_rule_sub_rule(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     head_sid: usize,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     let definitions = load_simple_rule_definitions(
         input_index,
@@ -925,12 +919,12 @@ fn load_simple_rule_sub_rule<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_simple_rule_optional<'a>(
+fn load_simple_rule_optional(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     head_sid: usize,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     let mut definitions = load_simple_rule_definitions(
         input_index,
@@ -944,12 +938,12 @@ fn load_simple_rule_optional<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_simple_rule_zero_or_more<'a>(
+fn load_simple_rule_zero_or_more(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     head_sid: usize,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     // get definitions
     let set_inner = load_simple_rule_definitions(
@@ -1001,12 +995,12 @@ fn load_simple_rule_zero_or_more<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_simple_rule_one_or_more<'a>(
+fn load_simple_rule_one_or_more(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     head_sid: usize,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     // get definitions
     let set_inner = load_simple_rule_definitions(
@@ -1055,12 +1049,12 @@ fn load_simple_rule_one_or_more<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_simple_rule_union<'a>(
+fn load_simple_rule_union(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     head_sid: usize,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     let set_left = load_simple_rule_definitions(
         input_index,
@@ -1080,12 +1074,12 @@ fn load_simple_rule_union<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_simple_rule_tree_action_promote<'a>(
+fn load_simple_rule_tree_action_promote(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     head_sid: usize,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     let mut set_inner = load_simple_rule_definitions(
         input_index,
@@ -1099,12 +1093,12 @@ fn load_simple_rule_tree_action_promote<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_simple_rule_tree_action_drop<'a>(
+fn load_simple_rule_tree_action_drop(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     head_sid: usize,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     let mut set_inner = load_simple_rule_definitions(
         input_index,
@@ -1118,12 +1112,12 @@ fn load_simple_rule_tree_action_drop<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_simple_rule_concat<'a>(
+fn load_simple_rule_concat(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     head_sid: usize,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     let set_left = load_simple_rule_definitions(
         input_index,
@@ -1150,11 +1144,11 @@ fn load_simple_rule_empty_part() -> BodySet<RuleBody> {
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_simple_rule_atomic<'a>(
+fn load_simple_rule_atomic(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     match node.get_symbol().id {
         hime_grammar::ID_VARIABLE_RULE_SYM_ACTION => {
@@ -1177,10 +1171,10 @@ fn load_simple_rule_atomic<'a>(
 }
 
 /// Builds the set of rule definitions that represents a single semantic action
-fn load_simple_rule_atomic_action<'a>(
+fn load_simple_rule_atomic_action(
     input_index: usize,
     grammar: &mut Grammar,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     let name = node.children().at(0).get_value().unwrap();
     let id = grammar.add_action(&name).id;
@@ -1193,10 +1187,10 @@ fn load_simple_rule_atomic_action<'a>(
 }
 
 /// Builds the set of rule definitions that represents a single virtual symbol
-fn load_simple_rule_atomic_virtual<'a>(
+fn load_simple_rule_atomic_virtual(
     input_index: usize,
     grammar: &mut Grammar,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     let name = node.children().at(0).get_value().unwrap();
     let name = replace_escapees(name[1..(name.len() - 1)].to_string());
@@ -1210,11 +1204,11 @@ fn load_simple_rule_atomic_virtual<'a>(
 }
 
 /// Builds the set of rule definitions that represents a single reference to a simple variable
-fn load_simple_rule_atomic_simple_ref<'a>(
+fn load_simple_rule_atomic_simple_ref(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     let name = node.children().at(0).get_value().unwrap();
     match grammar.get_symbol(&name) {
@@ -1235,11 +1229,11 @@ fn load_simple_rule_atomic_simple_ref<'a>(
 }
 
 /// Builds the set of rule definitions that represents a single reference to a template variable
-fn load_simple_rule_atomic_template_ref<'a>(
+fn load_simple_rule_atomic_template_ref(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     let name = node.children().at(0).get_value().unwrap();
     let arguments: Vec<SymbolRef> = node
@@ -1271,10 +1265,10 @@ fn load_simple_rule_atomic_template_ref<'a>(
 }
 
 /// Builds the set of rule definitions that represents a single inline piece of text
-fn load_simple_rule_atomic_inline_text<'a>(
+fn load_simple_rule_atomic_inline_text(
     input_index: usize,
     grammar: &mut Grammar,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<RuleBody> {
     // Construct the terminal name
     let value = node.get_value().unwrap();
@@ -1306,11 +1300,11 @@ fn load_simple_rule_atomic_inline_text<'a>(
 }
 
 /// Loads the syntactic rule in the given AST
-fn load_template_rule<'a>(
+fn load_template_rule(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
-    node: AstNode<'a>
+    node: AstNode
 ) {
     let name = node.children().at(0).get_value().unwrap();
     let template_index = grammar
@@ -1330,12 +1324,12 @@ fn load_template_rule<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_template_rule_definitions<'a>(
+fn load_template_rule_definitions(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     match node.get_symbol().id {
         hime_grammar::ID_VARIABLE_RULE_DEF_CONTEXT => {
@@ -1371,12 +1365,12 @@ fn load_template_rule_definitions<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_template_rule_context<'a>(
+fn load_template_rule_context(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     let name = node.children().at(0).get_value().unwrap();
     let context_id = grammar.resolve_context(&name);
@@ -1407,12 +1401,12 @@ fn load_template_rule_context<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_template_rule_sub_rule<'a>(
+fn load_template_rule_sub_rule(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     let definitions = load_template_rule_definitions(
         input_index,
@@ -1439,12 +1433,12 @@ fn load_template_rule_sub_rule<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_template_rule_optional<'a>(
+fn load_template_rule_optional(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     let mut definitions = load_template_rule_definitions(
         input_index,
@@ -1458,12 +1452,12 @@ fn load_template_rule_optional<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_template_rule_zero_or_more<'a>(
+fn load_template_rule_zero_or_more(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     // get definitions
     let set_inner = load_template_rule_definitions(
@@ -1517,12 +1511,12 @@ fn load_template_rule_zero_or_more<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_template_rule_one_or_more<'a>(
+fn load_template_rule_one_or_more(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     // get definitions
     let set_inner = load_template_rule_definitions(
@@ -1573,12 +1567,12 @@ fn load_template_rule_one_or_more<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_template_rule_union<'a>(
+fn load_template_rule_union(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     let set_left = load_template_rule_definitions(
         input_index,
@@ -1598,12 +1592,12 @@ fn load_template_rule_union<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_template_rule_tree_action_promote<'a>(
+fn load_template_rule_tree_action_promote(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     let mut set_inner = load_template_rule_definitions(
         input_index,
@@ -1617,12 +1611,12 @@ fn load_template_rule_tree_action_promote<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_template_rule_tree_action_drop<'a>(
+fn load_template_rule_tree_action_drop(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     let mut set_inner = load_template_rule_definitions(
         input_index,
@@ -1636,12 +1630,12 @@ fn load_template_rule_tree_action_drop<'a>(
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_template_rule_concat<'a>(
+fn load_template_rule_concat(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     let set_left = load_template_rule_definitions(
         input_index,
@@ -1668,12 +1662,12 @@ fn load_template_rule_empty_part() -> BodySet<TemplateRuleBody> {
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
-fn load_template_rule_atomic<'a>(
+fn load_template_rule_atomic(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     match node.get_symbol().id {
         hime_grammar::ID_VARIABLE_RULE_SYM_ACTION => {
@@ -1696,10 +1690,10 @@ fn load_template_rule_atomic<'a>(
 }
 
 /// Builds the set of rule definitions that represents a single semantic action
-fn load_template_rule_atomic_action<'a>(
+fn load_template_rule_atomic_action(
     input_index: usize,
     grammar: &mut Grammar,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     let name = node.children().at(0).get_value().unwrap();
     let id = grammar.add_action(&name).id;
@@ -1712,10 +1706,10 @@ fn load_template_rule_atomic_action<'a>(
 }
 
 /// Builds the set of rule definitions that represents a single virtual symbol
-fn load_template_rule_atomic_virtual<'a>(
+fn load_template_rule_atomic_virtual(
     input_index: usize,
     grammar: &mut Grammar,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     let name = node.children().at(0).get_value().unwrap();
     let name = replace_escapees(name[1..(name.len() - 1)].to_string());
@@ -1729,12 +1723,12 @@ fn load_template_rule_atomic_virtual<'a>(
 }
 
 /// Builds the set of rule definitions that represents a single reference to a simple variable
-fn load_template_rule_atomic_simple_ref<'a>(
+fn load_template_rule_atomic_simple_ref(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     let name = node.children().at(0).get_value().unwrap();
     if let Some(index) = parameters.iter().position(|p| p == &name) {
@@ -1763,12 +1757,12 @@ fn load_template_rule_atomic_simple_ref<'a>(
 }
 
 /// Builds the set of rule definitions that represents a single reference to a template variable
-fn load_template_rule_atomic_template_ref<'a>(
+fn load_template_rule_atomic_template_ref(
     input_index: usize,
     errors: &mut Vec<Error>,
     grammar: &mut Grammar,
     parameters: &[String],
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     let name = node.children().at(0).get_value().unwrap();
     let template_index = match grammar
@@ -1824,10 +1818,10 @@ fn load_template_rule_atomic_template_ref<'a>(
 }
 
 /// Builds the set of rule definitions that represents a single inline piece of text
-fn load_template_rule_atomic_inline_text<'a>(
+fn load_template_rule_atomic_inline_text(
     input_index: usize,
     grammar: &mut Grammar,
-    node: AstNode<'a>
+    node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     // Construct the terminal name
     let value = node.get_value().unwrap();
