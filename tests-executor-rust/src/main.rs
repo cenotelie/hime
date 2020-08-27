@@ -104,14 +104,18 @@ fn read_args() -> Vec<String> {
 }
 
 /// Gets the serialized expected AST
-fn get_expected_ast(my_path: &path::Path, library: &libloading::Library) -> ParseResult {
+fn get_expected_ast(
+    my_path: &path::Path,
+    library: &libloading::Library
+) -> ParseResult<'static, 'static> {
     let file = my_path.join("expected.txt");
     let file_input = fs::File::open(file).unwrap_or_else(|error| panic!("{}", error));
     let mut input_reader = io::BufReader::new(file_input);
     unsafe {
-        let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResult> = library
-            .get(b"expected_tree_parse_utf8")
-            .unwrap_or_else(|error| panic!("{}", error));
+        let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResult<'static, 'static>> =
+            library
+                .get(b"expected_tree_parse_utf8")
+                .unwrap_or_else(|error| panic!("{}", error));
         parser(&mut input_reader)
     }
 }
@@ -133,7 +137,7 @@ fn get_parsed_input(
     my_path: &path::Path,
     library: &libloading::Library,
     parser_name: &str
-) -> ParseResult {
+) -> ParseResult<'static, 'static> {
     let mut function_name = String::new();
     function_name.push_str(parser_name);
     function_name.push_str("_parse_utf8");
@@ -141,9 +145,10 @@ fn get_parsed_input(
     let file_input = fs::File::open(file).unwrap_or_else(|error| panic!("{}", error));
     let mut input_reader = io::BufReader::new(file_input);
     unsafe {
-        let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResult> = library
-            .get(function_name.as_bytes())
-            .unwrap_or_else(|error| panic!("{}", error));
+        let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResult<'static, 'static>> =
+            library
+                .get(function_name.as_bytes())
+                .unwrap_or_else(|error| panic!("{}", error));
         parser(&mut input_reader)
     }
 }
