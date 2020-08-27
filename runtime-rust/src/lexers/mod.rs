@@ -72,18 +72,18 @@ pub struct TokenKernel {
 }
 
 /// The public interface of a lexer
-pub trait Lexer<'a> {
+pub trait Lexer<'a: 'b, 'b, 'c> {
     /// Gets the terminals matched by this lexer
-    fn get_terminals(&self) -> &'static [Symbol];
+    fn get_terminals(&self) -> &'b [Symbol<'a>];
 
     /// Gets the lexer's input text
     fn get_input(&self) -> &Text;
 
     /// Gets the lexer's output stream of tokens
-    fn get_output(&self) -> &TokenRepository<'a>;
+    fn get_output(&self) -> &TokenRepository<'a, 'b, 'c>;
 
     /// Gets the lexer's errors
-    fn get_errors(&mut self) -> &mut ParseErrors;
+    fn get_errors(&mut self) -> &mut ParseErrors<'a>;
 
     /// Gets the maximum Levenshtein distance to go to for the recovery of a matching failure.
     /// A distance of 0 indicates no recovery.

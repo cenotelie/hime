@@ -146,25 +146,25 @@ impl Default for AstImpl {
 /// Represents a simple AST with a tree structure
 /// The nodes are stored in sequential arrays where the children of a node are an inner sequence.
 /// The linkage is represented by each node storing its number of children and the index of its first child.
-pub struct Ast<'a> {
+pub struct Ast<'a: 'b, 'b, 'c> {
     /// The table of tokens
-    tokens: Option<TokenRepository<'a>>,
+    tokens: Option<TokenRepository<'a, 'b, 'c>>,
     /// The table of variables
-    variables: &'static [Symbol],
+    variables: &'b [Symbol<'a>],
     /// The table of virtuals
-    virtuals: &'static [Symbol],
+    virtuals: &'b [Symbol<'a>],
     /// The data of the implementation
-    data: EitherMut<'a, AstImpl>
+    data: EitherMut<'c, AstImpl>
 }
 
-impl<'a> Ast<'a> {
+impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
     /// Creates a new AST proxy structure
     pub fn new(
-        tokens: TokenRepository<'a>,
-        variables: &'static [Symbol],
-        virtuals: &'static [Symbol],
-        data: &'a AstImpl
-    ) -> Ast<'a> {
+        tokens: TokenRepository<'a, 'b, 'c>,
+        variables: &'b [Symbol<'a>],
+        virtuals: &'b [Symbol<'a>],
+        data: &'c AstImpl
+    ) -> Ast<'a, 'b, 'c> {
         Ast {
             tokens: Some(tokens),
             variables,
@@ -175,10 +175,10 @@ impl<'a> Ast<'a> {
 
     /// Creates a new AST proxy structure
     pub fn new_mut(
-        variables: &'static [Symbol],
-        virtuals: &'static [Symbol],
-        data: &'a mut AstImpl
-    ) -> Ast<'a> {
+        variables: &'b [Symbol<'a>],
+        virtuals: &'b [Symbol<'a>],
+        data: &'c mut AstImpl
+    ) -> Ast<'a, 'b, 'c> {
         Ast {
             tokens: None,
             variables,
@@ -188,7 +188,7 @@ impl<'a> Ast<'a> {
     }
 
     /// Gets the i-th token in the associated repository
-    fn get_token(&self, index: usize) -> Token {
+    fn get_token<'x>(&'x self, index: usize) -> Token<'a, 'b, 'c, 'x> {
         match self.tokens {
             None => panic!("Missing token repository"),
             Some(ref x) => x.get_token(index)
@@ -196,12 +196,12 @@ impl<'a> Ast<'a> {
     }
 
     /// Gets the grammar variables for this AST
-    pub fn get_variables(&self) -> &'static [Symbol] {
+    pub fn get_variables(&self) -> &'b [Symbol<'a>] {
         &self.variables
     }
 
     /// Gets the grammar virtuals for this AST
-    pub fn get_virtuals(&self) -> &'static [Symbol] {
+    pub fn get_virtuals(&self) -> &'b [Symbol<'a>] {
         &self.virtuals
     }
 
@@ -231,7 +231,7 @@ impl<'a> Ast<'a> {
     }
 
     /// Gets the AST node (if any) that has the specified token as label
-    pub fn find_node_for(&self, token: &Token<'a>) -> Option<AstNode> {
+    pub fn find_node_for(&self, token: &Token) -> Option<AstNode> {
         let data = self.data.get();
         for i in 0..data.nodes.len() {
             let node = data.nodes[i];
@@ -390,14 +390,14 @@ impl<'a> Ast<'a> {
 
 /// Represents a node in an Abstract Syntax Tree
 #[derive(Clone)]
-pub struct AstNode<'a> {
+pub struct AstNode<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> {
     /// The original parse tree
-    tree: &'a Ast<'a>,
+    tree: &'d Ast<'a, 'b, 'c>,
     /// The index of this node in the parse tree
     index: usize
 }
 
-impl<'a> AstNode<'a> {
+impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> AstNode<'a, 'b, 'c, 'd> {
     /// Gets the identifier of this node
     pub fn id(&self) -> usize {
         self.index
@@ -436,7 +436,7 @@ impl<'a> AstNode<'a> {
     }
 }
 
-impl<'a> SemanticElementTrait for AstNode<'a> {
+impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> SemanticElementTrait<'a> for AstNode<'a, 'b, 'c, 'd> {
     /// Gets the position in the input text of this element
     fn get_position(&self) -> Option<TextPosition> {
         self.tree.get_position_at(self.tree.data.get(), self.index)
@@ -460,7 +460,7 @@ impl<'a> SemanticElementTrait for AstNode<'a> {
     }
 
     /// Gets the grammar symbol associated to this element
-    fn get_symbol(&self) -> Symbol {
+    fn get_symbol(&self) -> Symbol<'a> {
         let cell = self.tree.data.get().nodes[self.index];
         match cell.label.get_type() {
             TableType::Token => {
@@ -491,7 +491,7 @@ impl<'a> SemanticElementTrait for AstNode<'a> {
     }
 }
 
-impl<'a> Display for AstNode<'a> {
+impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Display for AstNode<'a, 'b, 'c, 'd> {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         let cell = self.tree.data.get().nodes[self.index];
         match cell.label.get_type() {
@@ -522,17 +522,17 @@ impl<'a> Display for AstNode<'a> {
 
 /// Represents a family of children for an ASTNode
 #[derive(Clone)]
-pub struct AstFamily<'a> {
+pub struct AstFamily<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> {
     /// The original parse tree
-    tree: &'a Ast<'a>,
+    tree: &'d Ast<'a, 'b, 'c>,
     /// The index of the parent node in the parse tree
     parent: usize
 }
 
 /// Represents and iterator for adjacents in this graph
-pub struct AstFamilyIterator<'a> {
+pub struct AstFamilyIterator<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> {
     /// The original parse tree
-    tree: &'a Ast<'a>,
+    tree: &'d Ast<'a, 'b, 'c>,
     /// The index of the current child in the parse tree
     current: usize,
     /// the index of the last child (excluded) in the parse tree
@@ -540,8 +540,8 @@ pub struct AstFamilyIterator<'a> {
 }
 
 /// Implementation of the `Iterator` trait for `AstFamilyIterator`
-impl<'a> Iterator for AstFamilyIterator<'a> {
-    type Item = AstNode<'a>;
+impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Iterator for AstFamilyIterator<'a, 'b, 'c, 'd> {
+    type Item = AstNode<'a, 'b, 'c, 'd>;
     fn next(&mut self) -> Option<Self::Item> {
         if self.current >= self.end {
             None
@@ -556,7 +556,7 @@ impl<'a> Iterator for AstFamilyIterator<'a> {
     }
 }
 
-impl<'a> AstFamily<'a> {
+impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> AstFamily<'a, 'b, 'c, 'd> {
     /// Gets whether the family is empty
     pub fn is_empty(&self) -> bool {
         self.tree.data.get().nodes[self.parent].count == 0

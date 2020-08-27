@@ -181,7 +181,7 @@ impl RNGLRAutomaton {
     }
 
     /// Gets the expected terminals for the specified state
-    pub fn get_expected(&self, state: u32, terminals: &'static [Symbol]) -> LRExpected {
+    pub fn get_expected<'a>(&self, state: u32, terminals: &[Symbol<'a>]) -> LRExpected<'a> {
         let mut expected = LRExpected::new();
         for (column, terminal) in terminals.iter().enumerate() {
             let cell = self.cells[state as usize * self.columns_count + column];
@@ -785,9 +785,9 @@ struct SPPFReduction {
 /// A SPPF is a compact representation of multiple variants of an AST at once.
 /// GLR algorithms originally builds the complete SPPF.
 /// However we only need to build one of the variant, i.e. an AST for the user.
-struct SPPFBuilder<'l> {
+struct SPPFBuilder<'a: 'b, 'b, 'c> {
     /// Lexer associated to this parser
-    lexer: &'l mut dyn Lexer<'l>,
+    lexer: &'c mut dyn Lexer<'a, 'b, 'c>,
     /// The history
     history: Vec<HistoryPart>,
     /// The SPPF being built
@@ -795,10 +795,10 @@ struct SPPFBuilder<'l> {
     /// The data of the current reduction
     reduction: Option<SPPFReduction>,
     /// The AST being built
-    result: Ast<'l>
+    result: Ast<'a, 'b, 'c>
 }
 
-impl<'l> SemanticBody for SPPFBuilder<'l> {
+impl<'a: 'b, 'b, 'c> SemanticBody for SPPFBuilder<'a, 'b, 'c> {
     fn get_element_at(&self, index: usize) -> SemanticElement {
         let reduction = self
             .reduction
@@ -830,9 +830,12 @@ impl<'l> SemanticBody for SPPFBuilder<'l> {
     }
 }
 
-impl<'l> SPPFBuilder<'l> {
+impl<'a: 'b, 'b, 'c> SPPFBuilder<'a, 'b, 'c> {
     /// Initializes the builder with the given stack size
-    pub fn new(lexer: &'l mut dyn Lexer<'l>, result: Ast<'l>) -> SPPFBuilder<'l> {
+    pub fn new(
+        lexer: &'c mut dyn Lexer<'a, 'b, 'c>,
+        result: Ast<'a, 'b, 'c>
+    ) -> SPPFBuilder<'a, 'b, 'c> {
         SPPFBuilder {
             lexer,
             history: Vec::new(),
@@ -843,7 +846,7 @@ impl<'l> SPPFBuilder<'l> {
     }
 
     /// Gets the grammar variables for this AST
-    pub fn get_variables(&self) -> &'static [Symbol] {
+    pub fn get_variables(&self) -> &'b [Symbol<'a>] {
         self.result.get_variables()
     }
 
@@ -1185,7 +1188,7 @@ struct RNGLRShift {
     to: usize
 }
 
-struct RNGLRParserData<'a> {
+struct RNGLRParserData<'a: 'b, 'b, 'c> {
     /// The parser's automaton
     automaton: RNGLRAutomaton,
     /// The GSS for this parser
@@ -1197,12 +1200,12 @@ struct RNGLRParserData<'a> {
     /// The queue of shift operations
     shifts: VecDeque<RNGLRShift>,
     /// The grammar variables
-    variables: &'static [Symbol],
+    variables: &'b [Symbol<'a>],
     /// The semantic actions
-    actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+    actions: &'c mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
 }
 
-impl<'a> ContextProvider for RNGLRParserData<'a> {
+impl<'a: 'b, 'b, 'c> ContextProvider for RNGLRParserData<'a, 'b, 'c> {
     /// Gets the priority of the specified context required by the specified terminal
     /// The priority is an unsigned integer. The lesser the value the higher the priority.
     /// The absence of value represents the unavailability of the required context.
@@ -1415,7 +1418,7 @@ impl<'a> ContextProvider for RNGLRParserData<'a> {
     }
 }
 
-impl<'a> RNGLRParserData<'a> {
+impl<'a: 'b, 'b, 'c> RNGLRParserData<'a, 'b, 'c> {
     /// Gets the terminal's identifier for the next token
     fn get_next_token_id(&self) -> u32 {
         match self.next_token {
@@ -1612,23 +1615,23 @@ impl<'a> RNGLRParserData<'a> {
 }
 
 /// Represents a base for all RNGLR parsers
-pub struct RNGLRParser<'l, 'a: 'l> {
+pub struct RNGLRParser<'a: 'b, 'b, 'c> {
     /// The parser's data
-    data: RNGLRParserData<'a>,
+    data: RNGLRParserData<'a, 'b, 'c>,
     /// The AST builder
-    builder: SPPFBuilder<'l>,
+    builder: SPPFBuilder<'a, 'b, 'c>,
     /// The sub-trees for the constant nullable variables
     nullables: Vec<usize>
 }
 
-impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
+impl<'a: 'b, 'b, 'c> RNGLRParser<'a, 'b, 'c> {
     /// Initializes a new instance of the parser
     pub fn new(
-        lexer: &'l mut dyn Lexer<'l>,
+        lexer: &'c mut dyn Lexer<'a, 'b, 'c>,
         automaton: RNGLRAutomaton,
-        ast: Ast<'l>,
+        ast: Ast<'a, 'b, 'c>,
         actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
-    ) -> RNGLRParser<'l, 'a> {
+    ) -> RNGLRParser<'a, 'b, 'c> {
         let mut parser = RNGLRParser {
             data: RNGLRParserData {
                 automaton,
@@ -1654,7 +1657,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
 
     /// Builds the constant sub-trees of nullable variables
     fn build_nullables(
-        builder: &mut SPPFBuilder<'l>,
+        builder: &mut SPPFBuilder<'a, 'b, 'c>,
         actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
         nullables: &mut Vec<usize>,
         automaton: &RNGLRAutomaton,
@@ -1765,7 +1768,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
 
     /// Builds the SPPF
     fn build_sppf(
-        builder: &mut SPPFBuilder<'l>,
+        builder: &mut SPPFBuilder<'a, 'b, 'c>,
         actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
         nullables: &[usize],
         generation: usize,
@@ -1979,7 +1982,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
     }
 
     /// Builds the unexpected token error
-    fn build_error(&self, kernel: TokenKernel, stem: usize) -> ParseErrorUnexpectedToken {
+    fn build_error(&self, kernel: TokenKernel, stem: usize) -> ParseErrorUnexpectedToken<'a> {
         let token = self
             .builder
             .lexer
@@ -2023,7 +2026,7 @@ impl<'l, 'a: 'l> RNGLRParser<'l, 'a> {
     }
 }
 
-impl<'l, 'a> Parser for RNGLRParser<'l, 'a> {
+impl<'a: 'b, 'b, 'c> Parser for RNGLRParser<'a, 'b, 'c> {
     fn parse(&mut self) {
         let mut generation = self.data.gss.create_generation();
         let state0 = self.data.gss.create_node(0);

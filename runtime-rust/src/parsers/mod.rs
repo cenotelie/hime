@@ -263,16 +263,16 @@ impl LRProduction {
 
 /// Container for the expected terminals for a LR state
 #[derive(Default)]
-pub struct LRExpected {
+pub struct LRExpected<'a> {
     /// The terminals expected for shift actions
-    pub shifts: Vec<Symbol>,
+    pub shifts: Vec<Symbol<'a>>,
     /// The terminals expected for reduction actions
-    pub reductions: Vec<Symbol>
+    pub reductions: Vec<Symbol<'a>>
 }
 
-impl LRExpected {
+impl<'a> LRExpected<'a> {
     /// Initializes this container
-    pub fn new() -> LRExpected {
+    pub fn new() -> LRExpected<'a> {
         LRExpected {
             shifts: Vec::new(),
             reductions: Vec::new()
@@ -281,7 +281,7 @@ impl LRExpected {
 
     /// Adds the specified terminal as expected on a shift action
     /// If the terminal is already added to the reduction collection it is removed from it.
-    pub fn add_unique_shift(&mut self, terminal: Symbol) {
+    pub fn add_unique_shift(&mut self, terminal: Symbol<'a>) {
         let position = self.reductions.iter().position(|x| *x == terminal);
         if let Some(index) = position {
             self.reductions.remove(index);
@@ -293,7 +293,7 @@ impl LRExpected {
 
     /// Adds the specified terminal as expected on a reduction action
     /// If the terminal is in the shift collection, nothing happens.
-    pub fn add_unique_reduction(&mut self, terminal: Symbol) {
+    pub fn add_unique_reduction(&mut self, terminal: Symbol<'a>) {
         if !self.shifts.contains(&terminal) && !self.reductions.contains(&terminal) {
             self.reductions.push(terminal);
         }

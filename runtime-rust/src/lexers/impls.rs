@@ -35,12 +35,12 @@ use crate::tokens::TokenRepository;
 const DEFAULT_RECOVERY_MATCHING_DISTANCE: usize = 3;
 
 /// Runs the fuzzy DFA matcher
-fn run_fuzzy_matcher<'a>(
-    repository: &TokenRepository<'a>,
-    automaton: &Automaton,
+fn run_fuzzy_matcher<'a: 'b, 'b, 'c, 'd>(
+    repository: &TokenRepository<'a, 'b, 'c>,
+    automaton: &'b Automaton,
     separator_id: u32,
     recovery: usize,
-    errors: &mut ParseErrors,
+    errors: &'d mut ParseErrors<'a>,
     origin_index: usize
 ) -> Option<TokenMatch> {
     if recovery == 0 {
@@ -71,11 +71,11 @@ fn run_fuzzy_matcher<'a>(
 }
 
 /// Represents a context-free lexer (lexing rules do not depend on the context)
-pub struct ContextFreeLexer<'a> {
+pub struct ContextFreeLexer<'a: 'b, 'b, 'c> {
     /// The token repository for this lexer
-    repository: TokenRepository<'a>,
+    repository: TokenRepository<'a, 'b, 'c>,
     /// The repository for errors
-    errors: &'a mut ParseErrors,
+    errors: &'b mut ParseErrors<'a>,
     /// The DFA automaton for this lexer
     automaton: Automaton,
     /// Whether the lexer has run yet
@@ -89,9 +89,9 @@ pub struct ContextFreeLexer<'a> {
     recovery: usize
 }
 
-impl<'a> Lexer<'a> for ContextFreeLexer<'a> {
+impl<'a: 'b, 'b, 'c> Lexer<'a, 'b, 'c> for ContextFreeLexer<'a, 'b, 'c> {
     /// Gets the terminals matched by this lexer
-    fn get_terminals(&self) -> &'static [Symbol] {
+    fn get_terminals(&self) -> &'b [Symbol<'a>] {
         self.repository.get_terminals()
     }
 
@@ -101,12 +101,12 @@ impl<'a> Lexer<'a> for ContextFreeLexer<'a> {
     }
 
     /// Gets the lexer's output stream of tokens
-    fn get_output(&self) -> &TokenRepository<'a> {
+    fn get_output(&self) -> &TokenRepository<'a, 'b, 'c> {
         &self.repository
     }
 
     /// Gets the lexer's errors
-    fn get_errors(&mut self) -> &mut ParseErrors {
+    fn get_errors(&mut self) -> &mut ParseErrors<'a> {
         &mut self.errors
     }
 
@@ -142,14 +142,14 @@ impl<'a> Lexer<'a> for ContextFreeLexer<'a> {
     }
 }
 
-impl<'a> ContextFreeLexer<'a> {
+impl<'a: 'b, 'b, 'c> ContextFreeLexer<'a, 'b, 'c> {
     /// Creates a new lexer
     pub fn new(
-        repository: TokenRepository<'a>,
-        errors: &'a mut ParseErrors,
+        repository: TokenRepository<'a, 'b, 'c>,
+        errors: &'b mut ParseErrors<'a>,
         automaton: Automaton,
         separator_id: u32
-    ) -> ContextFreeLexer<'a> {
+    ) -> ContextFreeLexer<'a, 'b, 'c> {
         ContextFreeLexer {
             repository,
             errors,
@@ -206,11 +206,11 @@ impl<'a> ContextFreeLexer<'a> {
 }
 
 /// Represents a context-sensitive lexer (lexing rules do not depend on the context)
-pub struct ContextSensitiveLexer<'a> {
+pub struct ContextSensitiveLexer<'a: 'b, 'b, 'c> {
     /// The token repository for this lexer
-    repository: TokenRepository<'a>,
+    repository: TokenRepository<'a, 'b, 'c>,
     /// The repository for errors
-    errors: &'a mut ParseErrors,
+    errors: &'b mut ParseErrors<'a>,
     /// The DFA automaton for this lexer
     automaton: Automaton,
     /// Whether the lexer has run yet
@@ -224,9 +224,9 @@ pub struct ContextSensitiveLexer<'a> {
     recovery: usize
 }
 
-impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
+impl<'a: 'b, 'b, 'c> Lexer<'a, 'b, 'c> for ContextSensitiveLexer<'a, 'b, 'c> {
     /// Gets the terminals matched by this lexer
-    fn get_terminals(&self) -> &'static [Symbol] {
+    fn get_terminals(&self) -> &'b [Symbol<'a>] {
         self.repository.get_terminals()
     }
 
@@ -236,12 +236,12 @@ impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
     }
 
     /// Gets the lexer's output stream of tokens
-    fn get_output(&self) -> &TokenRepository<'a> {
+    fn get_output(&self) -> &TokenRepository<'a, 'b, 'c> {
         &self.repository
     }
 
     /// Gets the lexer's errors
-    fn get_errors(&mut self) -> &mut ParseErrors {
+    fn get_errors(&mut self) -> &mut ParseErrors<'a> {
         &mut self.errors
     }
 
@@ -316,14 +316,14 @@ impl<'a> Lexer<'a> for ContextSensitiveLexer<'a> {
     }
 }
 
-impl<'a> ContextSensitiveLexer<'a> {
+impl<'a: 'b, 'b, 'c> ContextSensitiveLexer<'a, 'b, 'c> {
     /// Creates a new lexer
     pub fn new(
-        repository: TokenRepository<'a>,
-        errors: &'a mut ParseErrors,
+        repository: TokenRepository<'a, 'b, 'c>,
+        errors: &'b mut ParseErrors<'a>,
         automaton: Automaton,
         separator_id: u32
-    ) -> ContextSensitiveLexer<'a> {
+    ) -> ContextSensitiveLexer<'a, 'b, 'c> {
         ContextSensitiveLexer {
             repository,
             errors,

@@ -26,31 +26,31 @@ use crate::tokens::TokenRepository;
 use crate::tokens::TokenRepositoryImpl;
 
 /// Represents the output of a parser
-pub struct ParseResult {
+pub struct ParseResult<'a: 'b, 'b> {
     /// The table of grammar terminals
-    pub terminals: &'static [Symbol],
+    pub terminals: &'b [Symbol<'a>],
     /// The table of grammar variables
-    pub variables: &'static [Symbol],
+    pub variables: &'b [Symbol<'a>],
     /// The table of grammar virtuals
-    pub virtuals: &'static [Symbol],
+    pub virtuals: &'b [Symbol<'a>],
     /// The input text
     pub text: Text,
     /// The errors found in the input
-    pub errors: ParseErrors,
+    pub errors: ParseErrors<'a>,
     /// The table of matched tokens
     pub tokens: TokenRepositoryImpl,
     /// The produced AST
     ast: AstImpl
 }
 
-impl ParseResult {
+impl<'a: 'b, 'b> ParseResult<'a, 'b> {
     /// Initialize a new parse result
     pub fn new(
-        terminals: &'static [Symbol],
-        variables: &'static [Symbol],
-        virtuals: &'static [Symbol],
+        terminals: &'b [Symbol<'a>],
+        variables: &'b [Symbol<'a>],
+        virtuals: &'b [Symbol<'a>],
         text: Text
-    ) -> ParseResult {
+    ) -> ParseResult<'a, 'b> {
         ParseResult {
             terminals,
             variables,
@@ -73,7 +73,7 @@ impl ParseResult {
     }
 
     /// Gets the resulting AST
-    pub fn get_ast(&self) -> Ast {
+    pub fn get_ast<'x>(&'x self) -> Ast<'a, 'b, 'x> {
         Ast::new(
             TokenRepository::new(&self.terminals, &self.text, &self.tokens),
             self.variables,
@@ -83,7 +83,13 @@ impl ParseResult {
     }
 
     /// Gets the mutable data required for parsing
-    pub fn get_parsing_data(&mut self) -> (TokenRepository, &mut ParseErrors, Ast) {
+    pub fn get_parsing_data<'x>(
+        &'x mut self
+    ) -> (
+        TokenRepository<'a, 'b, 'x>,
+        &mut ParseErrors<'a>,
+        Ast<'a, 'b, 'x>
+    ) {
         (
             TokenRepository::new_mut(&self.terminals, &self.text, &mut self.tokens),
             &mut self.errors,

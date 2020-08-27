@@ -109,7 +109,7 @@ impl LRkAutomaton {
     }
 
     /// Gets the expected terminals for the specified state
-    pub fn get_expected(&self, state: u32, terminals: &'static [Symbol]) -> LRExpected {
+    pub fn get_expected<'a>(&self, state: u32, terminals: &[Symbol<'a>]) -> LRExpected<'a> {
         let mut expected = LRExpected::new();
         let mut offset = self.columns_count * state as usize * 2;
         for terminal in terminals.iter() {
@@ -145,20 +145,20 @@ impl LRkAstReduction {
 }
 
 /// Represents the builder of Parse Trees for LR(k) parsers
-struct LRkAstBuilder<'l> {
+struct LRkAstBuilder<'a: 'b, 'b, 'c> {
     /// Lexer associated to this parser
-    lexer: &'l mut dyn Lexer<'l>,
+    lexer: &'c mut dyn Lexer<'a, 'b, 'c>,
     /// The stack of semantic objects
     stack: Vec<SubTree>,
     /// The AST being built
-    result: Ast<'l>,
+    result: Ast<'a, 'b, 'c>,
     /// The reduction handle represented as the indices of the sub-trees in the cache
     handle: Vec<usize>,
     /// The data of the current reduction
     reduction: Option<LRkAstReduction>
 }
 
-impl<'l> SemanticBody for LRkAstBuilder<'l> {
+impl<'a: 'b, 'b, 'c> SemanticBody for LRkAstBuilder<'a, 'b, 'c> {
     fn get_element_at(&self, index: usize) -> SemanticElement {
         match self.reduction {
             None => panic!("Not in a reduction"),
@@ -185,9 +185,12 @@ impl<'l> SemanticBody for LRkAstBuilder<'l> {
     }
 }
 
-impl<'l> LRkAstBuilder<'l> {
+impl<'a: 'b, 'b, 'c> LRkAstBuilder<'a, 'b, 'c> {
     /// Initializes the builder with the given stack size
-    pub fn new(lexer: &'l mut dyn Lexer<'l>, result: Ast<'l>) -> LRkAstBuilder<'l> {
+    pub fn new(
+        lexer: &'c mut dyn Lexer<'a, 'b, 'c>,
+        result: Ast<'a, 'b, 'c>
+    ) -> LRkAstBuilder<'a, 'b, 'c> {
         LRkAstBuilder {
             lexer,
             stack: Vec::new(),
@@ -198,7 +201,7 @@ impl<'l> LRkAstBuilder<'l> {
     }
 
     /// Gets the grammar variables for this AST
-    pub fn get_variables(&self) -> &'static [Symbol] {
+    pub fn get_variables(&self) -> &'b [Symbol<'a>] {
         self.result.get_variables()
     }
 
@@ -374,18 +377,18 @@ struct LRkHead {
     identifier: u32
 }
 
-struct LRkParserData<'a> {
+struct LRkParserData<'a: 'b, 'b, 'c> {
     /// The parser's automaton
     automaton: LRkAutomaton,
     /// The parser's stack
     stack: Vec<LRkHead>,
     /// The grammar variables
-    variables: &'static [Symbol],
+    variables: &'b [Symbol<'a>],
     /// The semantic actions
-    actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+    actions: &'c mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
 }
 
-impl<'a> ContextProvider for LRkParserData<'a> {
+impl<'a: 'b, 'b, 'c> ContextProvider for LRkParserData<'a, 'b, 'c> {
     /// Gets the priority of the specified context required by the specified terminal
     /// The priority is an unsigned integer. The lesser the value the higher the priority.
     /// The absence of value represents the unavailability of the required context.
@@ -494,11 +497,11 @@ impl<'a> ContextProvider for LRkParserData<'a> {
     }
 }
 
-impl<'a> LRkParserData<'a> {
+impl<'a: 'b, 'b, 'c> LRkParserData<'a, 'b, 'c> {
     /// Checks whether the specified terminal is indeed expected for a reduction
     /// This check is required because in the case of a base LALR graph,
     /// some terminals expected for reduction in the automaton are coming from other paths.
-    fn check_is_expected(&self, terminal: Symbol) -> bool {
+    fn check_is_expected(&self, terminal: Symbol<'a>) -> bool {
         // copy the stack to use for the simulation
         let mut my_stack = self.stack.clone();
         let mut action = self
@@ -570,9 +573,9 @@ impl<'a> LRkParserData<'a> {
     /// Executes the given LR reduction
     fn reduce(
         production: &LRProduction,
-        builder: &mut LRkAstBuilder,
+        builder: &mut LRkAstBuilder<'a, 'b, 'c>,
         actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
-    ) -> Symbol {
+    ) -> Symbol<'a> {
         let variable = builder.get_variables()[production.head];
         builder.reduction_prepare(
             production.head,
@@ -605,21 +608,21 @@ impl<'a> LRkParserData<'a> {
 }
 
 /// Represents a base for all LR(k) parsers
-pub struct LRkParser<'l, 'a: 'l> {
+pub struct LRkParser<'a: 'b, 'b, 'c> {
     /// The parser's data
-    data: LRkParserData<'a>,
+    data: LRkParserData<'a, 'b, 'c>,
     /// The AST builder
-    builder: LRkAstBuilder<'l>
+    builder: LRkAstBuilder<'a, 'b, 'c>
 }
 
-impl<'l, 'a: 'l> LRkParser<'l, 'a> {
+impl<'a: 'b, 'b, 'c> LRkParser<'a, 'b, 'c> {
     /// Initializes a new instance of the parser
     pub fn new(
-        lexer: &'l mut dyn Lexer<'l>,
+        lexer: &'c mut dyn Lexer<'a, 'b, 'c>,
         automaton: LRkAutomaton,
-        ast: Ast<'l>,
-        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
-    ) -> LRkParser<'l, 'a> {
+        ast: Ast<'a, 'b, 'c>,
+        actions: &'c mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+    ) -> LRkParser<'a, 'b, 'c> {
         let mut stack = Vec::new();
         stack.push(LRkHead {
             state: 0,
@@ -632,7 +635,7 @@ impl<'l, 'a: 'l> LRkParser<'l, 'a> {
                 variables: ast.get_variables(),
                 actions
             },
-            builder: LRkAstBuilder::new(lexer, ast)
+            builder: LRkAstBuilder::<'a, 'b, 'c>::new(lexer, ast)
         }
     }
 
@@ -643,7 +646,7 @@ impl<'l, 'a: 'l> LRkParser<'l, 'a> {
     }
 
     /// Builds the unexpected token error
-    fn build_error(&self, kernel: TokenKernel) -> ParseErrorUnexpectedToken {
+    fn build_error(&self, kernel: TokenKernel) -> ParseErrorUnexpectedToken<'a> {
         let token = self
             .builder
             .lexer
@@ -672,7 +675,7 @@ impl<'l, 'a: 'l> LRkParser<'l, 'a> {
     }
 }
 
-impl<'l, 'a> Parser for LRkParser<'l, 'a> {
+impl<'a: 'b, 'b, 'c> Parser for LRkParser<'a, 'b, 'c> {
     fn parse(&mut self) {
         let mut kernel_maybe = self.get_next_token();
         loop {

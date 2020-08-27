@@ -46,22 +46,22 @@ pub const SID_DOLLAR: u32 = 2;
 
 /// Represents a grammar symbol (terminal, variable or virtual)
 #[derive(Copy, Clone, Eq, PartialEq)]
-pub struct Symbol {
+pub struct Symbol<'a> {
     /// The symbol's unique identifier
     pub id: u32,
     /// The symbol's name
-    pub name: &'static str
+    pub name: &'a str
 }
 
 /// Implementation of `Display` for `Symbol`
-impl Display for Symbol {
+impl<'a> Display for Symbol<'a> {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(f, "{}", self.name)
     }
 }
 
 /// A trait for a parsing element
-pub trait SemanticElementTrait {
+pub trait SemanticElementTrait<'a> {
     /// Gets the position in the input text of this element
     fn get_position(&self) -> Option<TextPosition>;
 
@@ -72,25 +72,25 @@ pub trait SemanticElementTrait {
     fn get_context(&self) -> Option<TextContext>;
 
     /// Gets the grammar symbol associated to this element
-    fn get_symbol(&self) -> Symbol;
+    fn get_symbol(&self) -> Symbol<'a>;
 
     /// Gets the value of this element, if any
     fn get_value(&self) -> Option<String>;
 }
 
 /// Represents an element of parsing data
-pub enum SemanticElement<'a> {
+pub enum SemanticElement<'a: 'b + 'd, 'b: 'd, 'c, 'd> {
     /// A token, i.e. a piece of text matched by a lexer
-    Token(Token<'a>),
+    Token(Token<'a, 'b, 'c, 'd>),
     /// A terminal symbol, defined in the original grammar
-    Terminal(Symbol),
+    Terminal(Symbol<'a>),
     /// A variable symbol defined in the original grammar
-    Variable(Symbol),
+    Variable(Symbol<'a>),
     /// A virtual symbol, defined in the original grammar
-    Virtual(Symbol)
+    Virtual(Symbol<'a>)
 }
 
-impl<'a> SemanticElementTrait for SemanticElement<'a> {
+impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> SemanticElementTrait<'a> for SemanticElement<'a, 'b, 'c, 'd> {
     fn get_position(&self) -> Option<TextPosition> {
         match *self {
             SemanticElement::Token(ref token) => token.get_position(),
@@ -118,7 +118,7 @@ impl<'a> SemanticElementTrait for SemanticElement<'a> {
         }
     }
 
-    fn get_symbol(&self) -> Symbol {
+    fn get_symbol(&self) -> Symbol<'a> {
         match *self {
             SemanticElement::Token(ref token) => token.get_symbol(),
             SemanticElement::Terminal(ref symbol) => *symbol,
@@ -137,7 +137,7 @@ impl<'a> SemanticElementTrait for SemanticElement<'a> {
     }
 }
 
-impl<'a> SemanticElement<'a> {
+impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> SemanticElement<'a, 'b, 'c, 'd> {
     /// Gets the type of the associated symbol
     pub fn get_symbol_type(&self) -> SymbolType {
         match *self {

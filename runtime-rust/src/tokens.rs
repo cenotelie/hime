@@ -63,25 +63,25 @@ impl TokenRepositoryImpl {
 }
 
 /// The proxy structure for a repository of matched tokens
-pub struct TokenRepository<'a> {
+pub struct TokenRepository<'a: 'b, 'b, 'c> {
     /// The table of grammar terminals
-    terminals: &'static [Symbol],
+    terminals: &'b [Symbol<'a>],
     /// The input text
-    text: &'a Text,
+    text: &'c Text,
     /// The table of matched tokens
-    data: EitherMut<'a, TokenRepositoryImpl>
+    data: EitherMut<'c, TokenRepositoryImpl>
 }
 
 /// Represents a token as an output element of a lexer
-pub struct Token<'a> {
+pub struct Token<'a: 'b + 'd, 'b: 'd, 'c, 'd> {
     /// The repository containing this token
-    repository: &'a TokenRepository<'a>,
+    repository: &'d TokenRepository<'a, 'b, 'c>,
     /// The index of this token in the text
     pub index: usize
 }
 
 /// Implementation of `Clone` for `Token`
-impl<'a> Clone for Token<'a> {
+impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> Clone for Token<'a, 'b, 'c, 'd> {
     fn clone(&self) -> Self {
         Token {
             repository: self.repository,
@@ -91,19 +91,19 @@ impl<'a> Clone for Token<'a> {
 }
 
 /// Implementation of `Copy` for `Token`
-impl<'a> Copy for Token<'a> {}
+impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> Copy for Token<'a, 'b, 'c, 'd> {}
 
 /// the iterator over the tokens in a repository
-pub struct TokenRepositoryIterator<'a> {
+pub struct TokenRepositoryIterator<'a: 'b + 'd, 'b: 'd, 'c, 'd> {
     /// The repository containing this token
-    repository: &'a TokenRepository<'a>,
+    repository: &'d TokenRepository<'a, 'b, 'c>,
     /// The current index within the repository
     index: usize
 }
 
 /// Implementation of `Iterator` for `TokenRepositoryIterator`
-impl<'a> Iterator for TokenRepositoryIterator<'a> {
-    type Item = Token<'a>;
+impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> Iterator for TokenRepositoryIterator<'a, 'b, 'c, 'd> {
+    type Item = Token<'a, 'b, 'c, 'd>;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index >= self.repository.data.get().cells.len() {
             None
@@ -118,13 +118,13 @@ impl<'a> Iterator for TokenRepositoryIterator<'a> {
     }
 }
 
-impl<'a> TokenRepository<'a> {
+impl<'a: 'b, 'b, 'c> TokenRepository<'a, 'b, 'c> {
     /// Creates a new repository
     pub fn new(
-        terminals: &'static [Symbol],
-        text: &'a Text,
-        tokens: &'a TokenRepositoryImpl
-    ) -> TokenRepository<'a> {
+        terminals: &'b [Symbol<'a>],
+        text: &'c Text,
+        tokens: &'c TokenRepositoryImpl
+    ) -> TokenRepository<'a, 'b, 'c> {
         TokenRepository {
             terminals,
             text,
@@ -134,10 +134,10 @@ impl<'a> TokenRepository<'a> {
 
     /// Creates a new mutable repository
     pub fn new_mut(
-        terminals: &'static [Symbol],
-        text: &'a Text,
-        tokens: &'a mut TokenRepositoryImpl
-    ) -> TokenRepository<'a> {
+        terminals: &'b [Symbol<'a>],
+        text: &'c Text,
+        tokens: &'c mut TokenRepositoryImpl
+    ) -> TokenRepository<'a, 'b, 'c> {
         TokenRepository {
             terminals,
             text,
@@ -166,7 +166,7 @@ impl<'a> TokenRepository<'a> {
     }
 
     /// Gets the terminals
-    pub fn get_terminals(&self) -> &'static [Symbol] {
+    pub fn get_terminals(&self) -> &'b [Symbol<'a>] {
         &self.terminals
     }
 
@@ -186,7 +186,7 @@ impl<'a> TokenRepository<'a> {
     }
 
     /// Gets the i-th token
-    pub fn get_token(&'a self, index: usize) -> Token<'a> {
+    pub fn get_token<'x>(&'x self, index: usize) -> Token<'a, 'b, 'c, 'x> {
         Token {
             repository: &self,
             index
@@ -228,7 +228,7 @@ impl<'a> TokenRepository<'a> {
     }
 }
 
-impl<'a> SemanticElementTrait for Token<'a> {
+impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> SemanticElementTrait<'a> for Token<'a, 'b, 'c, 'd> {
     /// Gets the position in the input text of this element
     fn get_position(&self) -> Option<TextPosition> {
         Some(
@@ -252,7 +252,7 @@ impl<'a> SemanticElementTrait for Token<'a> {
     }
 
     /// Gets the grammar symbol associated to this element
-    fn get_symbol(&self) -> Symbol {
+    fn get_symbol(&self) -> Symbol<'a> {
         self.repository.terminals[self.repository.data.get().cells[self.index].terminal]
     }
 

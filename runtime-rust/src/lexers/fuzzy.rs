@@ -98,15 +98,15 @@ impl FuzzyMatcherHead {
 /// This matcher uses the Levenshtein distance to match the input ahead against the current DFA automaton.
 /// The matcher favors solutions that are the closest to the original input.
 /// When multiple solutions are at the same Levenshtein distance to the input, the longest one is preferred.
-pub struct FuzzyMatcher<'a> {
+pub struct FuzzyMatcher<'a: 'd, 'b, 'c, 'd> {
     /// This lexer's automaton
-    automaton: &'a Automaton,
+    automaton: &'b Automaton,
     /// Terminal index of the SEPARATOR terminal
     separator: u32,
     /// The input text
-    text: &'a Text,
+    text: &'c Text,
     /// Delegate for raising errors
-    errors: &'a mut ParseErrors,
+    errors: &'d mut ParseErrors<'a>,
     /// The maximum Levenshtein distance between the input and the DFA
     max_distance: usize,
     /// The index in the input from which the error was raised
@@ -174,16 +174,16 @@ impl FuzzyMatcherResult {
     }
 }
 
-impl<'a> FuzzyMatcher<'a> {
+impl<'a: 'd, 'b, 'c, 'd> FuzzyMatcher<'a, 'b, 'c, 'd> {
     /// Initializes this matcher
     pub fn new(
-        automaton: &'a Automaton,
+        automaton: &'b Automaton,
         separator: u32,
-        text: &'a Text,
-        errors: &'a mut ParseErrors,
+        text: &'c Text,
+        errors: &'d mut ParseErrors<'a>,
         max_distance: usize,
         origin_index: usize
-    ) -> FuzzyMatcher<'a> {
+    ) -> FuzzyMatcher<'a, 'b, 'c, 'd> {
         FuzzyMatcher {
             automaton,
             separator,
