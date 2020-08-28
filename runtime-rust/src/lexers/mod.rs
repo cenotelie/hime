@@ -24,8 +24,7 @@ pub mod impls;
 use std::usize;
 
 use crate::errors::ParseErrors;
-use crate::symbols::Symbol;
-use crate::text::Text;
+use crate::lexers::automaton::Automaton;
 use crate::tokens::TokenRepository;
 
 /// Identifier of the default context
@@ -71,28 +70,57 @@ pub struct TokenKernel {
     pub index: u32
 }
 
+/// Represents a context-free lexer (lexing rules do not depend on the context)
+pub struct LexerData<'a: 'b, 'b, 'c> {
+    /// The token repository for this lexer
+    pub repository: TokenRepository<'a, 'b, 'c>,
+    /// The repository for errors
+    pub errors: &'c mut ParseErrors<'a>,
+    /// The DFA automaton for this lexer
+    pub automaton: Automaton,
+    /// Whether the lexer has run yet
+    pub has_run: bool,
+    /// Symbol ID of the SEPARATOR terminal
+    pub separator_id: u32,
+    /// The next token in this repository
+    pub index: usize,
+    /// The maximum Levenshtein distance to go to for the recovery of a matching failure.
+    /// A distance of 0 indicates no recovery.
+    pub recovery: usize
+}
+
+pub use impls::Lexer;
+
+/*
 /// The public interface of a lexer
 pub trait Lexer<'a: 'b, 'b, 'c> {
-    /// Gets the terminals matched by this lexer
-    fn get_terminals(&self) -> &'b [Symbol<'a>];
+    /// Gets the data for the lexer
+    fn get_data(&self) -> &LexerData<'a, 'b, 'c>;
 
-    /// Gets the lexer's input text
-    fn get_input(&self) -> &Text;
-
-    /// Gets the lexer's output stream of tokens
-    fn get_output(&self) -> &TokenRepository<'a, 'b, 'c>;
-
-    /// Gets the lexer's errors
-    fn get_errors(&mut self) -> &mut ParseErrors<'a>;
-
-    /// Gets the maximum Levenshtein distance to go to for the recovery of a matching failure.
-    /// A distance of 0 indicates no recovery.
-    fn get_recovery_distance(&self) -> usize;
-
-    /// Sets the maximum Levenshtein distance to go to for the recovery of a matching failure.
-    /// A distance of 0 indicates no recovery.
-    fn set_recovery_distance(&mut self, distance: usize);
+    /// Gets the data for the lexer
+    fn get_data_mut(&mut self) -> &mut LexerData<'a, 'b, 'c>;
 
     /// Gets the next token in the input
     fn get_next_token(&mut self, contexts: &dyn ContextProvider) -> Option<TokenKernel>;
 }
+
+impl<'a: 'b, 'b, 'c, T> Lexer<'a, 'b, 'c> for T
+where
+    T: Deref<Target = Lexer<'a, 'b, 'c> + 'c> + DerefMut<Target = Lexer<'a, 'b, 'c> + 'c>
+{
+    /// Gets the data for the lexer
+    fn get_data(&self) -> &LexerData<'a, 'b, 'c> {
+        self.deref().get_data()
+    }
+
+    /// Gets the data for the lexer
+    fn get_data_mut(&mut self) -> &mut LexerData<'a, 'b, 'c> {
+        self.deref_mut().get_data_mut()
+    }
+
+    /// Gets the next token in the input
+    fn get_next_token(&mut self, contexts: &dyn ContextProvider) -> Option<TokenKernel> {
+        self.deref_mut().get_next_token(contexts)
+    }
+}
+*/

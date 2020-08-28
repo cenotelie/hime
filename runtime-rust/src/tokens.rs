@@ -65,9 +65,9 @@ impl TokenRepositoryImpl {
 /// The proxy structure for a repository of matched tokens
 pub struct TokenRepository<'a: 'b, 'b, 'c> {
     /// The table of grammar terminals
-    terminals: &'b [Symbol<'a>],
+    pub terminals: &'b [Symbol<'a>],
     /// The input text
-    text: &'c Text,
+    pub text: &'c Text,
     /// The table of matched tokens
     data: EitherMut<'c, TokenRepositoryImpl>
 }
@@ -163,16 +163,6 @@ impl<'a: 'b, 'b, 'c> TokenRepository<'a, 'b, 'c> {
                 span: TextSpan { index, length }
             })
         }
-    }
-
-    /// Gets the terminals
-    pub fn get_terminals(&self) -> &'b [Symbol<'a>] {
-        &self.terminals
-    }
-
-    /// Gets the input text
-    pub fn get_input(&self) -> &Text {
-        &self.text
     }
 
     /// Gets the number of tokens in this repository

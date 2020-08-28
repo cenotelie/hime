@@ -45,9 +45,9 @@ pub fn write(
 
     let name = to_upper_camel_case(&grammar.name);
     let base_lexer = if grammar.contexts.len() > 1 {
-        "ContextSensitiveLexer"
+        "ContextSensitive"
     } else {
-        "ContextFreeLexer"
+        "ContextFree"
     };
     let bin_name = get_lexer_bin_name_rust(grammar);
     let separator = match separator {
@@ -64,7 +64,12 @@ pub fn write(
     writeln!(writer, "use hime_redist::ast::AstNode;")?;
     writeln!(writer, "use hime_redist::errors::ParseErrors;")?;
     writeln!(writer, "use hime_redist::lexers::automaton::Automaton;")?;
-    writeln!(writer, "use hime_redist::lexers::impls::{};", base_lexer)?;
+    writeln!(
+        writer,
+        "use hime_redist::lexers::impls::{}Lexer;",
+        base_lexer
+    )?;
+    writeln!(writer, "use hime_redist::lexers::Lexer;")?;
     if is_rnglr {
         writeln!(writer, "use hime_redist::parsers::rnglr::RNGLRAutomaton;")?;
         writeln!(writer, "use hime_redist::parsers::rnglr::RNGLRParser;")?;
@@ -161,17 +166,18 @@ pub fn write(
     writeln!(writer, "/// Creates a new lexer")?;
     writeln!(writer, "fn new_lexer<'a: 'b, 'b, 'c>(")?;
     writeln!(writer, "    repository: TokenRepository<'a, 'b, 'c>,")?;
-    writeln!(writer, "    errors: &'b mut ParseErrors<'a>")?;
-    writeln!(writer, ") -> {}<'a, 'b, 'c> {{", base_lexer)?;
+    writeln!(writer, "    errors: &'c mut ParseErrors<'a>")?;
+    writeln!(writer, ") -> Lexer<'a, 'b, 'c> {{")?;
     writeln!(
         writer,
         "    let automaton = Automaton::new(LEXER_AUTOMATON);"
     )?;
     writeln!(
         writer,
-        "    {}::new(repository, errors, automaton, 0x{:04X})",
-        base_lexer, separator
+        "    Lexer::{}({}Lexer::new(repository, errors, automaton, 0x{:04X}))",
+        base_lexer, base_lexer, separator
     )?;
     writeln!(writer, "}}")?;
+    writeln!(writer)?;
     Ok(())
 }

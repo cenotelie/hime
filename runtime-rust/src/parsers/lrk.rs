@@ -33,6 +33,7 @@ use crate::symbols::SemanticElement;
 use crate::symbols::SemanticElementTrait;
 
 /// Represents the LR(k) parsing table and productions
+#[derive(Clone)]
 pub struct LRkAutomaton {
     /// The number of columns in the LR table
     columns_count: usize,
@@ -147,7 +148,7 @@ impl LRkAstReduction {
 /// Represents the builder of Parse Trees for LR(k) parsers
 struct LRkAstBuilder<'a: 'b, 'b, 'c> {
     /// Lexer associated to this parser
-    lexer: &'c mut dyn Lexer<'a, 'b, 'c>,
+    lexer: &'c mut Lexer<'a, 'b, 'c>,
     /// The stack of semantic objects
     stack: Vec<SubTree>,
     /// The AST being built
@@ -165,16 +166,21 @@ impl<'a: 'b, 'b, 'c> SemanticBody for LRkAstBuilder<'a, 'b, 'c> {
             Some(ref data) => {
                 let label = data.cache.get_label_at(self.handle[index]);
                 match label.get_type() {
-                    TableType::Token => {
-                        SemanticElement::Token(self.lexer.get_output().get_token(label.get_index()))
-                    }
+                    TableType::Token => SemanticElement::Token(
+                        self.lexer
+                            .get_data()
+                            .repository
+                            .get_token(label.get_index())
+                    ),
                     TableType::Variable => {
                         SemanticElement::Variable(self.result.get_variables()[label.get_index()])
                     }
                     TableType::Virtual => {
                         SemanticElement::Virtual(self.result.get_virtuals()[label.get_index()])
                     }
-                    TableType::None => SemanticElement::Terminal(self.lexer.get_terminals()[0])
+                    TableType::None => {
+                        SemanticElement::Terminal(self.lexer.get_data().repository.terminals[0])
+                    }
                 }
             }
         }
@@ -188,7 +194,7 @@ impl<'a: 'b, 'b, 'c> SemanticBody for LRkAstBuilder<'a, 'b, 'c> {
 impl<'a: 'b, 'b, 'c> LRkAstBuilder<'a, 'b, 'c> {
     /// Initializes the builder with the given stack size
     pub fn new(
-        lexer: &'c mut dyn Lexer<'a, 'b, 'c>,
+        lexer: &'c mut Lexer<'a, 'b, 'c>,
         result: Ast<'a, 'b, 'c>
     ) -> LRkAstBuilder<'a, 'b, 'c> {
         LRkAstBuilder {
@@ -618,7 +624,7 @@ pub struct LRkParser<'a: 'b, 'b, 'c> {
 impl<'a: 'b, 'b, 'c> LRkParser<'a, 'b, 'c> {
     /// Initializes a new instance of the parser
     pub fn new(
-        lexer: &'c mut dyn Lexer<'a, 'b, 'c>,
+        lexer: &'c mut Lexer<'a, 'b, 'c>,
         automaton: LRkAutomaton,
         ast: Ast<'a, 'b, 'c>,
         actions: &'c mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
@@ -650,11 +656,12 @@ impl<'a: 'b, 'b, 'c> LRkParser<'a, 'b, 'c> {
         let token = self
             .builder
             .lexer
-            .get_output()
+            .get_data()
+            .repository
             .get_token(kernel.index as usize);
         let expected_on_head = self.data.automaton.get_expected(
             self.data.stack[self.data.stack.len() - 1].state,
-            self.builder.lexer.get_terminals()
+            self.builder.lexer.get_data().repository.terminals
         );
         let mut my_expected = Vec::new();
         for x in expected_on_head.shifts.iter() {
@@ -697,8 +704,11 @@ impl<'a: 'b, 'b, 'c> Parser for LRkParser<'a, 'b, 'c> {
                         _ => {
                             // this is an error
                             let error = self.build_error(kernel);
-                            let errors = self.builder.lexer.get_errors();
-                            errors.push_error_unexpected_token(error);
+                            self.builder
+                                .lexer
+                                .get_data_mut()
+                                .errors
+                                .push_error_unexpected_token(error);
                             // TODO: try to recover here
                             return;
                         }

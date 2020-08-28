@@ -89,6 +89,7 @@ struct LRColumnMapCell {
 
 /// Represent a map from symbols' IDs to the index of their corresponding column in an LR table.
 /// It is optimized for IDs from 0x0000 to 0x01FF (the first 512 symbols) with hope they are the most frequent.
+#[derive(Clone)]
 struct LRColumnMap {
     /// The cache for Ids from 0x0000 to 0x01FF
     cache: [u16; 512],
@@ -145,7 +146,7 @@ struct LRContextOpening {
 }
 
 /// Represents the contexts opening by transitions from a state
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct LRContexts {
     /// The contexts, if any
     openings: Option<Vec<LRContextOpening>>
@@ -225,6 +226,7 @@ impl<'a> LRAction<'a> {
 /// u8: bytecode length in number of op-code
 /// --- production's bytecode
 /// array of LROpCode
+#[derive(Clone)]
 pub struct LRProduction {
     /// Index of the rule's head in the parser's array of variables
     pub head: usize,

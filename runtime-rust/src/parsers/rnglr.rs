@@ -45,6 +45,7 @@ struct RNGLRAutomatonCell {
 }
 
 /// Represents the RNGLR parsing table and productions
+#[derive(Clone)]
 pub struct RNGLRAutomaton {
     /// Index of the axiom variable
     axiom: usize,
@@ -787,7 +788,7 @@ struct SPPFReduction {
 /// However we only need to build one of the variant, i.e. an AST for the user.
 struct SPPFBuilder<'a: 'b, 'b, 'c> {
     /// Lexer associated to this parser
-    lexer: &'c mut dyn Lexer<'a, 'b, 'c>,
+    lexer: &'c mut Lexer<'a, 'b, 'c>,
     /// The history
     history: Vec<HistoryPart>,
     /// The SPPF being built
@@ -808,16 +809,21 @@ impl<'a: 'b, 'b, 'c> SemanticBody for SPPFBuilder<'a, 'b, 'c> {
         let node = self.sppf.get_node(reference.node_id as usize).as_normal();
         let label = node.versions[reference.version as usize].label;
         match label.get_type() {
-            TableType::Token => {
-                SemanticElement::Token(self.lexer.get_output().get_token(label.get_index()))
-            }
+            TableType::Token => SemanticElement::Token(
+                self.lexer
+                    .get_data()
+                    .repository
+                    .get_token(label.get_index())
+            ),
             TableType::Variable => {
                 SemanticElement::Variable(self.result.get_variables()[label.get_index()])
             }
             TableType::Virtual => {
                 SemanticElement::Virtual(self.result.get_virtuals()[label.get_index()])
             }
-            TableType::None => SemanticElement::Terminal(self.lexer.get_terminals()[0])
+            TableType::None => {
+                SemanticElement::Terminal(self.lexer.get_data().repository.terminals[0])
+            }
         }
     }
 
@@ -833,7 +839,7 @@ impl<'a: 'b, 'b, 'c> SemanticBody for SPPFBuilder<'a, 'b, 'c> {
 impl<'a: 'b, 'b, 'c> SPPFBuilder<'a, 'b, 'c> {
     /// Initializes the builder with the given stack size
     pub fn new(
-        lexer: &'c mut dyn Lexer<'a, 'b, 'c>,
+        lexer: &'c mut Lexer<'a, 'b, 'c>,
         result: Ast<'a, 'b, 'c>
     ) -> SPPFBuilder<'a, 'b, 'c> {
         SPPFBuilder {
@@ -1627,10 +1633,10 @@ pub struct RNGLRParser<'a: 'b, 'b, 'c> {
 impl<'a: 'b, 'b, 'c> RNGLRParser<'a, 'b, 'c> {
     /// Initializes a new instance of the parser
     pub fn new(
-        lexer: &'c mut dyn Lexer<'a, 'b, 'c>,
+        lexer: &'c mut Lexer<'a, 'b, 'c>,
         automaton: RNGLRAutomaton,
         ast: Ast<'a, 'b, 'c>,
-        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+        actions: &'c mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
     ) -> RNGLRParser<'a, 'b, 'c> {
         let mut parser = RNGLRParser {
             data: RNGLRParserData {
@@ -1986,7 +1992,8 @@ impl<'a: 'b, 'b, 'c> RNGLRParser<'a, 'b, 'c> {
         let token = self
             .builder
             .lexer
-            .get_output()
+            .get_data()
+            .repository
             .get_token(kernel.index as usize);
         let mut my_expected = Vec::new();
         let generation_data = self.data.gss.get_current_generation();
@@ -1995,7 +2002,7 @@ impl<'a: 'b, 'b, 'c> RNGLRParser<'a, 'b, 'c> {
                 self.data
                     .gss
                     .get_represented_state(generation_data.start + i),
-                self.builder.lexer.get_terminals()
+                self.builder.lexer.get_data().repository.terminals
             );
             // register the terminals for shift actions
             for symbol in expected_on_head.shifts.iter() {
@@ -2068,8 +2075,11 @@ impl<'a: 'b, 'b, 'c> Parser for RNGLRParser<'a, 'b, 'c> {
             if self.data.shifts.is_empty() {
                 // this is an error
                 let error = self.build_error(self.data.next_token.unwrap(), stem);
-                let errors = self.builder.lexer.get_errors();
-                errors.push_error_unexpected_token(error);
+                self.builder
+                    .lexer
+                    .get_data_mut()
+                    .errors
+                    .push_error_unexpected_token(error);
                 // TODO: try to recover here
                 return;
             }

@@ -36,6 +36,7 @@ use crate::grammars::{
     Grammar, OPTION_ACCESS_MODIFIER, OPTION_METHOD, OPTION_MODE, OPTION_NAMESPACE,
     OPTION_OUTPUT_PATH, OPTION_RUNTIME
 };
+use crate::sdk::InMemoryParser;
 use hime_redist::ast::AstNode;
 use hime_redist::text::{Text, TextPosition};
 use std::cmp::Ordering;
@@ -557,6 +558,20 @@ impl<'a> CompilationTask<'a> {
         } else {
             Ok(data)
         }
+    }
+
+    /// Loads the data for this task
+    pub fn load(&self) -> Result<LoadedData, Errors> {
+        loaders::load(&self.inputs)
+    }
+
+    /// Generates the in-memory parser for a grammar
+    pub fn generate_in_memory<'g>(
+        &self,
+        grammar: &'g mut Grammar,
+        grammar_index: usize
+    ) -> Result<InMemoryParser<'g>, Vec<Error>> {
+        output::build_in_memory_grammar(self, grammar, grammar_index)
     }
 
     /// Build an assembly for the relevant grammars

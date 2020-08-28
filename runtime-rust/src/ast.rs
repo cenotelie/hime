@@ -259,7 +259,7 @@ impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
     /// a token label that contains the specified index in the input text
     pub fn find_node_at_position(&self, position: TextPosition) -> Option<AstNode> {
         let tokens = self.tokens.as_ref().unwrap();
-        let index = tokens.get_input().get_line_index(position.line) + position.column - 1;
+        let index = tokens.text.get_line_index(position.line) + position.column - 1;
         let token = tokens.find_token_at(index);
         match token {
             None => None,
@@ -472,7 +472,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> SemanticElementTrait<'a> for AstNode<'a, '
             TableType::None => {
                 match self.tree.tokens {
                     None => panic!("Missing token repository"),
-                    Some(ref repository) => repository.get_terminals()[0] // terminal epsilon
+                    Some(ref repository) => repository.terminals[0] // terminal epsilon
                 }
             }
         }
@@ -512,7 +512,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Display for AstNode<'a, 'b, 'c, 'd> {
             TableType::None => match self.tree.tokens {
                 None => panic!("Missing token repository"),
                 Some(ref repository) => {
-                    let symbol = repository.get_terminals()[0];
+                    let symbol = repository.terminals[0];
                     write!(f, "{}", symbol.name)
                 }
             }

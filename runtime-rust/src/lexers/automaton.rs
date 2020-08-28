@@ -138,6 +138,7 @@ impl<'a> AutomatonState<'a> {
 /// each entry is of the form:
 /// u32: offset of the state from the beginning of the states table in number of u16
 /// -- states table
+#[derive(Clone, Default)]
 pub struct Automaton {
     /// Table of indices in the states table
     table: Vec<u32>,

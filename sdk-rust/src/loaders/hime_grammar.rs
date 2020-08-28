@@ -8,6 +8,7 @@ use hime_redist::ast::AstNode;
 use hime_redist::errors::ParseErrors;
 use hime_redist::lexers::automaton::Automaton;
 use hime_redist::lexers::impls::ContextFreeLexer;
+use hime_redist::lexers::Lexer;
 use hime_redist::parsers::lrk::LRkAutomaton;
 use hime_redist::parsers::lrk::LRkParser;
 use hime_redist::parsers::Parser;
@@ -234,11 +235,12 @@ pub const TERMINALS: &[Symbol] = &[
 /// Creates a new lexer
 fn new_lexer<'a: 'b, 'b, 'c>(
     repository: TokenRepository<'a, 'b, 'c>,
-    errors: &'b mut ParseErrors<'a>
-) -> ContextFreeLexer<'a, 'b, 'c> {
+    errors: &'c mut ParseErrors<'a>
+) -> Lexer<'a, 'b, 'c> {
     let automaton = Automaton::new(LEXER_AUTOMATON);
-    ContextFreeLexer::new(repository, errors, automaton, 0x0007)
+    Lexer::ContextFree(ContextFreeLexer::new(repository, errors, automaton, 0x0007))
 }
+
 /// Static resource for the serialized parser automaton
 const PARSER_AUTOMATON: &[u8] = include_bytes!("hime_grammar_parser.bin");
 

@@ -35,8 +35,11 @@ use crate::grammars::{
     Grammar, TerminalRef, TerminalSet, OPTION_SEPARATOR, PREFIX_GENERATED_TERMINAL
 };
 use crate::lr::{self, Graph};
-use crate::sdk::InMemoryParser;
+use crate::sdk::{InMemoryParser, ParserAutomaton};
 use crate::{CompilationTask, ParsingMethod, Runtime};
+use hime_redist::lexers::automaton::Automaton;
+use hime_redist::parsers::lrk::LRkAutomaton;
+use hime_redist::parsers::rnglr::RNGLRAutomaton;
 use hime_redist::symbols::Symbol;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
@@ -276,10 +279,13 @@ pub fn build_in_memory_grammar<'a>(
             None => 0xFFFF,
             Some(terminal_ref) => terminal_ref.sid() as u32
         },
-        lexer_automaton,
+        lexer_automaton: Automaton::new(&lexer_automaton),
         lexer_is_context_sensitive: grammar.contexts.len() > 1,
-        parser_automaton,
-        parser_is_rnglr: data.method.is_rnglr()
+        parser_automaton: if data.method.is_rnglr() {
+            ParserAutomaton::Rnglr(RNGLRAutomaton::new(&parser_automaton))
+        } else {
+            ParserAutomaton::Lrk(LRkAutomaton::new(&parser_automaton))
+        }
     })
 }
 
