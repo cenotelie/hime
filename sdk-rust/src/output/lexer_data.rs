@@ -28,7 +28,7 @@ use std::io::{self, Write};
 use std::path::PathBuf;
 
 /// Writes the lexer's data
-pub fn write_lexer_data(
+pub fn write_lexer_data_file(
     path: Option<&String>,
     file_name: String,
     grammar: &Grammar,
@@ -42,12 +42,22 @@ pub fn write_lexer_data(
     final_path.push(file_name);
     let file = File::create(final_path)?;
     let mut writer = io::BufWriter::new(file);
+    write_lexer_data(&mut writer, grammar, dfa, expected)
+}
+
+/// Writes the lexer's data
+pub fn write_lexer_data(
+    writer: &mut dyn Write,
+    grammar: &Grammar,
+    dfa: &DFA,
+    expected: &TerminalSet
+) -> Result<(), Error> {
     // write number of states
-    write_u32(&mut writer, dfa.len() as u32)?;
+    write_u32(writer, dfa.len() as u32)?;
     // write the offsets to all the states
     let mut offset: u32 = 0;
     for state in dfa.states.iter() {
-        write_u32(&mut writer, offset)?;
+        write_u32(writer, offset)?;
         // adds the length required by this state
         offset += 3 + 256; // header + transitions for [0-255] characters
         let mut current_contexts = Vec::new();
@@ -68,7 +78,7 @@ pub fn write_lexer_data(
     }
     // write each state
     for state in dfa.states.iter() {
-        write_lexer_data_state(&mut writer, grammar, expected, state)?;
+        write_lexer_data_state(writer, grammar, expected, state)?;
     }
     Ok(())
 }

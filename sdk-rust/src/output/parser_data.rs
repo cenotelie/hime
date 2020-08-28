@@ -34,7 +34,7 @@ use std::io::{self, Write};
 use std::path::PathBuf;
 
 /// Writes the data for a LR(k) parser
-pub fn write_parser_lrk_data(
+pub fn write_parser_lrk_data_file(
     path: Option<&String>,
     file_name: String,
     grammar: &Grammar,
@@ -48,6 +48,16 @@ pub fn write_parser_lrk_data(
     final_path.push(file_name);
     let file = File::create(final_path)?;
     let mut writer = io::BufWriter::new(file);
+    write_parser_lrk_data(&mut writer, grammar, expected, graph)
+}
+
+/// Writes the data for a LR(k) parser
+pub fn write_parser_lrk_data(
+    writer: &mut dyn Write,
+    grammar: &Grammar,
+    expected: &TerminalSet,
+    graph: &Graph
+) -> Result<(), Error> {
     let mut rules = Vec::new();
     for variable in grammar.variables.iter() {
         for i in 0..variable.rules.len() {
@@ -55,26 +65,23 @@ pub fn write_parser_lrk_data(
         }
     }
     // number of columns
-    write_u16(
-        &mut writer,
-        (expected.len() + grammar.variables.len()) as u16
-    )?;
+    write_u16(writer, (expected.len() + grammar.variables.len()) as u16)?;
     // number of states
-    write_u16(&mut writer, graph.states.len() as u16)?;
+    write_u16(writer, graph.states.len() as u16)?;
     // number of rules
-    write_u16(&mut writer, rules.len() as u16)?;
+    write_u16(writer, rules.len() as u16)?;
 
-    write_parser_column_headers(&mut writer, grammar, expected)?;
-    write_parser_opening_contexts(&mut writer, graph)?;
+    write_parser_column_headers(writer, grammar, expected)?;
+    write_parser_opening_contexts(writer, graph)?;
 
     // write the LR table
     for state in graph.states.iter() {
-        write_parser_lrk_data_state(&mut writer, grammar, expected, &rules, state)?;
+        write_parser_lrk_data_state(writer, grammar, expected, &rules, state)?;
     }
     // write production rules
     for variable in grammar.variables.iter() {
         for rule in variable.rules.iter() {
-            write_parser_lrk_data_rule(&mut writer, grammar, rule)?;
+            write_parser_lrk_data_rule(writer, grammar, rule)?;
         }
     }
     Ok(())
@@ -225,9 +232,26 @@ fn write_parser_lrk_data_rule(
 }
 
 /// Writes the data for a RNGLR parser
-pub fn write_parser_rnglr_data(
+pub fn write_parser_rnglr_data_file(
     path: Option<&String>,
     file_name: String,
+    grammar: &Grammar,
+    expected: &TerminalSet,
+    graph: &Graph
+) -> Result<(), Error> {
+    let mut final_path = PathBuf::new();
+    if let Some(path) = path {
+        final_path.push(path);
+    }
+    final_path.push(file_name);
+    let file = File::create(final_path)?;
+    let mut writer = io::BufWriter::new(file);
+    write_parser_rnglr_data(&mut writer, grammar, expected, graph)
+}
+
+/// Writes the data for a RNGLR parser
+pub fn write_parser_rnglr_data(
+    writer: &mut dyn Write,
     grammar: &Grammar,
     expected: &TerminalSet,
     graph: &Graph
@@ -302,50 +326,39 @@ pub fn write_parser_rnglr_data(
         .position(|variable| variable.name == GENERATED_AXIOM)
         .unwrap();
 
-    let mut final_path = PathBuf::new();
-    if let Some(path) = path {
-        final_path.push(path);
-    }
-    final_path.push(file_name);
-    let file = File::create(final_path)?;
-    let mut writer = io::BufWriter::new(file);
-
     // index of the axiom variable
-    write_u16(&mut writer, axiom_index as u16)?;
+    write_u16(writer, axiom_index as u16)?;
     // nb of colimns
-    write_u16(
-        &mut writer,
-        (expected.len() + grammar.variables.len()) as u16
-    )?;
+    write_u16(writer, (expected.len() + grammar.variables.len()) as u16)?;
     // nb of rows
-    write_u16(&mut writer, graph.states.len() as u16)?;
+    write_u16(writer, graph.states.len() as u16)?;
     // nb of actions
-    write_u32(&mut writer, total)?;
+    write_u32(writer, total)?;
     // nb of rules
-    write_u16(&mut writer, rules.len() as u16)?;
+    write_u16(writer, rules.len() as u16)?;
     // nb of nullables
-    write_u16(&mut writer, nullables.len() as u16)?;
+    write_u16(writer, nullables.len() as u16)?;
 
-    write_parser_column_headers(&mut writer, grammar, expected)?;
-    write_parser_opening_contexts(&mut writer, graph)?;
+    write_parser_column_headers(writer, grammar, expected)?;
+    write_parser_opening_contexts(writer, graph)?;
 
     //write the offset tables
     for (count, offset) in counts.into_iter().zip(offsets.into_iter()) {
-        write_u16(&mut writer, count)?;
-        write_u32(&mut writer, offset)?;
+        write_u16(writer, count)?;
+        write_u32(writer, offset)?;
     }
 
     for state in graph.states.iter() {
-        write_parser_rnglr_data_action_table(&mut writer, expected, grammar, &rules, state)?;
+        write_parser_rnglr_data_action_table(writer, expected, grammar, &rules, state)?;
     }
 
     for (rule_ref, length) in rules.into_iter() {
-        write_parser_rnglr_data_rule(&mut writer, grammar, rule_ref.get_rule_in(grammar), length)?;
+        write_parser_rnglr_data_rule(writer, grammar, rule_ref.get_rule_in(grammar), length)?;
     }
 
     // write the indexes for nullables production
     for index in nullables.into_iter() {
-        write_u16(&mut writer, index as u16)?;
+        write_u16(writer, index as u16)?;
     }
 
     Ok(())

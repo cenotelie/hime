@@ -28,6 +28,7 @@ pub mod grammars;
 pub mod loaders;
 pub mod lr;
 pub mod output;
+pub mod sdk;
 pub mod unicode;
 
 use crate::errors::{Error, Errors};
@@ -613,23 +614,21 @@ impl<'a> CompilationTask<'a> {
         // gather all source files
         let mut all_files = Vec::new();
         for (index, grammar) in units.iter() {
-            match self.get_mode_for(grammar, *index) {
-                Ok(Mode::Sources) => {
-                    return;
-                }
-                Ok(Mode::SourcesAndAssembly) => {
-                    return;
-                }
-                Ok(Mode::Assembly) => {}
+            let shall_delete = match self.get_mode_for(grammar, *index) {
+                Ok(Mode::Sources) => false,
+                Ok(Mode::SourcesAndAssembly) => false,
+                Ok(Mode::Assembly) => true,
                 Err(error) => {
                     errors.push(error);
-                    return;
+                    false
                 }
-            }
-            match output::get_sources(self, grammar, *index) {
-                Ok(mut sources) => all_files.append(&mut sources),
-                Err(error) => {
-                    errors.push(error);
+            };
+            if shall_delete {
+                match output::get_sources(self, grammar, *index) {
+                    Ok(mut sources) => all_files.append(&mut sources),
+                    Err(error) => {
+                        errors.push(error);
+                    }
                 }
             }
         }

@@ -31,9 +31,13 @@ mod parser_rust;
 
 use crate::errors::{Error, UnmatchableTokenError};
 use crate::finite::DFA;
-use crate::grammars::{Grammar, TerminalRef, TerminalSet, OPTION_SEPARATOR};
-use crate::lr;
+use crate::grammars::{
+    Grammar, TerminalRef, TerminalSet, OPTION_SEPARATOR, PREFIX_GENERATED_TERMINAL
+};
+use crate::lr::{self, Graph};
+use crate::sdk::InMemoryParser;
 use crate::{CompilationTask, ParsingMethod, Runtime};
+use hime_redist::symbols::Symbol;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use std::env;
@@ -47,9 +51,9 @@ pub fn execute_for_grammar(
     grammar: &mut Grammar,
     grammar_index: usize
 ) -> Result<(), Vec<Error>> {
-    if let Err(error) = grammar.prepare(grammar_index) {
-        return Err(vec![error]);
-    };
+    let data = build_grammar(task, grammar, grammar_index)?;
+
+    // gather required options
     let mode = match task.get_mode_for(grammar, grammar_index) {
         Ok(mode) => mode,
         Err(error) => return Err(vec![error])
@@ -70,6 +74,238 @@ pub fn execute_for_grammar(
     let modifier = match task.get_output_modifier_for(grammar, grammar_index) {
         Ok(modifier) => modifier,
         Err(error) => return Err(vec![error])
+    };
+
+    // write data
+    let output_path = task.get_output_path_for(grammar);
+    if let Err(error) = lexer_data::write_lexer_data_file(
+        output_path.as_ref(),
+        get_lexer_bin_name(grammar, runtime),
+        grammar,
+        &data.dfa,
+        &data.expected
+    ) {
+        return Err(vec![error]);
+    }
+    if let Err(error) = match data.method {
+        ParsingMethod::LR0 => parser_data::write_parser_lrk_data_file(
+            output_path.as_ref(),
+            get_parser_bin_name(grammar, runtime),
+            grammar,
+            &data.expected,
+            &data.graph
+        ),
+        ParsingMethod::LR1 => parser_data::write_parser_lrk_data_file(
+            output_path.as_ref(),
+            get_parser_bin_name(grammar, runtime),
+            grammar,
+            &data.expected,
+            &data.graph
+        ),
+        ParsingMethod::LALR1 => parser_data::write_parser_lrk_data_file(
+            output_path.as_ref(),
+            get_parser_bin_name(grammar, runtime),
+            grammar,
+            &data.expected,
+            &data.graph
+        ),
+        ParsingMethod::RNGLR1 => parser_data::write_parser_rnglr_data_file(
+            output_path.as_ref(),
+            get_parser_bin_name(grammar, runtime),
+            grammar,
+            &data.expected,
+            &data.graph
+        ),
+        ParsingMethod::RNGLALR1 => parser_data::write_parser_rnglr_data_file(
+            output_path.as_ref(),
+            get_parser_bin_name(grammar, runtime),
+            grammar,
+            &data.expected,
+            &data.graph
+        )
+    } {
+        return Err(vec![error]);
+    }
+    // write code
+    match runtime {
+        Runtime::Net => {
+            if let Err(error) = lexer_net::write(
+                output_path.as_ref(),
+                format!("{}Lexer.cs", helper::to_upper_camel_case(&grammar.name)),
+                grammar,
+                &data.expected,
+                data.separator,
+                &nmspace,
+                modifier
+            ) {
+                return Err(vec![error]);
+            }
+            if let Err(error) = parser_net::write(
+                output_path.as_ref(),
+                format!("{}Parser.cs", helper::to_upper_camel_case(&grammar.name)),
+                grammar,
+                &data.expected,
+                data.method,
+                &nmspace,
+                modifier
+            ) {
+                return Err(vec![error]);
+            }
+        }
+        Runtime::Java => {
+            if let Err(error) = lexer_java::write(
+                output_path.as_ref(),
+                format!("{}Lexer.java", helper::to_upper_camel_case(&grammar.name)),
+                grammar,
+                &data.expected,
+                data.separator,
+                &nmspace,
+                modifier
+            ) {
+                return Err(vec![error]);
+            }
+            if let Err(error) = parser_java::write(
+                output_path.as_ref(),
+                format!("{}Parser.java", helper::to_upper_camel_case(&grammar.name)),
+                grammar,
+                &data.expected,
+                data.method,
+                &nmspace,
+                modifier
+            ) {
+                return Err(vec![error]);
+            }
+        }
+        Runtime::Rust => {
+            if let Err(error) = lexer_rust::write(
+                output_path.as_ref(),
+                format!("{}.rs", helper::to_snake_case(&grammar.name)),
+                grammar,
+                &data.expected,
+                data.separator,
+                data.method.is_rnglr()
+            ) {
+                return Err(vec![error]);
+            }
+            if let Err(error) = parser_rust::write(
+                output_path.as_ref(),
+                format!("{}.rs", helper::to_snake_case(&grammar.name)),
+                grammar,
+                &data.expected,
+                data.method,
+                &nmspace,
+                mode.output_assembly()
+            ) {
+                return Err(vec![error]);
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Builds the in-memory parser for a grammar
+pub fn build_in_memory_grammar<'a>(
+    task: &CompilationTask,
+    grammar: &'a mut Grammar,
+    grammar_index: usize
+) -> Result<InMemoryParser<'a>, Vec<Error>> {
+    let data = build_grammar(task, grammar, grammar_index)?;
+
+    // get symbols
+    let mut terminals: Vec<Symbol<'a>> = Vec::new();
+    for terminal_ref in data.expected.content.iter().skip(2) {
+        let terminal = grammar.get_terminal(terminal_ref.sid()).unwrap();
+        if terminal.name.starts_with(PREFIX_GENERATED_TERMINAL) {
+            continue;
+        } else {
+            terminals.push(Symbol {
+                id: terminal.id as u32,
+                name: &terminal.name
+            });
+        }
+    }
+    let variables: Vec<Symbol<'a>> = grammar
+        .variables
+        .iter()
+        .map(|variable| Symbol {
+            id: variable.id as u32,
+            name: &variable.name
+        })
+        .collect();
+    let virtuals: Vec<Symbol<'a>> = grammar
+        .virtuals
+        .iter()
+        .map(|symbol| Symbol {
+            id: symbol.id as u32,
+            name: &symbol.name
+        })
+        .collect();
+
+    // build automata
+    let mut lexer_automaton = Vec::new();
+    if let Err(error) =
+        lexer_data::write_lexer_data(&mut lexer_automaton, grammar, &data.dfa, &data.expected)
+    {
+        return Err(vec![error]);
+    }
+    let mut parser_automaton = Vec::new();
+    if let Err(error) = if data.method.is_rnglr() {
+        parser_data::write_parser_lrk_data(
+            &mut parser_automaton,
+            grammar,
+            &data.expected,
+            &data.graph
+        )
+    } else {
+        parser_data::write_parser_rnglr_data(
+            &mut parser_automaton,
+            grammar,
+            &data.expected,
+            &data.graph
+        )
+    } {
+        return Err(vec![error]);
+    }
+
+    Ok(InMemoryParser {
+        name: &grammar.name,
+        terminals,
+        variables,
+        virtuals,
+        separator: match data.separator {
+            None => 0xFFFF,
+            Some(terminal_ref) => terminal_ref.sid() as u32
+        },
+        lexer_automaton,
+        lexer_is_context_sensitive: grammar.contexts.len() > 1,
+        parser_automaton,
+        parser_is_rnglr: data.method.is_rnglr()
+    })
+}
+
+/// Represents the build data for a grammar
+#[derive(Debug, Clone)]
+struct BuildData {
+    /// The DFA
+    pub dfa: DFA,
+    /// The expected terminals
+    pub expected: TerminalSet,
+    /// The separator terminal
+    pub separator: Option<TerminalRef>,
+    /// The parsing method
+    pub method: ParsingMethod,
+    /// The LR graph
+    pub graph: Graph
+}
+
+/// Build and output artifacts for a grammar
+fn build_grammar(
+    task: &CompilationTask,
+    grammar: &mut Grammar,
+    grammar_index: usize
+) -> Result<BuildData, Vec<Error>> {
+    if let Err(error) = grammar.prepare(grammar_index) {
+        return Err(vec![error]);
     };
     // Build DFA
     let dfa = grammar.build_dfa();
@@ -93,131 +329,13 @@ pub fn execute_for_grammar(
     };
     // Build the data for the parser
     let graph = lr::build_graph(grammar, grammar_index, &expected, &dfa, method)?;
-    // write data
-    let output_path = task.get_output_path_for(grammar);
-    if let Err(error) = lexer_data::write_lexer_data(
-        output_path.as_ref(),
-        get_lexer_bin_name(grammar, runtime),
-        grammar,
-        &dfa,
-        &expected
-    ) {
-        return Err(vec![error]);
-    }
-    if let Err(error) = match method {
-        ParsingMethod::LR0 => parser_data::write_parser_lrk_data(
-            output_path.as_ref(),
-            get_parser_bin_name(grammar, runtime),
-            grammar,
-            &expected,
-            &graph
-        ),
-        ParsingMethod::LR1 => parser_data::write_parser_lrk_data(
-            output_path.as_ref(),
-            get_parser_bin_name(grammar, runtime),
-            grammar,
-            &expected,
-            &graph
-        ),
-        ParsingMethod::LALR1 => parser_data::write_parser_lrk_data(
-            output_path.as_ref(),
-            get_parser_bin_name(grammar, runtime),
-            grammar,
-            &expected,
-            &graph
-        ),
-        ParsingMethod::RNGLR1 => parser_data::write_parser_rnglr_data(
-            output_path.as_ref(),
-            get_parser_bin_name(grammar, runtime),
-            grammar,
-            &expected,
-            &graph
-        ),
-        ParsingMethod::RNGLALR1 => parser_data::write_parser_rnglr_data(
-            output_path.as_ref(),
-            get_parser_bin_name(grammar, runtime),
-            grammar,
-            &expected,
-            &graph
-        )
-    } {
-        return Err(vec![error]);
-    }
-    // write code
-    match runtime {
-        Runtime::Net => {
-            if let Err(error) = lexer_net::write(
-                output_path.as_ref(),
-                format!("{}Lexer.cs", helper::to_upper_camel_case(&grammar.name)),
-                grammar,
-                &expected,
-                separator,
-                &nmspace,
-                modifier
-            ) {
-                return Err(vec![error]);
-            }
-            if let Err(error) = parser_net::write(
-                output_path.as_ref(),
-                format!("{}Parser.cs", helper::to_upper_camel_case(&grammar.name)),
-                grammar,
-                &expected,
-                method,
-                &nmspace,
-                modifier
-            ) {
-                return Err(vec![error]);
-            }
-        }
-        Runtime::Java => {
-            if let Err(error) = lexer_java::write(
-                output_path.as_ref(),
-                format!("{}Lexer.java", helper::to_upper_camel_case(&grammar.name)),
-                grammar,
-                &expected,
-                separator,
-                &nmspace,
-                modifier
-            ) {
-                return Err(vec![error]);
-            }
-            if let Err(error) = parser_java::write(
-                output_path.as_ref(),
-                format!("{}Parser.java", helper::to_upper_camel_case(&grammar.name)),
-                grammar,
-                &expected,
-                method,
-                &nmspace,
-                modifier
-            ) {
-                return Err(vec![error]);
-            }
-        }
-        Runtime::Rust => {
-            if let Err(error) = lexer_rust::write(
-                output_path.as_ref(),
-                format!("{}.rs", helper::to_snake_case(&grammar.name)),
-                grammar,
-                &expected,
-                separator,
-                method.is_rnglr()
-            ) {
-                return Err(vec![error]);
-            }
-            if let Err(error) = parser_rust::write(
-                output_path.as_ref(),
-                format!("{}.rs", helper::to_snake_case(&grammar.name)),
-                grammar,
-                &expected,
-                method,
-                &nmspace,
-                mode.output_assembly()
-            ) {
-                return Err(vec![error]);
-            }
-        }
-    }
-    Ok(())
+    Ok(BuildData {
+        dfa,
+        expected,
+        separator,
+        method,
+        graph
+    })
 }
 
 /// Gets the list of sources to produce for a grammar
