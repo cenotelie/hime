@@ -25,7 +25,7 @@ extern crate hime_sdk;
 mod errors;
 
 use clap::{App, Arg};
-use hime_sdk::{CompilationTask, Mode, Modifier, ParsingMethod, Runtime};
+use hime_sdk::{CompilationTask, Input, Mode, Modifier, ParsingMethod, Runtime};
 use std::env;
 use std::process;
 
@@ -180,7 +180,7 @@ pub fn main() {
     task.grammar_name = matches.value_of("grammar_name").map(|v| v.to_string());
     if let Some(inputs) = matches.values_of("inputs") {
         for input in inputs {
-            task.input_files.push(input.to_string());
+            task.inputs.push(Input::FileName(input.to_string()));
         }
     }
     match task.execute() {

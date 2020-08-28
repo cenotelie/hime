@@ -26,7 +26,7 @@ use crate::grammars::{
     TemplateRuleSymbol, DEFAULT_CONTEXT_NAME
 };
 use crate::unicode::{Span, BLOCKS, CATEGORIES};
-use crate::{CharSpan, InputReference, LoadedData, LoadedInput};
+use crate::{CharSpan, Input, InputReference, LoadedData, LoadedInput};
 use hime_redist::ast::{Ast, AstFamily, AstNode};
 use hime_redist::errors::ParseErrorDataTrait;
 use hime_redist::lexers::DEFAULT_CONTEXT;
@@ -37,11 +37,10 @@ use hime_redist::parsers::{
 use hime_redist::result::ParseResult;
 use hime_redist::symbols::SemanticElementTrait;
 use hime_redist::text::Text;
-use std::fs;
 use std::io;
 
 /// Loads all inputs into grammars
-pub fn load(inputs: &[String]) -> Result<LoadedData, Errors> {
+pub fn load(inputs: &[Input]) -> Result<LoadedData, Errors> {
     let results = parse_inputs(inputs)?;
     let asts: Vec<Ast> = results.iter().map(|r| r.get_ast()).collect();
     let roots: Vec<AstNode> = asts.iter().map(|ast| ast.get_root()).collect();
@@ -64,8 +63,8 @@ pub fn load(inputs: &[String]) -> Result<LoadedData, Errors> {
     let loaded_inputs: Vec<LoadedInput> = results
         .into_iter()
         .zip(inputs.iter())
-        .map(|(result, name)| LoadedInput {
-            name: name.to_string(),
+        .map(|(result, input)| LoadedInput {
+            name: input.name(),
             content: result.text
         })
         .collect();
@@ -112,10 +111,10 @@ fn resolve_inheritance<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd>(
 
 /// Parses the specified input
 fn parse_input(
-    file_name: &str,
+    input: &Input,
     input_index: usize
 ) -> Result<ParseResult<'static, 'static>, (ParseResult<'static, 'static>, Vec<Error>)> {
-    let file = match fs::File::open(file_name) {
+    let content = match input.open() {
         Ok(f) => f,
         Err(err) => {
             return Err((
@@ -129,7 +128,7 @@ fn parse_input(
             ));
         }
     };
-    let mut reader = io::BufReader::new(file);
+    let mut reader = io::BufReader::new(content);
     let result = hime_grammar::parse_utf8(&mut reader);
     let errors: Vec<Error> = result
         .errors
@@ -155,7 +154,7 @@ fn parse_input(
 }
 
 /// Parses all inputs
-fn parse_inputs(inputs: &[String]) -> Result<Vec<ParseResult<'static, 'static>>, Errors> {
+fn parse_inputs(inputs: &[Input]) -> Result<Vec<ParseResult<'static, 'static>>, Errors> {
     let mut results = Vec::new();
     let mut has_errors = false;
     let mut errors = Vec::new();
@@ -177,8 +176,8 @@ fn parse_inputs(inputs: &[String]) -> Result<Vec<ParseResult<'static, 'static>>,
                 inputs: results
                     .into_iter()
                     .zip(inputs.iter())
-                    .map(|(result, name)| LoadedInput {
-                        name: name.clone(),
+                    .map(|(result, input)| LoadedInput {
+                        name: input.name(),
                         content: result.text
                     })
                     .collect(),

@@ -38,6 +38,8 @@ use crate::grammars::{
 use hime_redist::ast::AstNode;
 use hime_redist::text::{Text, TextPosition};
 use std::cmp::Ordering;
+use std::fs;
+use std::io::Read;
 
 /// The version of this program
 pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -208,6 +210,32 @@ fn test_charspan_split() {
     );
 }
 
+/// Represent an input for the compiler
+pub enum Input<'a> {
+    /// A file name
+    FileName(String),
+    /// An raw input
+    Raw(&'a str)
+}
+
+impl<'a> Input<'a> {
+    /// Gets the input's name
+    pub fn name(&self) -> String {
+        match self {
+            Input::FileName(ref file_name) => file_name.clone(),
+            Input::Raw(_) => String::from("Raw input")
+        }
+    }
+
+    ///
+    pub fn open(&self) -> Result<Box<dyn Read + 'a>, std::io::Error> {
+        match self {
+            Input::FileName(file_name) => Ok(Box::new(fs::File::open(file_name)?)),
+            Input::Raw(ref text) => Ok(Box::new(text.as_bytes()))
+        }
+    }
+}
+
 /// The data for an input that has been loaded
 #[derive(Debug, Clone)]
 pub struct LoadedInput {
@@ -346,10 +374,10 @@ pub enum Modifier {
 }
 
 /// Represents a compilation task for the generation of lexers and parsers from grammars
-#[derive(Debug, Default, Clone)]
-pub struct CompilationTask {
-    /// The input file names
-    pub input_files: Vec<String>,
+#[derive(Default)]
+pub struct CompilationTask<'a> {
+    /// The inputs
+    pub inputs: Vec<Input<'a>>,
     /// The name of the grammar to compile in the case where several grammars are loaded.
     pub grammar_name: Option<String>,
     /// The compiler's output mode
@@ -368,7 +396,7 @@ pub struct CompilationTask {
     pub method: Option<ParsingMethod>
 }
 
-impl CompilationTask {
+impl<'a> CompilationTask<'a> {
     /// Gets the compiler's output mode for the grammar
     pub fn get_mode_for(&self, grammar: &Grammar, grammar_index: usize) -> Result<Mode, Error> {
         match self.mode {
@@ -500,7 +528,7 @@ impl CompilationTask {
 
     /// Executes this task
     pub fn execute(&self) -> Result<LoadedData, Errors> {
-        let mut data = loaders::load(&self.input_files)?;
+        let mut data = loaders::load(&self.inputs)?;
         // select the grammars to build
         match &self.grammar_name {
             None => {}
@@ -546,12 +574,12 @@ impl CompilationTask {
     }
 
     /// Gather the grammars for build an assembly for a target
-    fn gather_grammars_for_assembly<'a>(
+    fn gather_grammars_for_assembly<'b>(
         &self,
-        data: &'a LoadedData,
+        data: &'b LoadedData,
         target: Runtime,
         errors: &mut Vec<Error>
-    ) -> Vec<(usize, &'a Grammar)> {
+    ) -> Vec<(usize, &'b Grammar)> {
         data.grammars
             .iter()
             .enumerate()
