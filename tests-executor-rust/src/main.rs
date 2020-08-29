@@ -62,7 +62,7 @@ fn main() {
     process::exit(result);
 }
 
-#[test]
+/*#[test]
 fn test_single() {
     let test_name = "test_position_lineendings_windows";
     let verb = VERB_MATCHES;
@@ -72,7 +72,7 @@ fn test_single() {
         libloading::Library::new(library_name).unwrap_or_else(|error| panic!("{}", error));
     let result = execute(my_path, &library, test_name, verb);
     assert_eq!(RESULT_SUCCESS, result);
-}
+}*/
 
 /// Gets the name of the shared parser library
 #[cfg(target_os = "linux")]

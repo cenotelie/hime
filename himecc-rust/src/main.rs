@@ -32,7 +32,7 @@ use std::process;
 /// The name of this program
 pub const CRATE_NAME: &str = env!("CARGO_PKG_NAME");
 /// The version of this program
-pub const CRATE_VERSION: &str = env!("CARGO_PKG_NAME");
+pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub fn main() {
     let matches = App::new("Hime Parser Generator")
