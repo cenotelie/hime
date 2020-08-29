@@ -1,0 +1,23 @@
+[package]
+name = "hime_langserv"
+version = "3.5.1"
+authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
+description = "Language server for Hime grammars"
+documentation = "https://cenotelie.fr/projects/hime"
+homepage = "https://cenotelie.fr/projects/hime"
+repository = "https://github.com/cenotelie/hime"
+readme = "README.md"
+keywords = ["hime", "parser", "lr", "glr", "rnglr", "language-server"]
+categories = ["algorithms", "parsing", "parser-implementations", "text-processing"]
+license = "LGPL-3.0"
+include = ["README.md", "Cargo.toml", "src/**/*.rs"]
+edition = "2018"
+
+[dependencies]
+hime_redist = "3.5.1"
+hime_sdk = "3.5.1"
+tokio = { version = "0.2", features = ["macros", "io-util", "io-std"] }
+tower-lsp = "0.13"
+
+[badges]
+maintenance = { status = "actively-developed" }
