@@ -242,6 +242,12 @@ impl Text {
         }
     }
 
+    /// Gets the position for a starting position and a length
+    pub fn get_position_for(&self, position: TextPosition, length: usize) -> TextPosition {
+        let index = self.lines[position.line - 1] + position.column - 1 + length;
+        self.get_position_at(index)
+    }
+
     /// Gets the context description for the current text at the specified position
     pub fn get_context_at(&self, position: TextPosition) -> TextContext {
         self.get_context_for(position, 1)
