@@ -18,19 +18,23 @@
 //! Module for the definition of a server-side workspace
 
 use hime_sdk::errors::Error;
+use hime_sdk::grammars::OPTION_AXIOM;
+use hime_sdk::grammars::OPTION_SEPARATOR;
 use hime_sdk::{CompilationTask, Input, InputReference, LoadedData};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufReader, ErrorKind, Read};
 use std::path::PathBuf;
 use tower_lsp::lsp_types::{
-    Diagnostic, DiagnosticSeverity, DidChangeTextDocumentParams, FileChangeType, FileEvent,
-    Position, Range, Url
+    Diagnostic, DiagnosticRelatedInformation, DiagnosticSeverity, DidChangeTextDocumentParams,
+    FileChangeType, FileEvent, Location, Position, Range, Url
 };
 
 /// Represents a document in a workspace
 #[derive(Debug, Clone)]
 pub struct Document {
+    /// The document's URL
+    pub url: Url,
     /// The content of the document in this version
     pub content: String,
     /// The current version
@@ -41,9 +45,10 @@ pub struct Document {
 
 impl Document {
     /// Creates a new document
-    pub fn new(content: String) -> Document {
+    pub fn new(url: Url, content: String) -> Document {
         Document {
-            content: content,
+            url,
+            content,
             version: None,
             diagnostics: Vec::new()
         }
@@ -56,7 +61,9 @@ pub struct Workspace {
     /// The root URL for the workspace
     pub root: Option<Url>,
     /// The documents in the workspace
-    pub documents: HashMap<Url, Document>
+    pub documents: HashMap<Url, Document>,
+    /// The currently loaded data, if any
+    pub data: Option<LoadedData>
 }
 
 impl Workspace {
@@ -127,9 +134,10 @@ impl Workspace {
         let mut reader = BufReader::new(File::open(path)?);
         let mut content = String::new();
         reader.read_to_string(&mut content)?;
+        let uri2 = uri.clone();
         self.documents
             .entry(uri)
-            .or_insert_with(|| Document::new(content));
+            .or_insert_with(move || Document::new(uri2, content));
         Ok(())
     }
 
@@ -164,6 +172,7 @@ impl Workspace {
 
     /// Runs the diagnostics
     pub fn lint(&mut self) {
+        self.data = None;
         let mut task = CompilationTask::default();
         let mut documents: Vec<&mut Document> =
             self.documents.iter_mut().map(|(_, doc)| doc).collect();
@@ -180,14 +189,15 @@ impl Workspace {
                     }
                 }
                 for error in errors.iter() {
-                    if let Some((index, diag)) = to_diagnostic(&data, error) {
+                    if let Some((index, diag)) = to_diagnostic(&documents, &data, error) {
                         documents[index].diagnostics.push(diag);
                     }
                 }
+                self.data = Some(data)
             }
             Err(errors) => {
                 for error in errors.errors.iter() {
-                    if let Some((index, diag)) = to_diagnostic(&errors.data, error) {
+                    if let Some((index, diag)) = to_diagnostic(&documents, &errors.data, error) {
                         documents[index].diagnostics.push(diag);
                     }
                 }
@@ -197,7 +207,11 @@ impl Workspace {
 }
 
 /// Converts an error to a diagnostic
-fn to_diagnostic(data: &LoadedData, error: &Error) -> Option<(usize, Diagnostic)> {
+fn to_diagnostic(
+    documents: &[&mut Document],
+    data: &LoadedData,
+    error: &Error
+) -> Option<(usize, Diagnostic)> {
     match error {
         Error::Parsing(input_reference, msg) => Some((
             input_reference.input_index,
@@ -211,6 +225,331 @@ fn to_diagnostic(data: &LoadedData, error: &Error) -> Option<(usize, Diagnostic)
                 tags: None
             }
         )),
+        Error::InvalidOption(grammar_index, name, valid) => {
+            let option = data.grammars[*grammar_index].get_option(name).unwrap();
+            let expected = if valid.is_empty() {
+                String::new()
+            } else {
+                format!(" expected one of: {}", valid.join(", "))
+            };
+            let input_reference = option.value_input_ref;
+            Some((
+                input_reference.input_index,
+                Diagnostic {
+                    range: to_range(data, input_reference),
+                    severity: Some(DiagnosticSeverity::Error),
+                    code: None,
+                    source: Some(super::CRATE_NAME.to_string()),
+                    message: format!("Invalid value for grammar option `{}`{}", name, expected),
+                    related_information: None,
+                    tags: None
+                }
+            ))
+        }
+        Error::AxiomNotSpecified(grammar_index) => {
+            let input_reference = data.grammars[*grammar_index].input_ref;
+            Some((
+                input_reference.input_index,
+                Diagnostic {
+                    range: to_range(data, input_reference),
+                    severity: Some(DiagnosticSeverity::Error),
+                    code: None,
+                    source: Some(super::CRATE_NAME.to_string()),
+                    message: format!("Grammar axiom has not been specified"),
+                    related_information: None,
+                    tags: None
+                }
+            ))
+        }
+        Error::AxiomNotDefined(grammar_index) => {
+            let option = data.grammars[*grammar_index]
+                .get_option(OPTION_AXIOM)
+                .unwrap();
+            let input_reference = option.value_input_ref;
+            Some((
+                input_reference.input_index,
+                Diagnostic {
+                    range: to_range(data, input_reference),
+                    severity: Some(DiagnosticSeverity::Error),
+                    code: None,
+                    source: Some(super::CRATE_NAME.to_string()),
+                    message: format!("Grammar axiom `{}` is not defined", &option.value),
+                    related_information: None,
+                    tags: None
+                }
+            ))
+        }
+        Error::SeparatorNotDefined(grammar_index) => {
+            let option = data.grammars[*grammar_index]
+                .get_option(OPTION_SEPARATOR)
+                .unwrap();
+            let input_reference = option.value_input_ref;
+            Some((
+                input_reference.input_index,
+                Diagnostic {
+                    range: to_range(data, input_reference),
+                    severity: Some(DiagnosticSeverity::Error),
+                    code: None,
+                    source: Some(super::CRATE_NAME.to_string()),
+                    message: format!("Grammar separator token `{}` is not defined", &option.value),
+                    related_information: None,
+                    tags: None
+                }
+            ))
+        }
+        Error::SeparatorIsContextual(grammar_index, terminal_ref) => {
+            let separator = data.grammars[*grammar_index]
+                .get_terminal(terminal_ref.sid())
+                .unwrap();
+            let input_reference = separator.input_ref;
+            let context = &data.grammars[*grammar_index].contexts[separator.context];
+            Some((
+                input_reference.input_index,
+                Diagnostic {
+                    range: to_range(data, input_reference),
+                    severity: Some(DiagnosticSeverity::Error),
+                    code: None,
+                    source: Some(super::CRATE_NAME.to_string()),
+                    message: format!(
+                        "Grammar separator token `{}` is only defined for context `{}`",
+                        &separator.name, context
+                    ),
+                    related_information: None,
+                    tags: None
+                }
+            ))
+        }
+        Error::SeparatorCannotBeMatched(grammar_index, error) => {
+            let terminal = data.grammars[*grammar_index]
+                .get_terminal(error.terminal.sid())
+                .unwrap();
+            let input_reference = terminal.input_ref;
+            Some((
+                input_reference.input_index,
+                Diagnostic {
+                    range: to_range(data, input_reference),
+                    severity: Some(DiagnosticSeverity::Error),
+                    code: None,
+                    source: Some(super::CRATE_NAME.to_string()),
+                    message: format!(
+                        "Token `{}` is expected but can never be matched",
+                        &terminal.name
+                    ),
+                    related_information: None,
+                    tags: None
+                }
+            ))
+        }
+        Error::TemplateRuleNotFound(input_reference, name) => Some((
+            input_reference.input_index,
+            Diagnostic {
+                range: to_range(data, *input_reference),
+                severity: Some(DiagnosticSeverity::Error),
+                code: None,
+                source: Some(super::CRATE_NAME.to_string()),
+                message: format!("Cannot find template rule `{}`", name),
+                related_information: None,
+                tags: None
+            }
+        )),
+        Error::TemplateRuleWrongNumberOfArgs(input_reference, expected, provided) => Some((
+            input_reference.input_index,
+            Diagnostic {
+                range: to_range(data, *input_reference),
+                severity: Some(DiagnosticSeverity::Error),
+                code: None,
+                source: Some(super::CRATE_NAME.to_string()),
+                message: format!(
+                    "Template expected {} arguments, {} given",
+                    expected, provided
+                ),
+                related_information: None,
+                tags: None
+            }
+        )),
+        Error::SymbolNotFound(input_reference, name) => Some((
+            input_reference.input_index,
+            Diagnostic {
+                range: to_range(data, *input_reference),
+                severity: Some(DiagnosticSeverity::Error),
+                code: None,
+                source: Some(super::CRATE_NAME.to_string()),
+                message: format!("Cannot find symbol `{}`", name),
+                related_information: None,
+                tags: None
+            }
+        )),
+        Error::InvalidCharacterSpan(input_reference) => Some((
+            input_reference.input_index,
+            Diagnostic {
+                range: to_range(data, *input_reference),
+                severity: Some(DiagnosticSeverity::Error),
+                code: None,
+                source: Some(super::CRATE_NAME.to_string()),
+                message: format!("Invalid character span, end is before begin"),
+                related_information: None,
+                tags: None
+            }
+        )),
+        Error::UnknownUnicodeBlock(input_reference, name) => Some((
+            input_reference.input_index,
+            Diagnostic {
+                range: to_range(data, *input_reference),
+                severity: Some(DiagnosticSeverity::Error),
+                code: None,
+                source: Some(super::CRATE_NAME.to_string()),
+                message: format!("Unknown unicode block `{}`", name),
+                related_information: None,
+                tags: None
+            }
+        )),
+        Error::UnknownUnicodeCategory(input_reference, name) => Some((
+            input_reference.input_index,
+            Diagnostic {
+                range: to_range(data, *input_reference),
+                severity: Some(DiagnosticSeverity::Error),
+                code: None,
+                source: Some(super::CRATE_NAME.to_string()),
+                message: format!("Unknown unicode category `{}`", name),
+                related_information: None,
+                tags: None
+            }
+        )),
+        Error::UnsupportedNonPlane0InCharacterClass(input_reference, c) => Some((
+            input_reference.input_index,
+            Diagnostic {
+                range: to_range(data, *input_reference),
+                severity: Some(DiagnosticSeverity::Error),
+                code: None,
+                source: Some(super::CRATE_NAME.to_string()),
+                message: format!(
+                    "Unsupported non-plane 0 Unicode character ({0}) in character class",
+                    c
+                ),
+                related_information: None,
+                tags: None
+            }
+        )),
+        Error::InvalidCodePoint(input_reference, c) => Some((
+            input_reference.input_index,
+            Diagnostic {
+                range: to_range(data, *input_reference),
+                severity: Some(DiagnosticSeverity::Error),
+                code: None,
+                source: Some(super::CRATE_NAME.to_string()),
+                message: format!("The value U+{:0X} is not a supported unicode code point", c),
+                related_information: None,
+                tags: None
+            }
+        )),
+        Error::OverridingPreviousTerminal(input_reference, name) => Some((
+            input_reference.input_index,
+            Diagnostic {
+                range: to_range(data, *input_reference),
+                severity: Some(DiagnosticSeverity::Error),
+                code: None,
+                source: Some(super::CRATE_NAME.to_string()),
+                message: format!("Overriding the previous definition of `{}`", name),
+                related_information: None,
+                tags: None
+            }
+        )),
+        Error::GrammarNotDefined(input_reference, name) => Some((
+            input_reference.input_index,
+            Diagnostic {
+                range: to_range(data, *input_reference),
+                severity: Some(DiagnosticSeverity::Error),
+                code: None,
+                source: Some(super::CRATE_NAME.to_string()),
+                message: format!("Grammar `{}` is not defined", name),
+                related_information: None,
+                tags: None
+            }
+        )),
+        Error::LrConflict(grammar_index, conflict) => {
+            let grammar = &data.grammars[*grammar_index];
+            let _terminal = grammar.get_symbol_value(conflict.lookahead.terminal.into());
+            None
+        }
+        Error::TerminalOutsideContext(grammar_index, error) => {
+            let grammar = &data.grammars[*grammar_index];
+            let terminal = grammar.get_terminal(error.terminal.sid()).unwrap();
+            let input_reference = terminal.input_ref;
+            Some((
+                input_reference.input_index,
+                Diagnostic {
+                    range: to_range(data, input_reference),
+                    severity: Some(DiagnosticSeverity::Error),
+                    code: None,
+                    source: Some(super::CRATE_NAME.to_string()),
+                    message: format!(
+                        "Contextual terminal `{}` is expected outside its context",
+                        &terminal.name
+                    ),
+                    related_information: Some(
+                        error
+                            .items
+                            .iter()
+                            .map(|item| {
+                                let rule = item.rule.get_rule_in(grammar);
+                                let choice = &rule.body.choices[0];
+                                let input_ref = choice.elements[item.position].input_ref.unwrap();
+                                DiagnosticRelatedInformation {
+                                    location: Location {
+                                        uri: documents[input_ref.input_index].url.clone(),
+                                        range: to_range(data, input_ref)
+                                    },
+                                    message: String::from("Used outside required context")
+                                }
+                            })
+                            .collect()
+                    ),
+                    tags: None
+                }
+            ))
+        }
+        Error::TerminalCannotBeMatched(grammar_index, error) => {
+            let terminal = data.grammars[*grammar_index]
+                .get_terminal(error.terminal.sid())
+                .unwrap();
+            let input_reference = terminal.input_ref;
+            Some((
+                input_reference.input_index,
+                Diagnostic {
+                    range: to_range(data, input_reference),
+                    severity: Some(DiagnosticSeverity::Error),
+                    code: None,
+                    source: Some(super::CRATE_NAME.to_string()),
+                    message: format!(
+                        "Token `{}` is expected but can never be matched",
+                        &terminal.name
+                    ),
+                    related_information: None,
+                    tags: None
+                }
+            ))
+        }
+        Error::TerminalMatchesEmpty(grammar_index, terminal_ref) => {
+            let terminal = data.grammars[*grammar_index]
+                .get_terminal(terminal_ref.sid())
+                .unwrap();
+            let input_reference = terminal.input_ref;
+            Some((
+                input_reference.input_index,
+                Diagnostic {
+                    range: to_range(data, input_reference),
+                    severity: Some(DiagnosticSeverity::Error),
+                    code: None,
+                    source: Some(super::CRATE_NAME.to_string()),
+                    message: format!(
+                        "Terminal `{}` matches empty string, which is not allowed",
+                        &terminal.name
+                    ),
+                    related_information: None,
+                    tags: None
+                }
+            ))
+        }
         _ => None
     }
 }
