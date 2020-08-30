@@ -305,7 +305,7 @@ impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
                 let total_span = total_span.as_mut().unwrap();
                 if span.index + span.length > total_span.index + total_span.length {
                     let margin =
-                        (total_span.index + total_span.length) - (span.index + span.length);
+                        (span.index + span.length) - (total_span.index + total_span.length);
                     total_span.length += margin;
                 }
                 if span.index < total_span.index {
