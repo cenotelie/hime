@@ -19,7 +19,6 @@
 
 use hime_sdk::errors::Error;
 use hime_sdk::{CompilationTask, Input, InputReference, LoadedData};
-use log::info;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufReader, ErrorKind, Read};
@@ -172,33 +171,47 @@ impl Workspace {
             task.inputs.push(Input::Raw(&doc.content));
             doc.diagnostics.clear();
         }
-        info!("worker, loading ...");
         match task.load() {
-            Ok(_) => {
-                info!("worker, no error ...");
+            Ok(mut data) => {
+                let mut errors = Vec::new();
+                for (index, grammar) in data.grammars.iter_mut().enumerate() {
+                    if let Err(mut errs) = task.generate_in_memory(grammar, index) {
+                        errors.append(&mut errs);
+                    }
+                }
+                for error in errors.iter() {
+                    if let Some((index, diag)) = to_diagnostic(&data, error) {
+                        documents[index].diagnostics.push(diag);
+                    }
+                }
             }
             Err(errors) => {
-                info!("worker, found errors ...");
                 for error in errors.errors.iter() {
-                    match error {
-                        Error::Parsing(input_reference, msg) => {
-                            documents[input_reference.input_index]
-                                .diagnostics
-                                .push(Diagnostic {
-                                    range: to_range(&errors.data, *input_reference),
-                                    severity: Some(DiagnosticSeverity::Error),
-                                    code: None,
-                                    source: Some(super::CRATE_NAME.to_string()),
-                                    message: msg.clone(),
-                                    related_information: None,
-                                    tags: None
-                                });
-                        }
-                        _ => {}
+                    if let Some((index, diag)) = to_diagnostic(&errors.data, error) {
+                        documents[index].diagnostics.push(diag);
                     }
                 }
             }
         }
+    }
+}
+
+/// Converts an error to a diagnostic
+fn to_diagnostic(data: &LoadedData, error: &Error) -> Option<(usize, Diagnostic)> {
+    match error {
+        Error::Parsing(input_reference, msg) => Some((
+            input_reference.input_index,
+            Diagnostic {
+                range: to_range(data, *input_reference),
+                severity: Some(DiagnosticSeverity::Error),
+                code: None,
+                source: Some(super::CRATE_NAME.to_string()),
+                message: msg.clone(),
+                related_information: None,
+                tags: None
+            }
+        )),
+        _ => None
     }
 }
 

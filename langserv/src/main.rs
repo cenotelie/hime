@@ -63,7 +63,6 @@ impl Backend {
     async fn worker(workspace: Arc<RwLock<Workspace>>, client: Arc<Client>) {
         info!("worker, starting ...");
         let mut workspace = workspace.write().await;
-        info!("worker, got the workspace ...");
         workspace.lint();
         info!("worker, sending ...");
         join_all(workspace.documents.iter().map(|(uri, doc)| {
