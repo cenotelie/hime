@@ -19,6 +19,7 @@
 
 use hime_sdk::errors::Error;
 use hime_sdk::{CompilationTask, Input, InputReference, LoadedData};
+use log::info;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufReader, ErrorKind, Read};
@@ -171,9 +172,13 @@ impl Workspace {
             task.inputs.push(Input::Raw(&doc.content));
             doc.diagnostics.clear();
         }
+        info!("worker, loading ...");
         match task.load() {
-            Ok(_) => {}
+            Ok(_) => {
+                info!("worker, no error ...");
+            }
             Err(errors) => {
+                info!("worker, found errors ...");
                 for error in errors.errors.iter() {
                     match error {
                         Error::Parsing(input_reference, msg) => {

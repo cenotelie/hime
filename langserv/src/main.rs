@@ -17,13 +17,18 @@
 
 //! Generator of lexers and parsers for the Hime runtime.
 
+extern crate fern;
+extern crate futures;
 extern crate hime_redist;
 extern crate hime_sdk;
+extern crate log;
 extern crate tokio;
 extern crate tower_lsp;
 
 pub mod workspace;
 
+use futures::future::join_all;
+use log::{error, info};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tower_lsp::jsonrpc::{Error, Result};
@@ -50,26 +55,27 @@ impl Backend {
     fn new(client: Client) -> Backend {
         Backend {
             client: Arc::new(client),
-            workspace: Arc::new(RwLock::new(Workspace::default())) // thread: Arc::new(RwLock::new(None)),
-                                                                   // comm: Arc::new((Mutex::new(WorkerCommand::Wait), Condvar::new()))
+            workspace: Arc::new(RwLock::new(Workspace::default()))
         }
     }
 
     /// Execute the background work
     async fn worker(workspace: Arc<RwLock<Workspace>>, client: Arc<Client>) {
+        info!("worker, starting ...");
         let mut workspace = workspace.write().await;
+        info!("worker, got the workspace ...");
         workspace.lint();
-        for (uri, doc) in workspace.documents.iter() {
-            if !doc.diagnostics.is_empty() {
-                client
-                    .publish_diagnostics(uri.clone(), doc.diagnostics.clone(), doc.version)
-                    .await;
-            }
-        }
+        info!("worker, sending ...");
+        join_all(workspace.documents.iter().map(|(uri, doc)| {
+            client.publish_diagnostics(uri.clone(), doc.diagnostics.clone(), doc.version)
+        }))
+        .await;
+        info!("worker, done!");
     }
 
     /// Execute the background work
     fn execute(&self) {
+        info!("calling worker ...");
         tokio::spawn(Backend::worker(self.workspace.clone(), self.client.clone()));
     }
 }
@@ -77,6 +83,7 @@ impl Backend {
 #[tower_lsp::async_trait]
 impl LanguageServer for Backend {
     async fn initialize(&self, params: InitializeParams) -> Result<InitializeResult> {
+        info!("initialize");
         let mut workspace = self.workspace.write().await;
         if let Some(root) = params.root_uri {
             if workspace.scan_workspace(root).is_err() {
@@ -108,10 +115,12 @@ impl LanguageServer for Backend {
     }
 
     async fn shutdown(&self) -> Result<()> {
+        info!("shutdown");
         Ok(())
     }
 
     async fn did_change_watched_files(&self, params: DidChangeWatchedFilesParams) {
+        info!("did_change_watched_files");
         let mut workspace = self.workspace.write().await;
         if workspace.on_file_events(&params.changes).is_err() {
             // do nothing
@@ -120,14 +129,37 @@ impl LanguageServer for Backend {
     }
 
     async fn did_change(&self, params: DidChangeTextDocumentParams) {
+        info!("did_change");
         let mut workspace = self.workspace.write().await;
         workspace.on_file_changes(params);
         self.execute();
     }
 }
 
+fn setup_logger() -> std::result::Result<(), fern::InitError> {
+    fern::Dispatch::new()
+        .format(|out, message, record| out.finish(format_args!("[{}] {}", record.level(), message)))
+        .level(log::LevelFilter::Debug)
+        .chain(fern::log_file("output.log")?)
+        .apply()?;
+    Ok(())
+}
+
 #[tokio::main]
 async fn main() {
+    std::panic::set_hook(Box::new(|info| {
+        let location = match info.location() {
+            Some(location) => format!("{}:{}", location.file(), location.line()),
+            None => String::from("unknown")
+        };
+        let message = match info.payload().downcast_ref::<String>() {
+            Some(message) => message.to_owned(),
+            None => String::from("no message")
+        };
+        error!("Panic: {} : {}", location, message);
+    }));
+    setup_logger().unwrap();
+
     let stdin = tokio::io::stdin();
     let stdout = tokio::io::stdout();
 
