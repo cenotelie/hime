@@ -40,6 +40,8 @@ pub enum Error {
     Msg(String),
     /// Parsing error
     Parsing(InputReference, String),
+    /// The target grammar was not specified
+    GrammarNotSpecified,
     /// The specified grammar was not found
     GrammarNotFound(String),
     /// The value for the option is invalid

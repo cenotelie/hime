@@ -25,8 +25,15 @@ extern crate hime_sdk;
 mod errors;
 
 use clap::{App, Arg};
+use hime_redist::ast::AstNode;
+use hime_redist::errors::{ParseError, ParseErrorDataTrait};
+use hime_redist::result::ParseResult;
+use hime_redist::symbols::{SemanticElementTrait, Symbol};
+use hime_redist::text::{TextPosition, TextSpan};
+use hime_sdk::errors::{Error, Errors};
 use hime_sdk::{CompilationTask, Input, Mode, Modifier, ParsingMethod, Runtime};
 use std::env;
+use std::io::{self, Read};
 use std::process;
 
 /// The name of this program
@@ -137,6 +144,12 @@ pub fn main() {
                 .required(false)
         )
         .arg(
+            Arg::with_name("test")
+                .long("test")
+                .help("Compiles the target grammar in-memory and test it against an input read from std::in and output the AST or parse errors")
+                .required(false)
+        )
+        .arg(
             Arg::with_name("inputs")
                 .value_name("INPUTS")
                 .help("The file names of the input grammars")
@@ -183,11 +196,196 @@ pub fn main() {
             task.inputs.push(Input::FileName(input.to_string()));
         }
     }
-    match task.execute() {
-        Ok(_) => process::exit(0),
+    let result = if matches.is_present("test") {
+        execute_test(task)
+    } else {
+        execute_normal(task)
+    };
+    if let Err(errors) = result {
+        errors::print_errors(&errors);
+        process::exit(1);
+    } else {
+        process::exit(0);
+    }
+}
+
+/// Executes the normal operation of the compiler
+fn execute_normal(task: CompilationTask) -> Result<(), Errors> {
+    task.execute()?;
+    Ok(())
+}
+
+/// Executes the compiler in test mode
+/// Compiles the target grammar in-memory
+/// Test it against the input read from std::in
+/// Output the result
+fn execute_test(task: CompilationTask) -> Result<(), Errors> {
+    let mut data = task.load()?;
+    if data.grammars.is_empty() || (data.grammars.len() > 1 && task.grammar_name.is_none()) {
+        return Err(Errors::from(data, vec![Error::GrammarNotSpecified]));
+    }
+    let (grammar_index, grammar) = if data.grammars.len() == 1 {
+        (0, &mut data.grammars[0])
+    } else {
+        let name = task.grammar_name.as_ref().unwrap();
+        match data
+            .grammars
+            .iter_mut()
+            .enumerate()
+            .find(|(_, grammar)| &grammar.name == name)
+        {
+            Some(couple) => couple,
+            None => {
+                return Err(Errors::from(
+                    data,
+                    vec![Error::GrammarNotFound(name.to_owned())]
+                ));
+            }
+        }
+    };
+    let parser = match task.generate_in_memory(grammar, grammar_index) {
+        Ok(p) => p,
         Err(errs) => {
-            errors::print_errors(&errs);
-            process::exit(1);
+            return Err(Errors::from(data, errs));
+        }
+    };
+
+    let mut input_stream = io::stdin();
+    let mut input = String::new();
+    match input_stream.read_to_string(&mut input) {
+        Ok(_) => {}
+        Err(error) => {
+            return Err(Errors::from(data, vec![Error::Io(error)]));
         }
     }
+    let result = parser.parse(&input);
+    let mut text = String::new();
+    serialize_result(&mut text, result);
+    println!("{}", text);
+    Ok(())
+}
+
+/// Serializes a parse error
+fn serialize_result(builder: &mut String, result: ParseResult) {
+    builder.push_str("{\"errors\": [");
+    let errors = &result.errors.errors;
+    for error in errors.iter().enumerate() {
+        if error.0 != 0 {
+            builder.push_str(", ");
+        }
+        serialize_error(builder, error.1);
+    }
+    builder.push_str("]");
+    if errors.is_empty() {
+        builder.push_str(", \"root\": ");
+        serialize_ast(builder, result.get_ast().get_root());
+    }
+    builder.push_str("}");
+}
+
+/// Serializes a parse error
+fn serialize_error(builder: &mut String, error: &ParseError) {
+    builder.push_str("{\"type\": \"");
+    match error {
+        ParseError::UnexpectedEndOfInput(ref _x) => builder.push_str("UnexpectedEndOfInput"),
+        ParseError::UnexpectedChar(ref _x) => builder.push_str("UnexpectedChar"),
+        ParseError::UnexpectedToken(ref _x) => builder.push_str("UnexpectedToken"),
+        ParseError::IncorrectUTF16NoHighSurrogate(ref _x) => {
+            builder.push_str("IncorrectUTF16NoHighSurrogate")
+        }
+        ParseError::IncorrectUTF16NoLowSurrogate(ref _x) => {
+            builder.push_str("IncorrectUTF16NoLowSurrogate")
+        }
+    }
+    //builder.push_str(error);
+    builder.push_str("\", \"position\": ");
+    serialize_position(builder, error.get_position());
+    builder.push_str(", \"length\": ");
+    builder.push_str(&error.get_length().to_string());
+    builder.push_str(", \"message\": \"");
+    builder.push_str(&escape_str(&error.get_message()));
+    builder.push_str("\"}");
+}
+
+/// Serializes an AST node
+fn serialize_ast(builder: &mut String, node: AstNode) {
+    builder.push_str("{\"symbol\": ");
+    serialize_symbol(builder, node.get_symbol());
+    match node.get_value() {
+        None => (),
+        Some(ref x) => {
+            builder.push_str(", \"value\": \"");
+            builder.push_str(&escape_str(x));
+            builder.push_str("\"");
+        }
+    }
+    match node.get_position() {
+        None => (),
+        Some(x) => {
+            builder.push_str(", \"position\": ");
+            serialize_position(builder, x);
+        }
+    }
+    match node.get_span() {
+        None => (),
+        Some(x) => {
+            builder.push_str(", \"position\": ");
+            serialize_span(builder, x);
+        }
+    }
+    builder.push_str(", \"children\": [");
+    for child in node.children().iter().enumerate() {
+        if child.0 != 0 {
+            builder.push_str(", ");
+        }
+        serialize_ast(builder, child.1);
+    }
+    builder.push_str("]}");
+}
+
+/// Serializes a symbol
+fn serialize_symbol(builder: &mut String, symbol: Symbol) {
+    builder.push_str("{\"id\": ");
+    builder.push_str(&symbol.id.to_string());
+    builder.push_str(", \"name\": \"");
+    builder.push_str(&escape_str(symbol.name));
+    builder.push_str("\"}");
+}
+
+/// Serializes a text position
+fn serialize_position(builder: &mut String, position: TextPosition) {
+    builder.push_str("{\"line\": ");
+    builder.push_str(&position.line.to_string());
+    builder.push_str(", \"column\": ");
+    builder.push_str(&position.column.to_string());
+    builder.push_str("}");
+}
+
+/// Serializes a text span
+fn serialize_span(builder: &mut String, span: TextSpan) {
+    builder.push_str("{\"index\": ");
+    builder.push_str(&span.index.to_string());
+    builder.push_str(", \"length\": ");
+    builder.push_str(&span.length.to_string());
+    builder.push_str("}");
+}
+
+/// Escapes the input string for serialization in JSON
+fn escape_str(value: &str) -> String {
+    let mut result = String::with_capacity(value.len());
+    for c in value.chars() {
+        match c {
+            '"' => result.push_str("\\\""),
+            '\\' => result.push_str("\\\\"),
+            '\0' => result.push_str("\\0"),
+            '\u{0007}' => result.push_str("\\a"),
+            '\t' => result.push_str("\\t"),
+            '\r' => result.push_str("\\r"),
+            '\n' => result.push_str("\\n"),
+            '\u{0008}' => result.push_str("\\b"),
+            '\u{000C}' => result.push_str("\\c"),
+            _ => result.push(c)
+        }
+    }
+    result
 }

@@ -69,6 +69,7 @@ pub fn get_line_number_width(error: &Error, data: &LoadedData) -> usize {
         Error::Io(_) => 0,
         Error::Msg(_) => 0,
         Error::Parsing(input, _) => input.get_line_number_width(),
+        Error::GrammarNotSpecified => 0,
         Error::GrammarNotFound(_) => 0,
         Error::InvalidOption(grammar_index, name, _) => {
             line_number_width_option_value(data, *grammar_index, name)
@@ -165,6 +166,7 @@ pub fn print_error(error: &Error, max_width: usize, data: &LoadedData) {
         Error::Io(err) => print_io(err),
         Error::Msg(msg) => print_msg(msg.as_ref()),
         Error::Parsing(input, msg) => print_msg_with_input_ref(max_width, data, input, msg),
+        Error::GrammarNotSpecified => print_msg(&format!("The target grammar was not specified")),
         Error::GrammarNotFound(name) => print_msg(&format!("Cannot find grammar `{}`", name)),
         Error::InvalidOption(grammar_index, name, valid) => {
             let option = data.grammars[*grammar_index].get_option(name).unwrap();
