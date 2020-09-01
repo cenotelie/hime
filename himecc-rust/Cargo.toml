@@ -1,6 +1,6 @@
 [package]
 name = "himecc"
-version = "3.5.1"
+version = "3.5.2"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Generator of lexers and parsers for the Hime runtime."
 documentation = "https://cenotelie.fr/projects/hime"
@@ -14,8 +14,8 @@ include = ["README.md", "Cargo.toml", "src/**/*.rs"]
 edition = "2018"
 
 [dependencies]
-hime_redist = "3.5.1"
-hime_sdk = "3.5.1"
+hime_redist = "3.5.2"
+hime_sdk = "3.5.2"
 clap = "2.32"
 ansi_term = "0.11"
 
