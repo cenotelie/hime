@@ -17,6 +17,7 @@
 
 //! Module for producing output
 
+mod assembly_java;
 mod assembly_net;
 mod assembly_rust;
 pub mod helper;
@@ -406,7 +407,7 @@ pub fn build_assembly(
 ) -> Result<(), Error> {
     match runtime {
         Runtime::Net => assembly_net::build(task, units),
-        Runtime::Java => Ok(()),
+        Runtime::Java => assembly_java::build(task, units),
         Runtime::Rust => assembly_rust::build(task, units)
     }
 }
