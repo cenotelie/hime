@@ -15,7 +15,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-//! Module for build .Net assemblies
+//! Module for build Rust assemblies
 
 use crate::errors::Error;
 use crate::grammars::Grammar;
@@ -33,7 +33,6 @@ const MANIFEST: &[u8] = include_bytes!("assembly_rust.toml");
 pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), Error> {
     // build the project
     let project_folder = build_cargo_project(task, units)?;
-    println!("{:?}", &project_folder);
     // compile
     execute_cargo_command(&project_folder, &["build", "--release"])?;
     execute_cargo_command(&project_folder, &["package", "--no-verify"])?;

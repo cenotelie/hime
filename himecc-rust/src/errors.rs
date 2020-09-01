@@ -166,7 +166,7 @@ pub fn print_error(error: &Error, max_width: usize, data: &LoadedData) {
         Error::Io(err) => print_io(err),
         Error::Msg(msg) => print_msg(msg.as_ref()),
         Error::Parsing(input, msg) => print_msg_with_input_ref(max_width, data, input, msg),
-        Error::GrammarNotSpecified => print_msg(&format!("The target grammar was not specified")),
+        Error::GrammarNotSpecified => print_msg("The target grammar was not specified"),
         Error::GrammarNotFound(name) => print_msg(&format!("Cannot find grammar `{}`", name)),
         Error::InvalidOption(grammar_index, name, valid) => {
             let option = data.grammars[*grammar_index].get_option(name).unwrap();

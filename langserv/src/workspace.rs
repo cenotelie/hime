@@ -255,7 +255,7 @@ fn to_diagnostic(
                     severity: Some(DiagnosticSeverity::Error),
                     code: None,
                     source: Some(super::CRATE_NAME.to_string()),
-                    message: format!("Grammar axiom has not been specified"),
+                    message: "Grammar axiom has not been specified".to_string(),
                     related_information: None,
                     tags: None
                 }
@@ -386,7 +386,7 @@ fn to_diagnostic(
                 severity: Some(DiagnosticSeverity::Error),
                 code: None,
                 source: Some(super::CRATE_NAME.to_string()),
-                message: format!("Invalid character span, end is before begin"),
+                message: "Invalid character span, end is before begin".to_string(),
                 related_information: None,
                 tags: None
             }
