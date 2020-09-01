@@ -31,6 +31,11 @@ const MANIFEST: &[u8] = include_bytes!("assembly_java.xml");
 
 /// Build the Rust assembly for the specified units
 pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), Error> {
+    if let Some(runtime) = task.output_target_runtime_path.as_ref() {
+        // install local runtime
+        let runtime_path = PathBuf::from(runtime);
+        execute_mvn_command(&runtime_path, &["clean", "install", "-Dgpg.skip=true"])?;
+    }
     // build the project
     let project_folder = build_maven_project(task, units)?;
     // compile
@@ -42,7 +47,11 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
         let candidate = item?;
         let file_name = candidate.file_name();
         if let Some(file_name) = file_name.to_str() {
-            if file_name.starts_with("hime-generated-") && file_name.ends_with(".jar") {
+            if file_name.starts_with("hime-generated-")
+                && file_name.ends_with(".jar")
+                && !file_name.contains("javadoc")
+                && !file_name.contains("sources")
+            {
                 output_file.push(&file_name);
                 break;
             }
