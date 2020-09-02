@@ -34,12 +34,11 @@ fn main() {
         return;
     }
     let mut input = io::stdin();
-    let text = do_parse(&mut input, &args[0], &args[1]);
-    println!("{}", text);
+    do_parse(&mut input, &args[0], &args[1]);
 }
 
 /// Parses the input
-fn do_parse(input: &mut dyn io::Read, lib_name: &str, parser_module: &str) -> String {
+fn do_parse(input: &mut dyn io::Read, lib_name: &str, parser_module: &str) {
     let mut function_name = String::new();
     function_name.push_str(parser_module);
     function_name.push_str("_parse_utf8");
@@ -49,7 +48,7 @@ fn do_parse(input: &mut dyn io::Read, lib_name: &str, parser_module: &str) -> St
             .get(function_name.as_bytes())
             .unwrap_or_else(|error| panic!("{}", error));
         let result = parser(input);
-        serde_json::to_string(&result).unwrap()
+        serde_json::to_writer(std::io::stdout(), &result).unwrap()
     }
 }
 

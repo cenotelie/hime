@@ -255,12 +255,11 @@ fn execute_test(task: CompilationTask) -> Result<(), Errors> {
         }
     }
     let result = parser.parse(&input);
-    let serialization = match serde_json::to_string(&result) {
-        Ok(d) => d,
+    match serde_json::to_writer(std::io::stdout(), &result) {
+        Ok(r) => r,
         Err(error) => {
             return Err(Errors::from(data, vec![Error::Msg(error.to_string())]));
         }
     };
-    println!("{}", serialization);
     Ok(())
 }
