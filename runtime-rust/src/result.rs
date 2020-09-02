@@ -24,6 +24,7 @@ use crate::symbols::Symbol;
 use crate::text::Text;
 use crate::tokens::TokenRepository;
 use crate::tokens::TokenRepositoryImpl;
+use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 /// Represents the output of a parser
 pub struct ParseResult<'a: 'b, 'b> {
@@ -95,5 +96,23 @@ impl<'a: 'b, 'b> ParseResult<'a, 'b> {
             &mut self.errors,
             Ast::new_mut(self.variables, self.virtuals, &mut self.ast)
         )
+    }
+}
+
+impl<'a: 'b, 'b> Serialize for ParseResult<'a, 'b> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer
+    {
+        let ast = self.get_ast();
+        let root = if self.is_success() {
+            Some(ast.get_root())
+        } else {
+            None
+        };
+        let mut state = serializer.serialize_struct("ParseResult", 2)?;
+        state.serialize_field("errors", &self.errors.errors)?;
+        state.serialize_field("root", &root)?;
+        state.end()
     }
 }

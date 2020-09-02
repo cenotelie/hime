@@ -17,6 +17,7 @@
 
 //! Module for the definition of grammar symbols
 
+use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use std::fmt::Error;
 use std::fmt::Formatter;
@@ -45,7 +46,7 @@ pub const SID_EPSILON: u32 = 1;
 pub const SID_DOLLAR: u32 = 2;
 
 /// Represents a grammar symbol (terminal, variable or virtual)
-#[derive(Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Symbol<'a> {
     /// The symbol's unique identifier
     pub id: u32,

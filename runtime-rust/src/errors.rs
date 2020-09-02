@@ -17,6 +17,7 @@
 
 //! Module for the definition of lexical and syntactic errors
 
+use serde::Serialize;
 use std::fmt::Display;
 use std::fmt::Error;
 use std::fmt::Formatter;
@@ -38,7 +39,7 @@ pub trait ParseErrorDataTrait {
 }
 
 /// Represents the unexpected of the input text while more characters were expected
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct ParseErrorEndOfInput {
     /// The error's position in the input text
     position: TextPosition
@@ -69,7 +70,7 @@ impl ParseErrorEndOfInput {
 }
 
 /// Represents an unexpected character error in the input stream of a lexer
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct ParseErrorUnexpectedChar {
     /// The error's position in the input text
     position: TextPosition,
@@ -124,11 +125,12 @@ impl ParseErrorUnexpectedChar {
 }
 
 /// Represents an incorrect encoding sequence error in the input of a lexer
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct ParseErrorIncorrectEncodingSequence {
     /// The error's position in the input text
     position: TextPosition,
     /// The precise error type
+    #[serde(rename = "missingHigh")]
     missing_high: bool,
     /// The incorrect sequence
     sequence: Utf16C
@@ -179,7 +181,7 @@ impl ParseErrorIncorrectEncodingSequence {
 }
 
 /// Represents an unexpected token error in a parser
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct ParseErrorUnexpectedToken<'a> {
     /// The error's position in the input text
     position: TextPosition,
@@ -243,7 +245,8 @@ impl<'a> ParseErrorUnexpectedToken<'a> {
 }
 
 /// Represents a lexical or syntactic error
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
+#[serde(tag = "type")]
 pub enum ParseError<'a> {
     /// Lexical error occurring when the end of input has been encountered while more characters were expected
     UnexpectedEndOfInput(ParseErrorEndOfInput),

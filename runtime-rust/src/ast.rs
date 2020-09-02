@@ -17,6 +17,7 @@
 
 //! Module for Abstract-Syntax Trees
 
+use serde::ser::{Serialize, SerializeSeq, SerializeStruct, Serializer};
 use std::fmt::Display;
 use std::fmt::Error;
 use std::fmt::Formatter;
@@ -520,6 +521,21 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Display for AstNode<'a, 'b, 'c, 'd> {
     }
 }
 
+impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Serialize for AstNode<'a, 'b, 'c, 'd> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer
+    {
+        let mut state = serializer.serialize_struct("AstNode", 5)?;
+        state.serialize_field("symbol", &self.get_symbol())?;
+        state.serialize_field("position", &self.get_position())?;
+        state.serialize_field("span", &self.get_span())?;
+        state.serialize_field("value", &self.get_value())?;
+        state.serialize_field("children", &self.children())?;
+        state.end()
+    }
+}
+
 /// Represents a family of children for an ASTNode
 #[derive(Clone)]
 pub struct AstFamily<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> {
@@ -584,5 +600,18 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> AstFamily<'a, 'b, 'c, 'd> {
             current: cell.first as usize,
             end: (cell.first + cell.count) as usize
         }
+    }
+}
+
+impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Serialize for AstFamily<'a, 'b, 'c, 'd> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer
+    {
+        let mut seq = serializer.serialize_seq(Some(self.len()))?;
+        for node in self.iter() {
+            seq.serialize_element(&node)?;
+        }
+        seq.end()
     }
 }

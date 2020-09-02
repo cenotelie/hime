@@ -17,6 +17,7 @@
 
 //! Module for text-handling APIs
 
+use serde::{Deserialize, Serialize};
 use std::cmp::{Ord, Ordering};
 use std::fmt::Display;
 use std::fmt::Error;
@@ -39,7 +40,7 @@ use crate::utils::biglist::BigList;
 pub type Utf16C = u16;
 
 /// Represents a span of text in an input as a starting index and length
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TextSpan {
     /// The starting index
     pub index: usize,
@@ -71,7 +72,7 @@ impl Display for TextSpan {
 }
 
 /// Represents a position in term of line and column in a text input
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TextPosition {
     /// The line number
     pub line: usize,
