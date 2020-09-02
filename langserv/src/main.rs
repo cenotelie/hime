@@ -22,6 +22,7 @@ extern crate futures;
 extern crate hime_redist;
 extern crate hime_sdk;
 extern crate log;
+extern crate serde_json;
 extern crate tokio;
 extern crate tower_lsp;
 
@@ -104,6 +105,12 @@ impl LanguageServer for Backend {
                         )
                     })
                 }),
+                execute_command_provider: Some(ExecuteCommandOptions {
+                    commands: vec![String::from("test")],
+                    work_done_progress_options: WorkDoneProgressOptions {
+                        work_done_progress: Some(false)
+                    }
+                }),
                 ..ServerCapabilities::default()
             },
             server_info: Some(ServerInfo {
@@ -132,6 +139,30 @@ impl LanguageServer for Backend {
         let mut workspace = self.workspace.write().await;
         workspace.on_file_changes(params);
         self.execute();
+    }
+
+    async fn execute_command(
+        &self,
+        params: ExecuteCommandParams
+    ) -> Result<Option<serde_json::Value>> {
+        info!("execute_command");
+        let workspace = self.workspace.read().await;
+        match &params.command[..] {
+            "test" => {
+                if params.arguments.len() != 2 {
+                    Err(Error::invalid_params("Expected exactly 2 parameters"))
+                } else {
+                    match (&params.arguments[0], &params.arguments[1]) {
+                        (
+                            serde_json::Value::String(ref grammar),
+                            serde_json::Value::String(ref input)
+                        ) => workspace.test(grammar, input),
+                        _ => Err(Error::invalid_params("Expected exactly 2 parameters"))
+                    }
+                }
+            }
+            _ => Err(Error::method_not_found())
+        }
     }
 }
 

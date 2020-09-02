@@ -213,6 +213,7 @@ fn test_charspan_split() {
 }
 
 /// Represent an input for the compiler
+#[derive(Debug, Clone)]
 pub enum Input<'a> {
     /// A file name
     FileName(String),
@@ -376,7 +377,7 @@ pub enum Modifier {
 }
 
 /// Represents a compilation task for the generation of lexers and parsers from grammars
-#[derive(Default)]
+#[derive(Debug, Default, Clone)]
 pub struct CompilationTask<'a> {
     /// The inputs
     pub inputs: Vec<Input<'a>>,

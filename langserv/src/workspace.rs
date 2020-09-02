@@ -21,10 +21,12 @@ use hime_sdk::errors::Error;
 use hime_sdk::grammars::OPTION_AXIOM;
 use hime_sdk::grammars::OPTION_SEPARATOR;
 use hime_sdk::{CompilationTask, Input, InputReference, LoadedData};
+use serde_json::Value;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufReader, ErrorKind, Read};
 use std::path::PathBuf;
+use tower_lsp::jsonrpc::Error as JsonRpcError;
 use tower_lsp::lsp_types::{
     Diagnostic, DiagnosticRelatedInformation, DiagnosticSeverity, DidChangeTextDocumentParams,
     FileChangeType, FileEvent, Location, Position, Range, Url
@@ -202,6 +204,32 @@ impl Workspace {
                     }
                 }
             }
+        }
+    }
+
+    /// Tests an input against a grammar
+    pub fn test(&self, grammar_name: &str, input: &str) -> Result<Option<Value>, JsonRpcError> {
+        match &self.data {
+            Some(data) => match data
+                .grammars
+                .iter()
+                .enumerate()
+                .find(|(_, grammar)| &grammar.name == grammar_name)
+            {
+                Some((grammar_index, grammar)) => {
+                    let mut grammar = grammar.clone();
+                    let task = CompilationTask::default();
+                    match task.generate_in_memory(&mut grammar, grammar_index) {
+                        Ok(parser) => {
+                            let result = parser.parse(input);
+                            Ok(Some(serde_json::to_value(&result).unwrap()))
+                        }
+                        Err(_) => Ok(None)
+                    }
+                }
+                None => Err(JsonRpcError::invalid_request())
+            },
+            None => Err(JsonRpcError::invalid_request())
         }
     }
 }

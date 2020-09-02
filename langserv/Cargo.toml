@@ -18,6 +18,7 @@ log = "0.4"
 fern = "0.5"
 hime_redist = "3.5.1"
 hime_sdk = "3.5.2"
+serde_json = "1.0"
 futures = "0.3"
 tokio = { version = "0.2", features = ["macros", "io-util", "io-std"] }
 tower-lsp = "0.13"
