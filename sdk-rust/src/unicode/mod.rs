@@ -162,6 +162,6 @@ impl Category {
 
     /// Aggregate the specified category into this one
     pub fn aggregate(&mut self, category: &Category) {
-        self.spans.copy_from_slice(&category.spans);
+        self.spans.extend_from_slice(&category.spans);
     }
 }
