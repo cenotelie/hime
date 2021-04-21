@@ -793,10 +793,7 @@ struct SPPFBuilder<'a: 'b, 'b, 'c> {
 
 impl<'a: 'b, 'b, 'c> SemanticBody for SPPFBuilder<'a, 'b, 'c> {
     fn get_element_at(&self, index: usize) -> SemanticElement {
-        let reduction = self
-            .reduction
-            .as_ref()
-            .unwrap_or_else(|| panic!("Not in a reduction"));
+        let reduction = self.reduction.as_ref().expect("Not in a reduction");
         let reference = reduction.cache[reduction.handle_indices[index]];
         let node = self.sppf.get_node(reference.node_id as usize).as_normal();
         let label = node.versions[reference.version as usize].label;
@@ -820,10 +817,7 @@ impl<'a: 'b, 'b, 'c> SemanticBody for SPPFBuilder<'a, 'b, 'c> {
     }
 
     fn length(&self) -> usize {
-        let reduction = self
-            .reduction
-            .as_ref()
-            .unwrap_or_else(|| panic!("Not in a reduction"));
+        let reduction = self.reduction.as_ref().expect("Not in a reduction");
         reduction.handle_indices.len()
     }
 }
@@ -973,10 +967,7 @@ impl<'a: 'b, 'b, 'c> SPPFBuilder<'a, 'b, 'c> {
 
     /// During a reduction, pops the top symbol from the stack and gives it a tree action
     pub fn reduction_pop(&mut self, action: TreeAction) {
-        let reduction = self
-            .reduction
-            .as_mut()
-            .unwrap_or_else(|| panic!("Not in a reduction"));
+        let reduction = self.reduction.as_mut().expect("Not in a reduction");
         let label = reduction.stack[reduction.pop_count];
         reduction.pop_count += 1;
         SPPFBuilder::reduction_add_to_cache(
@@ -989,10 +980,7 @@ impl<'a: 'b, 'b, 'c> SPPFBuilder<'a, 'b, 'c> {
 
     /// During a reduction, inserts a virtual symbol
     pub fn reduction_add_virtual(&mut self, index: usize, action: TreeAction) {
-        let reduction = self
-            .reduction
-            .as_mut()
-            .unwrap_or_else(|| panic!("Not in a reduction"));
+        let reduction = self.reduction.as_mut().expect("Not in a reduction");
         let node_id = self
             .sppf
             .new_normal_node(TableElemRef::new(TableType::Virtual, index));
@@ -1006,10 +994,7 @@ impl<'a: 'b, 'b, 'c> SPPFBuilder<'a, 'b, 'c> {
 
     /// During a reduction, inserts the sub-tree of a nullable variable
     pub fn reduction_add_nullable(&mut self, nullable: usize, action: TreeAction) {
-        let reduction = self
-            .reduction
-            .as_mut()
-            .unwrap_or_else(|| panic!("Not in a reduction"));
+        let reduction = self.reduction.as_mut().expect("Not in a reduction");
         SPPFBuilder::reduction_add_to_cache(reduction, &self.sppf, nullable, action);
     }
 
@@ -1031,10 +1016,7 @@ impl<'a: 'b, 'b, 'c> SPPFBuilder<'a, 'b, 'c> {
 
     /// Executes the reduction as a normal reduction
     pub fn reduce_normal(&mut self, variable_index: usize, head_action: TreeAction) -> usize {
-        let reduction = self
-            .reduction
-            .as_mut()
-            .unwrap_or_else(|| panic!("Not in a reduction"));
+        let reduction = self.reduction.as_mut().expect("Not in a reduction");
         let mut promoted: Option<(TableElemRef, SPPFNodeRef)> = None;
         let mut insertion = 0;
 
@@ -1103,10 +1085,7 @@ impl<'a: 'b, 'b, 'c> SPPFBuilder<'a, 'b, 'c> {
 
     /// Executes the reduction as the reduction of a replaceable variable
     pub fn reduce_replaceable(&mut self, variable_index: usize) -> usize {
-        let reduction = self
-            .reduction
-            .as_mut()
-            .unwrap_or_else(|| panic!("Not in a reduction"));
+        let reduction = self.reduction.as_mut().expect("Not in a reduction");
         for i in 0..reduction.handle_indices.len() {
             if i != reduction.handle_indices[i] {
                 reduction.cache[i] = reduction.cache[reduction.handle_indices[i]];
