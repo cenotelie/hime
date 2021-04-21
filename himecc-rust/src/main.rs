@@ -37,7 +37,7 @@ pub const GIT_TAG: &str = env!("GIT_TAG");
 
 pub fn main() {
     let matches = App::new("Hime Parser Generator")
-        .version(format!("{} tag={} hash={}", CRATE_VERSION, GIT_TAG, GIT_HASH).as_str())
+        .version(format!("{} {} tag={} hash={}", CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH).as_str())
         .author("Association Cénotélie <contact@cenotelie.fr>")
         .about("Generator of lexers and parsers for the Hime runtime.")
         .arg(

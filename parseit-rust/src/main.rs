@@ -22,6 +22,8 @@ use std::{env, io};
 use clap::{App, Arg};
 use hime_redist::result::ParseResult;
 
+/// The name of this program
+pub const CRATE_NAME: &str = env!("CARGO_PKG_NAME");
 /// The version of this program
 pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
 /// The commit that was used to build the application
@@ -32,7 +34,13 @@ pub const GIT_TAG: &str = env!("GIT_TAG");
 /// Main entry point
 fn main() {
     let matches = App::new("Hime ParseIt")
-        .version(format!("{} tag={} hash={}", CRATE_VERSION, GIT_TAG, GIT_HASH).as_str())
+        .version(
+            format!(
+                "{} {} tag={} hash={}",
+                CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH
+            )
+            .as_str()
+        )
         .author("Association Cénotélie <contact@cenotelie.fr>")
         .about("Command line to parse a piece of input using a packaged parser.")
         .arg(
