@@ -17,12 +17,6 @@
 
 //! Generator of lexers and parsers for the Hime runtime.
 
-extern crate ansi_term;
-extern crate clap;
-extern crate hime_redist;
-extern crate hime_sdk;
-extern crate serde_json;
-
 mod errors;
 
 use std::io::{self, Read};
@@ -36,10 +30,14 @@ use hime_sdk::{CompilationTask, Input, Mode, Modifier, ParsingMethod, Runtime};
 pub const CRATE_NAME: &str = env!("CARGO_PKG_NAME");
 /// The version of this program
 pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
+/// The commit that was used to build the application
+pub const GIT_HASH: &str = env!("GIT_HASH");
+/// The git tag that was used to build the application
+pub const GIT_TAG: &str = env!("GIT_TAG");
 
 pub fn main() {
     let matches = App::new("Hime Parser Generator")
-        .version(CRATE_VERSION)
+        .version(format!("{} tag={} hash={}", CRATE_VERSION, GIT_TAG, GIT_HASH).as_str())
         .author("Association Cénotélie <contact@cenotelie.fr>")
         .about("Generator of lexers and parsers for the Hime runtime.")
         .arg(

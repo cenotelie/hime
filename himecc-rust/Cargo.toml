@@ -16,9 +16,9 @@ edition = "2018"
 [dependencies]
 hime_redist = "3.5.2"
 hime_sdk = "3.5.2"
-clap = "2.32"
-ansi_term = "0.11"
-serde_json = "1.0"
+clap = "2.33"
+ansi_term = "0.12"
+serde_json = "1"
 
 [badges]
 maintenance = { status = "actively-developed" }
