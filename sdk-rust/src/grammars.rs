@@ -17,13 +17,15 @@
 
 //! Library for grammars
 
-use crate::errors::Error;
-use crate::finite::{FinalItem, DFA, EPSILON, NFA};
-use crate::InputReference;
-use hime_redist::parsers::{TreeAction, TREE_ACTION_DROP, TREE_ACTION_NONE, TREE_ACTION_PROMOTE};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering as AtomicOrdering};
+
+use hime_redist::parsers::{TreeAction, TREE_ACTION_DROP, TREE_ACTION_NONE, TREE_ACTION_PROMOTE};
+
+use crate::errors::Error;
+use crate::finite::{FinalItem, DFA, EPSILON, NFA};
+use crate::InputReference;
 
 /// Represents a symbol in a grammar
 pub trait Symbol {

@@ -17,14 +17,15 @@
 
 //! Module for generating parser code in rust
 
+use std::fs::OpenOptions;
+use std::io::{self, Write};
+use std::path::PathBuf;
+
 use crate::errors::Error;
 use crate::grammars::{Grammar, TerminalSet, PREFIX_GENERATED_TERMINAL, PREFIX_GENERATED_VARIABLE};
 use crate::output::get_parser_bin_name_rust;
 use crate::output::helper::{to_snake_case, to_upper_case};
 use crate::ParsingMethod;
-use std::fs::OpenOptions;
-use std::io::{self, Write};
-use std::path::PathBuf;
 
 /// Generates code for the specified file
 pub fn write(

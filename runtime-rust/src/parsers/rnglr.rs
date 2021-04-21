@@ -21,18 +21,10 @@ use std::collections::VecDeque;
 use std::usize;
 
 use super::*;
-use crate::ast::Ast;
-use crate::ast::AstCell;
-use crate::ast::TableElemRef;
-use crate::ast::TableType;
+use crate::ast::{Ast, AstCell, TableElemRef, TableType};
 use crate::errors::ParseErrorUnexpectedToken;
-use crate::lexers::Lexer;
-use crate::lexers::TokenKernel;
-use crate::lexers::DEFAULT_CONTEXT;
-use crate::symbols::SemanticBody;
-use crate::symbols::SemanticElement;
-use crate::symbols::SemanticElementTrait;
-use crate::symbols::SID_EPSILON;
+use crate::lexers::{Lexer, TokenKernel, DEFAULT_CONTEXT};
+use crate::symbols::{SemanticBody, SemanticElement, SemanticElementTrait, SID_EPSILON};
 use crate::utils::biglist::BigList;
 
 /// Represents a cell in a RNGLR parse table

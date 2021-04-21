@@ -18,8 +18,7 @@
 //! Module for the definition of `BigList`
 
 use std::fmt::{self, Debug, Formatter};
-use std::ops::Index;
-use std::ops::IndexMut;
+use std::ops::{Index, IndexMut};
 
 /// The number of bits allocated to the lowest part of the index (within a chunk)
 const UPPER_SHIFT: usize = 8;

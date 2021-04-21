@@ -19,11 +19,12 @@ extern crate hime_sdk;
 extern crate regex;
 extern crate reqwest;
 
-use hime_sdk::unicode::{Block, Category};
-use regex::Regex;
 use std::collections::HashMap;
 use std::fs;
 use std::io::{self, Write};
+
+use hime_sdk::unicode::{Block, Category};
+use regex::Regex;
 
 /// The URL of the latest specification of Unicode blocks
 const URL_UNICODE_BLOCKS: &str = "http://www.unicode.org/Public/UCD/latest/ucd/Blocks.txt";

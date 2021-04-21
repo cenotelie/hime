@@ -3,8 +3,9 @@
  * Hime Parser Generator
  */
 
-use crate::unicode::Block;
 use std::collections::HashMap;
+
+use crate::unicode::Block;
 
 /// Gets all blocks
 pub fn get_blocks() -> HashMap<&'static str, Block> {

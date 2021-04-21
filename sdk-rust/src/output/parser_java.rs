@@ -17,14 +17,15 @@
 
 //! Module for generating parser code in Java
 
+use std::fs::File;
+use std::io::{self, Write};
+use std::path::PathBuf;
+
 use crate::errors::Error;
 use crate::grammars::{Grammar, TerminalSet, PREFIX_GENERATED_TERMINAL, PREFIX_GENERATED_VARIABLE};
 use crate::output::get_parser_bin_name_java;
 use crate::output::helper::{to_lower_camel_case, to_upper_camel_case, to_upper_case};
 use crate::{Modifier, ParsingMethod, CRATE_VERSION};
-use std::fs::File;
-use std::io::{self, Write};
-use std::path::PathBuf;
 
 /// Generates code for the specified file
 pub fn write(

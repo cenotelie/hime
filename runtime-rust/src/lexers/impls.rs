@@ -17,15 +17,10 @@
 
 //! Module for lexers' implementation
 
-use super::automaton::run_dfa;
-use super::automaton::Automaton;
-use super::automaton::TokenMatch;
+use super::automaton::{run_dfa, Automaton, TokenMatch};
 use super::fuzzy::FuzzyMatcher;
-use super::ContextProvider;
-use super::LexerData;
-use super::TokenKernel;
-use crate::errors::ParseErrorUnexpectedChar;
-use crate::errors::ParseErrors;
+use super::{ContextProvider, LexerData, TokenKernel};
+use crate::errors::{ParseErrorUnexpectedChar, ParseErrors};
 use crate::symbols::SID_DOLLAR;
 use crate::tokens::TokenRepository;
 

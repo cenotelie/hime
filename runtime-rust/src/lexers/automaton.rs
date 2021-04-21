@@ -17,8 +17,7 @@
 
 //! Module for lexers' automata
 
-use crate::text::Text;
-use crate::text::Utf16C;
+use crate::text::{Text, Utf16C};
 use crate::utils::bin::*;
 
 /// Identifier of an invalid state in an automaton

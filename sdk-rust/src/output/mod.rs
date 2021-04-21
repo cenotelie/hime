@@ -30,6 +30,18 @@ mod parser_java;
 mod parser_net;
 mod parser_rust;
 
+use std::env;
+use std::fs::File;
+use std::io::{self, Write};
+use std::path::PathBuf;
+
+use hime_redist::lexers::automaton::Automaton;
+use hime_redist::parsers::lrk::LRkAutomaton;
+use hime_redist::parsers::rnglr::RNGLRAutomaton;
+use hime_redist::symbols::Symbol;
+use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
+
 use crate::errors::{Error, UnmatchableTokenError};
 use crate::finite::DFA;
 use crate::grammars::{
@@ -38,16 +50,6 @@ use crate::grammars::{
 use crate::lr::{self, Graph};
 use crate::sdk::{InMemoryParser, ParserAutomaton};
 use crate::{CompilationTask, ParsingMethod, Runtime};
-use hime_redist::lexers::automaton::Automaton;
-use hime_redist::parsers::lrk::LRkAutomaton;
-use hime_redist::parsers::rnglr::RNGLRAutomaton;
-use hime_redist::symbols::Symbol;
-use rand::distributions::Alphanumeric;
-use rand::{thread_rng, Rng};
-use std::env;
-use std::fs::File;
-use std::io::{self, Write};
-use std::path::PathBuf;
 
 /// Build and output artifacts for a grammar
 pub fn execute_for_grammar(

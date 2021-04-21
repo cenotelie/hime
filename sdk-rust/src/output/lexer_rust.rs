@@ -17,14 +17,15 @@
 
 //! Module for generating lexer code in Rust
 
+use std::fs::File;
+use std::io::{self, Write};
+use std::path::PathBuf;
+
 use crate::errors::Error;
 use crate::grammars::{Grammar, TerminalRef, TerminalSet, PREFIX_GENERATED_TERMINAL};
 use crate::output::get_lexer_bin_name_rust;
 use crate::output::helper::{to_upper_camel_case, to_upper_case};
 use crate::CRATE_VERSION;
-use std::fs::File;
-use std::io::{self, Write};
-use std::path::PathBuf;
 
 /// Generates code for the specified file
 pub fn write(

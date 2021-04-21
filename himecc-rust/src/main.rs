@@ -25,12 +25,12 @@ extern crate serde_json;
 
 mod errors;
 
+use std::io::{self, Read};
+use std::{env, process};
+
 use clap::{App, Arg};
 use hime_sdk::errors::{Error, Errors};
 use hime_sdk::{CompilationTask, Input, Mode, Modifier, ParsingMethod, Runtime};
-use std::env;
-use std::io::{self, Read};
-use std::process;
 
 /// The name of this program
 pub const CRATE_NAME: &str = env!("CARGO_PKG_NAME");

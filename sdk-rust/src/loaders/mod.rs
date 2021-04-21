@@ -19,14 +19,8 @@
 
 pub mod hime_grammar;
 
-use crate::errors::{Error, Errors};
-use crate::finite::{FinalItem, NFA};
-use crate::grammars::{
-    BodySet, Grammar, Rule, RuleBody, SymbolRef, TemplateRuleBody, TemplateRuleRef,
-    TemplateRuleSymbol, DEFAULT_CONTEXT_NAME
-};
-use crate::unicode::{Span, BLOCKS, CATEGORIES};
-use crate::{CharSpan, Input, InputReference, LoadedData, LoadedInput};
+use std::io;
+
 use hime_redist::ast::{Ast, AstFamily, AstNode};
 use hime_redist::errors::ParseErrorDataTrait;
 use hime_redist::lexers::DEFAULT_CONTEXT;
@@ -37,7 +31,15 @@ use hime_redist::parsers::{
 use hime_redist::result::ParseResult;
 use hime_redist::symbols::SemanticElementTrait;
 use hime_redist::text::Text;
-use std::io;
+
+use crate::errors::{Error, Errors};
+use crate::finite::{FinalItem, NFA};
+use crate::grammars::{
+    BodySet, Grammar, Rule, RuleBody, SymbolRef, TemplateRuleBody, TemplateRuleRef,
+    TemplateRuleSymbol, DEFAULT_CONTEXT_NAME
+};
+use crate::unicode::{Span, BLOCKS, CATEGORIES};
+use crate::{CharSpan, Input, InputReference, LoadedData, LoadedInput};
 
 /// Loads all inputs into grammars
 pub fn load(inputs: &[Input]) -> Result<LoadedData, Errors> {

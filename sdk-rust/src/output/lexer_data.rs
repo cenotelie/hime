@@ -17,15 +17,17 @@
 
 //! Module for writing lexer automaton
 
+use std::fs::File;
+use std::io::{self, Write};
+use std::path::PathBuf;
+
+use hime_redist::lexers::automaton::DEAD_STATE;
+
 use crate::errors::Error;
 use crate::finite::{DFAState, DFA};
 use crate::grammars::{Grammar, TerminalRef, TerminalSet};
 use crate::output::helper::{write_u16, write_u32};
 use crate::CharSpan;
-use hime_redist::lexers::automaton::DEAD_STATE;
-use std::fs::File;
-use std::io::{self, Write};
-use std::path::PathBuf;
 
 /// Writes the lexer's data
 pub fn write_lexer_data_file(

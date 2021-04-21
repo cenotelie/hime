@@ -31,17 +31,19 @@ pub mod output;
 pub mod sdk;
 pub mod unicode;
 
+use std::cmp::Ordering;
+use std::fs;
+use std::io::Read;
+
+use hime_redist::ast::AstNode;
+use hime_redist::text::{Text, TextPosition};
+
 use crate::errors::{Error, Errors};
 use crate::grammars::{
     Grammar, OPTION_ACCESS_MODIFIER, OPTION_METHOD, OPTION_MODE, OPTION_NAMESPACE,
     OPTION_OUTPUT_PATH, OPTION_RUNTIME
 };
 use crate::sdk::InMemoryParser;
-use hime_redist::ast::AstNode;
-use hime_redist::text::{Text, TextPosition};
-use std::cmp::Ordering;
-use std::fs;
-use std::io::Read;
 
 /// The version of this program
 pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");

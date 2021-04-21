@@ -17,6 +17,8 @@
 
 //! Error handling
 
+use std::io;
+
 use ansi_term::Colour::{Blue, Red};
 use ansi_term::Style;
 use hime_redist::text::TextContext;
@@ -26,7 +28,6 @@ use hime_sdk::grammars::{
 };
 use hime_sdk::lr::{Conflict, ConflictKind, ContextError, Item, LookaheadOrigin, Phrase};
 use hime_sdk::{InputReference, LoadedData};
-use std::io;
 
 const MSG_AXIOM_NOT_SPECIFIED: &str = "Grammar axiom has not been specified";
 

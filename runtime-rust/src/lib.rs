@@ -36,8 +36,6 @@
 //! extern crate hime_redist;
 //! ```
 
-extern crate serde;
-
 pub mod ast;
 pub mod errors;
 pub mod lexers;

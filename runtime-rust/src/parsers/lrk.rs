@@ -21,16 +21,10 @@ use std::usize;
 
 use super::subtree::SubTree;
 use super::*;
-use crate::ast::Ast;
-use crate::ast::TableElemRef;
-use crate::ast::TableType;
+use crate::ast::{Ast, TableElemRef, TableType};
 use crate::errors::ParseErrorUnexpectedToken;
-use crate::lexers::Lexer;
-use crate::lexers::TokenKernel;
-use crate::lexers::DEFAULT_CONTEXT;
-use crate::symbols::SemanticBody;
-use crate::symbols::SemanticElement;
-use crate::symbols::SemanticElementTrait;
+use crate::lexers::{Lexer, TokenKernel, DEFAULT_CONTEXT};
+use crate::symbols::{SemanticBody, SemanticElement, SemanticElementTrait};
 
 /// Represents the LR(k) parsing table and productions
 #[derive(Clone)]

@@ -21,8 +21,7 @@ extern crate hime_redist;
 extern crate libloading;
 extern crate serde_json;
 
-use std::env;
-use std::io;
+use std::{env, io};
 
 use hime_redist::result::ParseResult;
 

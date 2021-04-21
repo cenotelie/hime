@@ -17,15 +17,15 @@
 
 //! Module for the definition of a server-side workspace
 
-use hime_sdk::errors::Error;
-use hime_sdk::grammars::OPTION_AXIOM;
-use hime_sdk::grammars::OPTION_SEPARATOR;
-use hime_sdk::{CompilationTask, Input, InputReference, LoadedData};
-use serde_json::Value;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufReader, ErrorKind, Read};
 use std::path::PathBuf;
+
+use hime_sdk::errors::Error;
+use hime_sdk::grammars::{OPTION_AXIOM, OPTION_SEPARATOR};
+use hime_sdk::{CompilationTask, Input, InputReference, LoadedData};
+use serde_json::Value;
 use tower_lsp::jsonrpc::Error as JsonRpcError;
 use tower_lsp::lsp_types::{
     Diagnostic, DiagnosticRelatedInformation, DiagnosticSeverity, DidChangeTextDocumentParams,

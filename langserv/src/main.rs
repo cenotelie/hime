@@ -28,9 +28,10 @@ extern crate tower_lsp;
 
 pub mod workspace;
 
+use std::sync::Arc;
+
 use futures::future::join_all;
 use log::{error, info};
-use std::sync::Arc;
 use tokio::sync::RwLock;
 use tower_lsp::jsonrpc::{Error, Result};
 use tower_lsp::lsp_types::*;

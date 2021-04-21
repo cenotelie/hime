@@ -17,11 +17,8 @@
 
 //! Module for AST subtree in parsers
 
-use super::TreeAction;
-use super::TREE_ACTION_REPLACE_BY_CHILDREN;
-use crate::ast::Ast;
-use crate::ast::AstCell;
-use crate::ast::TableElemRef;
+use super::{TreeAction, TREE_ACTION_REPLACE_BY_CHILDREN};
+use crate::ast::{Ast, AstCell, TableElemRef};
 
 /// Represents a sub-tree in an AST
 /// A sub-tree is composed of a root with its children.

@@ -19,16 +19,12 @@
 
 use std::mem::replace;
 
-use super::automaton::Automaton;
-use super::automaton::AutomatonState;
-use super::automaton::TokenMatch;
-use super::automaton::DEAD_STATE;
-use crate::errors::ParseErrorEndOfInput;
-use crate::errors::ParseErrorIncorrectEncodingSequence;
-use crate::errors::ParseErrorUnexpectedChar;
-use crate::errors::ParseErrors;
-use crate::text::Text;
-use crate::text::Utf16C;
+use super::automaton::{Automaton, AutomatonState, TokenMatch, DEAD_STATE};
+use crate::errors::{
+    ParseErrorEndOfInput, ParseErrorIncorrectEncodingSequence, ParseErrorUnexpectedChar,
+    ParseErrors
+};
+use crate::text::{Text, Utf16C};
 
 /// Represents a DFA stack head
 #[derive(Clone)]

@@ -17,12 +17,8 @@
 
 //! Module for the definition of lexical tokens
 
-use crate::symbols::SemanticElementTrait;
-use crate::symbols::Symbol;
-use crate::text::Text;
-use crate::text::TextContext;
-use crate::text::TextPosition;
-use crate::text::TextSpan;
+use crate::symbols::{SemanticElementTrait, Symbol};
+use crate::text::{Text, TextContext, TextPosition, TextSpan};
 use crate::utils::biglist::BigList;
 use crate::utils::EitherMut;
 

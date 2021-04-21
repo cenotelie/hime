@@ -9,13 +9,10 @@ use hime_redist::errors::ParseErrors;
 use hime_redist::lexers::automaton::Automaton;
 use hime_redist::lexers::impls::ContextFreeLexer;
 use hime_redist::lexers::Lexer;
-use hime_redist::parsers::lrk::LRkAutomaton;
-use hime_redist::parsers::lrk::LRkParser;
+use hime_redist::parsers::lrk::{LRkAutomaton, LRkParser};
 use hime_redist::parsers::Parser;
 use hime_redist::result::ParseResult;
-use hime_redist::symbols::SemanticBody;
-use hime_redist::symbols::SemanticElementTrait;
-use hime_redist::symbols::Symbol;
+use hime_redist::symbols::{SemanticBody, SemanticElementTrait, Symbol};
 use hime_redist::text::Text;
 use hime_redist::tokens::TokenRepository;
 

@@ -17,14 +17,13 @@
 
 //! Module for the definition of a parse result
 
-use crate::ast::Ast;
-use crate::ast::AstImpl;
+use serde::ser::{Serialize, SerializeStruct, Serializer};
+
+use crate::ast::{Ast, AstImpl};
 use crate::errors::ParseErrors;
 use crate::symbols::Symbol;
 use crate::text::Text;
-use crate::tokens::TokenRepository;
-use crate::tokens::TokenRepositoryImpl;
-use serde::ser::{Serialize, SerializeStruct, Serializer};
+use crate::tokens::{TokenRepository, TokenRepositoryImpl};
 
 /// Represents the output of a parser
 pub struct ParseResult<'a: 'b, 'b> {

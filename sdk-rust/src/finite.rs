@@ -17,10 +17,11 @@
 
 //! Finite automata
 
-use crate::grammars::{TerminalRef, TerminalSet};
-use crate::{CharSpan, CHARSPAN_INVALID};
 use std::cmp::Ordering;
 use std::collections::HashMap;
+
+use crate::grammars::{TerminalRef, TerminalSet};
+use crate::{CharSpan, CHARSPAN_INVALID};
 
 /// Represents the value epsilon on NFA transitions
 pub const EPSILON: CharSpan = CHARSPAN_INVALID;

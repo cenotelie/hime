@@ -17,15 +17,15 @@
 
 //! Module for build Rust assemblies
 
-use crate::errors::Error;
-use crate::grammars::Grammar;
-use crate::output;
-use crate::output::helper;
-use crate::CompilationTask;
 use std::fs::{self, File, OpenOptions};
 use std::io::{BufRead, BufReader, BufWriter, Write};
 use std::path::PathBuf;
 use std::process::Command;
+
+use crate::errors::Error;
+use crate::grammars::Grammar;
+use crate::output::helper;
+use crate::{output, CompilationTask};
 
 const MANIFEST: &[u8] = include_bytes!("assembly_rust.toml");
 

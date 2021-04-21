@@ -17,18 +17,13 @@
 
 //! Module for Abstract-Syntax Trees
 
-use serde::ser::{Serialize, SerializeSeq, SerializeStruct, Serializer};
-use std::fmt::Display;
-use std::fmt::Error;
-use std::fmt::Formatter;
+use std::fmt::{Display, Error, Formatter};
 
-use crate::symbols::SemanticElementTrait;
-use crate::symbols::Symbol;
-use crate::text::TextContext;
-use crate::text::TextPosition;
-use crate::text::TextSpan;
-use crate::tokens::Token;
-use crate::tokens::TokenRepository;
+use serde::ser::{Serialize, SerializeSeq, SerializeStruct, Serializer};
+
+use crate::symbols::{SemanticElementTrait, Symbol};
+use crate::text::{TextContext, TextPosition, TextSpan};
+use crate::tokens::{Token, TokenRepository};
 use crate::utils::biglist::BigList;
 use crate::utils::EitherMut;
 

@@ -17,14 +17,15 @@
 
 //! Module for generating lexer code in C#
 
+use std::fs::File;
+use std::io::{self, Write};
+use std::path::PathBuf;
+
 use crate::errors::Error;
 use crate::grammars::{Grammar, TerminalRef, TerminalSet, PREFIX_GENERATED_TERMINAL};
 use crate::output::get_lexer_bin_name_net;
 use crate::output::helper::to_upper_camel_case;
 use crate::{Modifier, CRATE_VERSION};
-use std::fs::File;
-use std::io::{self, Write};
-use std::path::PathBuf;
 
 /// Generates code for the specified file
 pub fn write(

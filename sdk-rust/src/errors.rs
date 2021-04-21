@@ -17,10 +17,11 @@
 
 //! Module for the management of errors in the SDK
 
+use std::io;
+
 use crate::grammars::TerminalRef;
 use crate::lr::{Conflict, ContextError};
 use crate::{InputReference, LoadedData};
-use std::io;
 
 /// Represents an error where a token is used by cannot be produced by the lexer
 #[derive(Debug, Clone)]

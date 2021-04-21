@@ -17,6 +17,10 @@
 
 //! Module for LR automata
 
+use std::collections::HashMap;
+
+use hime_redist::parsers::{LRActionCode, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT};
+
 use crate::errors::{Error, UnmatchableTokenError};
 use crate::finite::DFA;
 use crate::grammars::{
@@ -24,8 +28,6 @@ use crate::grammars::{
     GENERATED_AXIOM
 };
 use crate::ParsingMethod;
-use hime_redist::parsers::{LRActionCode, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT};
-use std::collections::HashMap;
 
 /// The lookahead mode for LR items
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]

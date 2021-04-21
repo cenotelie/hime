@@ -17,14 +17,12 @@
 
 //! Module for the definition of lexical and syntactic errors
 
+use std::fmt::{Display, Error, Formatter};
+
 use serde::Serialize;
-use std::fmt::Display;
-use std::fmt::Error;
-use std::fmt::Formatter;
 
 use crate::symbols::Symbol;
-use crate::text::TextPosition;
-use crate::text::Utf16C;
+use crate::text::{TextPosition, Utf16C};
 
 /// Common trait for data about an error
 pub trait ParseErrorDataTrait {
@@ -39,7 +37,7 @@ pub trait ParseErrorDataTrait {
 }
 
 /// Represents the unexpected of the input text while more characters were expected
-#[derive(Clone, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct ParseErrorEndOfInput {
     /// The error's position in the input text
     position: TextPosition
@@ -70,7 +68,7 @@ impl ParseErrorEndOfInput {
 }
 
 /// Represents an unexpected character error in the input stream of a lexer
-#[derive(Clone, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct ParseErrorUnexpectedChar {
     /// The error's position in the input text
     position: TextPosition,
@@ -125,7 +123,7 @@ impl ParseErrorUnexpectedChar {
 }
 
 /// Represents an incorrect encoding sequence error in the input of a lexer
-#[derive(Clone, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct ParseErrorIncorrectEncodingSequence {
     /// The error's position in the input text
     position: TextPosition,
@@ -181,7 +179,7 @@ impl ParseErrorIncorrectEncodingSequence {
 }
 
 /// Represents an unexpected token error in a parser
-#[derive(Clone, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct ParseErrorUnexpectedToken<'a> {
     /// The error's position in the input text
     position: TextPosition,
@@ -245,7 +243,7 @@ impl<'a> ParseErrorUnexpectedToken<'a> {
 }
 
 /// Represents a lexical or syntactic error
-#[derive(Clone, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 #[serde(tag = "type")]
 pub enum ParseError<'a> {
     /// Lexical error occurring when the end of input has been encountered while more characters were expected
@@ -300,6 +298,8 @@ impl<'a> Display for ParseError<'a> {
         write!(f, "@{} {}", self.get_position(), self.get_message())
     }
 }
+
+impl<'a> std::error::Error for ParseError<'a> {}
 
 /// Represents an entity that can handle lexical and syntactic errors
 #[derive(Default, Clone)]

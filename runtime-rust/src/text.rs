@@ -17,14 +17,12 @@
 
 //! Module for text-handling APIs
 
-use serde::{Deserialize, Serialize};
 use std::cmp::{Ord, Ordering};
-use std::fmt::Display;
-use std::fmt::Error;
-use std::fmt::Formatter;
-use std::io::BufReader;
-use std::io::Read;
+use std::fmt::{Display, Error, Formatter};
+use std::io::{BufReader, Read};
 use std::result::Result;
+
+use serde::{Deserialize, Serialize};
 
 use crate::utils::biglist::BigList;
 

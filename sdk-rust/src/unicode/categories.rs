@@ -3,8 +3,9 @@
  * Hime Parser Generator
  */
 
-use crate::unicode::Category;
 use std::collections::HashMap;
+
+use crate::unicode::Category;
 
 /// Gets all categories
 pub fn get_categories() -> HashMap<&'static str, Category> {

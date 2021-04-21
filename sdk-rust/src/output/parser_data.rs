@@ -17,21 +17,23 @@
 
 //! Module for writing parser LR automaton
 
+use std::collections::HashMap;
+use std::fs::File;
+use std::io::{self, Write};
+use std::path::PathBuf;
+
+use hime_redist::parsers::{
+    LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_NONE, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT,
+    LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE, LR_OP_CODE_BASE_ADD_VIRTUAL, LR_OP_CODE_BASE_POP_STACK,
+    LR_OP_CODE_BASE_SEMANTIC_ACTION
+};
+
 use crate::errors::Error;
 use crate::grammars::{
     Grammar, Rule, RuleRef, SymbolRef, TerminalRef, TerminalSet, GENERATED_AXIOM
 };
 use crate::lr::{Graph, State};
 use crate::output::helper::{write_u16, write_u32, write_u8};
-use hime_redist::parsers::{
-    LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_NONE, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT,
-    LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE, LR_OP_CODE_BASE_ADD_VIRTUAL, LR_OP_CODE_BASE_POP_STACK,
-    LR_OP_CODE_BASE_SEMANTIC_ACTION
-};
-use std::collections::HashMap;
-use std::fs::File;
-use std::io::{self, Write};
-use std::path::PathBuf;
 
 /// Writes the data for a LR(k) parser
 pub fn write_parser_lrk_data_file(
