@@ -19,7 +19,7 @@
 
 use std::fmt::{Display, Error, Formatter};
 
-use serde::Serialize;
+use serde_derive::Serialize;
 
 use crate::symbols::Symbol;
 use crate::text::{TextPosition, Utf16C};

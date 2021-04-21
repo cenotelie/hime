@@ -22,7 +22,7 @@ use std::fmt::{Display, Error, Formatter};
 use std::io::{BufReader, Read};
 use std::result::Result;
 
-use serde::{Deserialize, Serialize};
+use serde_derive::{Deserialize, Serialize};
 
 use crate::utils::biglist::BigList;
 

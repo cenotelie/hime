@@ -17,11 +17,6 @@
 
 //! Rust SDK for the Hime parser generator
 
-#[macro_use]
-extern crate lazy_static;
-extern crate hime_redist;
-extern crate rand;
-
 pub mod errors;
 pub mod finite;
 pub mod grammars;
@@ -47,6 +42,10 @@ use crate::sdk::InMemoryParser;
 
 /// The version of this program
 pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
+/// The commit that was used to build the application
+pub const GIT_HASH: &str = env!("GIT_HASH");
+/// The git tag that was used to build the application
+pub const GIT_TAG: &str = env!("GIT_TAG");
 
 /// Represents a range of characters
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]

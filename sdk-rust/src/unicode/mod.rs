@@ -22,6 +22,8 @@ mod categories;
 
 use std::collections::HashMap;
 
+use lazy_static::lazy_static;
+
 lazy_static! {
     /// Contains the supported Unicode blocks
     pub static ref BLOCKS: HashMap<&'static str, Block> = blocks::get_blocks();

@@ -6,7 +6,7 @@ members = [
     "tests-executor-rust",
     "unicode-gen",
     "himecc-rust",
-    "langserv"
+    # "langserv"
 ]
 
 [patch.crates-io]

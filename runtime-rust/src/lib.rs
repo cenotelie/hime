@@ -45,3 +45,10 @@ pub mod symbols;
 pub mod text;
 pub mod tokens;
 pub mod utils;
+
+/// The version of this program
+pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
+/// The commit that was used to build the application
+pub const GIT_HASH: &str = env!("GIT_HASH");
+/// The git tag that was used to build the application
+pub const GIT_TAG: &str = env!("GIT_TAG");

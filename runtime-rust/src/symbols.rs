@@ -19,7 +19,7 @@
 
 use std::fmt::{Display, Error, Formatter};
 
-use serde::{Deserialize, Serialize};
+use serde_derive::{Deserialize, Serialize};
 
 use crate::text::{TextContext, TextPosition, TextSpan};
 use crate::tokens::Token;
