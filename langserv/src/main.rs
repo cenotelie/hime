@@ -17,15 +17,6 @@
 
 //! Generator of lexers and parsers for the Hime runtime.
 
-extern crate fern;
-extern crate futures;
-extern crate hime_redist;
-extern crate hime_sdk;
-extern crate log;
-extern crate serde_json;
-extern crate tokio;
-extern crate tower_lsp;
-
 pub mod workspace;
 
 use std::sync::Arc;
@@ -42,6 +33,10 @@ use workspace::Workspace;
 pub const CRATE_NAME: &str = env!("CARGO_PKG_NAME");
 /// The version of this program
 pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
+/// The commit that was used to build the application
+pub const GIT_HASH: &str = env!("GIT_HASH");
+/// The git tag that was used to build the application
+pub const GIT_TAG: &str = env!("GIT_TAG");
 
 /// The server backend
 #[derive(Debug)]
