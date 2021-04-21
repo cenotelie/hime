@@ -17,22 +17,22 @@
 
 //! Main module
 
-// Used for tests debugging
-// extern crate hime_generated;
-extern crate hime_redist;
-extern crate libloading;
-
-use std::env;
-use std::fs;
-use std::io;
 use std::io::Read;
-use std::path;
-use std::process;
+use std::{env, fs, io, path, process};
 
 use hime_redist::ast::AstNode;
 use hime_redist::errors::ParseErrorDataTrait;
 use hime_redist::result::ParseResult;
 use hime_redist::symbols::SemanticElementTrait;
+
+/// The name of this program
+pub const CRATE_NAME: &str = env!("CARGO_PKG_NAME");
+/// The version of this program
+pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
+/// The commit that was used to build the application
+pub const GIT_HASH: &str = env!("GIT_HASH");
+/// The git tag that was used to build the application
+pub const GIT_TAG: &str = env!("GIT_TAG");
 
 /// The parser must produce an AST that matches the expected one
 const VERB_MATCHES: &str = "matches";
@@ -52,12 +52,11 @@ const RESULT_FAILURE_PARSING: i32 = 2;
 
 /// Main entry point
 fn main() {
-    let args = read_args();
-    let exe_path = env::current_exe().unwrap_or_else(|error| panic!("{}", error));
+    let args: Vec<String> = env::args().skip(1).collect();
+    let exe_path = env::current_exe().unwrap();
     let my_path = exe_path.parent().unwrap();
     let library_name = get_parser_library_name(my_path);
-    let library =
-        libloading::Library::new(library_name).unwrap_or_else(|error| panic!("{}", error));
+    let library = unsafe { libloading::Library::new(library_name).unwrap() };
     let result = execute(my_path, &library, &args[0], &args[1]);
     process::exit(result);
 }
@@ -69,7 +68,7 @@ fn test_single() {
     let my_path = path::Path::new("/home/laurent/dev/hime-main/tests-results");
     let library_name = get_parser_library_name(my_path);
     let library =
-        libloading::Library::new(library_name).unwrap_or_else(|error| panic!("{}", error));
+        unsafe { libloading::Library::new(library_name).unwrap() };
     let result = execute(my_path, &library, test_name, verb);
     assert_eq!(RESULT_SUCCESS, result);
 }*/
@@ -92,30 +91,17 @@ fn get_parser_library_name(my_path: &path::Path) -> path::PathBuf {
     my_path.join("parsers-rust.dll")
 }
 
-/// Reads the arguments
-fn read_args() -> Vec<String> {
-    let mut args = Vec::new();
-    for argument in env::args().enumerate() {
-        if argument.0 != 0 {
-            args.push(argument.1);
-        }
-    }
-    args
-}
-
 /// Gets the serialized expected AST
 fn get_expected_ast(
     my_path: &path::Path,
     library: &libloading::Library
 ) -> ParseResult<'static, 'static> {
     let file = my_path.join("expected.txt");
-    let file_input = fs::File::open(file).unwrap_or_else(|error| panic!("{}", error));
+    let file_input = fs::File::open(file).unwrap();
     let mut input_reader = io::BufReader::new(file_input);
     unsafe {
         let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResult<'static, 'static>> =
-            library
-                .get(b"expected_tree_parse_utf8")
-                .unwrap_or_else(|error| panic!("{}", error));
+            library.get(b"expected_tree_parse_utf8").unwrap();
         parser(&mut input_reader)
     }
 }
@@ -123,12 +109,10 @@ fn get_expected_ast(
 /// Gets the serialized expected output
 fn get_expected_output(my_path: &path::Path) -> String {
     let file = my_path.join("expected.txt");
-    let file_input = fs::File::open(file).unwrap_or_else(|error| panic!("{}", error));
+    let file_input = fs::File::open(file).unwrap();
     let mut input_reader = io::BufReader::new(file_input);
     let mut result = String::new();
-    let _length = input_reader
-        .read_to_string(&mut result)
-        .unwrap_or_else(|error| panic!("{}", error));
+    let _length = input_reader.read_to_string(&mut result).unwrap();
     result
 }
 
@@ -142,13 +126,11 @@ fn get_parsed_input(
     function_name.push_str(parser_name);
     function_name.push_str("_parse_utf8");
     let file = my_path.join("input.txt");
-    let file_input = fs::File::open(file).unwrap_or_else(|error| panic!("{}", error));
+    let file_input = fs::File::open(file).unwrap();
     let mut input_reader = io::BufReader::new(file_input);
     unsafe {
         let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResult<'static, 'static>> =
-            library
-                .get(function_name.as_bytes())
-                .unwrap_or_else(|error| panic!("{}", error));
+            library.get(function_name.as_bytes()).unwrap();
         parser(&mut input_reader)
     }
 }
@@ -323,9 +305,7 @@ fn execute_test_outputs(
 
 /// Compare the specified AST node to the expected node
 fn compare(expected: AstNode, node: AstNode) -> bool {
-    let name = expected
-        .get_value()
-        .unwrap_or_else(|| panic!("Malformed expected AST"));
+    let name = expected.get_value().expect("Malformed expected AST");
     if !node.get_symbol().name.eq(&name) {
         return false;
     }
@@ -336,16 +316,14 @@ fn compare(expected: AstNode, node: AstNode) -> bool {
         let test = predicate_children
             .at(0)
             .get_value()
-            .unwrap_or_else(|| panic!("Malformed expected AST"));
+            .expect("Malformed expected AST");
         let value_expected = unescape(
             predicate_children
                 .at(1)
                 .get_value()
-                .unwrap_or_else(|| panic!("Malformed expected AST"))
+                .expect("Malformed expected AST")
         );
-        let value_real = node
-            .get_value()
-            .unwrap_or_else(|| panic!("Malformed input AST"));
+        let value_real = node.get_value().expect("Malformed input AST");
         if test.eq("=") && !value_expected.eq(&value_real)
             || test.eq("!=") && value_expected.eq(&value_real)
         {

@@ -12,6 +12,6 @@ edition = "2018"
 
 [dependencies]
 hime_redist = "3.5.2"
-libloading = "0.4.3"
+libloading = "0.7"
 # Used for tests debugging
 # hime_generated = { path = "../tests-results/hime_generated-3.3.1" }
