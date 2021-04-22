@@ -21,7 +21,7 @@ pub mod hime_grammar;
 
 use std::io;
 
-use hime_redist::ast::{Ast, AstFamily, AstNode};
+use hime_redist::ast::{Ast, AstNode};
 use hime_redist::errors::ParseErrorDataTrait;
 use hime_redist::lexers::DEFAULT_CONTEXT;
 use hime_redist::parsers::{
@@ -43,25 +43,20 @@ use crate::{CharSpan, Input, InputReference, LoadedData, LoadedInput};
 
 /// Loads all inputs into grammars
 pub fn load(inputs: &[Input]) -> Result<LoadedData, Errors> {
+    // parse
     let results = parse_inputs(inputs)?;
+    // extract grammar roots
     let asts: Vec<Ast> = results.iter().map(|r| r.get_ast()).collect();
-    let roots: Vec<AstNode> = asts.iter().map(|ast| ast.get_root()).collect();
-    let families: Vec<AstFamily> = roots.iter().map(|root| root.children()).collect();
-    let mut errors = Vec::new();
-    let mut completed = Vec::new();
-    let mut to_resolve = Vec::new();
-    for ((index, _input), family) in inputs.iter().enumerate().zip(families.iter()) {
-        for sub_root in family.iter() {
-            let loader = Loader::new(index, sub_root, &mut errors);
-            if loader.is_solved() {
-                completed.push(loader);
-            } else {
-                to_resolve.push(loader);
-            }
-        }
-    }
-    resolve_inheritance(&mut completed, &mut to_resolve, &mut errors);
-    let grammars: Vec<Grammar> = completed.into_iter().map(|loader| loader.grammar).collect();
+    let doc_roots: Vec<AstNode> = asts.iter().map(|ast| ast.get_root()).collect();
+    let roots: Vec<(usize, AstNode)> = doc_roots
+        .iter()
+        .enumerate()
+        .map(|(index, &doc_root)| doc_root.into_iter().map(move |root| (index, root)))
+        .flatten()
+        .collect();
+    // get the grammars
+    let (grammars, errors) = do_load_grammars(&roots);
+
     let loaded_inputs: Vec<LoadedInput> = results
         .into_iter()
         .zip(inputs.iter())
@@ -79,6 +74,36 @@ pub fn load(inputs: &[Input]) -> Result<LoadedData, Errors> {
     } else {
         Err(Errors::from(data, errors))
     }
+}
+
+/// Loads grammars from AST roots
+pub fn load_parsed(roots: &[(usize, AstNode)]) -> Result<Vec<Grammar>, Vec<Error>> {
+    let (grammars, errors) = do_load_grammars(roots);
+    if errors.is_empty() {
+        Ok(grammars)
+    } else {
+        Err(errors)
+    }
+}
+
+/// Loads grammars from AST roots
+fn do_load_grammars(roots: &[(usize, AstNode)]) -> (Vec<Grammar>, Vec<Error>) {
+    let mut errors = Vec::new();
+    let mut completed = Vec::new();
+    let mut to_resolve = Vec::new();
+    for &(input_index, grammar_root) in roots.iter() {
+        let loader = Loader::new(input_index, grammar_root, &mut errors);
+        if loader.is_solved() {
+            completed.push(loader);
+        } else {
+            to_resolve.push(loader);
+        }
+    }
+    resolve_inheritance(&mut completed, &mut to_resolve, &mut errors);
+    (
+        completed.into_iter().map(|loader| loader.grammar).collect(),
+        errors
+    )
 }
 
 /// Resolves inheritance and load grammars
@@ -213,13 +238,11 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Loader<'a, 'b, 'c, 'd> {
         root: AstNode<'a, 'b, 'c, 'd>,
         errors: &mut Vec<Error>
     ) -> Loader<'a, 'b, 'c, 'd> {
-        let input_ref = InputReference::from(input_index, &root.children().at(0));
-        let name = root.children().at(0).get_value().unwrap();
+        let input_ref = InputReference::from(input_index, &root.child(0));
+        let name = root.child(0).get_value().unwrap();
         let inherited = root
-            .children()
-            .at(1)
-            .children()
-            .iter()
+            .child(1)
+            .into_iter()
             .map(|node| node.get_value().unwrap())
             .collect();
         let mut loader = Loader {
@@ -237,7 +260,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Loader<'a, 'b, 'c, 'd> {
 
     /// Prints errors for the unresolved inherited grammars
     fn collect_errors(&self, unresolved: &[Loader], errors: &mut Vec<Error>) {
-        for node in self.root.children().at(1).children().iter() {
+        for node in self.root.child(1) {
             let name = node.get_value().unwrap();
             if self.inherited.contains(&name) {
                 // was not resolved
@@ -279,7 +302,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Loader<'a, 'b, 'c, 'd> {
 
     /// Loads the content of the grammar
     fn load_content(&mut self, errors: &mut Vec<Error>) {
-        for node in self.root.children().iter() {
+        for node in self.root {
             let id = node.get_symbol().id;
             if id == hime_grammar::ID_TERMINAL_BLOCK_OPTIONS {
                 load_options(self.input_index, &mut self.grammar, node);
@@ -299,19 +322,19 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Loader<'a, 'b, 'c, 'd> {
 
 /// Loads the options block of a grammar
 fn load_options(input_index: usize, grammar: &mut Grammar, node: AstNode) {
-    for child in node.children().iter() {
+    for child in node {
         load_option(input_index, grammar, child);
     }
 }
 
 /// Loads the grammar option in the given AST
 fn load_option(input_index: usize, grammar: &mut Grammar, node: AstNode) {
-    let name = node.children().at(0).get_value().unwrap();
-    let value = replace_escapees(node.children().at(1).get_value().unwrap());
+    let name = node.child(0).get_value().unwrap();
+    let value = replace_escapees(node.child(1).get_value().unwrap());
     let value = value[1..(value.len() - 1)].to_string();
     grammar.add_option(
-        InputReference::from(input_index, &node.children().at(0)),
-        InputReference::from(input_index, &node.children().at(1)),
+        InputReference::from(input_index, &node.child(0)),
+        InputReference::from(input_index, &node.child(1)),
         name,
         value
     );
@@ -324,7 +347,7 @@ fn load_terminals(
     grammar: &mut Grammar,
     node: AstNode
 ) {
-    for child in node.children().iter() {
+    for child in node {
         let id = child.get_symbol().id;
         if id == hime_grammar::ID_TERMINAL_BLOCK_CONTEXT {
             load_terminal_rule_context(input_index, errors, grammar, child);
@@ -357,10 +380,9 @@ fn load_terminal_rule_context(
     grammar: &mut Grammar,
     node: AstNode
 ) {
-    let children = node.children();
-    let name = children.at(0).get_value().unwrap();
+    let name = node.child(0).get_value().unwrap();
     grammar.resolve_context(&name);
-    for child in children.iter().skip(1) {
+    for child in node.into_iter().skip(1) {
         load_terminal_rule(input_index, errors, grammar, child, &name, false);
     }
 }
@@ -374,8 +396,7 @@ fn load_terminal_rule(
     context: &str,
     is_fragment: bool
 ) {
-    let children = node.children();
-    let node_name = children.at(0);
+    let node_name = node.child(0);
     let name = node_name.get_value().unwrap();
     if grammar.get_terminal_for_name(&name).is_some() {
         errors.push(Error::OverridingPreviousTerminal(
@@ -384,7 +405,7 @@ fn load_terminal_rule(
         ));
         return;
     }
-    let nfa = load_nfa(input_index, errors, grammar, children.at(1));
+    let nfa = load_nfa(input_index, errors, grammar, node.child(1));
     let terminal = grammar.add_terminal_named(
         name,
         InputReference::from(input_index, &node_name),
@@ -416,51 +437,40 @@ fn load_nfa(input_index: usize, errors: &mut Vec<Error>, grammar: &Grammar, node
         hime_grammar::ID_TERMINAL_LITERAL_ANY => load_nfa_any(),
         hime_grammar::ID_TERMINAL_NAME => load_nfa_reference(input_index, errors, grammar, node),
         hime_grammar::ID_TERMINAL_OPERATOR_OPTIONAL => {
-            let inner = load_nfa(input_index, errors, grammar, node.children().at(0));
+            let inner = load_nfa(input_index, errors, grammar, node.child(0));
             inner.into_optional()
         }
         hime_grammar::ID_TERMINAL_OPERATOR_ZEROMORE => {
-            let inner = load_nfa(input_index, errors, grammar, node.children().at(0));
+            let inner = load_nfa(input_index, errors, grammar, node.child(0));
             inner.into_zero_or_more()
         }
         hime_grammar::ID_TERMINAL_OPERATOR_ONEMORE => {
-            let inner = load_nfa(input_index, errors, grammar, node.children().at(0));
+            let inner = load_nfa(input_index, errors, grammar, node.child(0));
             inner.into_one_or_more()
         }
         hime_grammar::ID_TERMINAL_OPERATOR_UNION => {
-            let left = load_nfa(input_index, errors, grammar, node.children().at(0));
-            let right = load_nfa(input_index, errors, grammar, node.children().at(1));
+            let left = load_nfa(input_index, errors, grammar, node.child(0));
+            let right = load_nfa(input_index, errors, grammar, node.child(1));
             left.into_union_with(right)
         }
         hime_grammar::ID_TERMINAL_OPERATOR_DIFFERENCE => {
-            let left = load_nfa(input_index, errors, grammar, node.children().at(0));
-            let right = load_nfa(input_index, errors, grammar, node.children().at(1));
+            let left = load_nfa(input_index, errors, grammar, node.child(0));
+            let right = load_nfa(input_index, errors, grammar, node.child(1));
             left.into_difference(right)
         }
         hime_grammar::ID_VIRTUAL_RANGE => {
-            let inner = load_nfa(input_index, errors, grammar, node.children().at(0));
-            let children = node.children();
-            let min = children
-                .at(1)
-                .get_value()
-                .unwrap()
-                .parse::<usize>()
-                .unwrap();
-            let max = if children.len() > 2 {
-                children
-                    .at(2)
-                    .get_value()
-                    .unwrap()
-                    .parse::<usize>()
-                    .unwrap()
+            let inner = load_nfa(input_index, errors, grammar, node.child(0));
+            let min = node.child(1).get_value().unwrap().parse::<usize>().unwrap();
+            let max = if node.children_count() > 2 {
+                node.child(2).get_value().unwrap().parse::<usize>().unwrap()
             } else {
                 min
             };
             inner.into_repeat_range(min, max)
         }
         hime_grammar::ID_VIRTUAL_CONCAT => {
-            let left = load_nfa(input_index, errors, grammar, node.children().at(0));
-            let right = load_nfa(input_index, errors, grammar, node.children().at(1));
+            let left = load_nfa(input_index, errors, grammar, node.child(0));
+            let right = load_nfa(input_index, errors, grammar, node.child(1));
             left.into_concatenation(right)
         }
         _ => NFA::new_minimal()
@@ -664,10 +674,9 @@ fn load_nfa_unicode_block(input_index: usize, errors: &mut Vec<Error>, node: Ast
 /// Builds a NFA from a unicode span
 fn load_nfa_unicode_span(input_index: usize, errors: &mut Vec<Error>, node: AstNode) -> NFA {
     // extract the value
-    let children = node.children();
-    let begin = children.at(0).get_value().unwrap();
+    let begin = node.child(0).get_value().unwrap();
     let begin = u32::from_str_radix(&begin[2..(begin.len() - 1)], 16).unwrap();
-    let end = children.at(1).get_value().unwrap();
+    let end = node.child(1).get_value().unwrap();
     let end = u32::from_str_radix(&end[2..(end.len() - 1)], 16).unwrap();
     if begin > end {
         errors.push(Error::InvalidCharacterSpan(InputReference::from(
@@ -752,32 +761,30 @@ fn add_unicode_span_to_nfa(nfa: &mut NFA, span: Span) {
 /// Loads the rules block of a grammar
 fn load_rules(input_index: usize, errors: &mut Vec<Error>, grammar: &mut Grammar, node: AstNode) {
     // load new variables for the rule's head
-    for child in node.children().iter() {
+    for child in node {
         let id = child.get_symbol().id;
         if id == hime_grammar::ID_VARIABLE_CF_RULE_SIMPLE {
-            let name = child.children().at(0).get_value().unwrap();
+            let name = child.child(0).get_value().unwrap();
             grammar.add_variable(&name);
         } else if id == hime_grammar::ID_VARIABLE_CF_RULE_TEMPLATE {
-            let name = child.children().at(0).get_value().unwrap();
+            let name = child.child(0).get_value().unwrap();
             let arguments: Vec<String> = child
-                .children()
-                .at(1)
-                .children()
-                .iter()
+                .child(1)
+                .into_iter()
                 .map(|n| n.get_value().unwrap())
                 .collect();
             grammar.add_template_rule(&name, arguments);
         }
     }
     // load template rules
-    for child in node.children().iter() {
+    for child in node {
         let id = child.get_symbol().id;
         if id == hime_grammar::ID_VARIABLE_CF_RULE_TEMPLATE {
             load_template_rule(input_index, errors, grammar, child);
         }
     }
     // load simple rules
-    for child in node.children().iter() {
+    for child in node {
         let id = child.get_symbol().id;
         if id == hime_grammar::ID_VARIABLE_CF_RULE_SIMPLE {
             load_simple_rule(input_index, errors, grammar, child);
@@ -792,15 +799,10 @@ fn load_simple_rule(
     grammar: &mut Grammar,
     node: AstNode
 ) {
-    let name = node.children().at(0).get_value().unwrap();
+    let name = node.child(0).get_value().unwrap();
     let head_sid = grammar.add_variable(&name).id;
-    let definitions = load_simple_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        head_sid,
-        node.children().at(1)
-    );
+    let definitions =
+        load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(1));
     let variable = grammar.add_variable(&name);
     for body in definitions.bodies.into_iter() {
         variable.add_rule(Rule::new(
@@ -861,15 +863,10 @@ fn load_simple_rule_context(
     head_sid: usize,
     node: AstNode
 ) -> BodySet<RuleBody> {
-    let name = node.children().at(0).get_value().unwrap();
+    let name = node.child(0).get_value().unwrap();
     let context_id = grammar.resolve_context(&name);
-    let definitions = load_simple_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        head_sid,
-        node.children().at(1)
-    );
+    let definitions =
+        load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(1));
     let sub_var = grammar.generate_variable(head_sid);
     for body in definitions.bodies.into_iter() {
         sub_var.add_rule(Rule::new(
@@ -895,13 +892,8 @@ fn load_simple_rule_sub_rule(
     head_sid: usize,
     node: AstNode
 ) -> BodySet<RuleBody> {
-    let definitions = load_simple_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        head_sid,
-        node.children().at(0)
-    );
+    let definitions =
+        load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(0));
     let sub_var = grammar.generate_variable(head_sid);
     for body in definitions.bodies.into_iter() {
         sub_var.add_rule(Rule::new(
@@ -927,13 +919,8 @@ fn load_simple_rule_optional(
     head_sid: usize,
     node: AstNode
 ) -> BodySet<RuleBody> {
-    let mut definitions = load_simple_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        head_sid,
-        node.children().at(0)
-    );
+    let mut definitions =
+        load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(0));
     definitions.bodies.push(RuleBody::empty());
     definitions
 }
@@ -947,13 +934,8 @@ fn load_simple_rule_zero_or_more(
     node: AstNode
 ) -> BodySet<RuleBody> {
     // get definitions
-    let set_inner = load_simple_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        head_sid,
-        node.children().at(0)
-    );
+    let set_inner =
+        load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(0));
     // generate the sub variables
     let sub_var = grammar.generate_variable(head_sid);
     // build all rules
@@ -1004,13 +986,8 @@ fn load_simple_rule_one_or_more(
     node: AstNode
 ) -> BodySet<RuleBody> {
     // get definitions
-    let set_inner = load_simple_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        head_sid,
-        node.children().at(0)
-    );
+    let set_inner =
+        load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(0));
     // generate the sub variables
     let sub_var = grammar.generate_variable(head_sid);
     // build all rules
@@ -1057,20 +1034,10 @@ fn load_simple_rule_union(
     head_sid: usize,
     node: AstNode
 ) -> BodySet<RuleBody> {
-    let set_left = load_simple_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        head_sid,
-        node.children().at(0)
-    );
-    let set_right = load_simple_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        head_sid,
-        node.children().at(1)
-    );
+    let set_left =
+        load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(0));
+    let set_right =
+        load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(1));
     BodySet::union(set_left, set_right)
 }
 
@@ -1082,13 +1049,8 @@ fn load_simple_rule_tree_action_promote(
     head_sid: usize,
     node: AstNode
 ) -> BodySet<RuleBody> {
-    let mut set_inner = load_simple_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        head_sid,
-        node.children().at(0)
-    );
+    let mut set_inner =
+        load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(0));
     set_inner.apply_action(TREE_ACTION_PROMOTE);
     set_inner
 }
@@ -1101,13 +1063,8 @@ fn load_simple_rule_tree_action_drop(
     head_sid: usize,
     node: AstNode
 ) -> BodySet<RuleBody> {
-    let mut set_inner = load_simple_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        head_sid,
-        node.children().at(0)
-    );
+    let mut set_inner =
+        load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(0));
     set_inner.apply_action(TREE_ACTION_DROP);
     set_inner
 }
@@ -1120,20 +1077,10 @@ fn load_simple_rule_concat(
     head_sid: usize,
     node: AstNode
 ) -> BodySet<RuleBody> {
-    let set_left = load_simple_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        head_sid,
-        node.children().at(0)
-    );
-    let set_right = load_simple_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        head_sid,
-        node.children().at(1)
-    );
+    let set_left =
+        load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(0));
+    let set_right =
+        load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(1));
     BodySet::product(set_left, set_right)
 }
 
@@ -1177,7 +1124,7 @@ fn load_simple_rule_atomic_action(
     grammar: &mut Grammar,
     node: AstNode
 ) -> BodySet<RuleBody> {
-    let name = node.children().at(0).get_value().unwrap();
+    let name = node.child(0).get_value().unwrap();
     let id = grammar.add_action(&name).id;
     BodySet {
         bodies: vec![RuleBody::single(
@@ -1193,7 +1140,7 @@ fn load_simple_rule_atomic_virtual(
     grammar: &mut Grammar,
     node: AstNode
 ) -> BodySet<RuleBody> {
-    let name = node.children().at(0).get_value().unwrap();
+    let name = node.child(0).get_value().unwrap();
     let name = replace_escapees(name[1..(name.len() - 1)].to_string());
     let id = grammar.add_virtual(&name).id;
     BodySet {
@@ -1211,7 +1158,7 @@ fn load_simple_rule_atomic_simple_ref(
     grammar: &mut Grammar,
     node: AstNode
 ) -> BodySet<RuleBody> {
-    let name = node.children().at(0).get_value().unwrap();
+    let name = node.child(0).get_value().unwrap();
     match grammar.get_symbol(&name) {
         Some(symbol_ref) => BodySet {
             bodies: vec![RuleBody::single(
@@ -1221,7 +1168,7 @@ fn load_simple_rule_atomic_simple_ref(
         },
         None => {
             errors.push(Error::SymbolNotFound(
-                InputReference::from(input_index, &node.children().at(0)),
+                InputReference::from(input_index, &node.child(0)),
                 name
             ));
             BodySet { bodies: Vec::new() }
@@ -1236,19 +1183,17 @@ fn load_simple_rule_atomic_template_ref(
     grammar: &mut Grammar,
     node: AstNode
 ) -> BodySet<RuleBody> {
-    let name = node.children().at(0).get_value().unwrap();
+    let name = node.child(0).get_value().unwrap();
     let arguments: Vec<SymbolRef> = node
-        .children()
-        .at(1)
-        .children()
-        .iter()
+        .child(1)
+        .into_iter()
         .map(|n| {
             load_simple_rule_atomic(input_index, errors, grammar, n).bodies[0].elements[0].symbol
         })
         .collect();
     let symbol_ref = match grammar.instantiate_template_rule(
         &name,
-        InputReference::from(input_index, &node.children().at(0)),
+        InputReference::from(input_index, &node.child(0)),
         arguments
     ) {
         Ok(symbol_ref) => symbol_ref,
@@ -1307,20 +1252,15 @@ fn load_template_rule(
     grammar: &mut Grammar,
     node: AstNode
 ) {
-    let name = node.children().at(0).get_value().unwrap();
+    let name = node.child(0).get_value().unwrap();
     let template_index = grammar
         .template_rules
         .iter()
         .position(|r| r.name == name)
         .unwrap();
     let parameters = grammar.template_rules[template_index].parameters.clone();
-    let definitions = load_template_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        &parameters,
-        node.children().at(2)
-    );
+    let definitions =
+        load_template_rule_definitions(input_index, errors, grammar, &parameters, node.child(2));
     grammar.template_rules[template_index].bodies = definitions.bodies;
 }
 
@@ -1373,15 +1313,10 @@ fn load_template_rule_context(
     parameters: &[String],
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
-    let name = node.children().at(0).get_value().unwrap();
+    let name = node.child(0).get_value().unwrap();
     let context_id = grammar.resolve_context(&name);
-    let definitions = load_template_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        parameters,
-        node.children().at(1)
-    );
+    let definitions =
+        load_template_rule_definitions(input_index, errors, grammar, parameters, node.child(1));
 
     let template_index = grammar.template_rules.len();
     let sub_template = grammar.generate_template_rule(parameters.to_vec());
@@ -1409,13 +1344,8 @@ fn load_template_rule_sub_rule(
     parameters: &[String],
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
-    let definitions = load_template_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        parameters,
-        node.children().at(0)
-    );
+    let definitions =
+        load_template_rule_definitions(input_index, errors, grammar, parameters, node.child(0));
     let template_index = grammar.template_rules.len();
     let sub_template = grammar.generate_template_rule(parameters.to_vec());
     sub_template.head_action = TREE_ACTION_REPLACE_BY_EPSILON;
@@ -1441,13 +1371,8 @@ fn load_template_rule_optional(
     parameters: &[String],
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
-    let mut definitions = load_template_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        parameters,
-        node.children().at(0)
-    );
+    let mut definitions =
+        load_template_rule_definitions(input_index, errors, grammar, parameters, node.child(0));
     definitions.bodies.push(TemplateRuleBody::empty());
     definitions
 }
@@ -1461,13 +1386,8 @@ fn load_template_rule_zero_or_more(
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     // get definitions
-    let set_inner = load_template_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        parameters,
-        node.children().at(0)
-    );
+    let set_inner =
+        load_template_rule_definitions(input_index, errors, grammar, parameters, node.child(0));
     // generate the sub variables
     let template_index = grammar.template_rules.len();
     let sub_template = grammar.generate_template_rule(parameters.to_vec());
@@ -1520,13 +1440,8 @@ fn load_template_rule_one_or_more(
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     // get definitions
-    let set_inner = load_template_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        parameters,
-        node.children().at(0)
-    );
+    let set_inner =
+        load_template_rule_definitions(input_index, errors, grammar, parameters, node.child(0));
     // generate the sub variables
     let template_index = grammar.template_rules.len();
     let sub_template = grammar.generate_template_rule(parameters.to_vec());
@@ -1575,20 +1490,10 @@ fn load_template_rule_union(
     parameters: &[String],
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
-    let set_left = load_template_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        parameters,
-        node.children().at(0)
-    );
-    let set_right = load_template_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        parameters,
-        node.children().at(1)
-    );
+    let set_left =
+        load_template_rule_definitions(input_index, errors, grammar, parameters, node.child(0));
+    let set_right =
+        load_template_rule_definitions(input_index, errors, grammar, parameters, node.child(1));
     BodySet::union(set_left, set_right)
 }
 
@@ -1600,13 +1505,8 @@ fn load_template_rule_tree_action_promote(
     parameters: &[String],
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
-    let mut set_inner = load_template_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        parameters,
-        node.children().at(0)
-    );
+    let mut set_inner =
+        load_template_rule_definitions(input_index, errors, grammar, parameters, node.child(0));
     set_inner.apply_action(TREE_ACTION_PROMOTE);
     set_inner
 }
@@ -1619,13 +1519,8 @@ fn load_template_rule_tree_action_drop(
     parameters: &[String],
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
-    let mut set_inner = load_template_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        parameters,
-        node.children().at(0)
-    );
+    let mut set_inner =
+        load_template_rule_definitions(input_index, errors, grammar, parameters, node.child(0));
     set_inner.apply_action(TREE_ACTION_DROP);
     set_inner
 }
@@ -1638,20 +1533,10 @@ fn load_template_rule_concat(
     parameters: &[String],
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
-    let set_left = load_template_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        parameters,
-        node.children().at(0)
-    );
-    let set_right = load_template_rule_definitions(
-        input_index,
-        errors,
-        grammar,
-        parameters,
-        node.children().at(1)
-    );
+    let set_left =
+        load_template_rule_definitions(input_index, errors, grammar, parameters, node.child(0));
+    let set_right =
+        load_template_rule_definitions(input_index, errors, grammar, parameters, node.child(1));
     BodySet::product(set_left, set_right)
 }
 
@@ -1696,7 +1581,7 @@ fn load_template_rule_atomic_action(
     grammar: &mut Grammar,
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
-    let name = node.children().at(0).get_value().unwrap();
+    let name = node.child(0).get_value().unwrap();
     let id = grammar.add_action(&name).id;
     BodySet {
         bodies: vec![TemplateRuleBody::single(
@@ -1712,7 +1597,7 @@ fn load_template_rule_atomic_virtual(
     grammar: &mut Grammar,
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
-    let name = node.children().at(0).get_value().unwrap();
+    let name = node.child(0).get_value().unwrap();
     let name = replace_escapees(name[1..(name.len() - 1)].to_string());
     let id = grammar.add_virtual(&name).id;
     BodySet {
@@ -1731,7 +1616,7 @@ fn load_template_rule_atomic_simple_ref(
     parameters: &[String],
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
-    let name = node.children().at(0).get_value().unwrap();
+    let name = node.child(0).get_value().unwrap();
     if let Some(index) = parameters.iter().position(|p| p == &name) {
         return BodySet {
             bodies: vec![TemplateRuleBody::single(
@@ -1749,7 +1634,7 @@ fn load_template_rule_atomic_simple_ref(
         },
         None => {
             errors.push(Error::SymbolNotFound(
-                InputReference::from(input_index, &node.children().at(0)),
+                InputReference::from(input_index, &node.child(0)),
                 name
             ));
             BodySet { bodies: Vec::new() }
@@ -1765,7 +1650,7 @@ fn load_template_rule_atomic_template_ref(
     parameters: &[String],
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
-    let name = node.children().at(0).get_value().unwrap();
+    let name = node.child(0).get_value().unwrap();
     let template_index = match grammar
         .template_rules
         .iter()
@@ -1774,17 +1659,15 @@ fn load_template_rule_atomic_template_ref(
         Some(index) => index,
         None => {
             errors.push(Error::TemplateRuleNotFound(
-                InputReference::from(input_index, &node.children().at(0)),
+                InputReference::from(input_index, &node.child(0)),
                 String::from("Undefined template rule")
             ));
             return BodySet { bodies: Vec::new() };
         }
     };
     let arguments: Vec<TemplateRuleSymbol> = node
-        .children()
-        .at(1)
-        .children()
-        .iter()
+        .child(1)
+        .into_iter()
         .map(|n| {
             let mut definitions =
                 load_template_rule_atomic(input_index, errors, grammar, parameters, n);
@@ -1801,7 +1684,7 @@ fn load_template_rule_atomic_template_ref(
     let expected_count = grammar.template_rules[template_index].parameters.len();
     if arguments.len() != expected_count {
         errors.push(Error::TemplateRuleWrongNumberOfArgs(
-            InputReference::from(input_index, &node.children().at(0)),
+            InputReference::from(input_index, &node.child(0)),
             expected_count,
             arguments.len()
         ));

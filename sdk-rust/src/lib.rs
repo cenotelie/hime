@@ -544,17 +544,14 @@ impl<'a> CompilationTask<'a> {
                 }
             }
         }
-        let mut errors = Vec::new();
-        // prepare the grammars
-        for (index, grammar) in data.grammars.iter_mut().enumerate() {
-            if let Err(mut errs) = output::execute_for_grammar(self, grammar, index) {
-                errors.append(&mut errs);
-            }
+        if let Err(errors) = self.prepare_grammars(&mut data.grammars) {
+            return Err(Errors::from(data, errors));
         }
+        let mut errors = Vec::new();
         // output assemblies
-        self.execute_output_assembly(&data, Runtime::Net, &mut errors);
-        self.execute_output_assembly(&data, Runtime::Java, &mut errors);
-        self.execute_output_assembly(&data, Runtime::Rust, &mut errors);
+        self.execute_output_assembly(&data.grammars, Runtime::Net, &mut errors);
+        self.execute_output_assembly(&data.grammars, Runtime::Java, &mut errors);
+        self.execute_output_assembly(&data.grammars, Runtime::Rust, &mut errors);
         if !errors.is_empty() {
             Err(Errors::from(data, errors))
         } else {
@@ -576,10 +573,26 @@ impl<'a> CompilationTask<'a> {
         output::build_in_memory_grammar(self, grammar, grammar_index)
     }
 
+    /// Prepare grammars
+    pub fn prepare_grammars<'g>(&self, grammars: &'g mut [Grammar]) -> Result<(), Vec<Error>> {
+        let mut errors = Vec::new();
+        // prepare the grammars
+        for (index, grammar) in grammars.iter_mut().enumerate() {
+            if let Err(mut errs) = output::execute_for_grammar(self, grammar, index) {
+                errors.append(&mut errs);
+            }
+        }
+        if errors.is_empty() {
+            Ok(())
+        } else {
+            Err(errors)
+        }
+    }
+
     /// Build an assembly for the relevant grammars
-    fn execute_output_assembly(&self, data: &LoadedData, target: Runtime, errors: &mut Vec<Error>) {
+    fn execute_output_assembly<'g>(&self, grammars: &'g [Grammar], target: Runtime, errors: &mut Vec<Error>) {
         // aggregate all targets for assembly
-        let units = self.gather_grammars_for_assembly(data, target, errors);
+        let units = self.gather_grammars_for_assembly(grammars, target, errors);
         if units.is_empty() {
             return;
         }
@@ -592,13 +605,13 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Gather the grammars for build an assembly for a target
-    fn gather_grammars_for_assembly<'b>(
+    fn gather_grammars_for_assembly<'g>(
         &self,
-        data: &'b LoadedData,
+        grammars: &'g [Grammar],
         target: Runtime,
         errors: &mut Vec<Error>
-    ) -> Vec<(usize, &'b Grammar)> {
-        data.grammars
+    ) -> Vec<(usize, &'g Grammar)> {
+        grammars
             .iter()
             .enumerate()
             .filter(|(index, grammar)| {

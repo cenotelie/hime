@@ -251,7 +251,7 @@ impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
     }
 
     /// Gets the parent of the specified node, if any
-    pub fn find_parent_of(&self, node: usize) -> Option<AstNode> {
+    pub fn find_parent_of<'x>(&'x self, node: usize) -> Option<AstNode<'a, 'b, 'c, 'x>> {
         // self.data.root?;
         self.data
             .nodes
@@ -383,16 +383,30 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> AstNode<'a, 'b, 'c, 'd> {
     }
 
     /// Gets the parent of this node, if any
-    pub fn parent(&self) -> Option<AstNode> {
+    pub fn parent(&self) -> Option<AstNode<'a, 'b, 'c, 'd>> {
         self.tree.find_parent_of(self.index)
     }
 
     /// Gets the children of this node
-    pub fn children(&self) -> AstFamily {
+    pub fn children(&self) -> AstFamily<'a, 'b, 'c, 'd> {
         AstFamily {
             tree: self.tree,
             parent: self.index
         }
+    }
+
+    /// Gets the i-th child
+    pub fn child(&self, index: usize) -> AstNode<'a, 'b, 'c, 'd> {
+        let cell = self.tree.data.nodes[self.index];
+        AstNode {
+            tree: self.tree,
+            index: cell.first as usize + index
+        }
+    }
+
+    /// Gets the number of children
+    pub fn children_count(&self) -> usize {
+        self.tree.data.nodes[self.index].count as usize
     }
 
     /// Gets the total span for the sub-tree at this node
