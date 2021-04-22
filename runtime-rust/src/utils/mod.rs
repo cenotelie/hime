@@ -17,6 +17,8 @@
 
 //! Module for utility APIs
 
+use std::ops::{Deref, DerefMut};
+
 pub mod biglist;
 pub mod bin;
 
@@ -28,20 +30,22 @@ pub enum EitherMut<'a, T: 'a> {
     Mutable(&'a mut T)
 }
 
-impl<'a, T: 'a> EitherMut<'a, T> {
-    /// Gets a mutable reference
-    pub fn get_mut(&mut self) -> Option<&mut T> {
-        match *self {
-            EitherMut::Mutable(ref mut data) => Some(data),
-            EitherMut::Immutable(ref _data) => None
+impl<'a, T: 'a> Deref for EitherMut<'a, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        match self {
+            EitherMut::Mutable(data) => data,
+            EitherMut::Immutable(data) => data
         }
     }
+}
 
-    /// Get an immutable reference
-    pub fn get(&self) -> &T {
-        match *self {
-            EitherMut::Mutable(ref data) => data,
-            EitherMut::Immutable(ref data) => data
+impl<'a, T: 'a> DerefMut for EitherMut<'a, T> {
+    fn deref_mut(&mut self) -> &mut T {
+        match self {
+            EitherMut::Mutable(data) => data,
+            EitherMut::Immutable(_) => panic!("Expected a mutable reference")
         }
     }
 }

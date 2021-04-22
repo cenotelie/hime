@@ -101,7 +101,7 @@ pub struct TokenRepositoryIterator<'a: 'b + 'd, 'b: 'd, 'c, 'd> {
 impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> Iterator for TokenRepositoryIterator<'a, 'b, 'c, 'd> {
     type Item = Token<'a, 'b, 'c, 'd>;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index >= self.repository.data.get().cells.len() {
+        if self.index >= self.repository.data.cells.len() {
             None
         } else {
             let result = Token {
@@ -151,24 +151,20 @@ impl<'a: 'b, 'b, 'c> TokenRepository<'a, 'b, 'c> {
 
     /// Registers a new token in this repository
     pub fn add(&mut self, terminal: usize, index: usize, length: usize) -> usize {
-        let x = self.data.get_mut();
-        match x {
-            None => panic!("Got a mutable token repository with an immutable implementation"),
-            Some(data) => data.cells.push(TokenRepositoryCell {
-                terminal,
-                span: TextSpan { index, length }
-            })
-        }
+        self.data.cells.push(TokenRepositoryCell {
+            terminal,
+            span: TextSpan { index, length }
+        })
     }
 
     /// Gets the number of tokens in this repository
     pub fn get_tokens_count(&self) -> usize {
-        self.data.get().cells.len()
+        self.data.cells.len()
     }
 
     /// Gets the terminal's identifier for the i-th token
     pub fn get_symbol_id_for(&self, index: usize) -> u32 {
-        self.terminals[self.data.get().cells[index].terminal].id
+        self.terminals[self.data.cells[index].terminal].id
     }
 
     /// Gets the i-th token
@@ -181,13 +177,12 @@ impl<'a: 'b, 'b, 'c> TokenRepository<'a, 'b, 'c> {
 
     /// Gets the number of tokens
     pub fn get_count(&self) -> usize {
-        self.data.get().cells.len()
+        self.data.cells.len()
     }
 
     /// Gets the token (if any) that contains the specified index in the input text
     pub fn find_token_at(&self, index: usize) -> Option<Token> {
-        let data = self.data.get();
-        let count = data.cells.len();
+        let count = self.data.cells.len();
         if count == 0 {
             return None;
         }
@@ -195,7 +190,7 @@ impl<'a: 'b, 'b, 'c> TokenRepository<'a, 'b, 'c> {
         let mut r = count - 1;
         while l <= r {
             let m = (l + r) / 2;
-            let cell = data.cells[m];
+            let cell = self.data.cells[m];
             if index < cell.span.index {
                 // look on the left
                 r = m - 1;
@@ -220,26 +215,26 @@ impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> SemanticElementTrait<'a> for Token<'a, 'b, 'c,
         Some(
             self.repository
                 .text
-                .get_position_at(self.repository.data.get().cells[self.index].span.index)
+                .get_position_at(self.repository.data.cells[self.index].span.index)
         )
     }
 
     /// Gets the span in the input text of this element
     fn get_span(&self) -> Option<TextSpan> {
-        Some(self.repository.data.get().cells[self.index].span)
+        Some(self.repository.data.cells[self.index].span)
     }
 
     /// Gets the context of this element in the input
     fn get_context(&self) -> Option<TextContext> {
         Some(self.repository.text.get_context_for(
             self.get_position().unwrap(),
-            self.repository.data.get().cells[self.index].span.length
+            self.repository.data.cells[self.index].span.length
         ))
     }
 
     /// Gets the grammar symbol associated to this element
     fn get_symbol(&self) -> Symbol<'a> {
-        self.repository.terminals[self.repository.data.get().cells[self.index].terminal]
+        self.repository.terminals[self.repository.data.cells[self.index].terminal]
     }
 
     /// Gets the value of this element, if any
@@ -247,7 +242,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> SemanticElementTrait<'a> for Token<'a, 'b, 'c,
         Some(
             self.repository
                 .text
-                .get_value_for(self.repository.data.get().cells[self.index].span)
+                .get_value_for(self.repository.data.cells[self.index].span)
         )
     }
 }

@@ -797,19 +797,12 @@ impl<'a: 'b, 'b, 'c> SemanticBody for SPPFBuilder<'a, 'b, 'c> {
         let reference = reduction.cache[reduction.handle_indices[index]];
         let node = self.sppf.get_node(reference.node_id as usize).as_normal();
         let label = node.versions[reference.version as usize].label;
-        match label.get_type() {
-            TableType::Token => SemanticElement::Token(
-                self.lexer
-                    .get_data()
-                    .repository
-                    .get_token(label.get_index())
-            ),
-            TableType::Variable => {
-                SemanticElement::Variable(self.result.get_variables()[label.get_index()])
+        match label.table_type() {
+            TableType::Token => {
+                SemanticElement::Token(self.lexer.get_data().repository.get_token(label.index()))
             }
-            TableType::Virtual => {
-                SemanticElement::Virtual(self.result.get_virtuals()[label.get_index()])
-            }
+            TableType::Variable => SemanticElement::Variable(self.result.variables[label.index()]),
+            TableType::Virtual => SemanticElement::Virtual(self.result.virtuals[label.index()]),
             TableType::None => {
                 SemanticElement::Terminal(self.lexer.get_data().repository.terminals[0])
             }
@@ -835,11 +828,6 @@ impl<'a: 'b, 'b, 'c> SPPFBuilder<'a, 'b, 'c> {
             reduction: None,
             result
         }
-    }
-
-    /// Gets the grammar variables for this AST
-    pub fn get_variables(&self) -> &'b [Symbol<'a>] {
-        self.result.get_variables()
     }
 
     /// Clears the current history
@@ -1616,7 +1604,7 @@ impl<'a: 'b, 'b, 'c> RNGLRParser<'a, 'b, 'c> {
                 next_token: None,
                 reductions: VecDeque::new(),
                 shifts: VecDeque::new(),
-                variables: ast.get_variables(),
+                variables: ast.variables,
                 actions
             },
             builder: SPPFBuilder::new(lexer, ast),
@@ -1753,7 +1741,7 @@ impl<'a: 'b, 'b, 'c> RNGLRParser<'a, 'b, 'c> {
         first: GSSLabel,
         path: &GSSPath
     ) -> usize {
-        let variable = builder.get_variables()[production.head];
+        let variable = builder.result.variables[production.head];
         builder.reduction_prepare(first, path, production.reduction_length);
         let mut i = 0;
         while i < production.bytecode.len() {

@@ -18,6 +18,7 @@
 //! Module for Abstract-Syntax Trees
 
 use std::fmt::{Display, Error, Formatter};
+use std::iter::FusedIterator;
 
 use serde::ser::{Serialize, SerializeSeq, SerializeStruct, Serializer};
 
@@ -28,7 +29,7 @@ use crate::utils::biglist::BigList;
 use crate::utils::EitherMut;
 
 /// Represents a type of symbol table
-#[derive(Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum TableType {
     /// Marks as other (used for SPPF nodes)
     None = 0,
@@ -67,12 +68,12 @@ impl TableElemRef {
     }
 
     /// Gets the element's type
-    pub fn get_type(self) -> TableType {
+    pub fn table_type(self) -> TableType {
         TableType::from(self.data >> 30)
     }
 
     /// Gets the element's index in its respective table
-    pub fn get_index(self) -> usize {
+    pub fn index(self) -> usize {
         self.data & 0x3FFF_FFFF
     }
 }
@@ -146,9 +147,9 @@ pub struct Ast<'a: 'b, 'b, 'c> {
     /// The table of tokens
     tokens: Option<TokenRepository<'a, 'b, 'c>>,
     /// The table of variables
-    variables: &'b [Symbol<'a>],
+    pub variables: &'b [Symbol<'a>],
     /// The table of virtuals
-    virtuals: &'b [Symbol<'a>],
+    pub virtuals: &'b [Symbol<'a>],
     /// The data of the implementation
     data: EitherMut<'c, AstImpl>
 }
@@ -185,37 +186,26 @@ impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
 
     /// Gets the i-th token in the associated repository
     fn get_token<'x>(&'x self, index: usize) -> Token<'a, 'b, 'c, 'x> {
-        match self.tokens {
-            None => panic!("Missing token repository"),
-            Some(ref x) => x.get_token(index)
-        }
-    }
-
-    /// Gets the grammar variables for this AST
-    pub fn get_variables(&self) -> &'b [Symbol<'a>] {
-        &self.variables
-    }
-
-    /// Gets the grammar virtuals for this AST
-    pub fn get_virtuals(&self) -> &'b [Symbol<'a>] {
-        &self.virtuals
+        self.tokens
+            .as_ref()
+            .expect("Missing token repository")
+            .get_token(index)
     }
 
     /// Gets whether a root has been defined for this AST
     pub fn has_root(&self) -> bool {
-        self.data.get().has_root()
+        self.data.has_root()
     }
 
     /// Gets the root node of this tree
     pub fn get_root(&self) -> AstNode {
-        let data = self.data.get();
-        match data.root {
-            None => panic!("No root defined!"),
-            Some(x) => AstNode {
+        self.data
+            .root
+            .map(|x| AstNode {
                 tree: self,
                 index: x
-            }
-        }
+            })
+            .expect("No root defined!")
     }
 
     /// Gets a specific node in this tree
@@ -228,27 +218,25 @@ impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
 
     /// Gets the AST node (if any) that has the specified token as label
     pub fn find_node_for(&self, token: &Token) -> Option<AstNode> {
-        let data = self.data.get();
-        for i in 0..data.nodes.len() {
-            let node = data.nodes[i];
-            if node.label.get_type() == TableType::Token && node.label.get_index() == token.index {
-                return Some(AstNode {
-                    tree: self,
-                    index: i
-                });
-            }
-        }
-        None
+        self.data
+            .nodes
+            .iter()
+            .enumerate()
+            .find(|(_, node)| {
+                node.label.table_type() == TableType::Token && node.label.index() == token.index
+            })
+            .map(|(index, _)| AstNode { tree: self, index })
     }
 
     /// Gets the AST node (if any) that has
     /// a token label that contains the specified index in the input text
     pub fn find_node_at_index(&self, index: usize) -> Option<AstNode> {
-        let token = self.tokens.as_ref().unwrap().find_token_at(index);
-        match token {
-            None => None,
-            Some(token) => self.find_node_for(&token)
-        }
+        self.tokens
+            .as_ref()
+            .unwrap()
+            .find_token_at(index)
+            .map(|token| self.find_node_for(&token))
+            .flatten()
     }
 
     /// Gets the AST node (if any) that has
@@ -256,30 +244,25 @@ impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
     pub fn find_node_at_position(&self, position: TextPosition) -> Option<AstNode> {
         let tokens = self.tokens.as_ref().unwrap();
         let index = tokens.text.get_line_index(position.line) + position.column - 1;
-        let token = tokens.find_token_at(index);
-        match token {
-            None => None,
-            Some(token) => self.find_node_for(&token)
-        }
+        tokens
+            .find_token_at(index)
+            .map(|token| self.find_node_for(&token))
+            .flatten()
     }
 
     /// Gets the parent of the specified node, if any
     pub fn find_parent_of(&self, node: usize) -> Option<AstNode> {
-        let data = self.data.get();
-        data.root?;
-        for i in 0..data.nodes.len() {
-            let candidate = data.nodes[i];
-            if candidate.count > 0
-                && node >= candidate.first as usize
-                && node < (candidate.first + candidate.count) as usize
-            {
-                return Some(AstNode {
-                    tree: self,
-                    index: i
-                });
-            }
-        }
-        None
+        // self.data.root?;
+        self.data
+            .nodes
+            .iter()
+            .enumerate()
+            .find(|(_, candidate)| {
+                candidate.count > 0
+                    && node >= candidate.first as usize
+                    && node < (candidate.first + candidate.count) as usize
+            })
+            .map(|(index, _)| AstNode { tree: self, index })
     }
 
     /// Gets the total span of sub-tree given its root and its position
@@ -321,24 +304,23 @@ impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
 
     /// Traverses the AST from the specified node
     fn traverse<F: FnMut(&AstImpl, usize)>(&self, from: usize, mut action: F) {
-        let data = self.data.get();
         let mut stack = vec![from];
         while !stack.is_empty() {
             let current = stack.pop().unwrap();
-            let cell = data.nodes[current];
+            let cell = self.data.nodes[current];
             for i in (0..cell.count).rev() {
                 stack.push((cell.first + i) as usize);
             }
-            action(data, current);
+            action(&self.data, current);
         }
     }
 
     /// Get the span of the symbol on a node
     fn get_span_at(&self, data: &AstImpl, node: usize) -> Option<TextSpan> {
         let cell = data.nodes[node];
-        match cell.label.get_type() {
+        match cell.label.table_type() {
             TableType::Token => {
-                let token = self.get_token(cell.label.get_index());
+                let token = self.get_token(cell.label.index());
                 token.get_span()
             }
             _ => None
@@ -348,9 +330,9 @@ impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
     /// Get the position of the symbol on a node
     fn get_position_at(&self, data: &AstImpl, node: usize) -> Option<TextPosition> {
         let cell = data.nodes[node];
-        match cell.label.get_type() {
+        match cell.label.table_type() {
             TableType::Token => {
-                let token = self.get_token(cell.label.get_index());
+                let token = self.get_token(cell.label.index());
                 token.get_position()
             }
             _ => None
@@ -362,30 +344,22 @@ impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
         if count == 0 {
             0
         } else {
-            match self.data.get_mut() {
-                None => panic!("Got a mutable AST with an immutable implementation"),
-                Some(data) => {
-                    let result = data.nodes.push(nodes[index]);
-                    for i in 1..count {
-                        data.nodes.push(nodes[index + i]);
-                    }
-                    result
-                }
+            let result = self.data.nodes.push(nodes[index]);
+            for i in 1..count {
+                self.data.nodes.push(nodes[index + i]);
             }
+            result
         }
     }
 
     /// Stores the root of this tree
     pub fn store_root(&mut self, node: AstCell) {
-        match self.data.get_mut() {
-            None => panic!("Got a mutable AST with an immutable implementation"),
-            Some(data) => data.root = Some(data.nodes.push(node))
-        }
+        self.data.root = Some(self.data.nodes.push(node));
     }
 }
 
 /// Represents a node in an Abstract Syntax Tree
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct AstNode<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> {
     /// The original parse tree
     tree: &'d Ast<'a, 'b, 'c>,
@@ -401,9 +375,9 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> AstNode<'a, 'b, 'c, 'd> {
 
     /// Gets the index of the token born by this node, if any
     pub fn get_token_index(&self) -> Option<usize> {
-        let cell = self.tree.data.get().nodes[self.index];
-        match cell.label.get_type() {
-            TableType::Token => Some(cell.label.get_index()),
+        let cell = self.tree.data.nodes[self.index];
+        match cell.label.table_type() {
+            TableType::Token => Some(cell.label.index()),
             _ => None
         }
     }
@@ -435,20 +409,20 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> AstNode<'a, 'b, 'c, 'd> {
 impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> SemanticElementTrait<'a> for AstNode<'a, 'b, 'c, 'd> {
     /// Gets the position in the input text of this element
     fn get_position(&self) -> Option<TextPosition> {
-        self.tree.get_position_at(self.tree.data.get(), self.index)
+        self.tree.get_position_at(&self.tree.data, self.index)
     }
 
     /// Gets the span in the input text of this element
     fn get_span(&self) -> Option<TextSpan> {
-        self.tree.get_span_at(self.tree.data.get(), self.index)
+        self.tree.get_span_at(&self.tree.data, self.index)
     }
 
     /// Gets the context of this element in the input
     fn get_context(&self) -> Option<TextContext> {
-        let cell = self.tree.data.get().nodes[self.index];
-        match cell.label.get_type() {
+        let cell = self.tree.data.nodes[self.index];
+        match cell.label.table_type() {
             TableType::Token => {
-                let token = self.tree.get_token(cell.label.get_index());
+                let token = self.tree.get_token(cell.label.index());
                 token.get_context()
             }
             _ => None
@@ -457,14 +431,14 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> SemanticElementTrait<'a> for AstNode<'a, '
 
     /// Gets the grammar symbol associated to this element
     fn get_symbol(&self) -> Symbol<'a> {
-        let cell = self.tree.data.get().nodes[self.index];
-        match cell.label.get_type() {
+        let cell = self.tree.data.nodes[self.index];
+        match cell.label.table_type() {
             TableType::Token => {
-                let token = self.tree.get_token(cell.label.get_index());
+                let token = self.tree.get_token(cell.label.index());
                 token.get_symbol()
             }
-            TableType::Variable => self.tree.variables[cell.label.get_index()],
-            TableType::Virtual => self.tree.virtuals[cell.label.get_index()],
+            TableType::Variable => self.tree.variables[cell.label.index()],
+            TableType::Virtual => self.tree.virtuals[cell.label.index()],
             TableType::None => {
                 match self.tree.tokens {
                     None => panic!("Missing token repository"),
@@ -476,10 +450,10 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> SemanticElementTrait<'a> for AstNode<'a, '
 
     /// Gets the value of this element, if any
     fn get_value(&self) -> Option<String> {
-        let cell = self.tree.data.get().nodes[self.index];
-        match cell.label.get_type() {
+        let cell = self.tree.data.nodes[self.index];
+        match cell.label.table_type() {
             TableType::Token => {
-                let token = self.tree.get_token(cell.label.get_index());
+                let token = self.tree.get_token(cell.label.index());
                 token.get_value()
             }
             _ => None
@@ -487,22 +461,46 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> SemanticElementTrait<'a> for AstNode<'a, '
     }
 }
 
+impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> PartialEq<AstNode<'a, 'b, 'c, 'd>>
+    for AstNode<'a, 'b, 'c, 'd>
+{
+    fn eq(&self, other: &AstNode<'a, 'b, 'c, 'd>) -> bool {
+        self.index == other.index
+    }
+}
+
+impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Eq for AstNode<'a, 'b, 'c, 'd> {}
+
+impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> IntoIterator for AstNode<'a, 'b, 'c, 'd> {
+    type Item = AstNode<'a, 'b, 'c, 'd>;
+    type IntoIter = AstFamilyIterator<'a, 'b, 'c, 'd>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        let cell = self.tree.data.nodes[self.index];
+        AstFamilyIterator {
+            tree: self.tree,
+            current: cell.first as usize,
+            end: (cell.first + cell.count) as usize
+        }
+    }
+}
+
 impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Display for AstNode<'a, 'b, 'c, 'd> {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        let cell = self.tree.data.get().nodes[self.index];
-        match cell.label.get_type() {
+        let cell = self.tree.data.nodes[self.index];
+        match cell.label.table_type() {
             TableType::Token => {
-                let token = self.tree.get_token(cell.label.get_index());
+                let token = self.tree.get_token(cell.label.index());
                 let symbol = token.get_symbol();
                 let value = token.get_value();
                 write!(f, "{} = {}", symbol.name, value.unwrap())
             }
             TableType::Variable => {
-                let symbol = self.tree.variables[cell.label.get_index()];
+                let symbol = self.tree.variables[cell.label.index()];
                 write!(f, "{}", symbol.name)
             }
             TableType::Virtual => {
-                let symbol = self.tree.virtuals[cell.label.get_index()];
+                let symbol = self.tree.virtuals[cell.label.index()];
                 write!(f, "{}", symbol.name)
             }
             TableType::None => match self.tree.tokens {
@@ -565,22 +563,59 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Iterator for AstFamilyIterator<'a, 'b, 'c,
             Some(result)
         }
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let c = self.end - self.current;
+        (c, Some(c))
+    }
+}
+
+impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> DoubleEndedIterator for AstFamilyIterator<'a, 'b, 'c, 'd> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        if self.current >= self.end {
+            None
+        } else {
+            let result = AstNode {
+                tree: self.tree,
+                index: self.end - 1
+            };
+            self.end -= 1;
+            Some(result)
+        }
+    }
+}
+
+impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> ExactSizeIterator for AstFamilyIterator<'a, 'b, 'c, 'd> {}
+impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> FusedIterator for AstFamilyIterator<'a, 'b, 'c, 'd> {}
+
+impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> IntoIterator for AstFamily<'a, 'b, 'c, 'd> {
+    type Item = AstNode<'a, 'b, 'c, 'd>;
+    type IntoIter = AstFamilyIterator<'a, 'b, 'c, 'd>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        let cell = self.tree.data.nodes[self.parent];
+        AstFamilyIterator {
+            tree: self.tree,
+            current: cell.first as usize,
+            end: (cell.first + cell.count) as usize
+        }
+    }
 }
 
 impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> AstFamily<'a, 'b, 'c, 'd> {
     /// Gets whether the family is empty
     pub fn is_empty(&self) -> bool {
-        self.tree.data.get().nodes[self.parent].count == 0
+        self.tree.data.nodes[self.parent].count == 0
     }
 
     /// Gets the number of children in this family
     pub fn len(&self) -> usize {
-        self.tree.data.get().nodes[self.parent].count as usize
+        self.tree.data.nodes[self.parent].count as usize
     }
 
     /// Gets the i-th child
     pub fn at(&self, index: usize) -> AstNode {
-        let cell = self.tree.data.get().nodes[self.parent];
+        let cell = self.tree.data.nodes[self.parent];
         AstNode {
             tree: self.tree,
             index: cell.first as usize + index
@@ -589,7 +624,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> AstFamily<'a, 'b, 'c, 'd> {
 
     /// Gets an iterator over this family
     pub fn iter(&self) -> AstFamilyIterator {
-        let cell = self.tree.data.get().nodes[self.parent];
+        let cell = self.tree.data.nodes[self.parent];
         AstFamilyIterator {
             tree: self.tree,
             current: cell.first as usize,

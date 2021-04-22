@@ -159,18 +159,15 @@ impl<'a: 'b, 'b, 'c> SemanticBody for LRkAstBuilder<'a, 'b, 'c> {
             None => panic!("Not in a reduction"),
             Some(ref data) => {
                 let label = data.cache.get_label_at(self.handle[index]);
-                match label.get_type() {
+                match label.table_type() {
                     TableType::Token => SemanticElement::Token(
-                        self.lexer
-                            .get_data()
-                            .repository
-                            .get_token(label.get_index())
+                        self.lexer.get_data().repository.get_token(label.index())
                     ),
                     TableType::Variable => {
-                        SemanticElement::Variable(self.result.get_variables()[label.get_index()])
+                        SemanticElement::Variable(self.result.variables[label.index()])
                     }
                     TableType::Virtual => {
-                        SemanticElement::Virtual(self.result.get_virtuals()[label.get_index()])
+                        SemanticElement::Virtual(self.result.virtuals[label.index()])
                     }
                     TableType::None => {
                         SemanticElement::Terminal(self.lexer.get_data().repository.terminals[0])
@@ -198,11 +195,6 @@ impl<'a: 'b, 'b, 'c> LRkAstBuilder<'a, 'b, 'c> {
             handle: Vec::new(),
             reduction: None
         }
-    }
-
-    /// Gets the grammar variables for this AST
-    pub fn get_variables(&self) -> &'b [Symbol<'a>] {
-        self.result.get_variables()
     }
 
     /// Push a token onto the stack
@@ -561,7 +553,7 @@ impl<'a: 'b, 'b, 'c> LRkParserData<'a, 'b, 'c> {
             stack.truncate(length - production.reduction_length);
             let action = self.automaton.get_action(
                 stack[stack.len() - 1].state,
-                builder.get_variables()[production.head].id
+                builder.result.variables[production.head].id
             );
             stack.push(LRkHead {
                 state: u32::from(action.get_data()),
@@ -576,7 +568,7 @@ impl<'a: 'b, 'b, 'c> LRkParserData<'a, 'b, 'c> {
         builder: &mut LRkAstBuilder<'a, 'b, 'c>,
         actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
     ) -> Symbol<'a> {
-        let variable = builder.get_variables()[production.head];
+        let variable = builder.result.variables[production.head];
         builder.reduction_prepare(
             production.head,
             production.reduction_length,
@@ -632,7 +624,7 @@ impl<'a: 'b, 'b, 'c> LRkParser<'a, 'b, 'c> {
             data: LRkParserData {
                 automaton,
                 stack,
-                variables: ast.get_variables(),
+                variables: ast.variables,
                 actions
             },
             builder: LRkAstBuilder::<'a, 'b, 'c>::new(lexer, ast)
