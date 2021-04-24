@@ -231,7 +231,7 @@ impl<'a> Input<'a> {
         }
     }
 
-    ///
+    /// Open a stream for the input
     pub fn open(&self) -> Result<Box<dyn Read + 'a>, std::io::Error> {
         match self {
             Input::FileName(file_name) => Ok(Box::new(fs::File::open(file_name)?)),
@@ -250,7 +250,7 @@ pub struct LoadedInput {
 }
 
 /// The data resulting of loading inputs
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct LoadedData {
     /// The loaded inputs
     pub inputs: Vec<LoadedInput>,
@@ -532,7 +532,7 @@ impl<'a> CompilationTask<'a> {
 
     /// Executes this task
     pub fn execute(&self) -> Result<LoadedData, Errors> {
-        let mut data = loaders::load(&self.inputs)?;
+        let mut data = self.load()?;
         // select the grammars to build
         match &self.grammar_name {
             None => {}
@@ -561,7 +561,8 @@ impl<'a> CompilationTask<'a> {
 
     /// Loads the data for this task
     pub fn load(&self) -> Result<LoadedData, Errors> {
-        loaders::load(&self.inputs)
+        let inputs = loaders::open_all(&self.inputs)?;
+        loaders::load(inputs)
     }
 
     /// Generates the in-memory parser for a grammar
@@ -590,7 +591,12 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Build an assembly for the relevant grammars
-    fn execute_output_assembly<'g>(&self, grammars: &'g [Grammar], target: Runtime, errors: &mut Vec<Error>) {
+    fn execute_output_assembly<'g>(
+        &self,
+        grammars: &'g [Grammar],
+        target: Runtime,
+        errors: &mut Vec<Error>
+    ) {
         // aggregate all targets for assembly
         let units = self.gather_grammars_for_assembly(grammars, target, errors);
         if units.is_empty() {

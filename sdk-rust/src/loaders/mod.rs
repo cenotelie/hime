@@ -19,7 +19,7 @@
 
 pub mod hime_grammar;
 
-use std::io;
+use std::io::{self, Read};
 
 use hime_redist::ast::{Ast, AstNode};
 use hime_redist::errors::ParseErrorDataTrait;
@@ -30,7 +30,6 @@ use hime_redist::parsers::{
 };
 use hime_redist::result::ParseResult;
 use hime_redist::symbols::SemanticElementTrait;
-use hime_redist::text::Text;
 
 use crate::errors::{Error, Errors};
 use crate::finite::{FinalItem, NFA};
@@ -41,10 +40,54 @@ use crate::grammars::{
 use crate::unicode::{Span, BLOCKS, CATEGORIES};
 use crate::{CharSpan, Input, InputReference, LoadedData, LoadedInput};
 
+/// Represents a generalised input for a loader
+pub struct LoadInput<'a>(String, Box<dyn Read + 'a>);
+
+/// Open all inputs
+pub fn open_all<'a>(inputs: &[Input<'a>]) -> Result<Vec<LoadInput<'a>>, Errors> {
+    let mut errors = Vec::new();
+    let mut result = Vec::new();
+    for input in inputs.iter() {
+        match input.open() {
+            Ok(stream) => result.push(LoadInput(input.name(), stream)),
+            Err(error) => errors.push(Error::Io(error))
+        }
+    }
+    if errors.is_empty() {
+        Ok(result)
+    } else {
+        Err(Errors::from(LoadedData::default(), errors))
+    }
+}
+
+/// Build the loaded data structure
+fn build_loaded_data(
+    names: Vec<String>,
+    parse_results: Vec<ParseResult>,
+    grammars: Vec<Grammar>
+) -> LoadedData {
+    LoadedData {
+        inputs: names
+            .into_iter()
+            .zip(parse_results.into_iter())
+            .map(|(name, result)| LoadedInput {
+                name,
+                content: result.text
+            })
+            .collect(),
+        grammars
+    }
+}
+
 /// Loads all inputs into grammars
-pub fn load(inputs: &[Input]) -> Result<LoadedData, Errors> {
+pub fn load_inputs(inputs: &[Input]) -> Result<LoadedData, Errors> {
+    load(open_all(inputs)?)
+}
+
+/// Loads all inputs into grammars
+pub fn load(inputs: Vec<LoadInput>) -> Result<LoadedData, Errors> {
     // parse
-    let results = parse_inputs(inputs)?;
+    let (names, results) = parse_inputs(inputs)?;
     // extract grammar roots
     let asts: Vec<Ast> = results.iter().map(|r| r.get_ast()).collect();
     let doc_roots: Vec<AstNode> = asts.iter().map(|ast| ast.get_root()).collect();
@@ -56,19 +99,7 @@ pub fn load(inputs: &[Input]) -> Result<LoadedData, Errors> {
         .collect();
     // get the grammars
     let (grammars, errors) = do_load_grammars(&roots);
-
-    let loaded_inputs: Vec<LoadedInput> = results
-        .into_iter()
-        .zip(inputs.iter())
-        .map(|(result, input)| LoadedInput {
-            name: input.name(),
-            content: result.text
-        })
-        .collect();
-    let data = LoadedData {
-        inputs: loaded_inputs,
-        grammars
-    };
+    let data = build_loaded_data(names, results, grammars);
     if errors.is_empty() {
         Ok(data)
     } else {
@@ -136,25 +167,11 @@ fn resolve_inheritance<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd>(
     }
 }
 
-/// Parses the specified input
-fn parse_input(
-    input: &Input,
+/// Parses the specified input stream
+fn parse_input_stream<'a>(
+    content: Box<dyn Read + 'a>,
     input_index: usize
 ) -> Result<ParseResult<'static, 'static>, (ParseResult<'static, 'static>, Vec<Error>)> {
-    let content = match input.open() {
-        Ok(f) => f,
-        Err(err) => {
-            return Err((
-                ParseResult::new(
-                    &hime_grammar::TERMINALS,
-                    &hime_grammar::VARIABLES,
-                    &hime_grammar::VIRTUALS,
-                    Text::new("")
-                ),
-                vec![Error::Io(err)]
-            ));
-        }
-    };
     let mut reader = io::BufReader::new(content);
     let result = hime_grammar::parse_utf8(&mut reader);
     let errors: Vec<Error> = result
@@ -181,12 +198,14 @@ fn parse_input(
 }
 
 /// Parses all inputs
-fn parse_inputs(inputs: &[Input]) -> Result<Vec<ParseResult<'static, 'static>>, Errors> {
+fn parse_inputs(inputs: Vec<LoadInput>) -> Result<(Vec<String>, Vec<ParseResult>), Errors> {
+    let mut names = Vec::new();
     let mut results = Vec::new();
     let mut has_errors = false;
     let mut errors = Vec::new();
-    for (index, input) in inputs.iter().enumerate() {
-        match parse_input(input, index) {
+    for (index, input) in inputs.into_iter().enumerate() {
+        names.push(input.0);
+        match parse_input_stream(input.1, index) {
             Ok(result) => {
                 results.push(result);
             }
@@ -197,23 +216,13 @@ fn parse_inputs(inputs: &[Input]) -> Result<Vec<ParseResult<'static, 'static>>, 
             }
         }
     }
-    if has_errors {
+    if !has_errors {
+        Ok((names, results))
+    } else {
         Err(Errors::from(
-            LoadedData {
-                inputs: results
-                    .into_iter()
-                    .zip(inputs.iter())
-                    .map(|(result, input)| LoadedInput {
-                        name: input.name(),
-                        content: result.text
-                    })
-                    .collect(),
-                grammars: Vec::new()
-            },
+            build_loaded_data(names, results, Vec::new()),
             errors
         ))
-    } else {
-        Ok(results)
     }
 }
 
