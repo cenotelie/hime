@@ -13,10 +13,15 @@ license = "LGPL-3.0"
 include = ["README.md", "Cargo.toml", "src/**/*.rs"]
 edition = "2018"
 
+[features]
+default = []
+print_errors = ["ansi_term"]
+
 [dependencies]
 hime_redist = "3.5.2"
 lazy_static = "1.4"
 rand = "0.7"
+ansi_term = { version = "0.12", optional = true}
 
 [badges]
 maintenance = { status = "actively-developed" }

@@ -17,6 +17,9 @@
 
 //! Module for the management of errors in the SDK
 
+#[cfg(feature = "print_errors")]
+pub mod print;
+
 use std::io;
 
 use crate::grammars::TerminalRef;

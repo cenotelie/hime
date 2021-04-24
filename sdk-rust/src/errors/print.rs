@@ -22,12 +22,11 @@ use std::io;
 use ansi_term::Colour::{Blue, Red};
 use ansi_term::Style;
 use hime_redist::text::TextContext;
-use hime_sdk::errors::{Error, Errors, UnmatchableTokenError};
-use hime_sdk::grammars::{
-    Grammar, RuleRef, SymbolRef, TerminalRef, OPTION_AXIOM, OPTION_SEPARATOR
-};
-use hime_sdk::lr::{Conflict, ConflictKind, ContextError, Item, LookaheadOrigin, Phrase};
-use hime_sdk::{InputReference, LoadedData};
+
+use super::{Error, Errors, UnmatchableTokenError};
+use crate::grammars::{Grammar, RuleRef, SymbolRef, TerminalRef, OPTION_AXIOM, OPTION_SEPARATOR};
+use crate::lr::{Conflict, ConflictKind, ContextError, Item, LookaheadOrigin, Phrase};
+use crate::{InputReference, LoadedData};
 
 const MSG_AXIOM_NOT_SPECIFIED: &str = "Grammar axiom has not been specified";
 

@@ -17,8 +17,6 @@
 
 //! Generator of lexers and parsers for the Hime runtime.
 
-mod errors;
-
 use std::io::{self, Read};
 use std::{env, process};
 
@@ -196,7 +194,7 @@ pub fn main() {
         execute_normal(task)
     };
     if let Err(errors) = result {
-        errors::print_errors(&errors);
+        hime_sdk::errors::print::print_errors(&errors);
         process::exit(1);
     } else {
         process::exit(0);
