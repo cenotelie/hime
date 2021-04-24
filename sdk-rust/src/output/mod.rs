@@ -319,7 +319,7 @@ fn build_grammar(
     // Build DFA
     let dfa = grammar.build_dfa();
     // Check that no terminal match the empty string
-    if dfa.states[0].is_final() {
+    if !dfa.states.is_empty() && dfa.states[0].is_final() {
         return Err(dfa.states[0]
             .items
             .iter()

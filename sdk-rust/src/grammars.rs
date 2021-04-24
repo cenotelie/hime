@@ -1352,6 +1352,16 @@ impl Grammar {
         &mut self.variables[index]
     }
 
+    /// Inherit the specified variable
+    fn inherit_variable(&mut self, other: &Variable) {
+        if self.variables.iter().all(|v| v.name != other.name) {
+            // no variable with the same name
+            let sid = self.next_sid + other.id - 3;
+            self.variables
+                .push(Variable::new(sid, other.name.clone(), None));
+        }
+    }
+
     /// Adds a virtual symbol with the given name to this grammar
     pub fn add_virtual(&mut self, name: &str) -> &mut Virtual {
         if let Some(index) = self.virtuals.iter().position(|v| v.name == name) {
@@ -1363,6 +1373,15 @@ impl Grammar {
         &mut self.virtuals[index]
     }
 
+    /// Inherit the specified virtual
+    fn inherit_virtal(&mut self, other: &Virtual) {
+        if self.virtuals.iter().all(|v| v.name != other.name) {
+            // no variable with the same name
+            let sid = self.next_sid + other.id - 3;
+            self.virtuals.push(Virtual::new(sid, other.name.clone()));
+        }
+    }
+
     /// Adds an action symbol with the given name to this grammar
     pub fn add_action(&mut self, name: &str) -> &mut Action {
         if let Some(index) = self.actions.iter().position(|v| v.name == name) {
@@ -1372,6 +1391,15 @@ impl Grammar {
         let sid = self.get_next_sid();
         self.actions.push(Action::new(sid, name.to_string()));
         &mut self.actions[index]
+    }
+
+    /// Inherit the specified action
+    fn inherit_action(&mut self, other: &Action) {
+        if self.actions.iter().all(|v| v.name != other.name) {
+            // no variable with the same name
+            let sid = self.next_sid + other.id - 3;
+            self.actions.push(Action::new(sid, other.name.clone()));
+        }
     }
 
     /// Adds a template rule with the given name to this grammar
@@ -1496,11 +1524,12 @@ impl Grammar {
     pub fn inherit(&mut self, other: &Grammar) {
         self.inherit_options(other);
         self.inherit_terminals(other);
+        self.inherit_variables(other);
         self.inherit_virtuals(other);
         self.inherit_actions(other);
-        self.inherit_variables(other);
         self.inherit_rules(other);
         self.inherit_template_rules(other);
+        self.next_sid += other.next_sid - 3;
     }
 
     /// Inherits the options from the parent grammar
@@ -1519,7 +1548,7 @@ impl Grammar {
                 .all(|t| t.name != terminal.name && t.value != terminal.value)
             {
                 // not already defined in this grammar
-                let sid = self.get_next_sid();
+                let sid = self.next_sid + terminal.id - 3;
                 let context = self.resolve_context(&other.contexts[terminal.context]);
                 let mut nfa = terminal.nfa.clone_no_finals();
                 nfa.states[nfa.exit]
@@ -1542,21 +1571,21 @@ impl Grammar {
     /// Inherits the virtuals from the parent grammar
     fn inherit_virtuals(&mut self, other: &Grammar) {
         for symbol in other.virtuals.iter() {
-            self.add_virtual(&symbol.name);
+            self.inherit_virtal(&symbol);
         }
     }
 
     /// Inherits the actions from the parent grammar
     fn inherit_actions(&mut self, other: &Grammar) {
         for symbol in other.actions.iter() {
-            self.add_action(&symbol.name);
+            self.inherit_action(&symbol);
         }
     }
 
     /// Inherits the variables from the parent grammar
     fn inherit_variables(&mut self, other: &Grammar) {
         for symbol in other.variables.iter() {
-            self.add_variable(&symbol.name);
+            self.inherit_variable(&symbol);
         }
     }
 

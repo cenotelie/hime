@@ -313,17 +313,26 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Loader<'a, 'b, 'c, 'd> {
     fn load_content(&mut self, errors: &mut Vec<Error>) {
         for node in self.root {
             let id = node.get_symbol().id;
-            if id == hime_grammar::ID_TERMINAL_BLOCK_OPTIONS {
-                load_options(self.input_index, &mut self.grammar, node);
-                if let Some(option) = self.grammar.options.get("CaseSensitive") {
-                    if &option.value == "false" {
-                        self.case_insensitive = true;
+            match id {
+                hime_grammar::ID_TERMINAL_BLOCK_OPTIONS => {
+                    load_options(self.input_index, &mut self.grammar, node);
+                    if let Some(option) = self.grammar.options.get("CaseSensitive") {
+                        if &option.value == "false" {
+                            self.case_insensitive = true;
+                        }
                     }
                 }
-            } else if id == hime_grammar::ID_TERMINAL_BLOCK_TERMINALS {
-                load_terminals(self.input_index, errors, &mut self.grammar, node);
-            } else if id == hime_grammar::ID_TERMINAL_BLOCK_RULES {
-                load_rules(self.input_index, errors, &mut self.grammar, node);
+                hime_grammar::ID_TERMINAL_BLOCK_TERMINALS => {
+                    load_terminals(self.input_index, errors, &mut self.grammar, node);
+                }
+                hime_grammar::ID_TERMINAL_BLOCK_RULES => {
+                    load_rules(self.input_index, errors, &mut self.grammar, node);
+                }
+                hime_grammar::ID_TERMINAL_NAME => {}
+                hime_grammar::ID_VARIABLE_GRAMMAR_PARENCY => {}
+                _ => {
+                    panic!(format!("Unrecognized symbol: {}", node.get_symbol().name));
+                }
             }
         }
     }
@@ -378,6 +387,8 @@ fn load_terminals(
                 DEFAULT_CONTEXT_NAME,
                 false
             );
+        } else {
+            panic!(format!("Unrecognized symbol: {}", node.get_symbol().name));
         }
     }
 }
@@ -482,7 +493,9 @@ fn load_nfa(input_index: usize, errors: &mut Vec<Error>, grammar: &Grammar, node
             let right = load_nfa(input_index, errors, grammar, node.child(1));
             left.into_concatenation(right)
         }
-        _ => NFA::new_minimal()
+        _ => {
+            panic!(format!("Unrecognized symbol: {}", node.get_symbol().name))
+        }
     }
 }
 
@@ -783,6 +796,8 @@ fn load_rules(input_index: usize, errors: &mut Vec<Error>, grammar: &mut Grammar
                 .map(|n| n.get_value().unwrap())
                 .collect();
             grammar.add_template_rule(&name, arguments);
+        } else {
+            panic!(format!("Unrecognized symbol: {}", node.get_symbol().name));
         }
     }
     // load template rules
@@ -1123,7 +1138,9 @@ fn load_simple_rule_atomic(
         hime_grammar::ID_TERMINAL_LITERAL_TEXT => {
             load_simple_rule_atomic_inline_text(input_index, grammar, node)
         }
-        _ => BodySet { bodies: Vec::new() }
+        _ => {
+            panic!(format!("Unrecognized symbol: {}", node.get_symbol().name))
+        }
     }
 }
 
@@ -1580,7 +1597,9 @@ fn load_template_rule_atomic(
         hime_grammar::ID_TERMINAL_LITERAL_TEXT => {
             load_template_rule_atomic_inline_text(input_index, grammar, node)
         }
-        _ => BodySet { bodies: Vec::new() }
+        _ => {
+            panic!(format!("Unrecognized symbol: {}", node.get_symbol().name));
+        }
     }
 }
 
