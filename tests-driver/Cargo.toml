@@ -1,0 +1,18 @@
+[package]
+name = "hime_tests_driver"
+version = "3.5.2"
+authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
+description = "Main driver for the test suits"
+homepage = "https://cenotelie.fr/projects/hime"
+repository = "https://github.com/cenotelie/hime"
+keywords = ["hime", "parser", "generator", "lr", "glr", "rnglr"]
+categories = ["algorithms", "parsing", "parser-implementations", "text-processing"]
+license = "LGPL-3.0"
+edition = "2018"
+
+[dependencies]
+hime_redist = "3.5.2"
+hime_sdk = { version = "3.5.2", features = ["print_errors"] }
+libloading = "0.7"
+# Used for tests debugging
+# hime_generated = { path = "../tests-results/hime_generated-3.3.1" }

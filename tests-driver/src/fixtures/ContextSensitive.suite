@@ -1,0 +1,442 @@
+fixture ContextSensitive
+
+test Test_CS_NoContext_LR:
+	grammar Test_CS_NoContext_LR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'; }
+		}
+		rules {
+			sub1 -> '('! #inner1{ X1* } ')'!;
+			e -> (X0 | sub1)* ;
+		}
+	}
+	parser LALR1
+	on "x"
+	yields e(X0)
+
+test Test_CS_NoContext_GLR:
+	grammar Test_CS_NoContext_GLR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'; }
+		}
+		rules {
+			sub1 -> '('! #inner1{ X1* } ')'!;
+			e -> (X0 | sub1)* ;
+		}
+	}
+	parser RNGLALR1
+	on "x"
+	yields e(X0)
+
+test Test_CS_SingleContext_LR:
+	grammar Test_CS_SingleContext_LR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'; }
+		}
+		rules {
+			sub1 -> '('! #inner1{ X1* } ')'!;
+			e -> (X0 | sub1)* ;
+		}
+	}
+	parser LALR1
+	on "x(x)"
+	yields e(X0 sub1(X1))
+
+test Test_CS_SingleContext_GLR:
+	grammar Test_CS_SingleContext_GLR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'; }
+		}
+		rules {
+			sub1 -> '('! #inner1{ X1* } ')'!;
+			e -> (X0 | sub1)* ;
+		}
+	}
+	parser RNGLALR1
+	on "x(x)"
+	yields e(X0 sub1(X1))
+
+test Test_CS_MatchingSeparator_LR:
+	grammar Test_CS_MatchingSeparator_LR {
+		options {Axiom="e"; Separator="SEP";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'; }
+			SEP -> ' '+;
+		}
+		rules {
+			sub1 -> '('! #inner1{ X1* } ')'!;
+			e -> (X0 | sub1)* ;
+		}
+	}
+	parser LALR1
+	on "x( x )"
+	yields e(X0 sub1(X1))
+
+test Test_CS_MatchingSeparator_GLR:
+	grammar Test_CS_MatchingSeparator_GLR {
+		options {Axiom="e"; Separator="SEP";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'; }
+			SEP -> ' '+;
+		}
+		rules {
+			sub1 -> '('! #inner1{ X1* } ')'!;
+			e -> (X0 | sub1)* ;
+		}
+	}
+	parser RNGLALR1
+	on "x( x )"
+	yields e(X0 sub1(X1))
+
+test Test_CS_MultipleContext_LR:
+	grammar Test_CS_MultipleContext_LR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'; }
+			context inner2 { X2 -> 'x'; }
+		}
+		rules {
+			sub1 -> '('! #inner1{ X1* } ')'!;
+			sub2 -> '['! #inner2{ X2* } ']'!;
+			e -> (X0 | sub1 | sub2)* ;
+		}
+	}
+	parser LALR1
+	on "x(x)[x]"
+	yields e(X0 sub1(X1) sub2(X2))
+
+test Test_CS_MultipleContext_GLR:
+	grammar Test_CS_MultipleContext_GLR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'; }
+			context inner2 { X2 -> 'x'; }
+		}
+		rules {
+			sub1 -> '('! #inner1{ X1* } ')'!;
+			sub2 -> '['! #inner2{ X2* } ']'!;
+			e -> (X0 | sub1 | sub2)* ;
+		}
+	}
+	parser RNGLALR1
+	on "x(x)[x]"
+	yields e(X0 sub1(X1) sub2(X2))
+
+test Test_CS_ContextStack_1_LR:
+	grammar Test_CS_ContextStack_1_LR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'; }
+			context inner2 { X2 -> 'x'; }
+		}
+		rules {
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
+			inner2 -> ;
+			e -> (X0 | sub1 | sub2)* ;
+		}
+	}
+	parser LALR1
+	on "x(x[x])"
+	yields e(X0 sub1(X1 sub2(X2)))
+
+test Test_CS_ContextStack_1_GLR:
+	grammar Test_CS_ContextStack_1_GLR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'; }
+			context inner2 { X2 -> 'x'; }
+		}
+		rules {
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
+			e -> (X0 | sub1 | sub2)* ;
+		}
+	}
+	parser RNGLALR1
+	on "x(x[x])"
+	yields e(X0 sub1(X1 sub2(X2)))
+
+test Test_CS_ContextStack_2_LR:
+	grammar Test_CS_ContextStack_2_LR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'; }
+			context inner2 { X2 -> 'x'; }
+		}
+		rules {
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
+			e -> (X0 | sub1 | sub2)* ;
+		}
+	}
+	parser LALR1
+	on "x[x(x)]"
+	yields e(X0 sub2(X2 sub1(X1)))
+
+test Test_CS_ContextStack_2_GLR:
+	grammar Test_CS_ContextStack_2_GLR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'; }
+			context inner2 { X2 -> 'x'; }
+		}
+		rules {
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
+			e -> (X0 | sub1 | sub2)* ;
+		}
+	}
+	parser RNGLALR1
+	on "x[x(x)]"
+	yields e(X0 sub2(X2 sub1(X1)))
+
+test Test_CS_MatchLongest_1_LR:
+	grammar Test_CS_MatchLongest_1_LR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'+; }
+			context inner2 { X2 -> 'xxx'; }
+		}
+		rules {
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
+			e -> (X0 | sub1 | sub2)* ;
+		}
+	}
+	parser LALR1
+	on "(xx[xxx]xx)"
+	yields e(sub1(X1 sub2(X2) X1))
+
+test Test_CS_MatchLongest_1_GLR:
+	grammar Test_CS_MatchLongest_1_GLR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'+; }
+			context inner2 { X2 -> 'xxx'; }
+		}
+		rules {
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
+			e -> (X0 | sub1 | sub2)* ;
+		}
+	}
+	parser RNGLALR1
+	on "(xx[xxx]xx)"
+	yields e(sub1(X1 sub2(X2) X1))
+
+test Test_CS_MatchLongest_2_LR:
+	grammar Test_CS_MatchLongest_2_LR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'+; }
+			context inner2 { X2 -> 'xxx'; }
+		}
+		rules {
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
+			e -> (X0 | sub1 | sub2)* ;
+		}
+	}
+	parser LALR1
+	on "(xx[xxxxx]xx)"
+	fails
+
+test Test_CS_MatchLongest_2_GLR:
+	grammar Test_CS_MatchLongest_2_GLR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context inner1 { X1 -> 'x'+; }
+			context inner2 { X2 -> 'xxx'; }
+		}
+		rules {
+			sub1 -> '('! #inner1{ (X1 | sub1 | sub2)* } ')'!;
+			sub2 -> '['! #inner2{ (X2 | sub1 | sub2)* } ']'!;
+			e -> (X0 | sub1 | sub2)* ;
+		}
+	}
+	parser RNGLALR1
+	on "(xx[xxxxx]xx)"
+	fails
+
+test Test_CS_HiddenContext_LR:
+	grammar Test_CS_HiddenContext_LR {
+		options {Axiom="e";}
+		terminals {
+			A -> 'a' ;
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> a #c1 { X1 } ;
+			a -> A ;
+		}
+	}
+	parser LALR1
+	on "ax"
+	yields e(a(A) X1)
+
+test Test_CS_HiddenContext_GLR:
+	grammar Test_CS_HiddenContext_GLR {
+		options {Axiom="e";}
+		terminals {
+			A -> 'a' ;
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> a #c1 { X1 } ;
+			a -> A ;
+		}
+	}
+	parser RNGLALR1
+	on "ax"
+	yields e(a(A) X1)
+
+test Test_CS_ContextNotOpened_LR:
+	grammar Test_CS_ContextNotOpened_LR {
+		options {Axiom="e";}
+		terminals {
+			A -> 'a' ; B -> 'b' ;
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> a | b ;
+			a -> #c1 { A X1 } ;
+			b -> B B B B X0 ;
+		}
+	}
+	parser LALR1
+	on "bbbbx"
+	yields e(b(B B B B X0))
+
+test Test_CS_ContextNotOpened_GLR:
+	grammar Test_CS_ContextNotOpened_GLR {
+		options {Axiom="e";}
+		terminals {
+			A -> 'a' ; B -> 'b' ;
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> a | b ;
+			a -> #c1 { A X1 } ;
+			b -> B B B B X0 ;
+		}
+	}
+	parser RNGLALR1
+	on "bbbbx"
+	yields e(b(B B B B X0))
+
+test Test_CS_ContextClosing1_LR:
+	grammar Test_CS_ContextClosing1_LR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> X0 #c1{ X1 } X0 ;
+		}
+	}
+	parser LALR1
+	on "xxx"
+	yields e(X0 X1 X0)
+
+test Test_CS_ContextClosing1_GLR:
+	grammar Test_CS_ContextClosing1_GLR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> X0 #c1{ X1 } X0 ;
+		}
+	}
+	parser RNGLALR1
+	on "xxx"
+	yields e(X0 X1 X0)
+
+test Test_CS_ContextClosing2_LR:
+	grammar Test_CS_ContextClosing2_LR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> X0 #c1{ X1 } (X1 | X0) ;
+		}
+	}
+	parser LALR1
+	on "xxx"
+	yields e(X0 X1 X0)
+
+test Test_CS_ContextClosing2_GLR:
+	grammar Test_CS_ContextClosing2_GLR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> X0 #c1{ X1 } (X1 | X0) ;
+		}
+	}
+	parser RNGLALR1
+	on "xxx"
+	yields e(X0 X1 X0)
+
+test Test_CS_ContextClosing3_LR:
+	grammar Test_CS_ContextClosing3_LR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> X0 #c1{ X1 inner X1 } (X1 | X0) ;
+			inner -> X1 ;
+		}
+	}
+	parser LALR1
+	on "xxxxx"
+	yields e(X0 X1 inner(X1) X1 X0)
+
+test Test_CS_ContextClosing3_GLR:
+	grammar Test_CS_ContextClosing3_GLR {
+		options {Axiom="e";}
+		terminals {
+			X0 -> 'x';
+			context c1 { X1 -> 'x'; }
+		}
+		rules {
+			e -> X0 #c1{ X1 inner X1 } (X1 | X0) ;
+			inner -> X1 ;
+		}
+	}
+	parser RNGLALR1
+	on "xxxxx"
+	yields e(X0 X1 inner(X1) X1 X0)

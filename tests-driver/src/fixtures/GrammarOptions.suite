@@ -1,0 +1,19 @@
+fixture GrammarOptions
+
+test Test_Option_Axiom_CorrectVariable:
+	grammar Test_Option_Axiom_CorrectVariable { options {Axiom="e";} rules { b->; e->; } }
+	parser LALR1
+	on ""
+	yields e
+
+test Test_Option_Separator_Space:
+	grammar Test_Option_Separator_Space { options {Axiom="e"; Separator="SEPARATOR";} terminals {SEPARATOR->' '+; A->'a'; } rules { e->A+; } }
+	parser LALR1
+	on "a a   a     a"
+	yields e(A A A A)
+
+test Test_Option_Separator_ArbitraryCharacter:
+	grammar Test_Option_Separator_ArbitraryCharacter { options {Axiom="e"; Separator="SEPARATOR";} terminals {SEPARATOR->'x'+; A->'a'; } rules { e->A+; } }
+	parser LALR1
+	on "axaxxxaxxxxa"
+	yields e(A A A A)

@@ -1,0 +1,73 @@
+fixture TreeActions
+
+test Test_Promote_Simple_LR:
+	grammar Test_Promote_Simple_LR { options {Axiom="e";} terminals {A->'a';} rules { e->x; x->A^; } }
+	parser LALR1
+	on "a"
+	yields e(A)
+
+test Test_Promote_Simple_GLR:
+	grammar Test_Promote_Simple_GLR { options {Axiom="e";} terminals {A->'a';} rules { e->x; x->A^; } }
+	parser RNGLALR1
+	on "a"
+	yields e(A)
+
+test Test_Promote_ToRoot_LR:
+	grammar Test_Promote_ToRoot_LR { options {Axiom="e";} terminals {A->'a';} rules { e->A^; } }
+	parser LALR1
+	on "a"
+	yields A
+
+test Test_Promote_ToRoot_GLR:
+	grammar Test_Promote_ToRoot_GLR { options {Axiom="e";} terminals {A->'a';} rules { e->A^; } }
+	parser RNGLALR1
+	on "a"
+	yields A
+
+test Test_Promote_MultipleInSameRule_LR:
+	grammar Test_Promote_MultipleInSameRule_LR { options {Axiom="e";} terminals {A->'a'; B->'b'; C->'c';} rules { e->A^ B^ C; } }
+	parser LALR1
+	on "abc"
+	yields B(A C)
+
+test Test_Promote_MultipleInSameRule_GLR:
+	grammar Test_Promote_MultipleInSameRule_GLR { options {Axiom="e";} terminals {A->'a'; B->'b'; C->'c';} rules { e->A^ B^ C; } }
+	parser RNGLALR1
+	on "abc"
+	yields B(A C)
+
+test Test_Promote_Chaining_LR:
+	grammar Test_Promote_Chaining_LR { options {Axiom="e";} terminals {A->'a'; B->'b'; C->'c';} rules { e->x^ A; x->y^ B; y->C^; } }
+	parser LALR1
+	on "cba"
+	yields C(B A)
+
+test Test_Promote_Chaining_GLR:
+	grammar Test_Promote_Chaining_GLR { options {Axiom="e";} terminals {A->'a'; B->'b'; C->'c';} rules { e->x^ A; x->y^ B; y->C^; } }
+	parser RNGLALR1
+	on "cba"
+	yields C(B A)
+
+test Test_Drop_Simple_LR:
+	grammar Test_Drop_Simple_LR { options {Axiom="e";} terminals {A->'a'; B->'b'; C->'c';} rules { e->A B! C; } }
+	parser LALR1
+	on "abc"
+	yields e(A C)
+
+test Test_Drop_Simple_GLR:
+	grammar Test_Drop_Simple_GLR { options {Axiom="e";} terminals {A->'a'; B->'b'; C->'c';} rules { e->A B! C; } }
+	parser RNGLALR1
+	on "abc"
+	yields e(A C)
+
+test Test_Drop_SubTree_LR:
+	grammar Test_Drop_SubTree_LR { options {Axiom="e";} terminals {A->'a'; B->'b'; C->'c';} rules { e->A x! C; x->B; } }
+	parser LALR1
+	on "abc"
+	yields e(A C)
+
+test Test_Drop_SubTree_GLR:
+	grammar Test_Drop_SubTree_GLR { options {Axiom="e";} terminals {A->'a'; B->'b'; C->'c';} rules { e->A x! C; x->B; } }
+	parser RNGLALR1
+	on "abc"
+	yields e(A C)

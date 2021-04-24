@@ -3,9 +3,10 @@ members = [
     "runtime-rust",
     "parseit-rust",
     "sdk-rust",
-    "tests-executor-rust",
     "unicode-gen",
     "himecc-rust",
+    "tests-executor-rust",
+    "tests-driver",
     # "langserv"
 ]
 
