@@ -22,6 +22,9 @@ Cargo.lock
 # GEdit temp file
 *~
 
+# Environment
+.vscode/
+
 # Hime test
 tests-results/
 TestResults.xml
