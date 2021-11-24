@@ -33,7 +33,7 @@ mod parser_rust;
 use std::env;
 use std::fs::File;
 use std::io::{self, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use hime_redist::lexers::automaton::Automaton;
 use hime_redist::parsers::lrk::LRkAutomaton;
@@ -42,23 +42,18 @@ use hime_redist::symbols::Symbol;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 
-use crate::errors::{Error, UnmatchableTokenError};
-use crate::finite::DFA;
-use crate::grammars::{
-    Grammar, TerminalRef, TerminalSet, OPTION_SEPARATOR, PREFIX_GENERATED_TERMINAL
-};
-use crate::lr::{self, Graph};
+use crate::errors::Error;
+use crate::grammars::{BuildData, Grammar, PREFIX_GENERATED_TERMINAL};
 use crate::sdk::{InMemoryParser, ParserAutomaton};
 use crate::{CompilationTask, ParsingMethod, Runtime};
 
-/// Build and output artifacts for a grammar
-pub fn execute_for_grammar(
+/// Output artifacts for a grammar
+pub fn output_grammar_artifacts(
     task: &CompilationTask,
-    grammar: &mut Grammar,
-    grammar_index: usize
+    grammar: &Grammar,
+    grammar_index: usize,
+    data: &BuildData
 ) -> Result<(), Vec<Error>> {
-    let data = build_grammar(task, grammar, grammar_index)?;
-
     // gather required options
     let mode = match task.get_mode_for(grammar, grammar_index) {
         Ok(mode) => mode,
@@ -211,12 +206,9 @@ pub fn execute_for_grammar(
 
 /// Builds the in-memory parser for a grammar
 pub fn build_in_memory_grammar<'a>(
-    task: &CompilationTask,
-    grammar: &'a mut Grammar,
-    grammar_index: usize
+    grammar: &'a Grammar,
+    data: &BuildData
 ) -> Result<InMemoryParser<'a>, Vec<Error>> {
-    let data = build_grammar(task, grammar, grammar_index)?;
-
     // get symbols
     let mut terminals: Vec<Symbol<'a>> = Vec::new();
     for terminal_ref in data.expected.content.iter().skip(2) {
@@ -292,61 +284,6 @@ pub fn build_in_memory_grammar<'a>(
     })
 }
 
-/// Represents the build data for a grammar
-#[derive(Debug, Clone)]
-struct BuildData {
-    /// The DFA
-    pub dfa: DFA,
-    /// The expected terminals
-    pub expected: TerminalSet,
-    /// The separator terminal
-    pub separator: Option<TerminalRef>,
-    /// The parsing method
-    pub method: ParsingMethod,
-    /// The LR graph
-    pub graph: Graph
-}
-
-/// Build and output artifacts for a grammar
-fn build_grammar(
-    task: &CompilationTask,
-    grammar: &mut Grammar,
-    grammar_index: usize
-) -> Result<BuildData, Vec<Error>> {
-    if let Err(error) = grammar.prepare(grammar_index) {
-        return Err(vec![error]);
-    };
-    // Build DFA
-    let dfa = grammar.build_dfa();
-    // Check that no terminal match the empty string
-    if !dfa.states.is_empty() && dfa.states[0].is_final() {
-        return Err(dfa.states[0]
-            .items
-            .iter()
-            .map(|item| Error::TerminalMatchesEmpty(grammar_index, (*item).into()))
-            .collect());
-    }
-    // Build the data for the lexer
-    let expected = dfa.get_expected();
-    let separator = match get_separator(grammar, grammar_index, &expected, &dfa) {
-        Ok(separator) => separator,
-        Err(error) => return Err(vec![error])
-    };
-    let method = match task.get_parsing_method(grammar, grammar_index) {
-        Ok(method) => method,
-        Err(error) => return Err(vec![error])
-    };
-    // Build the data for the parser
-    let graph = lr::build_graph(grammar, grammar_index, &expected, &dfa, method)?;
-    Ok(BuildData {
-        dfa,
-        expected,
-        separator,
-        method,
-        graph
-    })
-}
-
 /// Gets the list of sources to produce for a grammar
 pub fn get_sources(
     task: &CompilationTask,
@@ -414,41 +351,6 @@ pub fn build_assembly(
     }
 }
 
-/// Gets the separator for the grammar
-fn get_separator(
-    grammar: &mut Grammar,
-    grammar_index: usize,
-    expected: &TerminalSet,
-    dfa: &DFA
-) -> Result<Option<TerminalRef>, Error> {
-    let option = match grammar.get_option(OPTION_SEPARATOR) {
-        Some(option) => option,
-        None => return Ok(None)
-    };
-    let terminal = match grammar.get_terminal_for_name(&option.value) {
-        Some(terminal) => terminal,
-        None => return Err(Error::SeparatorNotDefined(grammar_index))
-    };
-    let terminal_ref = TerminalRef::Terminal(terminal.id);
-    // warn if the separator is context-sensitive
-    if terminal.context != 0 {
-        return Err(Error::SeparatorIsContextual(grammar_index, terminal_ref));
-    }
-    if expected.content.contains(&terminal_ref) {
-        // the terminal is produced by the lexer => ok
-        return Ok(Some(terminal_ref));
-    }
-    // the separator will not be produced by the lexer, try to investigate why
-    let overriders = dfa.get_overriders(terminal_ref, 0);
-    Err(Error::SeparatorCannotBeMatched(
-        grammar_index,
-        UnmatchableTokenError {
-            terminal: terminal_ref,
-            overriders
-        }
-    ))
-}
-
 /// Gets the name of the file for the lexer automaton
 fn get_lexer_bin_name(grammar: &Grammar, runtime: Runtime) -> String {
     match runtime {
@@ -498,7 +400,7 @@ fn get_parser_bin_name_rust(grammar: &Grammar) -> String {
 }
 
 /// Creates a temp folder
-fn temporary_folder() -> PathBuf {
+pub fn temporary_folder() -> PathBuf {
     let mut result = env::temp_dir();
     let name: String = thread_rng().sample_iter(&Alphanumeric).take(10).collect();
     result.push(name);
@@ -506,8 +408,8 @@ fn temporary_folder() -> PathBuf {
 }
 
 /// Export a resource a target file
-fn export_resource(folder: &PathBuf, file_name: &str, content: &[u8]) -> Result<(), Error> {
-    let mut target = folder.clone();
+fn export_resource(folder: &Path, file_name: &str, content: &[u8]) -> Result<(), Error> {
+    let mut target = folder.to_path_buf();
     target.push(file_name);
     let file = File::create(target)?;
     let mut writer = io::BufWriter::new(file);

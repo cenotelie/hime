@@ -218,16 +218,16 @@ fn write_code_constructors(
     automaton_type: &str,
     parser_type: &str
 ) -> Result<(), Error> {
+    writeln!(writer, "/// Parses the specified string with this parser")?;
+    if output_assembly {
+        writeln!(writer, "#[no_mangle]")?;
+        writeln!(writer, "#[export_name = \"{}_parse_string\"]", nmespace)?;
+    }
+    writeln!(
+        writer,
+        "pub fn parse_string(input: &str) -> ParseResult<'static, 'static> {{"
+    )?;
     if grammar.actions.is_empty() {
-        writeln!(writer, "/// Parses the specified string with this parser")?;
-        if output_assembly {
-            writeln!(writer, "#[no_mangle]")?;
-            writeln!(writer, "#[export_name = \"{}_parse_string\"]", nmespace)?;
-        }
-        writeln!(
-            writer,
-            "pub fn parse_string(input: &str) -> ParseResult<'static, 'static> {{"
-        )?;
         writeln!(writer, "    let text = Text::new(input);")?;
         writeln!(writer, "    parse_text(text)")?;
         writeln!(writer, "}}")?;
@@ -293,33 +293,7 @@ fn write_code_constructors(
             writer,
             "    let mut result = ParseResult::new(terminals, variables, virtuals, text);"
         )?;
-        writeln!(writer, "    {{")?;
-        writeln!(writer, "        let data = result.get_parsing_data();")?;
-        writeln!(writer, "        let mut lexer = new_lexer(data.0, data.1);")?;
-        writeln!(
-            writer,
-            "        let automaton = {}::new(PARSER_AUTOMATON);",
-            automaton_type
-        )?;
-        writeln!(
-            writer,
-            "        let mut parser = {}::new(&mut lexer, automaton, data.2, &mut my_actions);",
-            parser_type
-        )?;
-        writeln!(writer, "        parser.parse();")?;
-        writeln!(writer, "    }}")?;
-        writeln!(writer, "    result")?;
-        writeln!(writer, "}}")?;
     } else {
-        writeln!(writer, "/// Parses the specified string with this parser")?;
-        if output_assembly {
-            writeln!(writer, "#[no_mangle]")?;
-            writeln!(writer, "#[export_name = \"{}_parse_string\"]", nmespace)?;
-        }
-        writeln!(
-            writer,
-            "pub fn parse_string(input: &str) -> ParseResult<'static, 'static> {{"
-        )?;
         writeln!(writer, "    let mut actions = NoActions {{}};")?;
         writeln!(writer, "    parse_string_with(input, &mut actions)")?;
         writeln!(writer, "}}")?;
@@ -440,24 +414,24 @@ fn write_code_constructors(
             writer,
             "    let mut result = ParseResult<'static, 'static>::new(terminals, variables, virtuals, text);"
         )?;
-        writeln!(writer, "    {{")?;
-        writeln!(writer, "        let data = result.get_parsing_data();")?;
-        writeln!(writer, "        let mut lexer = new_lexer(data.0, data.1);")?;
-        writeln!(
-            writer,
-            "        let automaton = {}::new(PARSER_AUTOMATON);",
-            automaton_type
-        )?;
-        writeln!(
-            writer,
-            "        let mut parser = {}::new(&mut lexer, automaton, data.2, &mut my_actions);",
-            parser_type
-        )?;
-        writeln!(writer, "        parser.parse();")?;
-        writeln!(writer, "    }}")?;
-        writeln!(writer, "    result")?;
-        writeln!(writer, "}}")?;
     }
+    writeln!(writer, "    {{")?;
+    writeln!(writer, "        let data = result.get_parsing_data();")?;
+    writeln!(writer, "        let mut lexer = new_lexer(data.0, data.1);")?;
+    writeln!(
+        writer,
+        "        let automaton = {}::new(PARSER_AUTOMATON);",
+        automaton_type
+    )?;
+    writeln!(
+        writer,
+        "        let mut parser = {}::new(&mut lexer, automaton, data.2, &mut my_actions);",
+        parser_type
+    )?;
+    writeln!(writer, "        parser.parse();")?;
+    writeln!(writer, "    }}")?;
+    writeln!(writer, "    result")?;
+    writeln!(writer, "}}")?;
     Ok(())
 }
 

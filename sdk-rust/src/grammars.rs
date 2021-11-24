@@ -23,9 +23,11 @@ use std::sync::atomic::{AtomicUsize, Ordering as AtomicOrdering};
 
 use hime_redist::parsers::{TreeAction, TREE_ACTION_DROP, TREE_ACTION_NONE, TREE_ACTION_PROMOTE};
 
-use crate::errors::Error;
+use crate::errors::{Error, UnmatchableTokenError};
 use crate::finite::{FinalItem, DFA, EPSILON, NFA};
-use crate::InputReference;
+use crate::lr::Graph;
+use crate::sdk::InMemoryParser;
+use crate::{InputReference, ParsingMethod};
 
 /// Represents a symbol in a grammar
 pub trait Symbol {
@@ -1119,6 +1121,21 @@ pub struct Grammar {
     pub template_rules: Vec<TemplateRule>
 }
 
+/// Represents the build data for a grammar
+#[derive(Debug, Clone)]
+pub struct BuildData {
+    /// The DFA
+    pub dfa: DFA,
+    /// The expected terminals
+    pub expected: TerminalSet,
+    /// The separator terminal
+    pub separator: Option<TerminalRef>,
+    /// The parsing method
+    pub method: ParsingMethod,
+    /// The LR graph
+    pub graph: Graph
+}
+
 impl Grammar {
     /// Initializes this grammar
     pub fn new(input_ref: InputReference, name: String) -> Grammar {
@@ -1571,21 +1588,21 @@ impl Grammar {
     /// Inherits the virtuals from the parent grammar
     fn inherit_virtuals(&mut self, other: &Grammar) {
         for symbol in other.virtuals.iter() {
-            self.inherit_virtal(&symbol);
+            self.inherit_virtal(symbol);
         }
     }
 
     /// Inherits the actions from the parent grammar
     fn inherit_actions(&mut self, other: &Grammar) {
         for symbol in other.actions.iter() {
-            self.inherit_action(&symbol);
+            self.inherit_action(symbol);
         }
     }
 
     /// Inherits the variables from the parent grammar
     fn inherit_variables(&mut self, other: &Grammar) {
         for symbol in other.variables.iter() {
-            self.inherit_variable(&symbol);
+            self.inherit_variable(symbol);
         }
     }
 
@@ -1805,12 +1822,12 @@ impl Grammar {
         let axiom_option = self
             .options
             .get(OPTION_AXIOM)
-            .ok_or_else(|| Error::AxiomNotSpecified(grammar_index))?;
+            .ok_or(Error::AxiomNotSpecified(grammar_index))?;
         let axiom_id = self
             .variables
             .iter()
             .find(|v| v.name == axiom_option.value)
-            .ok_or_else(|| Error::AxiomNotDefined(grammar_index))?
+            .ok_or(Error::AxiomNotDefined(grammar_index))?
             .id;
         // Create the real axiom rule variable and rule
         let real_axiom = self.add_variable(GENERATED_AXIOM);
@@ -1858,5 +1875,117 @@ impl Grammar {
                 variable.followers = followers;
             }
         }
+    }
+
+    /// Build data for this grammar
+    pub fn build(
+        &mut self,
+        parsing_method: Option<ParsingMethod>,
+        grammar_index: usize
+    ) -> Result<BuildData, Vec<Error>> {
+        if let Err(error) = self.prepare(grammar_index) {
+            return Err(vec![error]);
+        };
+        // Build DFA
+        let dfa = self.build_dfa();
+        // Check that no terminal match the empty string
+        if !dfa.states.is_empty() && dfa.states[0].is_final() {
+            return Err(dfa.states[0]
+                .items
+                .iter()
+                .map(|item| Error::TerminalMatchesEmpty(grammar_index, (*item).into()))
+                .collect());
+        }
+        // Build the data for the lexer
+        let expected = dfa.get_expected();
+        let separator = match self.get_separator(grammar_index, &expected, &dfa) {
+            Ok(separator) => separator,
+            Err(error) => return Err(vec![error])
+        };
+        let method = match self.get_parsing_method(parsing_method, grammar_index) {
+            Ok(method) => method,
+            Err(error) => return Err(vec![error])
+        };
+        // Build the data for the parser
+        let graph = crate::lr::build_graph(self, grammar_index, &expected, &dfa, method)?;
+        Ok(BuildData {
+            dfa,
+            expected,
+            separator,
+            method,
+            graph
+        })
+    }
+
+    /// Gets the separator for the grammar
+    fn get_separator(
+        &self,
+        grammar_index: usize,
+        expected: &TerminalSet,
+        dfa: &DFA
+    ) -> Result<Option<TerminalRef>, Error> {
+        let option = match self.get_option(OPTION_SEPARATOR) {
+            Some(option) => option,
+            None => return Ok(None)
+        };
+        let terminal = match self.get_terminal_for_name(&option.value) {
+            Some(terminal) => terminal,
+            None => return Err(Error::SeparatorNotDefined(grammar_index))
+        };
+        let terminal_ref = TerminalRef::Terminal(terminal.id);
+        // warn if the separator is context-sensitive
+        if terminal.context != 0 {
+            return Err(Error::SeparatorIsContextual(grammar_index, terminal_ref));
+        }
+        if expected.content.contains(&terminal_ref) {
+            // the terminal is produced by the lexer => ok
+            return Ok(Some(terminal_ref));
+        }
+        // the separator will not be produced by the lexer, try to investigate why
+        let overriders = dfa.get_overriders(terminal_ref, 0);
+        Err(Error::SeparatorCannotBeMatched(
+            grammar_index,
+            UnmatchableTokenError {
+                terminal: terminal_ref,
+                overriders
+            }
+        ))
+    }
+
+    /// Gets the parsing method
+    fn get_parsing_method(
+        &self,
+        parsing_method: Option<ParsingMethod>,
+        grammar_index: usize
+    ) -> Result<ParsingMethod, Error> {
+        match parsing_method {
+            Some(method) => Ok(method),
+            None => match self.get_option(OPTION_METHOD) {
+                Some(option) => match option.value.as_ref() {
+                    "lr0" => Ok(ParsingMethod::LR0),
+                    "lr1" => Ok(ParsingMethod::LR1),
+                    "lalr1" => Ok(ParsingMethod::LALR1),
+                    "rnglr1" => Ok(ParsingMethod::RNGLR1),
+                    "rnglalr1" => Ok(ParsingMethod::RNGLALR1),
+                    _ => Err(Error::InvalidOption(
+                        grammar_index,
+                        OPTION_METHOD.to_string(),
+                        vec![
+                            String::from("lr0"),
+                            String::from("lr1"),
+                            String::from("lalr1"),
+                            String::from("rnglr1"),
+                            String::from("rnglalr1"),
+                        ]
+                    ))
+                },
+                None => Ok(ParsingMethod::LALR1)
+            }
+        }
+    }
+
+    /// Builds the in-memory parser for a grammar
+    pub fn get_in_memory<'a>(&'a self, data: &BuildData) -> Result<InMemoryParser<'a>, Vec<Error>> {
+        crate::output::build_in_memory_grammar(self, data)
     }
 }

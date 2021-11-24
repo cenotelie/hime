@@ -34,11 +34,11 @@ pub fn to_upper_camel_case(name: &str) -> String {
     let mut new_word = false;
     for (i, c) in name.bytes().enumerate() {
         if i == 0 {
-            if c >= UPPER_A && c <= UPPER_Z {
+            if (UPPER_A..=UPPER_Z).contains(&c) {
                 result.push(c);
-            } else if c >= LOWER_A && c <= LOWER_Z {
+            } else if (LOWER_A..=LOWER_Z).contains(&c) {
                 result.push(c - TO_LOWER);
-            } else if c >= DIGIT0 && c <= DIGIT9 {
+            } else if (DIGIT0..=DIGIT9).contains(&c) {
                 result.push(UNDERSCORE);
                 result.push(c);
                 new_word = true;
@@ -47,22 +47,22 @@ pub fn to_upper_camel_case(name: &str) -> String {
             }
         } else {
             let is_empty = result.is_empty();
-            if c >= UPPER_A && c <= UPPER_Z {
+            if (UPPER_A..=UPPER_Z).contains(&c) {
                 if is_empty || new_word {
                     result.push(c);
                 } else {
                     let x = (&name as &dyn AsRef<[u8]>).as_ref()[i - 1];
-                    if x >= UPPER_A && x <= UPPER_Z {
+                    if (UPPER_A..=UPPER_Z).contains(&x) {
                         result.push(c + TO_LOWER);
                     } else {
                         result.push(c);
                     }
                 }
                 new_word = false;
-            } else if c >= LOWER_A && c <= LOWER_Z {
+            } else if (LOWER_A..=LOWER_Z).contains(&c) {
                 result.push(if new_word { c - TO_LOWER } else { c });
                 new_word = false;
-            } else if c >= DIGIT0 && c <= DIGIT9 {
+            } else if (DIGIT0..=DIGIT9).contains(&c) {
                 result.push(c);
                 new_word = true;
             } else {
@@ -89,35 +89,35 @@ pub fn to_lower_camel_case(name: &str) -> String {
     let mut new_word = false;
     for (i, c) in name.bytes().enumerate() {
         if i == 0 {
-            if c >= UPPER_A && c <= UPPER_Z {
+            if (UPPER_A..=UPPER_Z).contains(&c) {
                 result.push(c + TO_LOWER);
-            } else if c >= LOWER_A && c <= LOWER_Z {
+            } else if (LOWER_A..=LOWER_Z).contains(&c) {
                 result.push(c);
-            } else if c >= DIGIT0 && c <= DIGIT9 {
+            } else if (DIGIT0..=DIGIT9).contains(&c) {
                 result.push(UNDERSCORE);
                 result.push(c);
                 new_word = true;
             }
         } else {
             let is_empty = result.is_empty();
-            if c >= UPPER_A && c <= UPPER_Z {
+            if (UPPER_A..=UPPER_Z).contains(&c) {
                 if is_empty {
                     result.push(c + TO_LOWER);
                 } else if new_word {
                     result.push(c);
                 } else {
                     let x = (&name as &dyn AsRef<[u8]>).as_ref()[i - 1];
-                    if x >= UPPER_A && x <= UPPER_Z {
+                    if (UPPER_A..=UPPER_Z).contains(&x) {
                         result.push(c + TO_LOWER);
                     } else {
                         result.push(c);
                     }
                 }
                 new_word = false;
-            } else if c >= LOWER_A && c <= LOWER_Z {
+            } else if (LOWER_A..=LOWER_Z).contains(&c) {
                 result.push(if new_word { c - TO_LOWER } else { c });
                 new_word = false;
-            } else if c >= DIGIT0 && c <= DIGIT9 {
+            } else if (DIGIT0..=DIGIT9).contains(&c) {
                 result.push(c);
                 new_word = true;
             } else {
@@ -143,26 +143,26 @@ pub fn to_upper_case(name: &str) -> String {
     let mut result = Vec::<u8>::new();
     for (i, c) in name.bytes().enumerate() {
         if i == 0 {
-            if c >= UPPER_A && c <= UPPER_Z {
+            if (UPPER_A..=UPPER_Z).contains(&c) {
                 result.push(c);
-            } else if c >= LOWER_A && c <= LOWER_Z {
+            } else if (LOWER_A..=LOWER_Z).contains(&c) {
                 result.push(c - TO_LOWER);
-            } else if c >= DIGIT0 && c <= DIGIT9 {
+            } else if (DIGIT0..=DIGIT9).contains(&c) {
                 result.push(UNDERSCORE);
                 result.push(c);
             } else {
                 result.push(UNDERSCORE);
             }
-        } else if c >= UPPER_A && c <= UPPER_Z {
+        } else if (UPPER_A..=UPPER_Z).contains(&c) {
             let x = (&name as &dyn AsRef<[u8]>).as_ref()[i - 1];
-            if (x >= LOWER_A && x <= LOWER_Z) || (x >= DIGIT0 && x <= DIGIT9) {
+            if (LOWER_A..=LOWER_Z).contains(&x) || (DIGIT0..=DIGIT9).contains(&x) {
                 // preceded by a lower-case character or a number, this is a new word
                 result.push(UNDERSCORE);
             }
             result.push(c);
-        } else if c >= LOWER_A && c <= LOWER_Z {
+        } else if (LOWER_A..=LOWER_Z).contains(&c) {
             result.push(c - TO_LOWER);
-        } else if c >= DIGIT0 && c <= DIGIT9 {
+        } else if (DIGIT0..=DIGIT9).contains(&c) {
             result.push(c);
         } else {
             result.push(UNDERSCORE);
@@ -186,24 +186,24 @@ pub fn to_snake_case(name: &str) -> String {
     let mut result = Vec::<u8>::new();
     for (i, c) in name.bytes().enumerate() {
         if i == 0 {
-            if c >= UPPER_A && c <= UPPER_Z {
+            if (UPPER_A..=UPPER_Z).contains(&c) {
                 result.push(c + TO_LOWER);
-            } else if c >= LOWER_A && c <= LOWER_Z {
+            } else if (LOWER_A..=LOWER_Z).contains(&c) {
                 result.push(c);
-            } else if c >= DIGIT0 && c <= DIGIT9 {
+            } else if (DIGIT0..=DIGIT9).contains(&c) {
                 result.push(UNDERSCORE);
                 result.push(c);
             } else {
                 result.push(UNDERSCORE);
             }
-        } else if c >= UPPER_A && c <= UPPER_Z {
+        } else if (UPPER_A..=UPPER_Z).contains(&c) {
             let x = (&name as &dyn AsRef<[u8]>).as_ref()[i - 1];
-            if (x >= LOWER_A && x <= LOWER_Z) || (x >= DIGIT0 && x <= DIGIT9) {
+            if (LOWER_A..=LOWER_Z).contains(&x) || (DIGIT0..=DIGIT9).contains(&x) {
                 // preceded by a lower-case character or a number, this is a new word
                 result.push(UNDERSCORE);
             }
             result.push(c + TO_LOWER);
-        } else if (c >= LOWER_A && c <= LOWER_Z) || (c >= DIGIT0 && c <= DIGIT9) {
+        } else if ((LOWER_A..=LOWER_Z).contains(&c)) || ((DIGIT0..=DIGIT9).contains(&c)) {
             result.push(c);
         } else {
             result.push(UNDERSCORE);

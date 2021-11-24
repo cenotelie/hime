@@ -19,7 +19,7 @@
 
 use std::fs::{self, File, OpenOptions};
 use std::io::{BufRead, BufReader, BufWriter, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use crate::errors::Error;
@@ -207,8 +207,8 @@ fn build_cargo_project(
 }
 
 /// Write the lib.rs file
-fn write_lib_rs(src_folder: &PathBuf) -> Result<(), Error> {
-    let mut file_path = src_folder.clone();
+fn write_lib_rs(src_folder: &Path) -> Result<(), Error> {
+    let mut file_path = src_folder.to_path_buf();
     file_path.push("lib.rs");
     let mut writer = BufWriter::new(File::create(file_path)?);
     writeln!(writer, "//! Generated parsers")?;
@@ -227,7 +227,7 @@ fn get_module_name(task: &CompilationTask, grammar: &Grammar) -> String {
 }
 
 /// Execute a cargo command
-fn execute_cargo_command(project_folder: &PathBuf, args: &[&str]) -> Result<(), Error> {
+fn execute_cargo_command(project_folder: &Path, args: &[&str]) -> Result<(), Error> {
     let output = Command::new("cargo")
         .current_dir(project_folder)
         .args(args)

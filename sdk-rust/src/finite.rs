@@ -323,7 +323,7 @@ impl DFA {
     pub fn prune(&mut self) {
         let inverse = DFAInverse::new(self);
         let mut finals = inverse.close_by_antecedents(&inverse.finals);
-        finals.sort();
+        finals.sort_unstable();
         if finals.len() == self.states.len() {
             // no change
             return;

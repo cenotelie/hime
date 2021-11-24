@@ -327,33 +327,22 @@ fn write_code_constructors(
     } else {
         ""
     };
+    writeln!(writer, "    /**")?;
+    writeln!(writer, "     * Initializes a new instance of the parser")?;
+    writeln!(writer, "     *")?;
+    writeln!(writer, "     * @param lexer The input lexer")?;
+    writeln!(writer, "     */")?;
+    writeln!(
+        writer,
+        "    public {}Parser({}Lexer lexer) {}{{",
+        &name, &name, exception
+    )?;
     if grammar.actions.is_empty() {
-        writeln!(writer, "    /**")?;
-        writeln!(writer, "     * Initializes a new instance of the parser")?;
-        writeln!(writer, "     *")?;
-        writeln!(writer, "     * @param lexer The input lexer")?;
-        writeln!(writer, "     */")?;
-        writeln!(
-            writer,
-            "    public {}Parser({}Lexer lexer) {}{{",
-            &name, &name, exception
-        )?;
         writeln!(
             writer,
             "        super(COMMON_AUTOMATON, variables, virtuals, null, lexer);"
         )?;
-        writeln!(writer, "    }}")?;
     } else {
-        writeln!(writer, "    /**")?;
-        writeln!(writer, "     * Initializes a new instance of the parser")?;
-        writeln!(writer, "     *")?;
-        writeln!(writer, "     * @param lexer The input lexer")?;
-        writeln!(writer, "     */")?;
-        writeln!(
-            writer,
-            "    public {}Parser({}Lexer lexer) {}{{",
-            &name, &name, exception
-        )?;
         writeln!(writer, "        super(COMMON_AUTOMATON, variables, virtuals, getUserActions(noActions), lexer);")?;
         writeln!(writer, "    }}")?;
 
@@ -389,8 +378,8 @@ fn write_code_constructors(
             writer,
             "        super(COMMON_AUTOMATON, variables, virtuals, getUserActions(actions), lexer);"
         )?;
-        writeln!(writer, "    }}")?;
     }
+    writeln!(writer, "    }}")?;
     Ok(())
 }
 

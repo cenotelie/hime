@@ -160,7 +160,7 @@ fn resolve_inheritance<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd>(
         }
         if !modified {
             for loader in to_resolve.iter() {
-                loader.collect_errors(&to_resolve, errors);
+                loader.collect_errors(to_resolve, errors);
             }
             return;
         }
@@ -331,7 +331,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Loader<'a, 'b, 'c, 'd> {
                 hime_grammar::ID_TERMINAL_NAME => {}
                 hime_grammar::ID_VARIABLE_GRAMMAR_PARENCY => {}
                 _ => {
-                    panic!(format!("Unrecognized symbol: {}", node.get_symbol().name));
+                    panic!("Unrecognized symbol: {}", node.get_symbol().name);
                 }
             }
         }
@@ -388,7 +388,7 @@ fn load_terminals(
                 false
             );
         } else {
-            panic!(format!("Unrecognized symbol: {}", node.get_symbol().name));
+            panic!("Unrecognized symbol: {}", node.get_symbol().name);
         }
     }
 }
@@ -494,7 +494,7 @@ fn load_nfa(input_index: usize, errors: &mut Vec<Error>, grammar: &Grammar, node
             left.into_concatenation(right)
         }
         _ => {
-            panic!(format!("Unrecognized symbol: {}", node.get_symbol().name))
+            panic!("Unrecognized symbol: {}", node.get_symbol().name)
         }
     }
 }
@@ -630,7 +630,7 @@ fn load_nfa_class(input_index: usize, errors: &mut Vec<Error>, node: AstNode) ->
             }
             b = span.end + 1;
             // skip the surrogate encoding points
-            if b >= 0xD800 && b <= 0xDFFF {
+            if (0xD800..=0xDFFF).contains(&b) {
                 b = 0xE000;
             }
         }
@@ -797,7 +797,7 @@ fn load_rules(input_index: usize, errors: &mut Vec<Error>, grammar: &mut Grammar
                 .collect();
             grammar.add_template_rule(&name, arguments);
         } else {
-            panic!(format!("Unrecognized symbol: {}", node.get_symbol().name));
+            panic!("Unrecognized symbol: {}", node.get_symbol().name);
         }
     }
     // load template rules
@@ -1139,7 +1139,7 @@ fn load_simple_rule_atomic(
             load_simple_rule_atomic_inline_text(input_index, grammar, node)
         }
         _ => {
-            panic!(format!("Unrecognized symbol: {}", node.get_symbol().name))
+            panic!("Unrecognized symbol: {}", node.get_symbol().name)
         }
     }
 }
@@ -1598,7 +1598,7 @@ fn load_template_rule_atomic(
             load_template_rule_atomic_inline_text(input_index, grammar, node)
         }
         _ => {
-            panic!(format!("Unrecognized symbol: {}", node.get_symbol().name));
+            panic!("Unrecognized symbol: {}", node.get_symbol().name);
         }
     }
 }
@@ -1784,7 +1784,8 @@ fn get_char_value(value: &[char], i: usize) -> (char, usize) {
             let mut l = 0;
             while i + 2 + l < value.len() {
                 c = value[i + 2 + l];
-                if (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') {
+                if ('0'..='9').contains(&c) || ('a'..='f').contains(&c) || ('A'..='F').contains(&c)
+                {
                     l += 1;
                 } else {
                     break;

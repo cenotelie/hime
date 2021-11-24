@@ -19,7 +19,7 @@
 
 use std::fs;
 use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use crate::errors::Error;
@@ -127,8 +127,8 @@ fn build_maven_project(
 }
 
 /// Creates folders for a namespace
-fn create_namespace_folder(root: &PathBuf, parts: &[&str]) -> Result<PathBuf, Error> {
-    let mut target = root.clone();
+fn create_namespace_folder(root: &Path, parts: &[&str]) -> Result<PathBuf, Error> {
+    let mut target = root.to_path_buf();
     for part in parts.iter() {
         target.push(part);
     }
@@ -146,7 +146,7 @@ fn get_namespace(task: &CompilationTask, grammar: &Grammar) -> String {
 }
 
 /// Execute a cargo command
-fn execute_mvn_command(project_folder: &PathBuf, args: &[&str]) -> Result<(), Error> {
+fn execute_mvn_command(project_folder: &Path, args: &[&str]) -> Result<(), Error> {
     let (executable, prefix_args) = get_mvn_command();
     let output = Command::new(executable)
         .current_dir(project_folder)

@@ -30,13 +30,14 @@ use std::cmp::Ordering;
 use std::fs;
 use std::io::Read;
 
+use grammars::BuildData;
 use hime_redist::ast::AstNode;
 use hime_redist::text::{Text, TextPosition};
 
 use crate::errors::{Error, Errors};
 use crate::grammars::{
-    Grammar, OPTION_ACCESS_MODIFIER, OPTION_METHOD, OPTION_MODE, OPTION_NAMESPACE,
-    OPTION_OUTPUT_PATH, OPTION_RUNTIME
+    Grammar, OPTION_ACCESS_MODIFIER, OPTION_MODE, OPTION_NAMESPACE, OPTION_OUTPUT_PATH,
+    OPTION_RUNTIME
 };
 use crate::sdk::InMemoryParser;
 
@@ -235,7 +236,7 @@ impl<'a> Input<'a> {
     pub fn open(&self) -> Result<Box<dyn Read + 'a>, std::io::Error> {
         match self {
             Input::FileName(file_name) => Ok(Box::new(fs::File::open(file_name)?)),
-            Input::Raw(ref text) => Ok(Box::new(text.as_bytes()))
+            Input::Raw(text) => Ok(Box::new(text.as_bytes()))
         }
     }
 }
@@ -457,10 +458,9 @@ impl<'a> CompilationTask<'a> {
     pub fn get_output_path_for(&self, grammar: &Grammar) -> Option<String> {
         match self.output_path.as_ref() {
             Some(path) => Some(path.clone()),
-            None => match grammar.get_option(OPTION_OUTPUT_PATH) {
-                Some(path) => Some(path.value.clone()),
-                None => None
-            }
+            None => grammar
+                .get_option(OPTION_OUTPUT_PATH)
+                .map(|path| path.value.clone())
         }
     }
 
@@ -468,10 +468,9 @@ impl<'a> CompilationTask<'a> {
     pub fn get_output_namespace(&self, grammar: &Grammar) -> Option<String> {
         match self.output_namespace.as_ref() {
             Some(nmspace) => Some(nmspace.clone()),
-            None => match grammar.get_option(OPTION_NAMESPACE) {
-                Some(path) => Some(path.value.clone()),
-                None => None
-            }
+            None => grammar
+                .get_option(OPTION_NAMESPACE)
+                .map(|path| path.value.clone())
         }
     }
 
@@ -498,38 +497,6 @@ impl<'a> CompilationTask<'a> {
         }
     }
 
-    /// Gets the parsing method
-    pub fn get_parsing_method(
-        &self,
-        grammar: &Grammar,
-        grammar_index: usize
-    ) -> Result<ParsingMethod, Error> {
-        match self.method {
-            Some(method) => Ok(method),
-            None => match grammar.get_option(OPTION_METHOD) {
-                Some(option) => match option.value.as_ref() {
-                    "lr0" => Ok(ParsingMethod::LR0),
-                    "lr1" => Ok(ParsingMethod::LR1),
-                    "lalr1" => Ok(ParsingMethod::LALR1),
-                    "rnglr1" => Ok(ParsingMethod::RNGLR1),
-                    "rnglalr1" => Ok(ParsingMethod::RNGLALR1),
-                    _ => Err(Error::InvalidOption(
-                        grammar_index,
-                        OPTION_METHOD.to_string(),
-                        vec![
-                            String::from("lr0"),
-                            String::from("lr1"),
-                            String::from("lalr1"),
-                            String::from("rnglr1"),
-                            String::from("rnglalr1"),
-                        ]
-                    ))
-                },
-                None => Ok(ParsingMethod::LALR1)
-            }
-        }
-    }
-
     /// Executes this task
     pub fn execute(&self) -> Result<LoadedData, Errors> {
         let mut data = self.load()?;
@@ -544,7 +511,11 @@ impl<'a> CompilationTask<'a> {
                 }
             }
         }
-        if let Err(errors) = self.prepare_grammars(&mut data.grammars) {
+        let all_data = match self.execute_build_grammars(&mut data.grammars) {
+            Ok(d) => d,
+            Err(errors) => return Err(Errors::from(data, errors))
+        };
+        if let Err(errors) = self.execute_grammar_artifacts(&data.grammars, &all_data) {
             return Err(Errors::from(data, errors));
         }
         let mut errors = Vec::new();
@@ -571,15 +542,45 @@ impl<'a> CompilationTask<'a> {
         grammar: &'g mut Grammar,
         grammar_index: usize
     ) -> Result<InMemoryParser<'g>, Vec<Error>> {
-        output::build_in_memory_grammar(self, grammar, grammar_index)
+        let data = grammar.build(self.method, grammar_index)?;
+        output::build_in_memory_grammar(grammar, &data)
     }
 
-    /// Prepare grammars
-    pub fn prepare_grammars<'g>(&self, grammars: &'g mut [Grammar]) -> Result<(), Vec<Error>> {
+    /// Build the specified grammars
+    fn execute_build_grammars(
+        &self,
+        grammars: &mut [Grammar]
+    ) -> Result<Vec<BuildData>, Vec<Error>> {
         let mut errors = Vec::new();
+        let mut results = Vec::new();
         // prepare the grammars
         for (index, grammar) in grammars.iter_mut().enumerate() {
-            if let Err(mut errs) = output::execute_for_grammar(self, grammar, index) {
+            match grammar.build(self.method, index) {
+                Ok(data) => {
+                    results.push(data);
+                }
+                Err(mut errs) => {
+                    errors.append(&mut errs);
+                }
+            }
+        }
+        if errors.is_empty() {
+            Ok(results)
+        } else {
+            Err(errors)
+        }
+    }
+
+    /// Outputs the grammar artifacts
+    fn execute_grammar_artifacts<'g>(
+        &self,
+        grammars: &'g [Grammar],
+        data: &[BuildData]
+    ) -> Result<(), Vec<Error>> {
+        let mut errors = Vec::new();
+        // prepare the grammars
+        for (index, (grammar, data)) in grammars.iter().zip(data.iter()).enumerate() {
+            if let Err(mut errs) = output::output_grammar_artifacts(self, grammar, index, data) {
                 errors.append(&mut errs);
             }
         }

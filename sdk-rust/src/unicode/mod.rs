@@ -41,7 +41,7 @@ pub struct CodePoint(u32);
 impl CodePoint {
     /// Initializes the code point
     pub fn new(value: u32) -> CodePoint {
-        if (value >= 0xD800 && value <= 0xDFFF) || value >= 0x0011_0000 {
+        if (0xD800..=0xDFFF).contains(&value) || value >= 0x0011_0000 {
             panic!("The value is not a valid Unicode character code point");
         }
         CodePoint(value)

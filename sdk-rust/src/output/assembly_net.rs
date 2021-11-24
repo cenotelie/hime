@@ -19,7 +19,7 @@
 
 use std::fs;
 use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use crate::errors::Error;
@@ -33,9 +33,20 @@ const MANIFEST: &[u8] = include_bytes!("assembly_net.csproj");
 pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), Error> {
     // build the project
     let project_folder = build_dotnet_project(task, units)?;
+    println!("dotnet project: {:?}", &project_folder);
     // compile
-    execute_dotnet_command(&project_folder, "restore", &[])?;
-    execute_dotnet_command(&project_folder, "build", &["-c", "Release"])?;
+    execute_dotnet_command(
+        &project_folder,
+        "restore",
+        &[],
+        task.output_target_runtime_path.as_deref()
+    )?;
+    execute_dotnet_command(
+        &project_folder,
+        "build",
+        &["-c", "Release"],
+        task.output_target_runtime_path.as_deref()
+    )?;
     // copy the output
     let mut output_file = project_folder.clone();
     output_file.push("bin");
@@ -88,15 +99,17 @@ fn build_dotnet_project(
 
 /// Execute a dotnet command
 fn execute_dotnet_command(
-    project_folder: &PathBuf,
+    project_folder: &Path,
     verb: &str,
-    args: &[&str]
+    args: &[&str],
+    target_runtime: Option<&str>
 ) -> Result<(), Error> {
-    let output = Command::new("dotnet")
-        .arg(verb)
-        .arg(project_folder.as_os_str())
-        .args(args)
-        .output()?;
+    let mut command = Command::new("dotnet");
+    command.arg(verb).arg(project_folder.as_os_str()).args(args);
+    if let Some(target_runtime) = target_runtime {
+        command.env("HimeLocalNuget", target_runtime);
+    }
+    let output = command.output()?;
     let mut lines = BufReader::<&[u8]>::new(output.stderr.as_ref()).lines();
     if let Some(line) = lines.next() {
         return Err(Error::Msg(line?));

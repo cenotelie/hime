@@ -806,14 +806,12 @@ impl Phrase {
         if variable.firsts.content.contains(&TerminalRef::Epsilon) {
             return;
         }
-        let rule_index = match (0..(variable.rules.len())).find(|index| {
-            // if it is not in the stack of rule definition
-            !stack.contains(&RuleRef::new(variable.id, *index))
-        }) {
-            Some(index) => index,
-            // if all identified rule definitions are in the stack (currently in use)
-            None => 0
-        };
+        let rule_index = (0..(variable.rules.len()))
+            .find(|index| {
+                // if it is not in the stack of rule definition
+                !stack.contains(&RuleRef::new(variable.id, *index))
+            })
+            .unwrap_or_default(); // if all identified rule definitions are in the stack (currently in use)
 
         let elements = stack.clone();
         // push the rule definition to use onto the stack

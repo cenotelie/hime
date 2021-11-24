@@ -331,23 +331,16 @@ fn write_code_actions(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
 /// Generates the code for the constructors
 fn write_code_constructors(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), Error> {
     let name = to_upper_camel_case(&grammar.name);
+    writeln!(writer, "\t\t/// <summary>")?;
+    writeln!(writer, "\t\t/// Initializes a new instance of the parser")?;
+    writeln!(writer, "\t\t/// </summary>")?;
+    writeln!(
+        writer,
+        "\t\t/// <param name=\"lexer\">The input lexer</param>"
+    )?;
     if grammar.actions.is_empty() {
-        writeln!(writer, "\t\t/// <summary>")?;
-        writeln!(writer, "\t\t/// Initializes a new instance of the parser")?;
-        writeln!(writer, "\t\t/// </summary>")?;
-        writeln!(
-            writer,
-            "\t\t/// <param name=\"lexer\">The input lexer</param>"
-        )?;
         writeln!(writer, "\t\tpublic {}Parser({}Lexer lexer) : base (commonAutomaton, variables, virtuals, null, lexer) {{ }}", &name, &name)?;
     } else {
-        writeln!(writer, "\t\t/// <summary>")?;
-        writeln!(writer, "\t\t/// Initializes a new instance of the parser")?;
-        writeln!(writer, "\t\t/// </summary>")?;
-        writeln!(
-            writer,
-            "\t\t/// <param name=\"lexer\">The input lexer</param>"
-        )?;
         writeln!(writer, "\t\tpublic {}Parser({}Lexer lexer) : base (commonAutomaton, variables, virtuals, GetUserActions(noActions), lexer) {{ }}", &name, &name)?;
 
         writeln!(writer, "\t\t/// <summary>")?;
