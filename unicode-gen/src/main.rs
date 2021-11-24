@@ -81,7 +81,7 @@ fn get_latet_categories() -> Result<Vec<Category>, Box<dyn Error>> {
                         .entry(current_name.clone())
                         .or_insert_with(|| Category::new_owned(current_name.clone()));
                     if let (Some(begin), Some(last)) = (current_span_begin, last_codepoint) {
-                        if (0xD800..0xE000).contains(&begin) && !(0xD800..0xE000).contains(&last) {
+                        if !(0xD800..0xE000).contains(&begin) && !(0xD800..0xE000).contains(&last) {
                             category.add_span(begin, last);
                         }
                     }
