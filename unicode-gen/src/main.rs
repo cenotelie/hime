@@ -75,24 +75,21 @@ fn get_latet_categories() -> Result<Vec<Category>, Box<dyn Error>> {
         if let Some(m) = re.captures(line) {
             let cp = u32::from_str_radix(&m[1], 16)?;
             let cat = &m[3];
-            if Some(cat) == current_name.as_ref().map(|n| n.as_ref()) {
-                last_codepoint = Some(cp);
-            } else {
+            if Some(cat) != current_name.as_deref() {
                 if let Some(ref current_name) = &current_name {
                     let category = categories
                         .entry(current_name.clone())
                         .or_insert_with(|| Category::new_owned(current_name.clone()));
                     if let (Some(begin), Some(last)) = (current_span_begin, last_codepoint) {
-                        if (begin < 0xD800 || begin >= 0xE000) && (last < 0xD800 || last >= 0xE000)
-                        {
+                        if (0xD800..0xE000).contains(&begin) && !(0xD800..0xE000).contains(&last) {
                             category.add_span(begin, last);
                         }
                     }
                 }
                 current_name = Some(cat.to_string());
                 current_span_begin = Some(cp);
-                last_codepoint = Some(cp);
             }
+            last_codepoint = Some(cp);
         }
     }
     if let (Some(ref current_name), Some(begin), Some(last)) =

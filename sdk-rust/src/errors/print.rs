@@ -346,7 +346,7 @@ fn print_msg(message: &str) {
         Style::new().bold().paint(":"),
         Style::new().bold().paint(message)
     );
-    eprintln!("");
+    eprintln!();
 }
 
 /// Prints input using a reference
@@ -410,7 +410,7 @@ fn print_msg_with_input_ref(
     message: &str
 ) {
     print_msg_with_input_ref_naked(max_width, data, input_ref, message, None);
-    eprintln!("");
+    eprintln!();
 }
 
 /// Prints an error with a message and an input reference
@@ -422,7 +422,7 @@ fn print_msg_with_input_ref_with_sub(
     sub_message: &str
 ) {
     print_msg_with_input_ref_naked(max_width, data, input_ref, message, Some(sub_message));
-    eprintln!("");
+    eprintln!();
 }
 
 /// Prints the error of a token that canot be matched
@@ -463,7 +463,7 @@ fn print_token_not_matched(
             print_input(max_width, data, &terminal.input_ref, &pad, None);
         }
     }
-    eprintln!("");
+    eprintln!();
 }
 
 /// Prints a conflict error message
@@ -523,7 +523,7 @@ fn print_lr_conflict(
             print_phrase(&pad, grammar, phrase);
         }
     }
-    eprintln!("");
+    eprintln!();
 }
 
 /// Prints a LR item
@@ -652,7 +652,7 @@ fn print_context_error(
         for phrase in error.phrases.iter() {
             print_phrase(&pad, grammar, phrase);
         }
-        eprintln!("");
+        eprintln!();
     }
 }
 
