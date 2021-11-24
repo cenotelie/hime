@@ -1,5 +1,5 @@
 [package]
-name = "parseit"
+name = "hime_parseit"
 version = "3.5.2"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Command line to parse a piece of input using a packaged parser."
@@ -9,6 +9,10 @@ keywords = ["hime", "parser", "generator", "lr", "glr", "rnglr"]
 categories = ["algorithms", "parsing", "parser-implementations", "text-processing"]
 license = "LGPL-3.0"
 edition = "2021"
+
+[[bin]]
+name = "parseit"
+path = "src/main.rs"
 
 [dependencies]
 hime_redist = "3.5.2"

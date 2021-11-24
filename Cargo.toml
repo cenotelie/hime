@@ -1,10 +1,10 @@
 [workspace]
 members = [
     "runtime-rust",
-    "parseit-rust",
+    "parseit",
     "sdk-rust",
     "unicode-gen",
-    "himecc-rust",
+    "himecc",
     "tests-executor-rust",
     "tests-driver",
     # "langserv"

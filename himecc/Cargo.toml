@@ -1,5 +1,5 @@
 [package]
-name = "himecc"
+name = "hime_compiler"
 version = "3.5.2"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Generator of lexers and parsers for the Hime runtime."
@@ -12,6 +12,10 @@ categories = ["algorithms", "parsing", "parser-implementations", "text-processin
 license = "LGPL-3.0"
 include = ["README.md", "Cargo.toml", "src/**/*.rs"]
 edition = "2021"
+
+[[bin]]
+name = "himecc"
+path = "src/main.rs"
 
 [dependencies]
 hime_redist = "3.5.2"
