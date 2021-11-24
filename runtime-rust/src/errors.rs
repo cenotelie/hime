@@ -107,7 +107,7 @@ impl ParseErrorDataTrait for ParseErrorUnexpectedChar {
             result.push_str("' (U+");
             result.push_str(&format!("{:X}", cp));
         }
-        result.push_str(")");
+        result.push(')');
         result
     }
 }
@@ -158,7 +158,7 @@ impl ParseErrorDataTrait for ParseErrorIncorrectEncodingSequence {
             result.push_str(&format!("{:X}", self.sequence));
             result.push_str(" <missing>");
         }
-        result.push_str("]");
+        result.push(']');
         result
     }
 }
@@ -209,7 +209,7 @@ impl<'a> ParseErrorDataTrait for ParseErrorUnexpectedToken<'a> {
         let mut result = String::new();
         result.push_str("Unexpected token \"");
         result.push_str(&self.value);
-        result.push_str("\"");
+        result.push('"');
         if !self.expected.is_empty() {
             result.push_str("; expected: ");
             for (i, x) in self.expected.iter().enumerate() {

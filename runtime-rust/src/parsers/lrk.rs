@@ -259,7 +259,7 @@ impl<'a: 'b, 'b, 'c> LRkAstBuilder<'a, 'b, 'c> {
             None => panic!("Not in a reduction"),
             Some(ref mut reduction) => {
                 let sub = &self.stack[self.stack.len() - reduction.length + reduction.pop_count];
-                LRkAstBuilder::reduction_add_sub(reduction, &mut self.handle, &sub, action);
+                LRkAstBuilder::reduction_add_sub(reduction, &mut self.handle, sub, action);
                 reduction.pop_count += 1;
             }
         }
@@ -615,15 +615,13 @@ impl<'a: 'b, 'b, 'c> LRkParser<'a, 'b, 'c> {
         ast: Ast<'a, 'b, 'c>,
         actions: &'c mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
     ) -> LRkParser<'a, 'b, 'c> {
-        let mut stack = Vec::new();
-        stack.push(LRkHead {
-            state: 0,
-            identifier: 0
-        });
         LRkParser {
             data: LRkParserData {
                 automaton,
-                stack,
+                stack: vec![LRkHead {
+                    state: 0,
+                    identifier: 0
+                }],
                 variables: ast.variables,
                 actions
             },

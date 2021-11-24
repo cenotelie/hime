@@ -284,6 +284,7 @@ impl GSSPath {
 }
 
 /// Represents Graph-Structured Stacks for GLR parsers
+#[allow(clippy::upper_case_acronyms)]
 struct GSS {
     /// The label (GLR state) on the GSS node for the given index
     node_labels: BigList<u32>,
@@ -562,11 +563,9 @@ impl SPPFNodeTrait for SPPFNodeNormal {
 impl SPPFNodeNormal {
     /// Initializes this node
     pub fn new(label: TableElemRef) -> SPPFNodeNormal {
-        let mut versions = Vec::new();
-        versions.push(SPPFNodeVersion::new(label));
         SPPFNodeNormal {
             original: label,
-            versions
+            versions: vec![SPPFNodeVersion::new(label)]
         }
     }
 
@@ -577,9 +576,10 @@ impl SPPFNodeNormal {
         buffer: &[SPPFNodeRef],
         count: usize
     ) -> SPPFNodeNormal {
-        let mut versions = Vec::new();
-        versions.push(SPPFNodeVersion::from(label, buffer, count));
-        SPPFNodeNormal { original, versions }
+        SPPFNodeNormal {
+            original,
+            versions: vec![SPPFNodeVersion::from(label, buffer, count)]
+        }
     }
 
     /// Adds a new version to this node
@@ -686,6 +686,7 @@ const EPSILON: GSSLabel = GSSLabel {
 };
 
 /// Represents a Shared-Packed Parse Forest
+#[allow(clippy::upper_case_acronyms)]
 struct SPPF {
     /// The nodes in the SPPF
     nodes: Vec<SPPFNode>
@@ -844,9 +845,10 @@ impl<'a: 'b, 'b, 'c> SPPFBuilder<'a, 'b, 'c> {
                 return;
             }
         }
-        let mut data = Vec::new();
-        data.push(label);
-        my_history.push(HistoryPart { generation, data });
+        my_history.push(HistoryPart {
+            generation,
+            data: vec![label]
+        });
     }
 
     /// Gets the GSS label already in history for the given GSS generation and symbol
@@ -1300,9 +1302,7 @@ impl<'a: 'b, 'b, 'c> ContextProvider for RNGLRParserData<'a, 'b, 'c> {
             if count > 0 {
                 // enqueue the info, top GSS stack node and target GLR state
                 queue_gss_heads.push(shift.from);
-                let mut stack = Vec::with_capacity(1);
-                stack.push(shift.to as u32);
-                queue_vstack.push(stack);
+                queue_vstack.push(vec![shift.to as u32]);
             }
         }
         // now, close the queue
@@ -1356,9 +1356,7 @@ impl<'a: 'b, 'b, 'c> ContextProvider for RNGLRParserData<'a, 'b, 'c> {
                         );
                         // enqueue the info, top GSS stack node and target GLR state
                         queue_gss_heads.push(path.last_node);
-                        let mut virtual_stack = Vec::with_capacity(1);
-                        virtual_stack.push(next.unwrap());
-                        queue_vstack.push(virtual_stack);
+                        queue_vstack.push(vec![next.unwrap()]);
                     }
                 }
             }
@@ -1424,9 +1422,7 @@ impl<'a: 'b, 'b, 'c> RNGLRParserData<'a, 'b, 'c> {
                     );
                     // enqueue the info, top GSS stack node and target GLR state
                     queue_gss_heads.push(path.last_node);
-                    let mut virtual_stack = Vec::with_capacity(1);
-                    virtual_stack.push(next.unwrap());
-                    queue_vstack.push(virtual_stack);
+                    queue_vstack.push(vec![next.unwrap()]);
                 }
             }
         }
@@ -1486,9 +1482,7 @@ impl<'a: 'b, 'b, 'c> RNGLRParserData<'a, 'b, 'c> {
                         );
                         // enqueue the info, top GSS stack node and target GLR state
                         queue_gss_heads.push(path.last_node);
-                        let mut virtual_stack = Vec::with_capacity(1);
-                        virtual_stack.push(next.unwrap());
-                        queue_vstack.push(virtual_stack);
+                        queue_vstack.push(vec![next.unwrap()]);
                     }
                 }
             }

@@ -170,7 +170,7 @@ impl<'a: 'b, 'b, 'c> TokenRepository<'a, 'b, 'c> {
     /// Gets the i-th token
     pub fn get_token<'x>(&'x self, index: usize) -> Token<'a, 'b, 'c, 'x> {
         Token {
-            repository: &self,
+            repository: self,
             index
         }
     }

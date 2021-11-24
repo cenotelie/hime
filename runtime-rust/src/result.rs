@@ -69,13 +69,13 @@ impl<'a: 'b, 'b> ParseResult<'a, 'b> {
 
     /// Gets the token repository associated with this result
     pub fn get_tokens(&self) -> TokenRepository {
-        TokenRepository::new(&self.terminals, &self.text, &self.tokens)
+        TokenRepository::new(self.terminals, &self.text, &self.tokens)
     }
 
     /// Gets the resulting AST
     pub fn get_ast<'x>(&'x self) -> Ast<'a, 'b, 'x> {
         Ast::new(
-            TokenRepository::new(&self.terminals, &self.text, &self.tokens),
+            TokenRepository::new(self.terminals, &self.text, &self.tokens),
             self.variables,
             self.virtuals,
             &self.ast
@@ -91,7 +91,7 @@ impl<'a: 'b, 'b> ParseResult<'a, 'b> {
         Ast<'a, 'b, 'x>
     ) {
         (
-            TokenRepository::new_mut(&self.terminals, &self.text, &mut self.tokens),
+            TokenRepository::new_mut(self.terminals, &self.text, &mut self.tokens),
             &mut self.errors,
             Ast::new_mut(self.variables, self.virtuals, &mut self.ast)
         )

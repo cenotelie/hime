@@ -98,7 +98,7 @@ impl<T: Debug + Copy + Clone> BigList<T> {
     /// Gets an iterator over the list
     pub fn iter(&self) -> BigListIterator<T> {
         BigListIterator {
-            list: &self,
+            list: self,
             index: 0
         }
     }

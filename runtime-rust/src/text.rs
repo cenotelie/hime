@@ -423,7 +423,7 @@ impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
 
         // now we have the decoded unicode character
         // encode it in UTF-16
-        if (c >= 0xD800 && c < 0xE000) || c >= 0x0011_0000 {
+        if (0xD800..0xE000).contains(&c) || c >= 0x0011_0000 {
             // not a valid unicode character
             return None;
         }

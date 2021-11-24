@@ -162,12 +162,10 @@ impl LRContexts {
     pub fn add(&mut self, identifier: u16, context: u16) {
         match self.openings {
             None => {
-                let mut content = Vec::new();
-                content.push(LRContextOpening {
+                self.openings = Some(vec![LRContextOpening {
                     identifier,
                     context
-                });
-                self.openings = Some(content);
+                }]);
             }
             Some(ref mut data) => {
                 data.push(LRContextOpening {

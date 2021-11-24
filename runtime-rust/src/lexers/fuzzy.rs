@@ -17,7 +17,7 @@
 
 //! Module for the lexers' fuzzy DFA matcher
 
-use std::mem::replace;
+use std::mem::take;
 
 use super::automaton::{Automaton, AutomatonState, TokenMatch, DEAD_STATE};
 use crate::errors::{
@@ -195,7 +195,7 @@ impl<'a: 'd, 'b, 'c, 'd> FuzzyMatcher<'a, 'b, 'c, 'd> {
         let mut offset = 0;
         let mut at_end = self.text.is_end(self.origin_index + offset);
         let mut current = if at_end {
-            0 as Utf16C
+            0
         } else {
             self.text.at(self.origin_index + offset)
         };
@@ -212,11 +212,11 @@ impl<'a: 'd, 'b, 'c, 'd> FuzzyMatcher<'a, 'b, 'c, 'd> {
             offset += 1;
             at_end = self.text.is_end(self.origin_index + offset);
             current = if at_end {
-                0 as Utf16C
+                0
             } else {
                 self.text.at(self.origin_index + offset)
             };
-            let generation = replace(&mut result.heads, Vec::new());
+            let generation = take(&mut result.heads);
             for head in generation {
                 if at_end {
                     self.inspect_at_end(&mut result, &head, offset);
@@ -255,7 +255,7 @@ impl<'a: 'd, 'b, 'c, 'd> FuzzyMatcher<'a, 'b, 'c, 'd> {
             // the end of input was not expected
             // there is necessarily some input before because an empty input would have matched the $
             let c = self.text.at(index - 1);
-            if c >= 0xD800 && c <= 0xDBFF {
+            if (0xD800..=0xDBFF).contains(&c) {
                 // a trailing UTF-16 high surrogate
                 self.errors.push_error_no_low_utf16_surrogate(
                     ParseErrorIncorrectEncodingSequence::new(
@@ -271,11 +271,11 @@ impl<'a: 'd, 'b, 'c, 'd> FuzzyMatcher<'a, 'b, 'c, 'd> {
             }
         } else {
             let c = self.text.at(index);
-            if c >= 0xD800 && c <= 0xDBFF && !self.text.is_end(index + 1) {
+            if (0xD800..=0xDBFF).contains(&c) && !self.text.is_end(index + 1) {
                 // a UTF-16 high surrogate
                 // if next next character is a low surrogate, also get it
                 let c2 = self.text.at(index + 1);
-                if c2 >= 0xDC00 && c2 <= 0xDFFF {
+                if (0xDC00..=0xDFFF).contains(&c2) {
                     // an unexpected high and low surrogate pair
                     self.errors
                         .push_error_unexpected_char(ParseErrorUnexpectedChar::new(
@@ -292,11 +292,11 @@ impl<'a: 'd, 'b, 'c, 'd> FuzzyMatcher<'a, 'b, 'c, 'd> {
                         )
                     );
                 }
-            } else if c >= 0xDC00 && c <= 0xDFFF && index > 0 {
+            } else if (0xDC00..=0xDFFF).contains(&c) && index > 0 {
                 // a UTF-16 low surrogate
                 // if the previous character is a high surrogate, also get it
                 let c2 = self.text.at(index - 1);
-                if c2 >= 0xD800 && c2 <= 0xDBFF {
+                if (0xD800..=0xDBFF).contains(&c2) {
                     // an unexpected high and low surrogate pair
                     self.errors
                         .push_error_unexpected_char(ParseErrorUnexpectedChar::new(
@@ -396,7 +396,7 @@ impl<'a: 'd, 'b, 'c, 'd> FuzzyMatcher<'a, 'b, 'c, 'd> {
         offset: usize,
         at_end: bool
     ) {
-        for i in 0..(256 as Utf16C) {
+        for i in 0..256 {
             let target = state_data.get_cached_transition(i);
             if target != DEAD_STATE {
                 self.explore_transition_to_target(result, head, target, offset, at_end);
