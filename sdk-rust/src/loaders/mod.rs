@@ -1805,7 +1805,7 @@ fn get_char_value(value: &[char], i: usize) -> (char, usize) {
 }
 
 /// Replaces the escape sequences in the given piece of text by their value
-fn replace_escapees(value: String) -> String {
+pub fn replace_escapees(value: String) -> String {
     if !value.contains('\\') {
         return value;
     }

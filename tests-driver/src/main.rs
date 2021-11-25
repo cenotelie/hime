@@ -60,8 +60,15 @@ const FIXTURES: [FixtureDef; 8] = [
 
 /// Main entry point
 fn main() {
+    println!("Loading ...");
     let fixtures = on_errors(loaders::parse_fixtures(&FIXTURES));
     on_errors(fixtures.build());
+    match fixtures.execute() {
+        Ok(_) => {}
+        Err(e) => {
+            println!("{:?}", e);
+        }
+    }
 }
 
 /// Handle errors
