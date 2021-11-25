@@ -15,6 +15,7 @@ RUN apt update && apt-get dist-upgrade -y && apt install -y --no-install-recomme
 		zip \
 		git \
 		pkg-config \
+		musl-tools \
     && rm -rf /var/lib/apt/lists/*
 
 # Add dotnet core and Mono
