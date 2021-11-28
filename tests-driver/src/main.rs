@@ -62,7 +62,9 @@ const FIXTURES: [FixtureDef; 8] = [
 fn main() {
     println!("Loading ...");
     let fixtures = on_errors(loaders::parse_fixtures(&FIXTURES));
+    println!("Building ...");
     on_errors(fixtures.build());
+    println!("Executing tests ...");
     match fixtures.execute() {
         Ok(_) => {}
         Err(e) => {

@@ -21,6 +21,7 @@ pub mod results;
 
 use std::fs::{self, File};
 use std::io::{BufWriter, Write};
+use std::path::PathBuf;
 use std::process::Command;
 use std::time::Instant;
 
@@ -30,7 +31,7 @@ use hime_redist::symbols::SemanticElementTrait;
 use hime_sdk::errors::{Error, Errors};
 use hime_sdk::grammars::{BuildData, Grammar, OPTION_METHOD};
 use hime_sdk::output::helper::{to_snake_case, to_upper_case};
-use hime_sdk::{CompilationTask, InputReference, LoadedData, LoadedInput, Runtime};
+use hime_sdk::{CompilationTask, InputReference, LoadedData, LoadedInput, Mode, Runtime};
 use results::{TestResultOnRuntime, TestResultStatus};
 
 use self::results::TestResult;
@@ -64,7 +65,6 @@ impl Fixtures {
         }
 
         if errors.is_empty() {
-            println!("Building Rust ...");
             self.build_rust(&grammars, &grammars_data, &mut errors);
         }
         if errors.is_empty() {
@@ -81,75 +81,102 @@ impl Fixtures {
         grammars_data: &[BuildData],
         errors: &mut Vec<Error>
     ) {
-        let temp_dir = hime_sdk::output::temporary_folder();
-        fs::create_dir_all(&temp_dir).unwrap();
-        let mut path = std::env::current_dir().unwrap();
-        path.push("runtime-rust");
+        if let Err(e) = self.build_rust_inner(grammars, grammars_data, errors) {
+            errors.push(e);
+        }
+    }
 
-        let mut task = CompilationTask::default();
-        task.output_target = Some(Runtime::Rust);
-        task.output_path = Some(temp_dir.to_str().unwrap().to_string());
-        task.output_target_runtime_path = path.to_str().map(|s| s.to_string());
+    /// Build the Rust parsers for the fixtures
+    fn build_rust_inner(
+        &self,
+        grammars: &[Grammar],
+        grammars_data: &[BuildData],
+        errors: &mut Vec<Error>
+    ) -> Result<(), Error> {
+        let temp_dir = hime_sdk::output::temporary_folder();
+        fs::create_dir_all(&temp_dir)?;
+        let mut runtime_path = get_repo_root();
+        runtime_path.push("runtime-rust");
+
+        let task = CompilationTask {
+            mode: Some(Mode::SourcesAndAssembly),
+            output_target: Some(Runtime::Rust),
+            output_path: Some(temp_dir.to_str().unwrap().to_string()),
+            output_target_runtime_path: runtime_path.to_str().map(|s| s.to_string()),
+            ..CompilationTask::default()
+        };
 
         // Build all parser data
         for (index, (grammar, data)) in grammars.iter().zip(grammars_data.iter()).enumerate() {
             if let Err(mut errs) =
-                hime_sdk::output::output_grammar_artifacts(&task, grammar, index, &data)
+                hime_sdk::output::output_grammar_artifacts(&task, grammar, index, data)
             {
                 errors.append(&mut errs);
             }
         }
 
         let units: Vec<(usize, &Grammar)> = grammars.iter().enumerate().collect();
-        hime_sdk::output::build_assembly(&task, &units, Runtime::Rust).unwrap();
+        hime_sdk::output::build_assembly(&task, &units, Runtime::Rust)?;
+
+        // export the result to the local dir
+        let mut path_result = temp_dir.clone();
+        path_result.push("parsers");
+        path_result.set_extension(get_system_ext_dl());
+        let mut path_target = get_local_dir();
+        path_target.push("parsers-rust");
+        path_target.set_extension(get_system_ext_dl());
+        std::fs::copy(path_result, path_target)?;
+        // cleanup
+        std::fs::remove_dir_all(temp_dir)?;
+        Ok(())
     }
 
-    /// Build the .Net parsers for the fixtures
-    fn build_net(&self) -> Result<(), Errors> {
-        let mut errors: Vec<Error> = Vec::new();
-        let mut task = CompilationTask::default();
-        let temp_dir = hime_sdk::output::temporary_folder();
-        fs::create_dir_all(&temp_dir).unwrap();
-        task.output_path = Some(temp_dir.to_str().unwrap().to_string());
-        println!("Write to: {:?}", &temp_dir);
+    // /// Build the .Net parsers for the fixtures
+    // fn build_net(&self) -> Result<(), Errors> {
+    //     let mut errors: Vec<Error> = Vec::new();
+    //     let mut task = CompilationTask::default();
+    //     let temp_dir = hime_sdk::output::temporary_folder();
+    //     fs::create_dir_all(&temp_dir).unwrap();
+    //     task.output_path = Some(temp_dir.to_str().unwrap().to_string());
+    //     println!("Write to: {:?}", &temp_dir);
 
-        // Load all grammars
-        let mut grammars: Vec<Grammar> = Vec::new();
-        for (index, fixture) in self.0.iter().enumerate() {
-            match fixture.grammars(index) {
-                Ok(mut fixture_grammars) => grammars.append(&mut fixture_grammars),
-                Err(mut fixture_errors) => errors.append(&mut fixture_errors)
-            }
-        }
+    //     // Load all grammars
+    //     let mut grammars: Vec<Grammar> = Vec::new();
+    //     for (index, fixture) in self.0.iter().enumerate() {
+    //         match fixture.grammars(index) {
+    //             Ok(mut fixture_grammars) => grammars.append(&mut fixture_grammars),
+    //             Err(mut fixture_errors) => errors.append(&mut fixture_errors)
+    //         }
+    //     }
 
-        // Build all parser data
-        for (index, grammar) in grammars.iter_mut().enumerate() {
-            match grammar.build(None, index) {
-                Ok(data) => {
-                    if let Err(mut errs) =
-                        hime_sdk::output::output_grammar_artifacts(&task, grammar, index, &data)
-                    {
-                        errors.append(&mut errs);
-                    }
-                }
-                Err(mut errs) => errors.append(&mut errs)
-            }
-        }
+    //     // Build all parser data
+    //     for (index, grammar) in grammars.iter_mut().enumerate() {
+    //         match grammar.build(None, index) {
+    //             Ok(data) => {
+    //                 if let Err(mut errs) =
+    //                     hime_sdk::output::output_grammar_artifacts(&task, grammar, index, &data)
+    //                 {
+    //                     errors.append(&mut errs);
+    //                 }
+    //             }
+    //             Err(mut errs) => errors.append(&mut errs)
+    //         }
+    //     }
 
-        let units: Vec<(usize, &Grammar)> = grammars.iter().enumerate().collect();
+    //     let units: Vec<(usize, &Grammar)> = grammars.iter().enumerate().collect();
 
-        // Build .Net
-        let mut path = std::env::current_dir().unwrap();
-        path.push("runtime-net/bin/Release/netstandard2.0");
-        task.output_target_runtime_path = path.to_str().map(|s| s.to_string());
-        hime_sdk::output::build_assembly(&task, &units, Runtime::Net).unwrap();
+    //     // Build .Net
+    //     let mut path = std::env::current_dir().unwrap();
+    //     path.push("runtime-net/bin/Release/netstandard2.0");
+    //     task.output_target_runtime_path = path.to_str().map(|s| s.to_string());
+    //     hime_sdk::output::build_assembly(&task, &units, Runtime::Net).unwrap();
 
-        if errors.is_empty() {
-            Ok(())
-        } else {
-            Err(self.build_errors(grammars, errors))
-        }
-    }
+    //     if errors.is_empty() {
+    //         Ok(())
+    //     } else {
+    //         Err(self.build_errors(grammars, errors))
+    //     }
+    // }
 
     /// Build loaded inputs
     fn get_loaded_inputs(&self) -> Vec<LoadedInput> {
@@ -279,7 +306,7 @@ impl OutputTest {
     /// Builds an output test from the specified AST
     pub fn from_ast(node: AstNode, index: usize) -> OutputTest {
         let name = node.child(0).get_value().unwrap();
-        let input = node.child(3).get_value().unwrap();
+        let input = hime_sdk::loaders::replace_escapees(node.child(3).get_value().unwrap());
         let output = node
             .children()
             .iter()
@@ -302,13 +329,13 @@ impl OutputTest {
     pub fn execute(&self, fixture_name: &str) -> Result<TestResult, Error> {
         {
             let mut input_file = BufWriter::new(File::create("input.txt")?);
-            write!(input_file, "{}", &self.input)?;
+            write!(input_file, "{}", &self.input[1..self.input.len() - 1])?;
             input_file.flush()?;
         }
         {
             let mut expected_file = BufWriter::new(File::create("expected.txt")?);
             for line in self.output.iter() {
-                writeln!(expected_file, "{}", line)?;
+                writeln!(expected_file, "{}", &line[1..line.len() - 1])?;
             }
             expected_file.flush()?;
         }
@@ -353,9 +380,18 @@ impl OutputTest {
 
     /// Execute this test on the Rust runtime
     fn execute_rust(&self) -> Result<TestResultOnRuntime, Error> {
-        let program = format!("executor-rust{}", get_system_ext());
+        let mut program = get_local_dir();
+        program.push("executor-rust");
+        let ext = get_system_ext_exe();
+        if !ext.is_empty() {
+            program.set_extension(ext);
+        }
         let name = to_snake_case(&self.name);
-        execute_command(Runtime::Rust, &program, &[&name, "outputs"])
+        execute_command(
+            Runtime::Rust,
+            program.to_str().unwrap(),
+            &[&name, "outputs"]
+        )
     }
 }
 
@@ -403,6 +439,7 @@ fn execute_command(
         Some(2) => TestResultStatus::Error,
         _ => TestResultStatus::Error
     };
+    println!("{} {:?} => {:?}", program, args, status);
     Ok(TestResultOnRuntime {
         runtime,
         start_time,
@@ -414,18 +451,53 @@ fn execute_command(
 
 /// Gets the system extension for the system executable
 #[cfg(target_os = "linux")]
-fn get_system_ext() -> &'static str {
+fn get_system_ext_exe() -> &'static str {
     ""
 }
 
 /// Gets the system extension for the system executable
 #[cfg(target_os = "macos")]
-fn get_system_ext() -> &'static str {
+fn get_system_ext_exe() -> &'static str {
     ""
 }
 
 /// Gets the system extension for the system executable
 #[cfg(windows)]
-fn get_system_ext() -> &'static str {
-    ".exe"
+fn get_system_ext_exe() -> &'static str {
+    "exe"
+}
+
+/// Gets the system extension for the system assembly
+#[cfg(target_os = "linux")]
+fn get_system_ext_dl() -> &'static str {
+    "so"
+}
+
+/// Gets the system extension for the system assembly
+#[cfg(target_os = "macos")]
+fn get_system_ext_dl() -> &'static str {
+    "dylib"
+}
+
+/// Gets the system extension for the system assembly
+#[cfg(windows)]
+fn get_system_ext_dl() -> &'static str {
+    "dll"
+}
+
+/// Gets the local directory
+fn get_local_dir() -> PathBuf {
+    let mut path = std::env::current_exe().unwrap();
+    path.pop(); // get the directory of the executable
+    path
+}
+
+/// Gets the path to the repository's root
+fn get_repo_root() -> PathBuf {
+    let mut path = get_local_dir();
+    if path.file_name().map(|s| s.to_str()) == Some(Some("tests-results")) {
+        // we are in tests-results
+        path.pop();
+    }
+    path
 }
