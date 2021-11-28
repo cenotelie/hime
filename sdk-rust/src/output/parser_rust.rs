@@ -253,7 +253,7 @@ fn write_code_constructors(
         writeln!(writer)?;
         writeln!(
             writer,
-            "/// Parses the specified stream of UTF-16 with this parser"
+            "/// Parses the specified stream of UTF-8 with this parser"
         )?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
@@ -352,7 +352,7 @@ fn write_code_constructors(
         writeln!(writer)?;
         writeln!(
             writer,
-            "/// Parses the specified stream of UTF-16 with this parser"
+            "/// Parses the specified stream of UTF-8 with this parser"
         )?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
@@ -368,7 +368,7 @@ fn write_code_constructors(
         writeln!(writer)?;
         writeln!(
             writer,
-            "/// Parses the specified stream of UTF-16 with this parser"
+            "/// Parses the specified stream of UTF-8 with this parser"
         )?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
