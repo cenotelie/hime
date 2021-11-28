@@ -72,6 +72,17 @@ impl Statistics {
     }
 }
 
+/// The results of the execution of tests
+#[derive(Debug, Default, Clone)]
+pub struct ExecutionResults(pub Vec<FixtureResults>);
+
+impl ExecutionResults {
+    /// Gets the statistics for this execution
+    pub fn get_stats(&self) -> Statistics {
+        self.0.iter().map(|t| t.get_stats()).sum()
+    }
+}
+
 /// The results for the tests on a fixture
 #[derive(Debug, Clone)]
 pub struct FixtureResults {
@@ -92,7 +103,7 @@ impl FixtureResults {
 #[derive(Debug, Clone)]
 pub struct TestResult {
     /// The test name
-    pub test_name: String,
+    pub name: String,
     /// The result of the test on the .Net runtime
     pub dot_net: Option<TestResultOnRuntime>,
     /// The result of the test on the Java runtime
@@ -170,7 +181,7 @@ impl TestResultOnRuntime {
     }
 
     /// Writes the test result as XML
-    pub fn write_xml<W: Write>(&self, writer: &mut W) -> Result<(), Error> {
+    pub fn write_xml<W: Write>(&self, writer: &mut W, test_name: &str) -> Result<(), Error> {
         write!(writer, "<testcase ")?;
 
         writeln!(writer, ">")?;

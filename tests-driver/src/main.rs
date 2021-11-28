@@ -66,7 +66,16 @@ fn main() {
     on_errors(fixtures.build());
     println!("Executing tests ...");
     match fixtures.execute() {
-        Ok(_) => {}
+        Ok(results) => {
+            let stats = results.get_stats();
+            println!(
+                "{} succeedes, {} failures, {} errors / {} total",
+                stats.success,
+                stats.failure,
+                stats.error,
+                stats.total()
+            );
+        }
         Err(e) => {
             println!("{:?}", e);
         }

@@ -34,7 +34,7 @@ use hime_sdk::output::helper::{to_snake_case, to_upper_case};
 use hime_sdk::{CompilationTask, InputReference, LoadedData, LoadedInput, Mode, Runtime};
 use results::{TestResultOnRuntime, TestResultStatus};
 
-use self::results::TestResult;
+use self::results::{ExecutionResults, FixtureResults, TestResult};
 
 /// A fixture definition
 pub struct FixtureDef(pub &'static str, pub &'static [u8]);
@@ -201,11 +201,13 @@ impl Fixtures {
     }
 
     /// Execute this fixture
-    pub fn execute(&self) -> Result<(), Error> {
-        for fixture in self.0.iter() {
-            fixture.execute()?;
-        }
-        Ok(())
+    pub fn execute(&self) -> Result<ExecutionResults, Error> {
+        let results = self
+            .0
+            .iter()
+            .map(|fixture| fixture.execute())
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(ExecutionResults(results))
     }
 }
 
@@ -264,11 +266,16 @@ impl Fixture {
     }
 
     /// Execute this fixture
-    pub fn execute(&self) -> Result<(), Error> {
-        for test in self.tests.iter() {
-            test.execute(&self.name)?;
-        }
-        Ok(())
+    pub fn execute(&self) -> Result<FixtureResults, Error> {
+        let results = self
+            .tests
+            .iter()
+            .map(|test| test.execute(&self.name))
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(FixtureResults {
+            name: self.name.clone(),
+            tests: results
+        })
     }
 }
 
@@ -343,7 +350,7 @@ impl OutputTest {
         let result_java = self.execute_java(fixture_name)?;
         let result_rust = self.execute_rust()?;
         Ok(TestResult {
-            test_name: self.name.clone(),
+            name: self.name.clone(),
             dot_net: Some(result_net),
             java: Some(result_java),
             rust: Some(result_rust)
@@ -411,9 +418,9 @@ impl ParsingTest {
     }
 
     /// Execute this test
-    pub fn execute(&self, fixture_name: &str) -> Result<TestResult, Error> {
+    pub fn execute(&self, _fixture_name: &str) -> Result<TestResult, Error> {
         Ok(TestResult {
-            test_name: self.name.clone(),
+            name: self.name.clone(),
             dot_net: None,
             java: None,
             rust: None
@@ -439,7 +446,6 @@ fn execute_command(
         Some(2) => TestResultStatus::Error,
         _ => TestResultStatus::Error
     };
-    println!("{} {:?} => {:?}", program, args, status);
     Ok(TestResultOnRuntime {
         runtime,
         start_time,
