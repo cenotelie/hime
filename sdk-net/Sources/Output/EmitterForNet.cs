@@ -158,9 +158,11 @@ namespace Hime.SDK.Output
 			string output = OutputPath + GetUniqueID() + SuffixAssembly;
 			using (CodeDomProvider compiler = CodeDomProvider.CreateProvider("C#"))
 			{
+				Assembly netstandard = Assembly.Load("netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51");
 				CompilerParameters compilerparams = new CompilerParameters();
 				compilerparams.GenerateExecutable = false;
 				compilerparams.GenerateInMemory = false;
+				compilerparams.ReferencedAssemblies.Add(netstandard.Location);
 				compilerparams.ReferencedAssemblies.Add(fileRedist);
 				compilerparams.ReferencedAssemblies.Add("mscorlib.dll");
 				compilerparams.ReferencedAssemblies.Add("System.dll");
