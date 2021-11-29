@@ -17,6 +17,9 @@
 
 //! Main module
 
+#[allow(dead_code)]
+mod expected_tree;
+
 use std::io::Read;
 use std::{env, fs, io, path, process};
 
@@ -92,18 +95,11 @@ fn get_parser_library_name(my_path: &path::Path) -> path::PathBuf {
 }
 
 /// Gets the serialized expected AST
-fn get_expected_ast(
-    my_path: &path::Path,
-    library: &libloading::Library
-) -> ParseResult<'static, 'static> {
+fn get_expected_ast(my_path: &path::Path) -> ParseResult<'static, 'static> {
     let file = my_path.join("expected.txt");
     let file_input = fs::File::open(file).unwrap();
     let mut input_reader = io::BufReader::new(file_input);
-    unsafe {
-        let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResult<'static, 'static>> =
-            library.get(b"expected_tree_parse_utf8").unwrap();
-        parser(&mut input_reader)
-    }
+    expected_tree::parse_utf8(&mut input_reader)
 }
 
 /// Gets the serialized expected output
@@ -157,7 +153,7 @@ fn execute_test_matches(
     library: &libloading::Library,
     parser_name: &str
 ) -> i32 {
-    let expected = get_expected_ast(my_path, library);
+    let expected = get_expected_ast(my_path);
     if !expected.errors.errors.is_empty() {
         println!("Failed to parse the expected AST");
         return RESULT_FAILURE_PARSING;
@@ -194,7 +190,7 @@ fn execute_test_no_matches(
     library: &libloading::Library,
     parser_name: &str
 ) -> i32 {
-    let expected = get_expected_ast(my_path, library);
+    let expected = get_expected_ast(my_path);
     if !expected.errors.errors.is_empty() {
         println!("Failed to parse the expected AST");
         return RESULT_FAILURE_PARSING;

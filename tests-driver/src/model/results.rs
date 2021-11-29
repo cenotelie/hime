@@ -251,7 +251,9 @@ pub struct TestResultOnRuntime {
     /// The test status in the end
     pub status: TestResultStatus,
     /// The console output for the test
-    pub output: String
+    pub stdout: String,
+    /// The console output for the test
+    pub stderr: String
 }
 
 impl TestResultOnRuntime {
@@ -293,12 +295,22 @@ impl TestResultOnRuntime {
             TestResultStatus::Success => {}
             TestResultStatus::Failure => {
                 writeln!(writer, "        <failure>")?;
-                writeln!(writer, "          {}", self.output)?;
+                if !self.stdout.is_empty() {
+                    write!(writer, "{}", self.stdout)?;
+                }
+                if !self.stderr.is_empty() {
+                    write!(writer, "{}", self.stderr)?;
+                }
                 writeln!(writer, "        </failure>")?;
             }
             TestResultStatus::Error => {
                 writeln!(writer, "        <error>")?;
-                writeln!(writer, "          {}", self.output)?;
+                if !self.stdout.is_empty() {
+                    write!(writer, "{}", self.stdout)?;
+                }
+                if !self.stderr.is_empty() {
+                    write!(writer, "{}", self.stderr)?;
+                }
                 writeln!(writer, "        </error>")?;
             }
         }

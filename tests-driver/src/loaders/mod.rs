@@ -20,8 +20,6 @@
 use std::io::BufReader;
 
 #[allow(dead_code)]
-mod expected_tree;
-#[allow(dead_code)]
 mod fixture;
 
 pub use fixture::{

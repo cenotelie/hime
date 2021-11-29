@@ -55,8 +55,9 @@ impl Fixtures {
                 Err(mut fixture_errors) => errors.append(&mut fixture_errors)
             }
         }
-        let mut grammars_data = Vec::new();
+
         // Build all parser data
+        let mut grammars_data = Vec::new();
         for (index, grammar) in grammars.iter_mut().enumerate() {
             match grammar.build(None, index) {
                 Ok(data) => grammars_data.push(data),
@@ -573,6 +574,8 @@ fn execute_command(
     command.args(args);
     let start_time = Instant::now();
     let output = command.output()?;
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    let stderr = String::from_utf8(output.stderr).unwrap();
     let end_time = Instant::now();
     let spent_time = end_time - start_time;
     let status = match output.status.code() {
@@ -586,7 +589,8 @@ fn execute_command(
         start_time,
         spent_time,
         status,
-        output: String::from_utf8(output.stdout).unwrap()
+        stdout,
+        stderr
     })
 }
 
