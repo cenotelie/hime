@@ -367,7 +367,7 @@ impl OutputTest {
         execute_command(
             Runtime::Java,
             "mono",
-            &["executor-net.exe", "executor-java.jar", &name, "outputs"]
+            &["executor-net.exe", &name, "outputs"]
         )
     }
 
@@ -402,29 +402,164 @@ impl OutputTest {
     }
 }
 
+/// The verb for a parsing test
+pub enum ParsingTestVerb {
+    /// The produced AST matches the expected one
+    Matches,
+    /// The produced AST does NOT match the provided one
+    NoMatch,
+    /// The parsing fails
+    Fails
+}
+
+impl ParsingTestVerb {
+    /// Gets the string representation for the verb
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            ParsingTestVerb::Matches => "matches",
+            ParsingTestVerb::NoMatch => "nomatches",
+            ParsingTestVerb::Fails => "fails"
+        }
+    }
+}
+
 /// A parsing test
 pub struct ParsingTest {
     /// The test name
     pub name: String,
     /// The index within the fixture
-    pub index: usize
+    pub index: usize,
+    /// The verb for this test
+    pub verb: ParsingTestVerb,
+    /// The input for the parser
+    pub input: String,
+    /// The string serialization of the reference AST
+    pub tree: String
 }
 
 impl ParsingTest {
     /// Builds an output test from the specified AST
     pub fn from_ast(node: AstNode, index: usize) -> ParsingTest {
         let name = node.child(0).get_value().unwrap();
-        ParsingTest { name, index }
+        let verb = match node.get_symbol().id {
+            crate::loaders::ID_VARIABLE_TEST_MATCHES => ParsingTestVerb::Matches,
+            crate::loaders::ID_VARIABLE_TEST_NO_MATCH => ParsingTestVerb::NoMatch,
+            _ => ParsingTestVerb::Fails
+        };
+        let input = hime_sdk::loaders::replace_escapees(node.child(3).get_value().unwrap());
+        let tree = if node.children_count() >= 5 {
+            let mut buffer = String::new();
+            ParsingTest::serialize_tree(node.child(4), &mut buffer);
+            buffer
+        } else {
+            String::new()
+        };
+        ParsingTest {
+            name,
+            index,
+            verb,
+            input,
+            tree
+        }
+    }
+
+    /// Serializes a tree into a string
+    fn serialize_tree(node: AstNode, buffer: &mut String) {
+        if let Some(value) = node.get_value() {
+            buffer.push_str(&value);
+        }
+        let node_check = node.child(0);
+        if node_check.children_count() > 0 {
+            buffer.push_str(&node_check.child(0).get_value().unwrap());
+            let value = node_check.child(1).get_value().unwrap();
+            // Decode the read value by replacing all the escape sequences
+            let value = hime_sdk::loaders::replace_escapees(value).replace("\\\'", "'");
+            // Reset escape sequences for single quotes and backslashes
+            let value = value[1..(value.len() - 1)]
+                .replace("\\", "\\\\")
+                .replace("'", "\\'");
+            buffer.push('\'');
+            buffer.push_str(&value);
+            buffer.push('\'');
+        }
+        let node_children = node.child(1);
+        if node_children.children_count() > 0 {
+            buffer.push_str(" (");
+            for (index, child) in node_children.children().iter().enumerate() {
+                if index > 0 {
+                    buffer.push(' ');
+                    ParsingTest::serialize_tree(child, buffer);
+                }
+            }
+            buffer.push(')');
+        }
     }
 
     /// Execute this test
-    pub fn execute(&self, _fixture_name: &str) -> Result<TestResult, Error> {
+    pub fn execute(&self, fixture_name: &str) -> Result<TestResult, Error> {
+        {
+            let mut input_file = BufWriter::new(File::create("input.txt")?);
+            write!(input_file, "{}", &self.input[1..self.input.len() - 1])?;
+            input_file.flush()?;
+        }
+        if !self.tree.is_empty() {
+            let mut expected_file = BufWriter::new(File::create("expected.txt")?);
+            write!(expected_file, "{}", &self.tree)?;
+            expected_file.flush()?;
+        }
+        let result_net = self.execute_net(fixture_name)?;
+        let result_java = self.execute_java(fixture_name)?;
+        let result_rust = self.execute_rust()?;
         Ok(TestResult {
             name: self.name.clone(),
-            dot_net: None,
-            java: None,
-            rust: None
+            dot_net: Some(result_net),
+            java: Some(result_java),
+            rust: Some(result_rust)
         })
+    }
+
+    /// Execute this test on the .Net runtime
+    fn execute_net(&self, fixture_name: &str) -> Result<TestResultOnRuntime, Error> {
+        let name = format!(
+            "Hime.Tests.Generated.{}.{}Parser",
+            to_upper_case(fixture_name),
+            self.name
+        );
+        execute_command(
+            Runtime::Java,
+            "mono",
+            &["executor-net.exe", &name, self.verb.as_str()]
+        )
+    }
+
+    /// Execute this test on the Java runtime
+    fn execute_java(&self, fixture_name: &str) -> Result<TestResultOnRuntime, Error> {
+        let name = format!(
+            "hime.tests.generated.{}.{}Parser",
+            to_snake_case(fixture_name),
+            self.name
+        );
+        execute_command(
+            Runtime::Java,
+            "java",
+            &["-jar", "executor-java.jar", &name, self.verb.as_str()]
+        )
+    }
+
+    /// Execute this test on the Rust runtime
+    fn execute_rust(&self) -> Result<TestResultOnRuntime, Error> {
+        let mut program = get_local_dir();
+        program.push("executor-rust");
+        let ext = get_system_ext_exe();
+        if !ext.is_empty() {
+            program.set_extension(ext);
+        }
+        let name = to_snake_case(&self.name);
+        execute_command(
+            Runtime::Rust,
+            program.to_str().unwrap(),
+            &[&name, self.verb.as_str()]
+        )
     }
 }
 

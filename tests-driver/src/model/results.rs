@@ -17,7 +17,8 @@
 
 //! The results of tests
 
-use std::io::Write;
+use std::fs::File;
+use std::io::{BufWriter, Write};
 use std::iter::Sum;
 use std::ops::Add;
 use std::time::{Duration, Instant};
@@ -26,14 +27,30 @@ use hime_sdk::errors::Error;
 use hime_sdk::Runtime;
 
 /// The statistics for test results
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Statistics {
     /// The number of tests in success
     pub success: usize,
     /// The number of tests in failure
     pub failure: usize,
     /// The number of tests in error
-    pub error: usize
+    pub error: usize,
+    /// The start time for the test
+    pub start_time: Instant,
+    /// The time spent in the test
+    pub spent_time: Duration
+}
+
+impl Default for Statistics {
+    fn default() -> Self {
+        Self {
+            success: 0,
+            failure: 0,
+            error: 0,
+            start_time: Instant::now(),
+            spent_time: Duration::default()
+        }
+    }
 }
 
 impl Add<Statistics> for Statistics {
@@ -42,7 +59,9 @@ impl Add<Statistics> for Statistics {
         Statistics {
             success: self.success + rhs.success,
             failure: self.failure + rhs.failure,
-            error: self.error + rhs.error
+            error: self.error + rhs.error,
+            start_time: self.start_time.min(rhs.start_time),
+            spent_time: self.spent_time + rhs.spent_time
         }
     }
 }
@@ -52,15 +71,21 @@ impl Sum for Statistics {
         let mut success = 0;
         let mut failure = 0;
         let mut error = 0;
+        let mut start_time = Instant::now();
+        let mut spent_time = Duration::default();
         for s in iter {
             success += s.success;
             failure += s.failure;
             error += s.error;
+            start_time = start_time.min(s.start_time);
+            spent_time += s.spent_time;
         }
         Statistics {
             success,
             failure,
-            error
+            error,
+            start_time,
+            spent_time
         }
     }
 }
@@ -81,6 +106,35 @@ impl ExecutionResults {
     pub fn get_stats(&self) -> Statistics {
         self.0.iter().map(|t| t.get_stats()).sum()
     }
+
+    /// Export the results as XML
+    pub fn export_xml(&self) -> Result<(), Error> {
+        let mut file = BufWriter::new(File::create("TestResults.xml")?);
+        self.write_xml(&mut file)?;
+        Ok(())
+    }
+
+    /// Writes the test result as XML
+    pub fn write_xml<W: Write>(&self, writer: &mut W) -> Result<(), Error> {
+        let stats = self.get_stats();
+        writeln!(
+            writer,
+            "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\" ?>"
+        )?;
+        write!(writer, "<testsuite")?;
+        write!(writer, " name=\"tests\"")?;
+        write!(writer, " timestamp=\"\"")?;
+        write!(writer, " tests=\"{}\"", stats.total())?;
+        write!(writer, " errors=\"{}\"", stats.error)?;
+        write!(writer, " failures=\"{}\"", stats.failure)?;
+        write!(writer, " time=\"{}\"", stats.spent_time.as_secs_f32())?;
+        writeln!(writer, ">")?;
+        for fixture in self.0.iter() {
+            fixture.write_xml(writer)?;
+        }
+        writeln!(writer, "</testsuite>")?;
+        Ok(())
+    }
 }
 
 /// The results for the tests on a fixture
@@ -96,6 +150,24 @@ impl FixtureResults {
     /// Gets the statistics for this fixture
     pub fn get_stats(&self) -> Statistics {
         self.tests.iter().map(|t| t.get_stats()).sum()
+    }
+
+    /// Writes the test result as XML
+    pub fn write_xml<W: Write>(&self, writer: &mut W) -> Result<(), Error> {
+        let stats = self.get_stats();
+        write!(writer, "  <testsuite")?;
+        write!(writer, " name=\"{}\"", self.name)?;
+        write!(writer, " timestamp=\"\"")?;
+        write!(writer, " tests=\"{}\"", stats.total())?;
+        write!(writer, " errors=\"{}\"", stats.error)?;
+        write!(writer, " failures=\"{}\"", stats.failure)?;
+        write!(writer, " time=\"{}\"", stats.spent_time.as_secs_f32())?;
+        writeln!(writer, ">")?;
+        for test in self.tests.iter() {
+            test.write_xml(writer)?;
+        }
+        writeln!(writer, "  </testsuite>")?;
+        Ok(())
     }
 }
 
@@ -129,6 +201,30 @@ impl TestResult {
                 .as_ref()
                 .map(|r| r.get_stats())
                 .unwrap_or_default()
+    }
+
+    /// Writes the test result as XML
+    pub fn write_xml<W: Write>(&self, writer: &mut W) -> Result<(), Error> {
+        let stats = self.get_stats();
+        write!(writer, "    <testsuite")?;
+        write!(writer, " name=\"{}\"", self.name)?;
+        write!(writer, " timestamp=\"\"")?;
+        write!(writer, " tests=\"{}\"", stats.total())?;
+        write!(writer, " errors=\"{}\"", stats.error)?;
+        write!(writer, " failures=\"{}\"", stats.failure)?;
+        write!(writer, " time=\"{}\"", stats.spent_time.as_secs_f32())?;
+        writeln!(writer, ">")?;
+        if let Some(test_result) = self.dot_net.as_ref() {
+            test_result.write_xml(writer, &self.name)?;
+        }
+        if let Some(test_result) = self.java.as_ref() {
+            test_result.write_xml(writer, &self.name)?;
+        }
+        if let Some(test_result) = self.rust.as_ref() {
+            test_result.write_xml(writer, &self.name)?;
+        }
+        writeln!(writer, "    </testsuite>")?;
+        Ok(())
     }
 }
 
@@ -165,28 +261,48 @@ impl TestResultOnRuntime {
             TestResultStatus::Success => Statistics {
                 success: 1,
                 failure: 0,
-                error: 0
+                error: 0,
+                start_time: self.start_time,
+                spent_time: self.spent_time
             },
             TestResultStatus::Failure => Statistics {
                 success: 0,
                 failure: 1,
-                error: 0
+                error: 0,
+                start_time: self.start_time,
+                spent_time: self.spent_time
             },
             TestResultStatus::Error => Statistics {
                 success: 0,
                 failure: 0,
-                error: 1
+                error: 1,
+                start_time: self.start_time,
+                spent_time: self.spent_time
             }
         }
     }
 
     /// Writes the test result as XML
     pub fn write_xml<W: Write>(&self, writer: &mut W, test_name: &str) -> Result<(), Error> {
-        write!(writer, "<testcase ")?;
-
+        write!(writer, "      <testcase")?;
+        write!(writer, " name=\"{}.{:?}\"", test_name, self.runtime)?;
+        write!(writer, " classname=\"\"")?;
+        write!(writer, " time=\"{}\"", self.spent_time.as_secs_f32())?;
         writeln!(writer, ">")?;
-
-        writeln!(writer, "</testcase>")?;
+        match self.status {
+            TestResultStatus::Success => {}
+            TestResultStatus::Failure => {
+                writeln!(writer, "        <failure>")?;
+                writeln!(writer, "          {}", self.output)?;
+                writeln!(writer, "        </failure>")?;
+            }
+            TestResultStatus::Error => {
+                writeln!(writer, "        <error>")?;
+                writeln!(writer, "          {}", self.output)?;
+                writeln!(writer, "        </error>")?;
+            }
+        }
+        writeln!(writer, "      </testcase>")?;
         Ok(())
     }
 }

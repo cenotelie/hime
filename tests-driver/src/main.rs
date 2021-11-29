@@ -69,12 +69,15 @@ fn main() {
         Ok(results) => {
             let stats = results.get_stats();
             println!(
-                "{} succeedes, {} failures, {} errors / {} total",
+                "{} successes, {} failures, {} errors / {} total",
                 stats.success,
                 stats.failure,
                 stats.error,
                 stats.total()
             );
+            if let Err(e) = results.export_xml() {
+                println!("{:?}", e);
+            }
         }
         Err(e) => {
             println!("{:?}", e);
