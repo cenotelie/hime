@@ -38,4 +38,8 @@
       <Name>Hime.Redist</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ExpectedTreeLexer.bin" />
+    <EmbeddedResource Include="ExpectedTreeParser.bin" />
+  </ItemGroup>
 </Project>

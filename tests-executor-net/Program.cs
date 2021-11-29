@@ -109,7 +109,7 @@ namespace Hime.Tests.Executor
 		private static ASTNode? GetExpectedAST()
 		{
 			string expectedText = File.ReadAllText("expected.txt", Encoding.UTF8);
-			Hime.Redist.Parsers.BaseLRParser expectedParser = GetParser("Hime.Tests.Generated.ExpectedTreeParser", expectedText);
+			ExpectedTreeParser expectedParser = new ExpectedTreeParser(new ExpectedTreeLexer(expectedText));
 			ParseResult result = expectedParser.Parse();
 			foreach (ParseError error in result.Errors)
 			{
