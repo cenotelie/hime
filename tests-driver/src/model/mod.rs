@@ -155,7 +155,7 @@ impl Fixtures {
         let temp_dir = hime_sdk::output::temporary_folder();
         fs::create_dir_all(&temp_dir)?;
         let mut runtime_path = get_repo_root();
-        runtime_path.push("runtime-net/bin/Release/netstandard2.0");
+        runtime_path.push("tests-results");
 
         let task = CompilationTask {
             mode: Some(Mode::SourcesAndAssembly),

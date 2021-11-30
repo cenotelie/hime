@@ -20,7 +20,15 @@ esac
 
 TERMINAL=""
 if [ -t 1 ] ; then
-  docker run -it --rm --user=$(id -u) -v "$ROOT:/src" -v "cargo-registry:/home/builder/.cargo/registry" -v "$HOME/.m2:/home/builder/.m2" -e "HOME=/home/builder" -e "GIT_HASH=$HASH" -e "GIT_TAG=$TAG" -w "$WD" "cenotelie/hime-build-env:latest" $@
+  docker run -it --rm --user=$(id -u) \
+    -v "$ROOT:/src" -v "cargo-registry:/home/builder/.cargo/registry" -v "$HOME/.m2:/home/builder/.m2" \
+    -e "HOME=/home/builder" -e "GIT_HASH=$HASH" -e "GIT_TAG=$TAG" -e "FrameworkPathOverride=/usr/lib/mono/4.6.1-api" \
+    -w "$WD" \
+    "cenotelie/hime-build-env:latest" $@
 else
-  docker run --rm --user=$(id -u) -v "$ROOT:/src" -v "cargo-registry:/home/builder/.cargo/registry" -v "$HOME/.m2:/home/builder/.m2" -e "HOME=/home/builder" -e "GIT_HASH=$HASH" -e "GIT_TAG=$TAG" -w "$WD" "cenotelie/hime-build-env:latest" $@
+  docker run --rm --user=$(id -u) \
+  -v "$ROOT:/src" -v "cargo-registry:/home/builder/.cargo/registry" -v "$HOME/.m2:/home/builder/.m2" \
+  -e "HOME=/home/builder" -e "GIT_HASH=$HASH" -e "GIT_TAG=$TAG" -e "FrameworkPathOverride=/usr/lib/mono/4.6.1-api" \
+  -w "$WD" \
+  "cenotelie/hime-build-env:latest" $@
 fi

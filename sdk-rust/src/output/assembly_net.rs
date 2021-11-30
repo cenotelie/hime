@@ -62,7 +62,7 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
             "{}.dll",
             helper::to_upper_camel_case(&units[0].1.name)
         ));
-        fs::rename(output_file, final_path)?;
+        fs::copy(output_file, final_path)?;
     } else {
         // output the package
         let mut final_path = PathBuf::new();
@@ -70,7 +70,7 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
             final_path.push(path);
         }
         final_path.push("Parsers.dll");
-        fs::rename(output_file, final_path)?;
+        fs::copy(output_file, final_path)?;
     }
     // cleanup the temp folder
     fs::remove_dir_all(&project_folder)?;
