@@ -30,8 +30,8 @@ use hime_redist::result::ParseResult;
 use hime_redist::symbols::SemanticElementTrait;
 use hime_sdk::errors::{Error, Errors};
 use hime_sdk::grammars::{BuildData, Grammar, OPTION_METHOD};
-use hime_sdk::output::helper::{to_snake_case, to_upper_case};
-use hime_sdk::{CompilationTask, InputReference, LoadedData, LoadedInput, Mode, Runtime};
+use hime_sdk::output::helper::{to_snake_case, to_upper_camel_case};
+use hime_sdk::{CompilationTask, InputReference, LoadedData, LoadedInput, Mode, Modifier, Runtime};
 use results::{TestResultOnRuntime, TestResultStatus};
 
 use self::results::{ExecutionResults, FixtureResults, TestResult};
@@ -67,6 +67,7 @@ impl Fixtures {
 
         if errors.is_empty() {
             self.build_net(&grammars, &grammars_data, &mut errors);
+            self.build_java(&grammars, &grammars_data, &mut errors);
             self.build_rust(&grammars, &grammars_data, &mut errors);
         }
         if errors.is_empty() {
@@ -83,6 +84,7 @@ impl Fixtures {
         grammars_data: &[BuildData],
         errors: &mut Vec<Error>
     ) {
+        println!("Building Rust test parsers");
         if let Err(e) = self.build_rust_inner(grammars, grammars_data, errors) {
             errors.push(e);
         }
@@ -140,6 +142,7 @@ impl Fixtures {
         grammars_data: &[BuildData],
         errors: &mut Vec<Error>
     ) {
+        println!("Building .Net test parsers");
         if let Err(e) = self.build_net_inner(grammars, grammars_data, errors) {
             errors.push(e);
         }
@@ -182,6 +185,67 @@ impl Fixtures {
         path_result.push("Parsers.dll");
         let mut path_target = get_local_dir();
         path_target.push("parsers-net.dll");
+        std::fs::copy(path_result, path_target)?;
+        // cleanup
+        std::fs::remove_dir_all(temp_dir)?;
+        Ok(())
+    }
+
+    /// Build the Java parsers for the fixtures
+    fn build_java(
+        &self,
+        grammars: &[Grammar],
+        grammars_data: &[BuildData],
+        errors: &mut Vec<Error>
+    ) {
+        println!("Building Java test parsers");
+        if let Err(e) = self.build_java_inner(grammars, grammars_data, errors) {
+            errors.push(e);
+        }
+    }
+
+    /// Build the Java parsers for the fixtures
+    fn build_java_inner(
+        &self,
+        grammars: &[Grammar],
+        grammars_data: &[BuildData],
+        errors: &mut Vec<Error>
+    ) -> Result<(), Error> {
+        let temp_dir = hime_sdk::output::temporary_folder();
+        fs::create_dir_all(&temp_dir)?;
+        let mut runtime_path = get_repo_root();
+        runtime_path.push("runtime-java");
+
+        let task = CompilationTask {
+            mode: Some(Mode::SourcesAndAssembly),
+            output_target: Some(Runtime::Java),
+            output_modifier: Some(Modifier::Public),
+            output_path: Some(temp_dir.to_str().unwrap().to_string()),
+            output_target_runtime_path: runtime_path.to_str().map(|s| s.to_string()),
+            java_maven_repository: match std::env::var("HOME") {
+                Ok(home) => Some(format!("{}/.m2/repository", home)),
+                Err(_) => None
+            },
+            ..CompilationTask::default()
+        };
+
+        // Build all parser data
+        for (index, (grammar, data)) in grammars.iter().zip(grammars_data.iter()).enumerate() {
+            if let Err(mut errs) =
+                hime_sdk::output::output_grammar_artifacts(&task, grammar, index, data)
+            {
+                errors.append(&mut errs);
+            }
+        }
+
+        let units: Vec<(usize, &Grammar)> = grammars.iter().enumerate().collect();
+        hime_sdk::output::build_assembly(&task, &units, Runtime::Java)?;
+
+        // export the result to the local dir
+        let mut path_result = temp_dir.clone();
+        path_result.push("Parsers.jar");
+        let mut path_target = get_local_dir();
+        path_target.push("parsers-java.jar");
         std::fs::copy(path_result, path_target)?;
         // cleanup
         std::fs::remove_dir_all(temp_dir)?;
@@ -280,7 +344,7 @@ impl Fixture {
         let results = self
             .tests
             .iter()
-            .map(|test| test.execute(&self.name))
+            .map(|test| test.execute())
             .collect::<Result<Vec<_>, _>>()?;
         Ok(FixtureResults {
             name: self.name.clone(),
@@ -299,10 +363,10 @@ pub enum Test {
 
 impl Test {
     /// Execute this test
-    pub fn execute(&self, fixture_name: &str) -> Result<TestResult, Error> {
+    pub fn execute(&self) -> Result<TestResult, Error> {
         match self {
-            Test::Output(inner) => inner.execute(fixture_name),
-            Test::Parsing(inner) => inner.execute(fixture_name)
+            Test::Output(inner) => inner.execute(),
+            Test::Parsing(inner) => inner.execute()
         }
     }
 }
@@ -343,7 +407,7 @@ impl OutputTest {
     }
 
     /// Execute this test
-    pub fn execute(&self, fixture_name: &str) -> Result<TestResult, Error> {
+    pub fn execute(&self) -> Result<TestResult, Error> {
         {
             let mut input_file = BufWriter::new(File::create("input.txt")?);
             write!(input_file, "{}", &self.input[1..self.input.len() - 1])?;
@@ -356,8 +420,8 @@ impl OutputTest {
             }
             expected_file.flush()?;
         }
-        let result_net = self.execute_net(fixture_name)?;
-        let result_java = self.execute_java(fixture_name)?;
+        let result_net = self.execute_net()?;
+        let result_java = self.execute_java()?;
         let result_rust = self.execute_rust()?;
         Ok(TestResult {
             name: self.name.clone(),
@@ -368,25 +432,25 @@ impl OutputTest {
     }
 
     /// Execute this test on the .Net runtime
-    fn execute_net(&self, fixture_name: &str) -> Result<TestResultOnRuntime, Error> {
+    fn execute_net(&self) -> Result<TestResultOnRuntime, Error> {
         let name = format!(
-            "Hime.Tests.Generated.{}.{}Parser",
-            to_upper_case(fixture_name),
-            self.name
+            "{}.{}Parser",
+            to_upper_camel_case(&self.name),
+            to_upper_camel_case(&self.name)
         );
         execute_command(
-            Runtime::Java,
+            Runtime::Net,
             "mono",
             &["executor-net.exe", &name, "outputs"]
         )
     }
 
     /// Execute this test on the Java runtime
-    fn execute_java(&self, fixture_name: &str) -> Result<TestResultOnRuntime, Error> {
+    fn execute_java(&self) -> Result<TestResultOnRuntime, Error> {
         let name = format!(
-            "hime.tests.generated.{}.{}Parser",
-            to_snake_case(fixture_name),
-            self.name
+            "{}.{}Parser",
+            to_snake_case(&self.name),
+            to_upper_camel_case(&self.name)
         );
         execute_command(
             Runtime::Java,
@@ -506,7 +570,7 @@ impl ParsingTest {
     }
 
     /// Execute this test
-    pub fn execute(&self, fixture_name: &str) -> Result<TestResult, Error> {
+    pub fn execute(&self) -> Result<TestResult, Error> {
         {
             let mut input_file = BufWriter::new(File::create("input.txt")?);
             write!(input_file, "{}", &self.input[1..self.input.len() - 1])?;
@@ -517,8 +581,8 @@ impl ParsingTest {
             write!(expected_file, "{}", &self.tree)?;
             expected_file.flush()?;
         }
-        let result_net = self.execute_net(fixture_name)?;
-        let result_java = self.execute_java(fixture_name)?;
+        let result_net = self.execute_net()?;
+        let result_java = self.execute_java()?;
         let result_rust = self.execute_rust()?;
         Ok(TestResult {
             name: self.name.clone(),
@@ -529,25 +593,25 @@ impl ParsingTest {
     }
 
     /// Execute this test on the .Net runtime
-    fn execute_net(&self, fixture_name: &str) -> Result<TestResultOnRuntime, Error> {
+    fn execute_net(&self) -> Result<TestResultOnRuntime, Error> {
         let name = format!(
-            "Hime.Tests.Generated.{}.{}Parser",
-            to_upper_case(fixture_name),
-            self.name
+            "{}.{}Parser",
+            to_upper_camel_case(&self.name),
+            to_upper_camel_case(&self.name)
         );
         execute_command(
-            Runtime::Java,
+            Runtime::Net,
             "mono",
             &["executor-net.exe", &name, self.verb.as_str()]
         )
     }
 
     /// Execute this test on the Java runtime
-    fn execute_java(&self, fixture_name: &str) -> Result<TestResultOnRuntime, Error> {
+    fn execute_java(&self) -> Result<TestResultOnRuntime, Error> {
         let name = format!(
-            "hime.tests.generated.{}.{}Parser",
-            to_snake_case(fixture_name),
-            self.name
+            "{}.{}Parser",
+            to_snake_case(&self.name),
+            to_upper_camel_case(&self.name)
         );
         execute_command(
             Runtime::Java,

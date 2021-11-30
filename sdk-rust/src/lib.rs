@@ -398,7 +398,9 @@ pub struct CompilationTask<'a> {
     /// The access modifier for the generated code
     pub output_modifier: Option<Modifier>,
     /// The parsing method use
-    pub method: Option<ParsingMethod>
+    pub method: Option<ParsingMethod>,
+    /// Java-only, the path to the local maven repository to use
+    pub java_maven_repository: Option<String>
 }
 
 impl<'a> CompilationTask<'a> {

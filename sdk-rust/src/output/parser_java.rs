@@ -47,7 +47,7 @@ pub fn write(
 
     let name = to_upper_camel_case(&grammar.name);
     let modifier = match modifier {
-        Modifier::Public => "public",
+        Modifier::Public => "public ",
         Modifier::Internal => ""
     };
     let (parser_type, automaton_type) = if method.is_rnglr() {

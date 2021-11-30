@@ -179,7 +179,10 @@ fn execute_test_matches(
     ) {
         RESULT_SUCCESS
     } else {
-        println!("Produced AST does not match the expected one");
+        println!("Produced AST does not match the expected one, expected:");
+        print_expected(expected.get_ast().get_root(), Vec::new());
+        println!("got:");
+        print_obtained(real_result.get_ast().get_root(), Vec::new());
         RESULT_FAILURE_VERB
     }
 }
@@ -339,6 +342,48 @@ fn compare(expected: AstNode, node: AstNode) -> bool {
         }
     }
     true
+}
+
+/// Prints a simple AST
+fn print_expected(node: AstNode, crossings: Vec<bool>) {
+    let mut i = 0;
+    if !crossings.is_empty() {
+        while i < crossings.len() - 1 {
+            print!("{:}", if crossings[i] { "|   " } else { "    " });
+            i += 1;
+        }
+        print!("+-> ");
+    }
+    println!("{:}", node);
+    i = 0;
+    let children = node.child(1).children();
+    while i < children.len() {
+        let mut child_crossings = crossings.clone();
+        child_crossings.push(i < children.len() - 1);
+        print_expected(children.at(i), child_crossings);
+        i += 1;
+    }
+}
+
+/// Prints a simple AST
+fn print_obtained(node: AstNode, crossings: Vec<bool>) {
+    let mut i = 0;
+    if !crossings.is_empty() {
+        while i < crossings.len() - 1 {
+            print!("{:}", if crossings[i] { "|   " } else { "    " });
+            i += 1;
+        }
+        print!("+-> ");
+    }
+    println!("{:}", node);
+    i = 0;
+    let children = node.children();
+    while i < children.len() {
+        let mut child_crossings = crossings.clone();
+        child_crossings.push(i < children.len() - 1);
+        print_obtained(children.at(i), child_crossings);
+        i += 1;
+    }
 }
 
 /// Un-escapes a value

@@ -33,12 +33,20 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
     if let Some(runtime) = task.output_target_runtime_path.as_ref() {
         // install local runtime
         let runtime_path = PathBuf::from(runtime);
-        execute_mvn_command(&runtime_path, &["clean", "install", "-Dgpg.skip=true"])?;
+        execute_mvn_command(
+            &runtime_path,
+            &["clean", "install", "-Dgpg.skip=true"],
+            task.java_maven_repository.as_deref()
+        )?;
     }
     // build the project
     let project_folder = build_maven_project(task, units)?;
     // compile
-    execute_mvn_command(&project_folder, &["package"])?;
+    execute_mvn_command(
+        &project_folder,
+        &["package"],
+        task.java_maven_repository.as_deref()
+    )?;
     // copy the output
     let mut output_file = project_folder.clone();
     output_file.push("target");
@@ -145,9 +153,17 @@ fn get_namespace(task: &CompilationTask, grammar: &Grammar) -> String {
 }
 
 /// Execute a cargo command
-fn execute_mvn_command(project_folder: &Path, args: &[&str]) -> Result<(), Error> {
+fn execute_mvn_command(
+    project_folder: &Path,
+    args: &[&str],
+    maven_repository: Option<&str>
+) -> Result<(), Error> {
     let (executable, prefix_args) = get_mvn_command();
-    let output = Command::new(executable)
+    let mut command = Command::new(executable);
+    if let Some(mvn_repo) = maven_repository {
+        command.arg(format!("-Dmaven.repo.local={}", mvn_repo));
+    }
+    let output = command
         .current_dir(project_folder)
         .args(prefix_args)
         .args(args)
