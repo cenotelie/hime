@@ -18,7 +18,6 @@
 //! Module for build .Net assemblies
 
 use std::fs;
-use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -33,7 +32,6 @@ const MANIFEST: &[u8] = include_bytes!("assembly_net.csproj");
 pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), Error> {
     // build the project
     let project_folder = build_dotnet_project(task, units)?;
-    println!("dotnet project: {:?}", &project_folder);
     // compile
     execute_dotnet_command(
         &project_folder,
@@ -110,15 +108,12 @@ fn execute_dotnet_command(
         command.env("HimeLocalNuget", target_runtime);
     }
     let output = command.output()?;
-    let mut lines = BufReader::<&[u8]>::new(output.stderr.as_ref()).lines();
-    if let Some(line) = lines.next() {
-        return Err(Error::Msg(line?));
-    }
-    for line in BufReader::<&[u8]>::new(output.stdout.as_ref()).lines() {
-        let line = line?;
-        if line.contains("FAILED") {
-            return Err(Error::Msg(line));
-        }
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    let stderr = String::from_utf8(output.stderr).unwrap();
+    if !stderr.is_empty() || stdout.contains("FAILED") {
+        let mut log = stderr;
+        log.push_str(&stdout);
+        return Err(Error::Msg(log));
     }
     Ok(())
 }

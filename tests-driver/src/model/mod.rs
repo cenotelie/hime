@@ -66,6 +66,7 @@ impl Fixtures {
         }
 
         if errors.is_empty() {
+            self.build_net(&grammars, &grammars_data, &mut errors);
             self.build_rust(&grammars, &grammars_data, &mut errors);
         }
         if errors.is_empty() {
@@ -132,52 +133,60 @@ impl Fixtures {
         Ok(())
     }
 
-    // /// Build the .Net parsers for the fixtures
-    // fn build_net(&self) -> Result<(), Errors> {
-    //     let mut errors: Vec<Error> = Vec::new();
-    //     let mut task = CompilationTask::default();
-    //     let temp_dir = hime_sdk::output::temporary_folder();
-    //     fs::create_dir_all(&temp_dir).unwrap();
-    //     task.output_path = Some(temp_dir.to_str().unwrap().to_string());
-    //     println!("Write to: {:?}", &temp_dir);
+    /// Build the .Net parsers for the fixtures
+    fn build_net(
+        &self,
+        grammars: &[Grammar],
+        grammars_data: &[BuildData],
+        errors: &mut Vec<Error>
+    ) {
+        if let Err(e) = self.build_net_inner(grammars, grammars_data, errors) {
+            errors.push(e);
+        }
+    }
 
-    //     // Load all grammars
-    //     let mut grammars: Vec<Grammar> = Vec::new();
-    //     for (index, fixture) in self.0.iter().enumerate() {
-    //         match fixture.grammars(index) {
-    //             Ok(mut fixture_grammars) => grammars.append(&mut fixture_grammars),
-    //             Err(mut fixture_errors) => errors.append(&mut fixture_errors)
-    //         }
-    //     }
+    /// Build the .Net parsers for the fixtures
+    fn build_net_inner(
+        &self,
+        grammars: &[Grammar],
+        grammars_data: &[BuildData],
+        errors: &mut Vec<Error>
+    ) -> Result<(), Error> {
+        let temp_dir = hime_sdk::output::temporary_folder();
+        fs::create_dir_all(&temp_dir)?;
+        let mut runtime_path = get_repo_root();
+        runtime_path.push("runtime-net/bin/Release/netstandard2.0");
 
-    //     // Build all parser data
-    //     for (index, grammar) in grammars.iter_mut().enumerate() {
-    //         match grammar.build(None, index) {
-    //             Ok(data) => {
-    //                 if let Err(mut errs) =
-    //                     hime_sdk::output::output_grammar_artifacts(&task, grammar, index, &data)
-    //                 {
-    //                     errors.append(&mut errs);
-    //                 }
-    //             }
-    //             Err(mut errs) => errors.append(&mut errs)
-    //         }
-    //     }
+        let task = CompilationTask {
+            mode: Some(Mode::SourcesAndAssembly),
+            output_target: Some(Runtime::Net),
+            output_path: Some(temp_dir.to_str().unwrap().to_string()),
+            output_target_runtime_path: runtime_path.to_str().map(|s| s.to_string()),
+            ..CompilationTask::default()
+        };
 
-    //     let units: Vec<(usize, &Grammar)> = grammars.iter().enumerate().collect();
+        // Build all parser data
+        for (index, (grammar, data)) in grammars.iter().zip(grammars_data.iter()).enumerate() {
+            if let Err(mut errs) =
+                hime_sdk::output::output_grammar_artifacts(&task, grammar, index, data)
+            {
+                errors.append(&mut errs);
+            }
+        }
 
-    //     // Build .Net
-    //     let mut path = std::env::current_dir().unwrap();
-    //     path.push("runtime-net/bin/Release/netstandard2.0");
-    //     task.output_target_runtime_path = path.to_str().map(|s| s.to_string());
-    //     hime_sdk::output::build_assembly(&task, &units, Runtime::Net).unwrap();
+        let units: Vec<(usize, &Grammar)> = grammars.iter().enumerate().collect();
+        hime_sdk::output::build_assembly(&task, &units, Runtime::Net)?;
 
-    //     if errors.is_empty() {
-    //         Ok(())
-    //     } else {
-    //         Err(self.build_errors(grammars, errors))
-    //     }
-    // }
+        // export the result to the local dir
+        let mut path_result = temp_dir.clone();
+        path_result.push("Parsers.dll");
+        let mut path_target = get_local_dir();
+        path_target.push("parsers-net.dll");
+        std::fs::copy(path_result, path_target)?;
+        // cleanup
+        std::fs::remove_dir_all(temp_dir)?;
+        Ok(())
+    }
 
     /// Build loaded inputs
     fn get_loaded_inputs(&self) -> Vec<LoadedInput> {

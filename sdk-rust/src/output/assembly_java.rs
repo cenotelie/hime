@@ -18,7 +18,6 @@
 //! Module for build Java assemblies
 
 use std::fs;
-use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -154,17 +153,12 @@ fn execute_mvn_command(project_folder: &Path, args: &[&str]) -> Result<(), Error
         .args(args)
         .arg("-B")
         .output()?;
-    for line in BufReader::<&[u8]>::new(output.stderr.as_ref()).lines() {
-        let line = line?;
-        if line.starts_with("[ERROR]") {
-            return Err(Error::Msg(line));
-        }
-    }
-    for line in BufReader::<&[u8]>::new(output.stdout.as_ref()).lines() {
-        let line = line?;
-        if line.starts_with("[ERROR]") {
-            return Err(Error::Msg(line));
-        }
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    let stderr = String::from_utf8(output.stderr).unwrap();
+    if !stderr.is_empty() || stdout.contains("[ERROR]") {
+        let mut log = stderr;
+        log.push_str(&stdout);
+        return Err(Error::Msg(log));
     }
     Ok(())
 }

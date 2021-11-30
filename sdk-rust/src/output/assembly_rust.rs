@@ -18,7 +18,7 @@
 //! Module for build Rust assemblies
 
 use std::fs::{self, File, OpenOptions};
-use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -232,17 +232,12 @@ fn execute_cargo_command(project_folder: &Path, args: &[&str]) -> Result<(), Err
         .current_dir(project_folder)
         .args(args)
         .output()?;
-    for line in BufReader::<&[u8]>::new(output.stderr.as_ref()).lines() {
-        let line = line?;
-        if line.starts_with("error") {
-            return Err(Error::Msg(line));
-        }
-    }
-    for line in BufReader::<&[u8]>::new(output.stdout.as_ref()).lines() {
-        let line = line?;
-        if line.starts_with("error") {
-            return Err(Error::Msg(line));
-        }
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    let stderr = String::from_utf8(output.stderr).unwrap();
+    if stderr.starts_with("error") || stderr.contains("\nerror") {
+        let mut log = stderr;
+        log.push_str(&stdout);
+        return Err(Error::Msg(log));
     }
     Ok(())
 }
