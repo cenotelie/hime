@@ -190,6 +190,19 @@ impl LRContexts {
             }
         }
     }
+
+    /// Gets the context opened by a symbol, if any
+    pub fn get_context_opened_by(&self, terminal_id: u32) -> Option<u16> {
+        self.openings
+            .as_ref()
+            .map(|openings| {
+                openings
+                    .iter()
+                    .find(|op| u32::from(op.identifier) == terminal_id)
+            })
+            .flatten()
+            .map(|op| op.context)
+    }
 }
 
 /// Represents a LR action in a LR parse table

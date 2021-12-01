@@ -88,6 +88,12 @@ impl<'a> AutomatonState<'a> {
         }
     }
 
+    /// Gets an iterator over all the matched terminals
+    pub fn get_terminals<'s>(&'s self) -> impl Iterator<Item = MatchedTerminal> + 's {
+        let count = self.get_terminals_count();
+        (0..count).map(|i| self.get_terminal(i))
+    }
+
     /// Gets whether this state is a dead end (no more transition)
     pub fn is_dead_end(&self) -> bool {
         self.table[self.offset + 1] == 0
@@ -105,6 +111,13 @@ impl<'a> AutomatonState<'a> {
         )
     }
 
+    /// Gets an iterator over all the cached transitions
+    pub fn get_cached_transitions<'s>(&'s self) -> impl Iterator<Item = (u16, u32)> + 's {
+        (0..256)
+            .map(|c| (c, self.get_cached_transition(c)))
+            .filter(|(_, s)| *s != DEAD_STATE)
+    }
+
     /// Gets the i-th non-cached transition in this state
     pub fn get_bulk_transition(&self, index: usize) -> AutomatonTransition {
         let offset = self.offset + 3 + self.table[self.offset] as usize * 2 + 256 + index * 3;
@@ -113,6 +126,12 @@ impl<'a> AutomatonState<'a> {
             end: self.table[offset + 1],
             target: u32::from(self.table[offset + 2])
         }
+    }
+
+    /// Gets an iterator over all the bulk transitions
+    pub fn get_bulk_transitions<'s>(&'s self) -> impl Iterator<Item = AutomatonTransition> + 's {
+        let count = self.get_bulk_transitions_count();
+        (0..count).map(|i| self.get_bulk_transition(i))
     }
 
     /// Gets the target of a transition from this state on the specified value
@@ -172,6 +191,11 @@ impl Automaton {
             table: &self.states,
             offset: self.table[state as usize] as usize
         }
+    }
+
+    /// Gets an iterator over the states
+    pub fn get_states<'s>(&'s self) -> impl Iterator<Item = AutomatonState<'s>> + 's {
+        (0..self.states_count).map(|i| self.get_state(i as u32))
     }
 }
 

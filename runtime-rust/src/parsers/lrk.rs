@@ -84,6 +84,11 @@ impl LRkAutomaton {
         self.states_count
     }
 
+    /// Gets the number of columns in the LR table
+    pub fn get_columns_count(&self) -> usize {
+        self.columns_count
+    }
+
     /// Gets the contexts opened by the specified state
     pub fn get_contexts(&self, state: u32) -> &LRContexts {
         &self.contexts[state as usize]
@@ -92,6 +97,11 @@ impl LRkAutomaton {
     /// Gets the LR(k) action for the given state and sid
     pub fn get_action(&self, state: u32, identifier: u32) -> LRAction {
         let column = self.columns_map.get(identifier) as usize;
+        self.get_action_at(state, column)
+    }
+
+    /// Gets the LR(k) action for the given state and column
+    pub fn get_action_at(&self, state: u32, column: usize) -> LRAction {
         LRAction {
             table: &self.table,
             offset: (state as usize * self.columns_count + column) * 2
