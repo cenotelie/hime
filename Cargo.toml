@@ -3,6 +3,7 @@ members = [
     "runtime-rust",
     "parseit",
     "sdk-rust",
+    "sdk-debugger",
     "unicode-gen",
     "himecc",
     "tests-executor-rust",

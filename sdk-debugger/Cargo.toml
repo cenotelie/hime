@@ -1,0 +1,15 @@
+[package]
+name = "hime_sdk_debugger"
+version = "3.5.2"
+authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
+description = "Debugger for the SDK"
+homepage = "https://cenotelie.fr/projects/hime"
+repository = "https://github.com/cenotelie/hime"
+keywords = ["hime", "parser", "generator", "lr", "glr", "rnglr"]
+categories = ["algorithms", "parsing", "parser-implementations", "text-processing"]
+license = "LGPL-3.0"
+edition = "2021"
+
+[dependencies]
+hime_redist = "3.5.2"
+clap = "2.33"
