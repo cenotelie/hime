@@ -468,27 +468,27 @@ fn write_parser_rnglr_data_rule(
     write_u16(writer, head_index as u16)?;
     write_u8(writer, rule.head_action as u8)?;
     write_u8(writer, length as u8)?;
-    let mut length = 0;
+    let mut bcl = 0;
     let mut pop = 0;
     for element in rule.body.elements.iter() {
         match element.symbol {
             SymbolRef::Virtual(_) => {
-                length += 2;
+                bcl += 2;
             }
             SymbolRef::Action(_) => {
-                length += 2;
+                bcl += 2;
             }
             _ => {
                 if pop >= length {
-                    length += 2;
+                    bcl += 2;
                 } else {
-                    length += 1;
+                    bcl += 1;
                     pop += 1;
                 }
             }
         };
     }
-    write_u8(writer, length)?;
+    write_u8(writer, bcl)?;
     pop = 0;
     for element in rule.body.elements.iter() {
         match element.symbol {

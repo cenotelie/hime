@@ -544,7 +544,7 @@ fn load_nfa_simple_text(node: &AstNode) -> NFA {
 fn load_nfa_codepoint(input_index: usize, errors: &mut Vec<Error>, node: AstNode) -> NFA {
     // extract the code point value
     let value = node.get_value().unwrap();
-    let value = u32::from_str_radix(&value[2..(value.len())], 16).unwrap();
+    let value = u32::from_str_radix(&value[2..], 16).unwrap();
     let value = match std::char::from_u32(value) {
         Some(v) => v,
         None => {
@@ -697,9 +697,9 @@ fn load_nfa_unicode_block(input_index: usize, errors: &mut Vec<Error>, node: Ast
 fn load_nfa_unicode_span(input_index: usize, errors: &mut Vec<Error>, node: AstNode) -> NFA {
     // extract the value
     let begin = node.child(0).get_value().unwrap();
-    let begin = u32::from_str_radix(&begin[2..(begin.len() - 1)], 16).unwrap();
+    let begin = u32::from_str_radix(&begin[2..], 16).unwrap();
     let end = node.child(1).get_value().unwrap();
-    let end = u32::from_str_radix(&end[2..(end.len() - 1)], 16).unwrap();
+    let end = u32::from_str_radix(&end[2..], 16).unwrap();
     if begin > end {
         errors.push(Error::InvalidCharacterSpan(InputReference::from(
             input_index,
