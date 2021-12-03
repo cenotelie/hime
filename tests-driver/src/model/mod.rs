@@ -562,8 +562,8 @@ impl ParsingTest {
             for (index, child) in node_children.children().iter().enumerate() {
                 if index > 0 {
                     buffer.push(' ');
-                    ParsingTest::serialize_tree(child, buffer);
                 }
+                ParsingTest::serialize_tree(child, buffer);
             }
             buffer.push(')');
         }
