@@ -3,7 +3,7 @@
 Language server for [Hime](https://github.com/cenotelie/hime) grammars.
 For more information about how to generate parsers using Hime, head to [Hime](https://cenotelie.fr/projects/hime).
 The code for this library is available on [GitHub](https://github.com/cenotelie/hime).
-The API documentation is available on [docs.rs](https://docs.rs/hime_langserv/3.5.2/hime_langserv/).
+The API documentation is available on [docs.rs](https://docs.rs/hime_langserv/4.0.0/hime_langserv/).
 This software is developed by the [Assocation Cénotélie](https://cenotelie.fr/), France.
 
 ## How can I contribute? ##

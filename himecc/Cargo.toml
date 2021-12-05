@@ -1,6 +1,6 @@
 [package]
 name = "hime_compiler"
-version = "3.5.2"
+version = "4.0.0"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Generator of lexers and parsers for the Hime runtime."
 documentation = "https://cenotelie.fr/projects/hime"
@@ -18,8 +18,8 @@ name = "himecc"
 path = "src/main.rs"
 
 [dependencies]
-hime_redist = "3.5.2"
-hime_sdk = { version = "3.5.2", features = ["print_errors"] }
+hime_redist = "4.0.0"
+hime_sdk = { version = "4.0.0", features = ["print_errors"] }
 clap = "2.33"
 serde_json = "1"
 

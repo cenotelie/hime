@@ -3,7 +3,7 @@
 The Rust SDK for the generation of lexers and parsers with [Hime](https://github.com/cenotelie/hime).
 For more information about how to generate parsers using Hime, head to [Hime](https://cenotelie.fr/projects/hime).
 The code for this library is available on [GitHub](https://github.com/cenotelie/hime).
-The API documentation is available on [docs.rs](https://docs.rs/hime_sdk/3.5.2/hime_sdk/).
+The API documentation is available on [docs.rs](https://docs.rs/hime_sdk/4.0.0/hime_sdk/).
 This software is developed by the [Assocation Cénotélie](https://cenotelie.fr/), France.
 
 ## Usage ##
@@ -13,7 +13,7 @@ used by adding `hime_sdk` to your dependencies in your project's `Cargo.toml`.
 
 ```toml
 [dependencies]
-hime_sdk = "3.5.2"
+hime_sdk = "4.0.0"
 ```
 
 Generated lexer and parser codes will import this crate and provide a simple API to parse input text.

@@ -1,6 +1,6 @@
 [package]
 name = "hime_langserv"
-version = "3.5.2"
+version = "4.0.0"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Language server for Hime grammars"
 documentation = "https://cenotelie.fr/projects/hime"
@@ -18,8 +18,8 @@ clap = "2.33"
 serde_json = "1.0"
 futures = "0.3"
 tokio = { version = "1", features = ["full"] }
-hime_redist = "3.5.2"
-hime_sdk = "3.5.2"
+hime_redist = "4.0.0"
+hime_sdk = "4.0.0"
 tower-lsp = "0.14"
 
 [badges]
