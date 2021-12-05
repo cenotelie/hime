@@ -89,6 +89,11 @@ impl LRkAutomaton {
         self.columns_count
     }
 
+    /// Gets the symbol's identifier for a column
+    pub fn get_sid_for_column(&self, column: usize) -> u32 {
+        self.columns_map.get_id_at(column)
+    }
+
     /// Gets the contexts opened by the specified state
     pub fn get_contexts(&self, state: u32) -> &LRContexts {
         &self.contexts[state as usize]

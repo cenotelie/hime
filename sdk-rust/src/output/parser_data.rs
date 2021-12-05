@@ -105,7 +105,7 @@ fn write_parser_column_headers(
     Ok(())
 }
 
-/// Write the opening context informations for each setate
+/// Write the opening context informations for each state
 fn write_parser_opening_contexts(writer: &mut dyn Write, graph: &Graph) -> Result<(), Error> {
     // write context openings for each state
     for state in graph.states.iter() {

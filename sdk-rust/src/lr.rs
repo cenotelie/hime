@@ -565,7 +565,7 @@ impl Graph {
             if let Some(context) = item.get_opened_context(grammar) {
                 let mut opening_terminals = TerminalSet::default();
                 match item.get_next_symbol(grammar) {
-                    Some(SymbolRef::Virtual(sid)) => {
+                    Some(SymbolRef::Variable(sid)) => {
                         let variable = &grammar.get_variable(sid).unwrap();
                         opening_terminals.add_others(&variable.firsts);
                     }

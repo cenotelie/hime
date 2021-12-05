@@ -390,22 +390,19 @@ fn print_obtained(node: AstNode, crossings: Vec<bool>) {
 fn unescape(value: String) -> String {
     let mut result = String::new();
     let mut on_escape = false;
-    for data in value.chars().enumerate() {
-        if data.0 != 0 {
-            // drop the first character
-            match data.1 {
-                '\\' => {
-                    if on_escape {
-                        result.push('\\');
-                        on_escape = false;
-                    } else {
-                        on_escape = true
-                    }
-                }
-                c => {
-                    result.push(c);
+    for c in value.chars().skip(1) {
+        match c {
+            '\\' => {
+                if on_escape {
+                    result.push('\\');
                     on_escape = false;
+                } else {
+                    on_escape = true
                 }
+            }
+            c => {
+                result.push(c);
+                on_escape = false;
             }
         }
     }

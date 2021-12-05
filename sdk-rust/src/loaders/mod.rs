@@ -1773,7 +1773,7 @@ fn get_char_value(value: &[char], i: usize) -> (char, usize) {
     c = value[i + 1];
     match c {
         '0' => (0 as char, 2),  // null
-        'a' => (2 as char, 2),  // alert
+        'a' => (7 as char, 2),  // alert
         'b' => (8 as char, 2),  // backspace
         'f' => (12 as char, 2), // form feed
         'n' => ('\n', 2),       //new line

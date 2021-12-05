@@ -134,6 +134,22 @@ impl LRColumnMap {
             0
         }
     }
+
+    /// Gets the symbol's identifier for a column
+    pub fn get_id_at(&self, column: usize) -> u32 {
+        let column = column as u16;
+        for (id, c) in self.cache.iter().enumerate() {
+            if *c == column {
+                return id as u32;
+            }
+        }
+        for cell in self.others.iter() {
+            if cell.column == column {
+                return cell.identifier as u32;
+            }
+        }
+        return 0;
+    }
 }
 
 /// Represents a context opening by a transition from a state

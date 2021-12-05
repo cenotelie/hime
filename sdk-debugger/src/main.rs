@@ -239,7 +239,9 @@ fn print_parser_lrk(file_name: &str, show_bytecode: bool) -> Result<(), Box<dyn 
             match action.get_code() {
                 LR_ACTION_CODE_SHIFT => {
                     print!("    on 0x{:X}, shift to {}", c, action.get_data());
-                    if let Some(context) = contexts.get_context_opened_by(c as u32) {
+                    if let Some(context) =
+                        contexts.get_context_opened_by(automaton.get_sid_for_column(c))
+                    {
                         print!(", open context {}", context);
                     }
                     println!();
@@ -257,7 +259,9 @@ fn print_parser_lrk(file_name: &str, show_bytecode: bool) -> Result<(), Box<dyn 
                         TREE_ACTION_REPLACE_BY_EPSILON => print!(" and replace by epsilon"),
                         _ => {}
                     }
-                    if let Some(context) = contexts.get_context_opened_by(c as u32) {
+                    if let Some(context) =
+                        contexts.get_context_opened_by(automaton.get_sid_for_column(c))
+                    {
                         print!(", open context {}", context);
                     }
                     println!();
@@ -432,8 +436,8 @@ fn diff_parser_lrk(file_left: &str, file_right: &str) -> Result<(), Box<dyn Erro
                     map_left_right[target_left] = target_right;
                     map_right_left[target_right] = target_left;
                     match (
-                        contexts_left.get_context_opened_by(c as u32),
-                        contexts_right.get_context_opened_by(c as u32)
+                        contexts_left.get_context_opened_by(automaton_left.get_sid_for_column(c)),
+                        contexts_right.get_context_opened_by(automaton_right.get_sid_for_column(c))
                     ) {
                         (None, None) => {}
                         (Some(from), Some(to)) => {

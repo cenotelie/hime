@@ -547,7 +547,7 @@ impl ParsingTest {
             buffer.push_str(&node_check.child(0).get_value().unwrap());
             let value = node_check.child(1).get_value().unwrap();
             // Decode the read value by replacing all the escape sequences
-            let value = hime_sdk::loaders::replace_escapees(value).replace("\\\'", "'");
+            let value = hime_sdk::loaders::replace_escapees(value);
             // Reset escape sequences for single quotes and backslashes
             let value = value[1..(value.len() - 1)]
                 .replace("\\", "\\\\")
