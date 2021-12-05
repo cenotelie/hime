@@ -21,6 +21,7 @@ pub mod workspace;
 
 use std::sync::Arc;
 
+use clap::{App, Arg, SubCommand};
 use futures::future::join_all;
 use log::{error, info};
 use tokio::sync::RwLock;
@@ -165,7 +166,6 @@ fn setup_logger() -> std::result::Result<(), fern::InitError> {
     fern::Dispatch::new()
         .format(|out, message, record| out.finish(format_args!("[{}] {}", record.level(), message)))
         .level(log::LevelFilter::Debug)
-        .chain(fern::log_file("output.log")?)
         .apply()?;
     Ok(())
 }
@@ -185,12 +185,79 @@ async fn main() {
     }));
     setup_logger().unwrap();
 
-    let stdin = tokio::io::stdin();
-    let stdout = tokio::io::stdout();
+    let matches = App::new("Hime Language Server")
+        .version(
+            format!(
+                "{} {} tag={} hash={}",
+                CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH
+            )
+            .as_str()
+        )
+        .author("Association Cénotélie <contact@cenotelie.fr>")
+        .about("Language server for Hime gramamrs")
+        .arg(
+            Arg::with_name("tcp")
+                .long("tcp")
+                .help("Use a tcp stream to communicate with clients")
+                .takes_value(false)
+                .required(false)
+        )
+        .arg(
+            Arg::with_name("address")
+                .value_name("ADDRESS")
+                .long("address")
+                .short("a")
+                .help("The address to listen on, if using a TCP stream")
+                .takes_value(true)
+                .required(false)
+        )
+        .arg(
+            Arg::with_name("port")
+                .long("port")
+                .short("p")
+                .help("The TCP port to listen to, if using a TCP stream")
+                .takes_value(true)
+                .required(false)
+        )
+        .subcommand(SubCommand::with_name("version").about("Display the version string"))
+        .get_matches();
 
-    let (service, messages) = LspService::new(Backend::new);
-    Server::new(stdin, stdout)
-        .interleave(messages)
-        .serve(service)
-        .await;
+    match matches.subcommand() {
+        ("version", _) => {
+            println!(
+                "{} {} tag={} hash={}",
+                CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH
+            )
+        }
+        _ => match matches.value_of("tcp") {
+            None => {
+                let stdin = tokio::io::stdin();
+                let stdout = tokio::io::stdout();
+                let (service, messages) = LspService::new(Backend::new);
+                Server::new(stdin, stdout)
+                    .interleave(messages)
+                    .serve(service)
+                    .await;
+            }
+            Some(_) => {
+                let address = matches.value_of("address").unwrap_or("127.0.0.1");
+                let port = matches
+                    .value_of("port")
+                    .map(|v| v.parse::<u16>())
+                    .transpose()
+                    .unwrap_or_default()
+                    .unwrap_or(9257);
+                let listener = tokio::net::TcpListener::bind(format!("{}:{}", address, port))
+                    .await
+                    .unwrap();
+                let (stream, _) = listener.accept().await.unwrap();
+                let (read, write) = tokio::io::split(stream);
+                let (service, messages) = LspService::new(Backend::new);
+                Server::new(read, write)
+                    .interleave(messages)
+                    .serve(service)
+                    .await;
+            }
+        }
+    }
 }
