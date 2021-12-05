@@ -125,9 +125,9 @@ stages:
         ./s3cli -c $(s3config.secureFilePath) object upload --acl public-read -f target/windows/hime_langserv.exe cenotelie hime/latest/windows/hime_langserv.exe
         ./s3cli -c $(s3config.secureFilePath) object upload --acl public-read -f target/macos/himecc              cenotelie hime/latest/macos/himecc
         ./s3cli -c $(s3config.secureFilePath) object upload --acl public-read -f target/macos/hime_langserv       cenotelie hime/latest/macos/hime_langserv
-        ./target/linux-musl/himecc --version        | ./s3cli -c $(s3config.secureFilePath) object upload --acl public-read -f cenotelie hime/latest/linux/himecc.version
-        ./target/linux-musl/hime_langserv --version | ./s3cli -c $(s3config.secureFilePath) object upload --acl public-read -f cenotelie hime/latest/linux/hime_langserv.version
-        ./target/linux-musl/himecc --version        | ./s3cli -c $(s3config.secureFilePath) object upload --acl public-read -f cenotelie hime/latest/windows/himecc.exe.version
-        ./target/linux-musl/hime_langserv --version | ./s3cli -c $(s3config.secureFilePath) object upload --acl public-read -f cenotelie hime/latest/windows/hime_langserv.exe.version
-        ./target/linux-musl/himecc --version        | ./s3cli -c $(s3config.secureFilePath) object upload --acl public-read -f cenotelie hime/latest/macos/himecc.version
-        ./target/linux-musl/hime_langserv --version | ./s3cli -c $(s3config.secureFilePath) object upload --acl public-read -f cenotelie hime/latest/macos/hime_langserv.version
+        ./target/linux-musl/himecc --version        | ./s3cli -c $(s3config.secureFilePath) object upload --acl public-read cenotelie hime/latest/linux/himecc.version
+        ./target/linux-musl/hime_langserv --version | ./s3cli -c $(s3config.secureFilePath) object upload --acl public-read cenotelie hime/latest/linux/hime_langserv.version
+        ./target/linux-musl/himecc --version        | ./s3cli -c $(s3config.secureFilePath) object upload --acl public-read cenotelie hime/latest/windows/himecc.exe.version
+        ./target/linux-musl/hime_langserv --version | ./s3cli -c $(s3config.secureFilePath) object upload --acl public-read cenotelie hime/latest/windows/hime_langserv.exe.version
+        ./target/linux-musl/himecc --version        | ./s3cli -c $(s3config.secureFilePath) object upload --acl public-read cenotelie hime/latest/macos/himecc.version
+        ./target/linux-musl/hime_langserv --version | ./s3cli -c $(s3config.secureFilePath) object upload --acl public-read cenotelie hime/latest/macos/hime_langserv.version
