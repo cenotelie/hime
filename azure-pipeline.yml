@@ -109,11 +109,9 @@ stages:
         pipeline: 6
         runVersion: 'specific'
         runId: 1524
-        path: $(Pipeline.SourcesDirectory)/target
+        path: $(Build.SourcesDirectory)/target
     - script: |
-        ls -l target
-        echo -n "$S3" > "s3.json"
-        cat s3.json
+        echo -n "$(S3)" > "s3.json"
         curl -o s3cli "https://cenotelie.s3.fr-par.scw.cloud/s3cli"
         chmod +x s3cli
         chmod +x target/linux-musl/himecc
