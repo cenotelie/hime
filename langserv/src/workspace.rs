@@ -20,7 +20,7 @@
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufReader, ErrorKind, Read};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use hime_sdk::errors::Error;
 use hime_sdk::grammars::{OPTION_AXIOM, OPTION_SEPARATOR};
@@ -80,7 +80,7 @@ impl Workspace {
     }
 
     /// Scans the workspace in the specified folder
-    fn scan_workspace_in(&mut self, path: &PathBuf) -> io::Result<()> {
+    fn scan_workspace_in(&mut self, path: &Path) -> io::Result<()> {
         if Workspace::scan_workspace_is_dir_excluded(path) {
             return Ok(());
         }
@@ -96,7 +96,7 @@ impl Workspace {
     }
 
     /// Determines whether the specified file should be analyzed
-    fn scan_workspace_is_file_included(path: &PathBuf) -> bool {
+    fn scan_workspace_is_file_included(path: &Path) -> bool {
         match path.extension() {
             None => false,
             Some(name) => name == "gram"
@@ -104,7 +104,7 @@ impl Workspace {
     }
 
     /// Determines whether the specified file or directory is excluded
-    fn scan_workspace_is_dir_excluded(path: &PathBuf) -> bool {
+    fn scan_workspace_is_dir_excluded(path: &Path) -> bool {
         match path.file_name() {
             None => true,
             Some(name) => name == ".git" || name == ".hg" || name == ".svn"
@@ -112,7 +112,7 @@ impl Workspace {
     }
 
     /// Resolves a document
-    fn resolve_document_path(&mut self, path: &PathBuf) -> io::Result<()> {
+    fn resolve_document_path(&mut self, path: &Path) -> io::Result<()> {
         let uri = match Url::from_file_path(path.canonicalize()?) {
             Ok(uri) => uri,
             Err(_) => {
@@ -132,7 +132,7 @@ impl Workspace {
     }
 
     /// Resolves a document
-    fn resolve_document(&mut self, uri: Url, path: &PathBuf) -> io::Result<()> {
+    fn resolve_document(&mut self, uri: Url, path: &Path) -> io::Result<()> {
         let mut reader = BufReader::new(File::open(path)?);
         let mut content = String::new();
         reader.read_to_string(&mut content)?;
@@ -214,7 +214,7 @@ impl Workspace {
                 .grammars
                 .iter()
                 .enumerate()
-                .find(|(_, grammar)| &grammar.name == grammar_name)
+                .find(|(_, grammar)| grammar.name == grammar_name)
             {
                 Some((grammar_index, grammar)) => {
                     let mut grammar = grammar.clone();
