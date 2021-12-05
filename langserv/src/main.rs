@@ -93,13 +93,12 @@ impl LanguageServer for Backend {
                 text_document_sync: Some(TextDocumentSyncCapability::Kind(
                     TextDocumentSyncKind::Full
                 )),
-                workspace: Some(WorkspaceCapability {
-                    workspace_folders: Some(WorkspaceFolderCapability {
+                workspace: Some(WorkspaceServerCapabilities {
+                    workspace_folders: Some(WorkspaceFoldersServerCapabilities {
                         supported: Some(true),
-                        change_notifications: Some(
-                            WorkspaceFolderCapabilityChangeNotifications::Bool(true)
-                        )
-                    })
+                        change_notifications: Some(OneOf::Left(true))
+                    }),
+                    file_operations: None
                 }),
                 execute_command_provider: Some(ExecuteCommandOptions {
                     commands: vec![String::from("test")],

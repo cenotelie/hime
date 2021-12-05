@@ -39,10 +39,9 @@ echo "   => OK"
 
 echo "-- Rust components --"
 cargo update
-cargo check
-cargo clippy
-cargo test
 cargo build
+cargo test
+cargo clippy
 
 echo "-- .Net components --"
 dotnet restore "$ROOT/runtime-net"

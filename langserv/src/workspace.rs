@@ -40,7 +40,7 @@ pub struct Document {
     /// The content of the document in this version
     pub content: String,
     /// The current version
-    pub version: Option<i64>,
+    pub version: Option<i32>,
     /// The diagnostics for the document
     pub diagnostics: Vec<Diagnostic>
 }
@@ -247,10 +247,12 @@ fn to_diagnostic(
                 range: to_range(data, *input_reference),
                 severity: Some(DiagnosticSeverity::Error),
                 code: None,
+                code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
                 message: msg.clone(),
                 related_information: None,
-                tags: None
+                tags: None,
+                data: None
             }
         )),
         Error::InvalidOption(grammar_index, name, valid) => {
@@ -267,10 +269,12 @@ fn to_diagnostic(
                     range: to_range(data, input_reference),
                     severity: Some(DiagnosticSeverity::Error),
                     code: None,
+                    code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
                     message: format!("Invalid value for grammar option `{}`{}", name, expected),
                     related_information: None,
-                    tags: None
+                    tags: None,
+                    data: None
                 }
             ))
         }
@@ -282,10 +286,12 @@ fn to_diagnostic(
                     range: to_range(data, input_reference),
                     severity: Some(DiagnosticSeverity::Error),
                     code: None,
+                    code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
                     message: "Grammar axiom has not been specified".to_string(),
                     related_information: None,
-                    tags: None
+                    tags: None,
+                    data: None
                 }
             ))
         }
@@ -300,10 +306,12 @@ fn to_diagnostic(
                     range: to_range(data, input_reference),
                     severity: Some(DiagnosticSeverity::Error),
                     code: None,
+                    code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
                     message: format!("Grammar axiom `{}` is not defined", &option.value),
                     related_information: None,
-                    tags: None
+                    tags: None,
+                    data: None
                 }
             ))
         }
@@ -318,10 +326,12 @@ fn to_diagnostic(
                     range: to_range(data, input_reference),
                     severity: Some(DiagnosticSeverity::Error),
                     code: None,
+                    code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
                     message: format!("Grammar separator token `{}` is not defined", &option.value),
                     related_information: None,
-                    tags: None
+                    tags: None,
+                    data: None
                 }
             ))
         }
@@ -337,13 +347,15 @@ fn to_diagnostic(
                     range: to_range(data, input_reference),
                     severity: Some(DiagnosticSeverity::Error),
                     code: None,
+                    code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
                     message: format!(
                         "Grammar separator token `{}` is only defined for context `{}`",
                         &separator.name, context
                     ),
                     related_information: None,
-                    tags: None
+                    tags: None,
+                    data: None
                 }
             ))
         }
@@ -358,13 +370,15 @@ fn to_diagnostic(
                     range: to_range(data, input_reference),
                     severity: Some(DiagnosticSeverity::Error),
                     code: None,
+                    code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
                     message: format!(
                         "Token `{}` is expected but can never be matched",
                         &terminal.name
                     ),
                     related_information: None,
-                    tags: None
+                    tags: None,
+                    data: None
                 }
             ))
         }
@@ -374,10 +388,12 @@ fn to_diagnostic(
                 range: to_range(data, *input_reference),
                 severity: Some(DiagnosticSeverity::Error),
                 code: None,
+                code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
                 message: format!("Cannot find template rule `{}`", name),
                 related_information: None,
-                tags: None
+                tags: None,
+                data: None
             }
         )),
         Error::TemplateRuleWrongNumberOfArgs(input_reference, expected, provided) => Some((
@@ -386,13 +402,15 @@ fn to_diagnostic(
                 range: to_range(data, *input_reference),
                 severity: Some(DiagnosticSeverity::Error),
                 code: None,
+                code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
                 message: format!(
                     "Template expected {} arguments, {} given",
                     expected, provided
                 ),
                 related_information: None,
-                tags: None
+                tags: None,
+                data: None
             }
         )),
         Error::SymbolNotFound(input_reference, name) => Some((
@@ -401,10 +419,12 @@ fn to_diagnostic(
                 range: to_range(data, *input_reference),
                 severity: Some(DiagnosticSeverity::Error),
                 code: None,
+                code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
                 message: format!("Cannot find symbol `{}`", name),
                 related_information: None,
-                tags: None
+                tags: None,
+                data: None
             }
         )),
         Error::InvalidCharacterSpan(input_reference) => Some((
@@ -413,10 +433,12 @@ fn to_diagnostic(
                 range: to_range(data, *input_reference),
                 severity: Some(DiagnosticSeverity::Error),
                 code: None,
+                code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
                 message: "Invalid character span, end is before begin".to_string(),
                 related_information: None,
-                tags: None
+                tags: None,
+                data: None
             }
         )),
         Error::UnknownUnicodeBlock(input_reference, name) => Some((
@@ -425,10 +447,12 @@ fn to_diagnostic(
                 range: to_range(data, *input_reference),
                 severity: Some(DiagnosticSeverity::Error),
                 code: None,
+                code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
                 message: format!("Unknown unicode block `{}`", name),
                 related_information: None,
-                tags: None
+                tags: None,
+                data: None
             }
         )),
         Error::UnknownUnicodeCategory(input_reference, name) => Some((
@@ -437,10 +461,12 @@ fn to_diagnostic(
                 range: to_range(data, *input_reference),
                 severity: Some(DiagnosticSeverity::Error),
                 code: None,
+                code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
                 message: format!("Unknown unicode category `{}`", name),
                 related_information: None,
-                tags: None
+                tags: None,
+                data: None
             }
         )),
         Error::UnsupportedNonPlane0InCharacterClass(input_reference, c) => Some((
@@ -449,13 +475,15 @@ fn to_diagnostic(
                 range: to_range(data, *input_reference),
                 severity: Some(DiagnosticSeverity::Error),
                 code: None,
+                code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
                 message: format!(
                     "Unsupported non-plane 0 Unicode character ({0}) in character class",
                     c
                 ),
                 related_information: None,
-                tags: None
+                tags: None,
+                data: None
             }
         )),
         Error::InvalidCodePoint(input_reference, c) => Some((
@@ -464,10 +492,12 @@ fn to_diagnostic(
                 range: to_range(data, *input_reference),
                 severity: Some(DiagnosticSeverity::Error),
                 code: None,
+                code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
                 message: format!("The value U+{:0X} is not a supported unicode code point", c),
                 related_information: None,
-                tags: None
+                tags: None,
+                data: None
             }
         )),
         Error::OverridingPreviousTerminal(input_reference, name) => Some((
@@ -476,10 +506,12 @@ fn to_diagnostic(
                 range: to_range(data, *input_reference),
                 severity: Some(DiagnosticSeverity::Error),
                 code: None,
+                code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
                 message: format!("Overriding the previous definition of `{}`", name),
                 related_information: None,
-                tags: None
+                tags: None,
+                data: None
             }
         )),
         Error::GrammarNotDefined(input_reference, name) => Some((
@@ -488,10 +520,12 @@ fn to_diagnostic(
                 range: to_range(data, *input_reference),
                 severity: Some(DiagnosticSeverity::Error),
                 code: None,
+                code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
                 message: format!("Grammar `{}` is not defined", name),
                 related_information: None,
-                tags: None
+                tags: None,
+                data: None
             }
         )),
         Error::LrConflict(grammar_index, conflict) => {
@@ -509,6 +543,7 @@ fn to_diagnostic(
                     range: to_range(data, input_reference),
                     severity: Some(DiagnosticSeverity::Error),
                     code: None,
+                    code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
                     message: format!(
                         "Contextual terminal `{}` is expected outside its context",
@@ -532,7 +567,8 @@ fn to_diagnostic(
                             })
                             .collect()
                     ),
-                    tags: None
+                    tags: None,
+                    data: None
                 }
             ))
         }
@@ -547,13 +583,15 @@ fn to_diagnostic(
                     range: to_range(data, input_reference),
                     severity: Some(DiagnosticSeverity::Error),
                     code: None,
+                    code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
                     message: format!(
                         "Token `{}` is expected but can never be matched",
                         &terminal.name
                     ),
                     related_information: None,
-                    tags: None
+                    tags: None,
+                    data: None
                 }
             ))
         }
@@ -568,13 +606,15 @@ fn to_diagnostic(
                     range: to_range(data, input_reference),
                     severity: Some(DiagnosticSeverity::Error),
                     code: None,
+                    code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
                     message: format!(
                         "Terminal `{}` matches empty string, which is not allowed",
                         &terminal.name
                     ),
                     related_information: None,
-                    tags: None
+                    tags: None,
+                    data: None
                 }
             ))
         }
@@ -589,10 +629,10 @@ fn to_range(data: &LoadedData, input_reference: InputReference) -> Range {
         .get_position_for(input_reference.position, input_reference.length);
     Range::new(
         Position::new(
-            (input_reference.position.line - 1) as u64,
-            (input_reference.position.column - 1) as u64
+            (input_reference.position.line - 1) as u32,
+            (input_reference.position.column - 1) as u32
         ),
-        Position::new((end.line - 1) as u64, (end.column - 1) as u64)
+        Position::new((end.line - 1) as u32, (end.column - 1) as u32)
     )
 }
 
