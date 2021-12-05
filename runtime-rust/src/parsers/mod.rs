@@ -148,7 +148,7 @@ impl LRColumnMap {
                 return cell.identifier as u32;
             }
         }
-        return 0;
+        0
     }
 }
 

@@ -89,7 +89,7 @@ impl<'a> AutomatonState<'a> {
     }
 
     /// Gets an iterator over all the matched terminals
-    pub fn get_terminals<'s>(&'s self) -> impl Iterator<Item = MatchedTerminal> + 's {
+    pub fn get_terminals(&self) -> impl Iterator<Item = MatchedTerminal> + '_ {
         let count = self.get_terminals_count();
         (0..count).map(|i| self.get_terminal(i))
     }
@@ -112,7 +112,7 @@ impl<'a> AutomatonState<'a> {
     }
 
     /// Gets an iterator over all the cached transitions
-    pub fn get_cached_transitions<'s>(&'s self) -> impl Iterator<Item = (u16, u32)> + 's {
+    pub fn get_cached_transitions(&self) -> impl Iterator<Item = (u16, u32)> + '_ {
         (0..256)
             .map(|c| (c, self.get_cached_transition(c)))
             .filter(|(_, s)| *s != DEAD_STATE)
@@ -129,7 +129,7 @@ impl<'a> AutomatonState<'a> {
     }
 
     /// Gets an iterator over all the bulk transitions
-    pub fn get_bulk_transitions<'s>(&'s self) -> impl Iterator<Item = AutomatonTransition> + 's {
+    pub fn get_bulk_transitions(&self) -> impl Iterator<Item = AutomatonTransition> + '_ {
         let count = self.get_bulk_transitions_count();
         (0..count).map(|i| self.get_bulk_transition(i))
     }
@@ -194,7 +194,7 @@ impl Automaton {
     }
 
     /// Gets an iterator over the states
-    pub fn get_states<'s>(&'s self) -> impl Iterator<Item = AutomatonState<'s>> + 's {
+    pub fn get_states(&self) -> impl Iterator<Item = AutomatonState<'_>> + '_ {
         (0..self.states_count).map(|i| self.get_state(i as u32))
     }
 }

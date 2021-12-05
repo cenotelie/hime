@@ -354,11 +354,7 @@ fn diff_lexer(file_left: &str, file_right: &str) -> Result<(), Box<dyn Error>> {
             }
         }
         for term_right in terminals_right.iter() {
-            if terminals_left
-                .iter()
-                .find(|r| r.index == term_right.index)
-                .is_none()
-            {
+            if terminals_left.iter().any(|r| r.index == term_right.index) {
                 println!(
                     "State ({}, {}) is final for terminal 0x{:X} on the right, not the left",
                     s_left, s_right, term_right.index
@@ -389,8 +385,7 @@ fn diff_lexer(file_left: &str, file_right: &str) -> Result<(), Box<dyn Error>> {
             }
         }
     }
-    for s_right in 0..automaton_right.get_states_count() {
-        let s_left = map_right_left[s_right];
+    for (s_right, &s_left) in map_right_left.iter().enumerate() {
         if s_left == 0 && s_right != 0 {
             println!("State {} on right is unmapped on left", s_right);
         }
@@ -541,8 +536,7 @@ fn diff_parser_lrk(file_left: &str, file_right: &str) -> Result<(), Box<dyn Erro
             }
         }
     }
-    for s_right in 0..states_right {
-        let s_left = map_right_left[s_right];
+    for (s_right, &s_left) in map_right_left.iter().enumerate() {
         if s_left == 0 && s_right != 0 {
             println!("State {} on right is unmapped on left", s_right);
         }
