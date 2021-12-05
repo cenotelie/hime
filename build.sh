@@ -39,14 +39,15 @@ echo "   => OK"
 
 echo "-- Rust components --"
 cargo update
-cargo check --target x86_64-unknown-linux-musl --features vendored
-cargo clippy --target x86_64-unknown-linux-musl --features vendored
-cargo test --target x86_64-unknown-linux-musl --features vendored
-cargo build --target x86_64-unknown-linux-musl --features vendored
+cargo check
+cargo clippy
+cargo test
+cargo build
 
 echo "-- .Net components --"
 dotnet restore "$ROOT/runtime-net"
 (export FrameworkPathOverride="$MONO20"; dotnet build "$ROOT/runtime-net" -c Release)
+(export FrameworkPathOverride="$MONO20"; dotnet pack "$ROOT/runtime-net" -c Release)
 dotnet restore "$ROOT/tests-executor-net"
 (export FrameworkPathOverride="$MONO461"; dotnet build "$ROOT/tests-executor-net" -c Release -f net461)
 
@@ -54,21 +55,22 @@ echo "-- Java components --"
 mvn -f "$ROOT/runtime-java/pom.xml" clean install -Dgpg.skip=true -Duser.home="$HOME"
 mvn -f "$ROOT/tests-executor-java/pom.xml" clean verify -Dgpg.skip=true -Duser.home="$HOME"
 
+# Setup the test components
+rm -rf "$ROOT/tests-results"
+mkdir "$ROOT/tests-results"
+cp "$ROOT/target/debug/hime_tests_driver" "$ROOT/tests-results/hime_tests_driver"
+cp $ROOT/runtime-net/bin/Release/*.nupkg "$ROOT/tests-results/"
+cp "$ROOT/tests-executor-net/bin/Release/net461/Hime.Redist.dll" "$ROOT/tests-results/Hime.Redist.dll"
+cp "$ROOT/tests-executor-net/bin/Release/net461/executor.exe" "$ROOT/tests-results/executor-net.exe"
+cp $ROOT/tests-executor-java/target/hime-test-executor-*.jar "$ROOT/tests-results/executor-java.jar"
+cp $ROOT/tests-executor-java/target/dependency/*.jar "$ROOT/tests-results/"
+cp "$ROOT/target/debug/hime_tests_executor_rust" "$ROOT/tests-results/executor-rust"
 
-# # Setup the test components
-# rm -rf "$ROOT/tests-results"
-# mkdir "$ROOT/tests-results"
-# cp "$ROOT/tests-driver/bin/Release/net461/Hime.Redist.dll" "$ROOT/tests-results/Hime.Redist.dll"
-# cp "$ROOT/tests-driver/bin/Release/net461/Hime.SDK.dll" "$ROOT/tests-results/Hime.SDK.dll"
-# cp "$ROOT/tests-driver/bin/Release/net461/driver.exe" "$ROOT/tests-results/driver.exe"
-# cp "$ROOT/tests-executor-net/bin/Release/net461/executor.exe" "$ROOT/tests-results/executor-net.exe"
-# cp $ROOT/tests-executor-java/target/hime-test-executor-*.jar "$ROOT/tests-results/executor-java.jar"
-# cp $ROOT/tests-executor-java/target/dependency/*.jar "$ROOT/tests-results/"
-# cp "$ROOT/target/release/tests_executor_rust" "$ROOT/tests-results/executor-rust"
-# # Execute the tests
-# cd "$ROOT/tests-results"
-# mono driver.exe --all
-# cd "$ROOT"
-# # Cleanup the tests
-# mv "$ROOT/tests-results/TestResults.xml" "$ROOT/TestResults.xml"
-# rm -r "$ROOT/tests-results"
+# Execute the tests
+cd "$ROOT/tests-results"
+./hime_tests_driver
+cd "$ROOT"
+
+# Cleanup the tests
+mv "$ROOT/tests-results/TestResults.xml" "$ROOT/TestResults.xml"
+rm -r "$ROOT/tests-results"
