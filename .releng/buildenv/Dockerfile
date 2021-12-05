@@ -6,7 +6,7 @@ RUN mkdir /home/builder
 ENV HOME=/home/builder
 
 # Add required packages
-RUN apt update && apt-get dist-upgrade -y && apt install -y --no-install-recommends \
+RUN apt update && apt install -y --no-install-recommends \
 		software-properties-common \
 		apt-transport-https \
 		gnupg \
@@ -39,18 +39,16 @@ RUN apt update && apt install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Add support for Rust
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
-ENV PATH="${HOME}/.cargo/bin:${PATH}"
-RUN rustup target add x86_64-unknown-linux-musl
-RUN mkdir /home/builder/.cargo/registry
-ENV RUST_BACKTRACE=1
-
-# Setup ownership/permissions
-RUN chmod -R a+rwX /home/builder
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && \
+	export PATH="${HOME}/.cargo/bin:${PATH}" && \
+    rustup target add x86_64-unknown-linux-musl && \
+	mkdir /home/builder/.cargo/registry && \
+	chmod -R a+rwX /home/builder
 
 # Environment
-ENV HOME=/home/builder
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV PATH="${HOME}/.cargo/bin:${PATH}"
+ENV RUST_BACKTRACE=1
 
 # Specify volumes
 VOLUME /src
