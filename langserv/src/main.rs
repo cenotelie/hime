@@ -23,7 +23,6 @@ use std::sync::Arc;
 
 use clap::{App, Arg, SubCommand};
 use futures::future::join_all;
-use log::{error, info};
 use tokio::sync::RwLock;
 use tower_lsp::jsonrpc::{Error, Result};
 use tower_lsp::lsp_types::*;
@@ -59,20 +58,16 @@ impl Backend {
 
     /// Execute the background work
     async fn worker(workspace: Arc<RwLock<Workspace>>, client: Arc<Client>) {
-        info!("worker, starting ...");
         let mut workspace = workspace.write().await;
         workspace.lint();
-        info!("worker, sending ...");
         join_all(workspace.documents.iter().map(|(uri, doc)| {
             client.publish_diagnostics(uri.clone(), doc.diagnostics.clone(), doc.version)
         }))
         .await;
-        info!("worker, done!");
     }
 
     /// Execute the background work
     fn execute(&self) {
-        info!("calling worker ...");
         tokio::spawn(Backend::worker(self.workspace.clone(), self.client.clone()));
     }
 }
@@ -80,7 +75,6 @@ impl Backend {
 #[tower_lsp::async_trait]
 impl LanguageServer for Backend {
     async fn initialize(&self, params: InitializeParams) -> Result<InitializeResult> {
-        info!("initialize");
         let mut workspace = self.workspace.write().await;
         if let Some(root) = params.root_uri {
             if workspace.scan_workspace(root).is_err() {
@@ -117,12 +111,10 @@ impl LanguageServer for Backend {
     }
 
     async fn shutdown(&self) -> Result<()> {
-        info!("shutdown");
         Ok(())
     }
 
     async fn did_change_watched_files(&self, params: DidChangeWatchedFilesParams) {
-        info!("did_change_watched_files");
         let mut workspace = self.workspace.write().await;
         if workspace.on_file_events(&params.changes).is_err() {
             // do nothing
@@ -131,7 +123,6 @@ impl LanguageServer for Backend {
     }
 
     async fn did_change(&self, params: DidChangeTextDocumentParams) {
-        info!("did_change");
         let mut workspace = self.workspace.write().await;
         workspace.on_file_changes(params);
         self.execute();
@@ -141,7 +132,6 @@ impl LanguageServer for Backend {
         &self,
         params: ExecuteCommandParams
     ) -> Result<Option<serde_json::Value>> {
-        info!("execute_command");
         let workspace = self.workspace.read().await;
         match &params.command[..] {
             "test" => {
@@ -162,14 +152,6 @@ impl LanguageServer for Backend {
     }
 }
 
-fn setup_logger() -> std::result::Result<(), fern::InitError> {
-    fern::Dispatch::new()
-        .format(|out, message, record| out.finish(format_args!("[{}] {}", record.level(), message)))
-        .level(log::LevelFilter::Debug)
-        .apply()?;
-    Ok(())
-}
-
 #[tokio::main]
 async fn main() {
     std::panic::set_hook(Box::new(|info| {
@@ -181,9 +163,8 @@ async fn main() {
             Some(message) => message.to_owned(),
             None => String::from("no message")
         };
-        error!("Panic: {} : {}", location, message);
+        eprintln!("Panic: {} : {}", location, message);
     }));
-    setup_logger().unwrap();
 
     let matches = App::new("Hime Language Server")
         .version(
@@ -229,17 +210,8 @@ async fn main() {
                 CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH
             )
         }
-        _ => match matches.value_of("tcp") {
-            None => {
-                let stdin = tokio::io::stdin();
-                let stdout = tokio::io::stdout();
-                let (service, messages) = LspService::new(Backend::new);
-                Server::new(stdin, stdout)
-                    .interleave(messages)
-                    .serve(service)
-                    .await;
-            }
-            Some(_) => {
+        _ => {
+            if matches.is_present("tcp") {
                 let address = matches.value_of("address").unwrap_or("127.0.0.1");
                 let port = matches
                     .value_of("port")
@@ -247,6 +219,7 @@ async fn main() {
                     .transpose()
                     .unwrap_or_default()
                     .unwrap_or(9257);
+                println!("Listening on {}:{}", address, port);
                 let listener = tokio::net::TcpListener::bind(format!("{}:{}", address, port))
                     .await
                     .unwrap();
@@ -254,6 +227,14 @@ async fn main() {
                 let (read, write) = tokio::io::split(stream);
                 let (service, messages) = LspService::new(Backend::new);
                 Server::new(read, write)
+                    .interleave(messages)
+                    .serve(service)
+                    .await;
+            } else {
+                let stdin = tokio::io::stdin();
+                let stdout = tokio::io::stdout();
+                let (service, messages) = LspService::new(Backend::new);
+                Server::new(stdin, stdout)
                     .interleave(messages)
                     .serve(service)
                     .await;
