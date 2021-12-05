@@ -18,7 +18,8 @@ stages:
 #     container: cenotelie/hime-build-env:latest
 #     steps:
 #     - script: ./build.sh
-- stage: Build publishable artifacts
+- stage: BuildPublishableArtifacts
+  displayName: Build publishable artifacts
   jobs:
   - job: linux
     pool:
