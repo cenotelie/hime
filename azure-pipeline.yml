@@ -8,90 +8,90 @@ variables:
   tag: '$(Build.BuildId)'
 
 stages:
-# - stage: Build
-#   displayName: Build and test
-#   jobs:  
-#   - job: Build
-#     displayName: Build and test
-#     pool:
-#       vmImage: 'ubuntu-latest'
-#     container: cenotelie/hime-build-env:latest
-#     steps:
-#     - script: ./build.sh
-# - stage: BuildPublishableArtifacts
-#   displayName: Build publishable artifacts
-#   jobs:
-#   - job: linux
-#     pool:
-#       vmImage: 'ubuntu-latest'
-#     container: cenotelie/hime-build-env-light:latest
-#     steps:
-#     - script: |
-#         cargo build --release --target x86_64-unknown-linux-musl --features vendored
-#       displayName: Build
-#     - task: CopyFiles@2
-#       inputs:
-#         sourceFolder: '$(Build.SourcesDirectory)/target/x86_64-unknown-linux-musl/release'
-#         contents: |
-#           himecc
-#           hime_langserv
-#         targetFolder: '$(Build.ArtifactStagingDirectory)'
-#         overWrite: true
-#     - task: PublishPipelineArtifact@1
-#       inputs:
-#         path: '$(Build.ArtifactStagingDirectory)'
-#         artifact: linux-musl
-#   - job: windows
-#     pool:
-#       vmImage: 'windows-latest'
-#     steps:
-#     - script: |
-#         curl -sSf -o rustup-init.exe https://win.rustup.rs
-#         rustup-init.exe -y --default-host x86_64-pc-windows-msvc
-#         set PATH=%PATH%;%USERPROFILE%\.cargo\bin
-#         echo "##vso[task.setvariable variable=PATH;]%PATH%;%USERPROFILE%\.cargo\bin"
-#         cargo --version
-#       displayName: Install Rust
-#     - script: |
-#         cargo build --release --features vendored
-#       displayName: Build
-#     - task: CopyFiles@2
-#       inputs:
-#         sourceFolder: '$(Build.SourcesDirectory)/target/release'
-#         contents: |
-#           himecc.exe
-#           hime_langserv.exe
-#         targetFolder: '$(Build.ArtifactStagingDirectory)'
-#         overWrite: true
-#     - task: PublishPipelineArtifact@1
-#       inputs:
-#         path: '$(Build.ArtifactStagingDirectory)'
-#         artifact: windows
-#   - job: macos
-#     pool:
-#       vmImage: 'macOS-latest'
-#     steps:
-#     - script: |
-#         set -e
-#         curl https://sh.rustup.rs -sSf | sh -s -- -y
-#         echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
-#         cargo --version
-#       displayName: Install Rust
-#     - script: |
-#         cargo build --release
-#       displayName: Build
-#     - task: CopyFiles@2
-#       inputs:
-#         sourceFolder: '$(Build.SourcesDirectory)/target/release'
-#         contents: |
-#           himecc
-#           hime_langserv
-#         targetFolder: '$(Build.ArtifactStagingDirectory)'
-#         overWrite: true
-#     - task: PublishPipelineArtifact@1
-#       inputs:
-#         path: '$(Build.ArtifactStagingDirectory)'
-#         artifact: macos
+- stage: Build
+  displayName: Build and test
+  jobs:  
+  - job: Build
+    displayName: Build and test
+    pool:
+      vmImage: 'ubuntu-latest'
+    container: cenotelie/hime-build-env:latest
+    steps:
+    - script: ./build.sh
+- stage: BuildPublishableArtifacts
+  displayName: Build publishable artifacts
+  jobs:
+  - job: linux
+    pool:
+      vmImage: 'ubuntu-latest'
+    container: cenotelie/hime-build-env-light:latest
+    steps:
+    - script: |
+        cargo build --release --target x86_64-unknown-linux-musl --features vendored
+      displayName: Build
+    - task: CopyFiles@2
+      inputs:
+        sourceFolder: '$(Build.SourcesDirectory)/target/x86_64-unknown-linux-musl/release'
+        contents: |
+          himecc
+          hime_langserv
+        targetFolder: '$(Build.ArtifactStagingDirectory)'
+        overWrite: true
+    - task: PublishPipelineArtifact@1
+      inputs:
+        path: '$(Build.ArtifactStagingDirectory)'
+        artifact: linux-musl
+  - job: windows
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - script: |
+        curl -sSf -o rustup-init.exe https://win.rustup.rs
+        rustup-init.exe -y --default-host x86_64-pc-windows-msvc
+        set PATH=%PATH%;%USERPROFILE%\.cargo\bin
+        echo "##vso[task.setvariable variable=PATH;]%PATH%;%USERPROFILE%\.cargo\bin"
+        cargo --version
+      displayName: Install Rust
+    - script: |
+        cargo build --release --features vendored
+      displayName: Build
+    - task: CopyFiles@2
+      inputs:
+        sourceFolder: '$(Build.SourcesDirectory)/target/release'
+        contents: |
+          himecc.exe
+          hime_langserv.exe
+        targetFolder: '$(Build.ArtifactStagingDirectory)'
+        overWrite: true
+    - task: PublishPipelineArtifact@1
+      inputs:
+        path: '$(Build.ArtifactStagingDirectory)'
+        artifact: windows
+  - job: macos
+    pool:
+      vmImage: 'macOS-latest'
+    steps:
+    - script: |
+        set -e
+        curl https://sh.rustup.rs -sSf | sh -s -- -y
+        echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
+        cargo --version
+      displayName: Install Rust
+    - script: |
+        cargo build --release
+      displayName: Build
+    - task: CopyFiles@2
+      inputs:
+        sourceFolder: '$(Build.SourcesDirectory)/target/release'
+        contents: |
+          himecc
+          hime_langserv
+        targetFolder: '$(Build.ArtifactStagingDirectory)'
+        overWrite: true
+    - task: PublishPipelineArtifact@1
+      inputs:
+        path: '$(Build.ArtifactStagingDirectory)'
+        artifact: macos
 - stage: PublishArtifacts
   displayName: Publish artifacts
   jobs:
@@ -103,12 +103,7 @@ stages:
         mkdir target
     - task: DownloadPipelineArtifact@2
       inputs:
-        #source: 'current'
-        source: 'specific'
-        project: 'cenotelie'
-        pipeline: 6
-        runVersion: 'specific'
-        runId: 1524
+        source: 'current'
         path: $(Build.SourcesDirectory)/target
     - task: DownloadSecureFile@1
       name: s3config
