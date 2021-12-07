@@ -817,6 +817,8 @@ pub struct Rule {
     pub head: usize,
     /// The action on the rule's head
     pub head_action: TreeAction,
+    /// The input reference for the rule's head
+    pub head_input_ref: InputReference,
     /// The rule's body
     pub body: RuleBody,
     /// The lexical context pushed by this rule
@@ -825,10 +827,17 @@ pub struct Rule {
 
 impl Rule {
     /// Initializes this rule
-    pub fn new(head: usize, head_action: TreeAction, body: RuleBody, context: usize) -> Rule {
+    pub fn new(
+        head: usize,
+        head_action: TreeAction,
+        input_ref: InputReference,
+        body: RuleBody,
+        context: usize
+    ) -> Rule {
         Rule {
             head,
             head_action,
+            head_input_ref: input_ref,
             body,
             context
         }
@@ -893,6 +902,8 @@ impl RuleChoiceRef {
 pub struct TemplateRuleRef {
     /// Index of the template rule
     pub template: usize,
+    /// The input reference for this call
+    pub input_ref: InputReference,
     /// The arguments to the template
     pub arguments: Vec<TemplateRuleSymbol>
 }
@@ -1008,13 +1019,24 @@ impl TemplateRuleBody {
     }
 }
 
+/// A parameter for the template rule
+#[derive(Debug, Clone)]
+pub struct TemplateRuleParam {
+    /// The name of the parameter
+    pub name: String,
+    /// The input reference
+    pub input_ref: InputReference
+}
+
 /// A template rule in a grammar
 #[derive(Debug, Clone)]
 pub struct TemplateRule {
     /// The base head name for the rule
     pub name: String,
+    /// The input reference for the definition
+    pub input_ref: InputReference,
     /// The name of the parameters for the rule
-    pub parameters: Vec<String>,
+    pub parameters: Vec<TemplateRuleParam>,
     /// The action on the rule's head
     pub head_action: TreeAction,
     /// The lexical context pushed by this rule
@@ -1027,9 +1049,14 @@ pub struct TemplateRule {
 
 impl TemplateRule {
     /// Initializes a new template rule
-    pub fn new(name: String, parameters: Vec<String>) -> TemplateRule {
+    pub fn new(
+        name: String,
+        input_ref: InputReference,
+        parameters: Vec<TemplateRuleParam>
+    ) -> TemplateRule {
         TemplateRule {
             name,
+            input_ref,
             parameters,
             head_action: TREE_ACTION_NONE,
             context: 0,
@@ -1420,21 +1447,30 @@ impl Grammar {
     }
 
     /// Adds a template rule with the given name to this grammar
-    pub fn add_template_rule(&mut self, name: &str, parameters: Vec<String>) -> &mut TemplateRule {
+    pub fn add_template_rule(
+        &mut self,
+        name: &str,
+        input_ref: InputReference,
+        parameters: Vec<TemplateRuleParam>
+    ) -> &mut TemplateRule {
         if let Some(index) = self.template_rules.iter().position(|v| v.name == name) {
             return &mut self.template_rules[index];
         }
         let index = self.template_rules.len();
         self.template_rules
-            .push(TemplateRule::new(name.to_string(), parameters));
+            .push(TemplateRule::new(name.to_string(), input_ref, parameters));
         &mut self.template_rules[index]
     }
 
     /// Generates a new template rule
-    pub fn generate_template_rule(&mut self, parameters: Vec<String>) -> &mut TemplateRule {
+    pub fn generate_template_rule(
+        &mut self,
+        input_ref: InputReference,
+        parameters: Vec<TemplateRuleParam>
+    ) -> &mut TemplateRule {
         let sid = self.get_next_sid();
         let name = format!("{}{}", PREFIX_GENERATED_VARIABLE, sid);
-        self.add_template_rule(&name, parameters)
+        self.add_template_rule(&name, input_ref, parameters)
     }
 
     /// Instantiate a template rule
@@ -1455,7 +1491,7 @@ impl Grammar {
                         arguments.len()
                     ))
                 } else {
-                    Ok(self.instantiate_template_rule_at(index, arguments))
+                    Ok(self.instantiate_template_rule_at(index, call_ref, arguments))
                 }
             }
         }
@@ -1475,7 +1511,11 @@ impl Grammar {
                 for arg in template_ref.arguments.iter() {
                     new_arguments.push(self.instantiate_template_symbol(arguments, arg));
                 }
-                self.instantiate_template_rule_at(template_ref.template, new_arguments)
+                self.instantiate_template_rule_at(
+                    template_ref.template,
+                    template_ref.input_ref,
+                    new_arguments
+                )
             }
         }
     }
@@ -1484,6 +1524,7 @@ impl Grammar {
     fn instantiate_template_rule_at(
         &mut self,
         index: usize,
+        call_ref: InputReference,
         arguments: Vec<SymbolRef>
     ) -> SymbolRef {
         let mut new_instance = TemplateRuleInstance { arguments, head: 0 };
@@ -1524,6 +1565,7 @@ impl Grammar {
                         variable.rules.push(Rule {
                             head: variable.id,
                             head_action,
+                            head_input_ref: call_ref,
                             body,
                             context
                         });
@@ -1640,6 +1682,7 @@ impl Grammar {
                     Rule::new(
                         head,
                         rule.head_action,
+                        rule.head_input_ref,
                         RuleBody::from_parts(elements),
                         context
                     )
@@ -1676,6 +1719,7 @@ impl Grammar {
                     .0;
                 TemplateRuleSymbol::Template(TemplateRuleRef {
                     template: index,
+                    input_ref: template_ref.input_ref,
                     arguments: template_ref
                         .arguments
                         .iter()
@@ -1695,6 +1739,7 @@ impl Grammar {
                 let index = self.template_rules.len();
                 self.template_rules.push(TemplateRule {
                     name: rule.name.clone(),
+                    input_ref: rule.input_ref,
                     parameters: rule.parameters.clone(),
                     head_action: rule.head_action,
                     context: rule.context,
@@ -1829,11 +1874,13 @@ impl Grammar {
             .find(|v| v.name == axiom_option.value)
             .ok_or(Error::AxiomNotDefined(grammar_index))?
             .id;
+        let input_ref = axiom_option.value_input_ref;
         // Create the real axiom rule variable and rule
         let real_axiom = self.add_variable(GENERATED_AXIOM);
         real_axiom.rules.push(Rule::new(
             real_axiom.id,
             TREE_ACTION_NONE,
+            input_ref,
             RuleBody::from_parts(vec![
                 RuleBodyElement::new(SymbolRef::Variable(axiom_id), TREE_ACTION_PROMOTE, None),
                 RuleBodyElement::new(SymbolRef::Dollar, TREE_ACTION_DROP, None),
