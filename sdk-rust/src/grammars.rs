@@ -38,6 +38,15 @@ pub trait Symbol {
     fn get_name(&self) -> &str;
 }
 
+/// A reference to a terminal in a terminal rule
+#[derive(Debug, Clone)]
+pub struct TerminalReference {
+    /// The identifier of the referring terminal
+    pub referring_id: usize,
+    /// The input reference
+    pub input_ref: InputReference
+}
+
 /// Represents a terminal symbol in a grammar
 #[derive(Debug, Clone)]
 pub struct Terminal {
@@ -56,7 +65,9 @@ pub struct Terminal {
     /// Whether the terminal is anonymous
     pub is_anonymous: bool,
     /// Whether the terminal is a fragment
-    pub is_fragment: bool
+    pub is_fragment: bool,
+    /// The references to this terminal by others
+    pub terminal_references: Vec<TerminalReference>
 }
 
 impl Terminal {
@@ -1332,7 +1343,8 @@ impl Grammar {
             nfa,
             context,
             is_anonymous,
-            is_fragment
+            is_fragment,
+            terminal_references: Vec::new()
         };
         self.terminals.push(terminal);
         &mut self.terminals[index]
@@ -1341,6 +1353,11 @@ impl Grammar {
     /// Gets the terminal with the specified identifier
     pub fn get_terminal(&self, sid: usize) -> Option<&Terminal> {
         self.terminals.iter().find(|t| t.id == sid)
+    }
+
+    /// Gets the terminal with the specified identifier
+    pub fn get_terminal_mut(&mut self, sid: usize) -> Option<&mut Terminal> {
+        self.terminals.iter_mut().find(|t| t.id == sid)
     }
 
     /// Gets the terminal with the given name
@@ -1621,7 +1638,8 @@ impl Grammar {
                     nfa,
                     context,
                     is_fragment: terminal.is_fragment,
-                    is_anonymous: terminal.is_anonymous
+                    is_anonymous: terminal.is_anonymous,
+                    terminal_references: Vec::new()
                 });
             }
         }

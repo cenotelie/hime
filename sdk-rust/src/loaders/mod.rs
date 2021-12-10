@@ -35,7 +35,7 @@ use crate::errors::{Error, Errors};
 use crate::finite::{FinalItem, NFA};
 use crate::grammars::{
     BodySet, Grammar, Rule, RuleBody, SymbolRef, TemplateRuleBody, TemplateRuleParam,
-    TemplateRuleRef, TemplateRuleSymbol, DEFAULT_CONTEXT_NAME
+    TemplateRuleRef, TemplateRuleSymbol, TerminalReference, DEFAULT_CONTEXT_NAME
 };
 use crate::unicode::{Span, BLOCKS, CATEGORIES};
 use crate::{CharSpan, Input, InputReference, LoadedData, LoadedInput};
@@ -425,7 +425,8 @@ fn load_terminal_rule(
         ));
         return;
     }
-    let nfa = load_nfa(input_index, errors, grammar, node.child(1));
+    let mut references = Vec::new();
+    let nfa = load_nfa(input_index, errors, &mut references, grammar, node.child(1));
     let terminal = grammar.add_terminal_named(
         name,
         InputReference::from(input_index, &node_name),
@@ -435,10 +436,25 @@ fn load_terminal_rule(
     );
     terminal.nfa.states[terminal.nfa.exit]
         .add_item(FinalItem::Terminal(terminal.id, terminal.context));
+    let referring_id = terminal.id;
+    for (referred_id, input_ref) in references.into_iter() {
+        if let Some(referred) = grammar.get_terminal_mut(referred_id) {
+            referred.terminal_references.push(TerminalReference {
+                referring_id,
+                input_ref
+            });
+        }
+    }
 }
 
 /// Builds the NFA represented by the AST node
-fn load_nfa(input_index: usize, errors: &mut Vec<Error>, grammar: &Grammar, node: AstNode) -> NFA {
+fn load_nfa(
+    input_index: usize,
+    errors: &mut Vec<Error>,
+    references: &mut Vec<(usize, InputReference)>,
+    grammar: &Grammar,
+    node: AstNode
+) -> NFA {
     match node.get_symbol().id {
         hime_grammar::ID_TERMINAL_LITERAL_TEXT => load_nfa_simple_text(&node),
         hime_grammar::ID_TERMINAL_UNICODE_CODEPOINT => {
@@ -455,31 +471,33 @@ fn load_nfa(input_index: usize, errors: &mut Vec<Error>, grammar: &Grammar, node
             load_nfa_unicode_span(input_index, errors, node)
         }
         hime_grammar::ID_TERMINAL_LITERAL_ANY => load_nfa_any(),
-        hime_grammar::ID_TERMINAL_NAME => load_nfa_reference(input_index, errors, grammar, node),
+        hime_grammar::ID_TERMINAL_NAME => {
+            load_nfa_reference(input_index, errors, references, grammar, node)
+        }
         hime_grammar::ID_TERMINAL_OPERATOR_OPTIONAL => {
-            let inner = load_nfa(input_index, errors, grammar, node.child(0));
+            let inner = load_nfa(input_index, errors, references, grammar, node.child(0));
             inner.into_optional()
         }
         hime_grammar::ID_TERMINAL_OPERATOR_ZEROMORE => {
-            let inner = load_nfa(input_index, errors, grammar, node.child(0));
+            let inner = load_nfa(input_index, errors, references, grammar, node.child(0));
             inner.into_zero_or_more()
         }
         hime_grammar::ID_TERMINAL_OPERATOR_ONEMORE => {
-            let inner = load_nfa(input_index, errors, grammar, node.child(0));
+            let inner = load_nfa(input_index, errors, references, grammar, node.child(0));
             inner.into_one_or_more()
         }
         hime_grammar::ID_TERMINAL_OPERATOR_UNION => {
-            let left = load_nfa(input_index, errors, grammar, node.child(0));
-            let right = load_nfa(input_index, errors, grammar, node.child(1));
+            let left = load_nfa(input_index, errors, references, grammar, node.child(0));
+            let right = load_nfa(input_index, errors, references, grammar, node.child(1));
             left.into_union_with(right)
         }
         hime_grammar::ID_TERMINAL_OPERATOR_DIFFERENCE => {
-            let left = load_nfa(input_index, errors, grammar, node.child(0));
-            let right = load_nfa(input_index, errors, grammar, node.child(1));
+            let left = load_nfa(input_index, errors, references, grammar, node.child(0));
+            let right = load_nfa(input_index, errors, references, grammar, node.child(1));
             left.into_difference(right)
         }
         hime_grammar::ID_VIRTUAL_RANGE => {
-            let inner = load_nfa(input_index, errors, grammar, node.child(0));
+            let inner = load_nfa(input_index, errors, references, grammar, node.child(0));
             let min = node.child(1).get_value().unwrap().parse::<usize>().unwrap();
             let max = if node.children_count() > 2 {
                 node.child(2).get_value().unwrap().parse::<usize>().unwrap()
@@ -489,8 +507,8 @@ fn load_nfa(input_index: usize, errors: &mut Vec<Error>, grammar: &Grammar, node
             inner.into_repeat_range(min, max)
         }
         hime_grammar::ID_VIRTUAL_CONCAT => {
-            let left = load_nfa(input_index, errors, grammar, node.child(0));
-            let right = load_nfa(input_index, errors, grammar, node.child(1));
+            let left = load_nfa(input_index, errors, references, grammar, node.child(0));
+            let right = load_nfa(input_index, errors, references, grammar, node.child(1));
             left.into_concatenation(right)
         }
         _ => {
@@ -729,12 +747,16 @@ fn load_nfa_any() -> NFA {
 fn load_nfa_reference(
     input_index: usize,
     errors: &mut Vec<Error>,
+    references: &mut Vec<(usize, InputReference)>,
     grammar: &Grammar,
     node: AstNode
 ) -> NFA {
     let value = node.get_value().unwrap();
     match grammar.get_terminal_for_name(&value) {
-        Some(terminal) => terminal.nfa.clone_no_finals(),
+        Some(terminal) => {
+            references.push((terminal.id, InputReference::from(input_index, &node)));
+            terminal.nfa.clone_no_finals()
+        }
         None => {
             errors.push(Error::SymbolNotFound(
                 InputReference::from(input_index, &node),
