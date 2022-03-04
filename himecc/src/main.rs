@@ -20,7 +20,7 @@
 use std::io::{self, Read};
 use std::{env, process};
 
-use clap::{App, Arg};
+use clap::{Arg, Command};
 use hime_sdk::errors::{Error, Errors};
 use hime_sdk::{CompilationTask, Input, Mode, Modifier, ParsingMethod, Runtime};
 
@@ -34,14 +34,14 @@ pub const GIT_HASH: &str = env!("GIT_HASH");
 pub const GIT_TAG: &str = env!("GIT_TAG");
 
 pub fn main() {
-    let matches = App::new("Hime Parser Generator")
+    let matches = Command::new("Hime Parser Generator")
         .version(format!("{} {} tag={} hash={}", CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH).as_str())
         .author("Association Cénotélie <contact@cenotelie.fr>")
         .about("Generator of lexers and parsers for the Hime runtime.")
         .arg(
-            Arg::with_name("output_mode")
+            Arg::new("output_mode")
                 .value_name("MODE")
-                .short("o")
+                .short('o')
                 .long("output")
                 .help("The output mode.")
                 .takes_value(true)
@@ -54,9 +54,9 @@ pub fn main() {
                 ])
         )
         .arg(
-            Arg::with_name("output_target")
+            Arg::new("output_target")
                 .value_name("TARGET")
-                .short("t")
+                .short('t')
                 .long("target")
                 .help("The target runtime.")
                 .takes_value(true)
@@ -69,27 +69,27 @@ pub fn main() {
                 ])
         )
         .arg(
-            Arg::with_name("output_target_runtime_path")
+            Arg::new("output_target_runtime_path")
                 .value_name("RUNTIME")
-                .short("r")
+                .short('r')
                 .long("runtime")
                 .help("The path to a specific target runtime.")
                 .takes_value(true)
                 .required(false)
         )
         .arg(
-            Arg::with_name("output_path")
+            Arg::new("output_path")
                 .value_name("PATH")
-                .short("p")
+                .short('p')
                 .long("path")
                 .help("The path to write the output. By default, the current directory is used.")
                 .takes_value(true)
                 .required(false)
         )
         .arg(
-            Arg::with_name("output_access")
+            Arg::new("output_access")
                 .value_name("ACCESS")
-                .short("a")
+                .short('a')
                 .long("access")
                 .help("The access modifier for the generated code.")
                 .takes_value(true)
@@ -101,18 +101,18 @@ pub fn main() {
                 ])
         )
         .arg(
-            Arg::with_name("output_namespace")
+            Arg::new("output_namespace")
                 .value_name("NMSPCE")
-                .short("n")
+                .short('n')
                 .long("namespace")
                 .help("The namespace to use for the generated code. If none is given, and the target runtime requires one, the name of the grammar will be used.")
                 .takes_value(true)
                 .required(false)
         )
         .arg(
-            Arg::with_name("parsing_method")
+            Arg::new("parsing_method")
                 .value_name("METHOD")
-                .short("m")
+                .short('m')
                 .long("method")
                 .help("The parsing method to use.")
                 .takes_value(true)
@@ -127,27 +127,27 @@ pub fn main() {
                 ])
         )
         .arg(
-            Arg::with_name("grammar_name")
+            Arg::new("grammar_name")
                 .value_name("GRAMMAR")
-                .short("g")
+                .short('g')
                 .long("grammar")
                 .help("The name of the grammar to compile if there are multiple.")
                 .takes_value(true)
                 .required(false)
         )
         .arg(
-            Arg::with_name("test")
+            Arg::new("test")
                 .long("test")
                 .help("Compiles the target grammar in-memory and test it against an input read from std::in and output the AST or parse errors")
                 .required(false)
         )
         .arg(
-            Arg::with_name("inputs")
+            Arg::new("inputs")
                 .value_name("INPUTS")
                 .help("The file names of the input grammars")
                 .takes_value(true)
                 .required(true)
-                .multiple(true)
+                .multiple_values(true)
         )
         .get_matches();
 

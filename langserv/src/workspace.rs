@@ -23,14 +23,16 @@ use std::io::{self, BufReader, ErrorKind, Read};
 use std::path::{Path, PathBuf};
 
 use hime_sdk::errors::Error;
-use hime_sdk::grammars::{OPTION_AXIOM, OPTION_SEPARATOR};
-use hime_sdk::{CompilationTask, Input, InputReference, LoadedData};
+use hime_sdk::grammars::{Grammar, RuleBodyElement, SymbolRef, OPTION_AXIOM, OPTION_SEPARATOR};
+use hime_sdk::{CompilationTask, Input, InputReference, LoadedData, LoadedInput};
 use serde_json::Value;
 use tower_lsp::jsonrpc::Error as JsonRpcError;
 use tower_lsp::lsp_types::{
     Diagnostic, DiagnosticRelatedInformation, DiagnosticSeverity, DidChangeTextDocumentParams,
-    FileChangeType, FileEvent, Location, Position, Range, Url
+    FileChangeType, FileEvent, Location, Position, Range, SymbolInformation, SymbolKind, Url
 };
+
+use crate::symbols::SymbolRegistry;
 
 /// Represents a document in a workspace
 #[derive(Debug, Clone)]
@@ -57,6 +59,38 @@ impl Document {
     }
 }
 
+/// The data associated to the workspace
+#[derive(Debug, Clone, Default)]
+pub struct WorkspaceData {
+    /// The loaded inputs
+    pub inputs: Vec<LoadedInput>,
+    /// The loaded grammars
+    pub grammars: Vec<Grammar>,
+    /// The registry of symbols
+    pub symbols: SymbolRegistry
+}
+
+impl WorkspaceData {
+    /// Translate an input reference to a LSP range
+    pub fn get_range(&self, input_reference: InputReference) -> Range {
+        WorkspaceData::to_range(&self.inputs, input_reference)
+    }
+
+    /// Translate an input reference to a LSP range
+    fn to_range(inputs: &[LoadedInput], input_reference: InputReference) -> Range {
+        let end = inputs[input_reference.input_index]
+            .content
+            .get_position_for(input_reference.position, input_reference.length);
+        Range::new(
+            Position::new(
+                (input_reference.position.line - 1) as u32,
+                (input_reference.position.column - 1) as u32
+            ),
+            Position::new((end.line - 1) as u32, (end.column - 1) as u32)
+        )
+    }
+}
+
 /// Represents the current workspace for a server
 #[derive(Debug, Clone, Default)]
 pub struct Workspace {
@@ -65,7 +99,7 @@ pub struct Workspace {
     /// The documents in the workspace
     pub documents: HashMap<Url, Document>,
     /// The currently loaded data, if any
-    pub data: Option<LoadedData>
+    pub data: Option<WorkspaceData>
 }
 
 impl Workspace {
@@ -147,15 +181,16 @@ impl Workspace {
     pub fn on_file_events(&mut self, events: &[FileEvent]) -> io::Result<()> {
         for event in events.iter() {
             match event.typ {
-                FileChangeType::Created => {
+                FileChangeType::CREATED => {
                     self.resolve_document_url(event.uri.clone())?;
                 }
-                FileChangeType::Changed => {
+                FileChangeType::CHANGED => {
                     // TODO: handle this
                 }
-                FileChangeType::Deleted => {
+                FileChangeType::DELETED => {
                     self.documents.remove(&event.uri);
                 }
+                _ => {}
             }
         }
         Ok(())
@@ -195,13 +230,101 @@ impl Workspace {
                         documents[index].diagnostics.push(diag);
                     }
                 }
-                self.data = Some(data)
+                let symbols = SymbolRegistry::from(&data.grammars);
+                let data = WorkspaceData {
+                    inputs: data.inputs,
+                    grammars: data.grammars,
+                    symbols
+                };
+                self.data = Some(data);
             }
             Err(errors) => {
                 for error in errors.errors.iter() {
                     if let Some((index, diag)) = to_diagnostic(&documents, &errors.data, error) {
                         documents[index].diagnostics.push(diag);
                     }
+                }
+            }
+        }
+    }
+
+    /// Lookups information for symbols matching the query
+    pub fn lookup_symbols(&self, query: &str) -> Vec<SymbolInformation> {
+        let mut result = Vec::new();
+        if let Some(data) = self.data.as_ref() {
+            let parts = query.split('.').collect::<Vec<_>>();
+            if parts.len() == 2 {
+                // lookup in a specific grammar
+                if let Some(grammar) = data.grammars.iter().find(|g| g.name == parts[0]) {
+                    self.lookup_symbols_in(grammar, &mut result, parts[1]);
+                }
+            } else if parts.len() == 1 {
+                // lookup in all grammars
+                for grammar in data.grammars.iter() {
+                    self.lookup_symbols_in(grammar, &mut result, parts[0]);
+                }
+            }
+        }
+        result
+    }
+
+    /// Lookup symbols matching the specified name in the grammar
+    fn lookup_symbols_in(
+        &self,
+        grammar: &Grammar,
+        buffer: &mut Vec<SymbolInformation>,
+        query: &str
+    ) {
+        if grammar.name.contains(query) {
+            buffer.push(self.new_symbol(
+                grammar.name.to_string(),
+                SymbolKind::CLASS,
+                grammar.input_ref
+            ));
+        }
+        for terminal in grammar.terminals.iter() {
+            if !terminal.is_anonymous && terminal.name.contains(query) {
+                buffer.push(self.new_symbol(
+                    format!("{}.{}", grammar.name, terminal.name),
+                    SymbolKind::FIELD,
+                    terminal.input_ref
+                ));
+            }
+        }
+        for variable in grammar.variables.iter() {
+            if variable.generated_for.is_none() && variable.name.contains(query) {
+                if let Some(rule) = variable.rules.first() {
+                    buffer.push(self.new_symbol(
+                        format!("{}.{}", grammar.name, variable.name),
+                        SymbolKind::PROPERTY,
+                        rule.head_input_ref
+                    ));
+                }
+            }
+        }
+        for symbol in grammar.virtuals.iter() {
+            if symbol.name.contains(query) {
+                if let Some(element) =
+                    self.lookup_symbol_in_rules(grammar, SymbolRef::Virtual(symbol.id))
+                {
+                    buffer.push(self.new_symbol(
+                        format!("{}.{}", grammar.name, symbol.name),
+                        SymbolKind::CONSTANT,
+                        element.input_ref.unwrap()
+                    ));
+                }
+            }
+        }
+        for symbol in grammar.actions.iter() {
+            if symbol.name.contains(query) {
+                if let Some(element) =
+                    self.lookup_symbol_in_rules(grammar, SymbolRef::Action(symbol.id))
+                {
+                    buffer.push(self.new_symbol(
+                        format!("{}.{}", grammar.name, symbol.name),
+                        SymbolKind::METHOD,
+                        element.input_ref.unwrap()
+                    ));
                 }
             }
         }
@@ -232,6 +355,59 @@ impl Workspace {
             None => Err(JsonRpcError::invalid_request())
         }
     }
+
+    /// Finds a symbol in a rule
+    fn lookup_symbol_in_rules(
+        &self,
+        grammar: &Grammar,
+        symbol_ref: SymbolRef
+    ) -> Option<RuleBodyElement> {
+        for variable in grammar.variables.iter() {
+            for rule in variable.rules.iter() {
+                for element in rule.body.elements.iter() {
+                    if element.symbol == symbol_ref && element.input_ref.is_some() {
+                        return Some(*element);
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    /// Creates a new symbol information
+    #[allow(deprecated)]
+    fn new_symbol(
+        &self,
+        name: String,
+        kind: SymbolKind,
+        input_ref: InputReference
+    ) -> SymbolInformation {
+        SymbolInformation {
+            name,
+            kind,
+            tags: None,
+            deprecated: None,
+            location: self.get_location(input_ref),
+            container_name: None
+        }
+    }
+
+    /// Transforms an input reference into a location
+    fn get_location(&self, input_ref: InputReference) -> Location {
+        // we expect to have loaded data when calling this method,
+        // otherwise we would not have an input reference in argument
+        let data = self.data.as_ref().unwrap();
+        let (url, _doc) = self
+            .documents
+            .iter()
+            .skip(input_ref.input_index)
+            .next()
+            .unwrap();
+        Location {
+            range: data.get_range(input_ref),
+            uri: url.clone()
+        }
+    }
 }
 
 /// Converts an error to a diagnostic
@@ -244,8 +420,8 @@ fn to_diagnostic(
         Error::Parsing(input_reference, msg) => Some((
             input_reference.input_index,
             Diagnostic {
-                range: to_range(data, *input_reference),
-                severity: Some(DiagnosticSeverity::Error),
+                range: WorkspaceData::to_range(&data.inputs, *input_reference),
+                severity: Some(DiagnosticSeverity::ERROR),
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
@@ -266,8 +442,8 @@ fn to_diagnostic(
             Some((
                 input_reference.input_index,
                 Diagnostic {
-                    range: to_range(data, input_reference),
-                    severity: Some(DiagnosticSeverity::Error),
+                    range: WorkspaceData::to_range(&data.inputs, input_reference),
+                    severity: Some(DiagnosticSeverity::ERROR),
                     code: None,
                     code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
@@ -283,8 +459,8 @@ fn to_diagnostic(
             Some((
                 input_reference.input_index,
                 Diagnostic {
-                    range: to_range(data, input_reference),
-                    severity: Some(DiagnosticSeverity::Error),
+                    range: WorkspaceData::to_range(&data.inputs, input_reference),
+                    severity: Some(DiagnosticSeverity::ERROR),
                     code: None,
                     code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
@@ -303,8 +479,8 @@ fn to_diagnostic(
             Some((
                 input_reference.input_index,
                 Diagnostic {
-                    range: to_range(data, input_reference),
-                    severity: Some(DiagnosticSeverity::Error),
+                    range: WorkspaceData::to_range(&data.inputs, input_reference),
+                    severity: Some(DiagnosticSeverity::ERROR),
                     code: None,
                     code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
@@ -323,8 +499,8 @@ fn to_diagnostic(
             Some((
                 input_reference.input_index,
                 Diagnostic {
-                    range: to_range(data, input_reference),
-                    severity: Some(DiagnosticSeverity::Error),
+                    range: WorkspaceData::to_range(&data.inputs, input_reference),
+                    severity: Some(DiagnosticSeverity::ERROR),
                     code: None,
                     code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
@@ -344,8 +520,8 @@ fn to_diagnostic(
             Some((
                 input_reference.input_index,
                 Diagnostic {
-                    range: to_range(data, input_reference),
-                    severity: Some(DiagnosticSeverity::Error),
+                    range: WorkspaceData::to_range(&data.inputs, input_reference),
+                    severity: Some(DiagnosticSeverity::ERROR),
                     code: None,
                     code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
@@ -367,8 +543,8 @@ fn to_diagnostic(
             Some((
                 input_reference.input_index,
                 Diagnostic {
-                    range: to_range(data, input_reference),
-                    severity: Some(DiagnosticSeverity::Error),
+                    range: WorkspaceData::to_range(&data.inputs, input_reference),
+                    severity: Some(DiagnosticSeverity::ERROR),
                     code: None,
                     code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
@@ -385,8 +561,8 @@ fn to_diagnostic(
         Error::TemplateRuleNotFound(input_reference, name) => Some((
             input_reference.input_index,
             Diagnostic {
-                range: to_range(data, *input_reference),
-                severity: Some(DiagnosticSeverity::Error),
+                range: WorkspaceData::to_range(&data.inputs, *input_reference),
+                severity: Some(DiagnosticSeverity::ERROR),
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
@@ -399,8 +575,8 @@ fn to_diagnostic(
         Error::TemplateRuleWrongNumberOfArgs(input_reference, expected, provided) => Some((
             input_reference.input_index,
             Diagnostic {
-                range: to_range(data, *input_reference),
-                severity: Some(DiagnosticSeverity::Error),
+                range: WorkspaceData::to_range(&data.inputs, *input_reference),
+                severity: Some(DiagnosticSeverity::ERROR),
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
@@ -416,8 +592,8 @@ fn to_diagnostic(
         Error::SymbolNotFound(input_reference, name) => Some((
             input_reference.input_index,
             Diagnostic {
-                range: to_range(data, *input_reference),
-                severity: Some(DiagnosticSeverity::Error),
+                range: WorkspaceData::to_range(&data.inputs, *input_reference),
+                severity: Some(DiagnosticSeverity::ERROR),
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
@@ -430,8 +606,8 @@ fn to_diagnostic(
         Error::InvalidCharacterSpan(input_reference) => Some((
             input_reference.input_index,
             Diagnostic {
-                range: to_range(data, *input_reference),
-                severity: Some(DiagnosticSeverity::Error),
+                range: WorkspaceData::to_range(&data.inputs, *input_reference),
+                severity: Some(DiagnosticSeverity::ERROR),
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
@@ -444,8 +620,8 @@ fn to_diagnostic(
         Error::UnknownUnicodeBlock(input_reference, name) => Some((
             input_reference.input_index,
             Diagnostic {
-                range: to_range(data, *input_reference),
-                severity: Some(DiagnosticSeverity::Error),
+                range: WorkspaceData::to_range(&data.inputs, *input_reference),
+                severity: Some(DiagnosticSeverity::ERROR),
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
@@ -458,8 +634,8 @@ fn to_diagnostic(
         Error::UnknownUnicodeCategory(input_reference, name) => Some((
             input_reference.input_index,
             Diagnostic {
-                range: to_range(data, *input_reference),
-                severity: Some(DiagnosticSeverity::Error),
+                range: WorkspaceData::to_range(&data.inputs, *input_reference),
+                severity: Some(DiagnosticSeverity::ERROR),
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
@@ -472,8 +648,8 @@ fn to_diagnostic(
         Error::UnsupportedNonPlane0InCharacterClass(input_reference, c) => Some((
             input_reference.input_index,
             Diagnostic {
-                range: to_range(data, *input_reference),
-                severity: Some(DiagnosticSeverity::Error),
+                range: WorkspaceData::to_range(&data.inputs, *input_reference),
+                severity: Some(DiagnosticSeverity::ERROR),
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
@@ -489,8 +665,8 @@ fn to_diagnostic(
         Error::InvalidCodePoint(input_reference, c) => Some((
             input_reference.input_index,
             Diagnostic {
-                range: to_range(data, *input_reference),
-                severity: Some(DiagnosticSeverity::Error),
+                range: WorkspaceData::to_range(&data.inputs, *input_reference),
+                severity: Some(DiagnosticSeverity::ERROR),
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
@@ -503,8 +679,8 @@ fn to_diagnostic(
         Error::OverridingPreviousTerminal(input_reference, name) => Some((
             input_reference.input_index,
             Diagnostic {
-                range: to_range(data, *input_reference),
-                severity: Some(DiagnosticSeverity::Error),
+                range: WorkspaceData::to_range(&data.inputs, *input_reference),
+                severity: Some(DiagnosticSeverity::ERROR),
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
@@ -517,8 +693,8 @@ fn to_diagnostic(
         Error::GrammarNotDefined(input_reference, name) => Some((
             input_reference.input_index,
             Diagnostic {
-                range: to_range(data, *input_reference),
-                severity: Some(DiagnosticSeverity::Error),
+                range: WorkspaceData::to_range(&data.inputs, *input_reference),
+                severity: Some(DiagnosticSeverity::ERROR),
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
@@ -540,8 +716,8 @@ fn to_diagnostic(
             Some((
                 input_reference.input_index,
                 Diagnostic {
-                    range: to_range(data, input_reference),
-                    severity: Some(DiagnosticSeverity::Error),
+                    range: WorkspaceData::to_range(&data.inputs, input_reference),
+                    severity: Some(DiagnosticSeverity::ERROR),
                     code: None,
                     code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
@@ -560,7 +736,7 @@ fn to_diagnostic(
                                 DiagnosticRelatedInformation {
                                     location: Location {
                                         uri: documents[input_ref.input_index].url.clone(),
-                                        range: to_range(data, input_ref)
+                                        range: WorkspaceData::to_range(&data.inputs, input_ref)
                                     },
                                     message: String::from("Used outside required context")
                                 }
@@ -580,8 +756,8 @@ fn to_diagnostic(
             Some((
                 input_reference.input_index,
                 Diagnostic {
-                    range: to_range(data, input_reference),
-                    severity: Some(DiagnosticSeverity::Error),
+                    range: WorkspaceData::to_range(&data.inputs, input_reference),
+                    severity: Some(DiagnosticSeverity::ERROR),
                     code: None,
                     code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
@@ -603,8 +779,8 @@ fn to_diagnostic(
             Some((
                 input_reference.input_index,
                 Diagnostic {
-                    range: to_range(data, input_reference),
-                    severity: Some(DiagnosticSeverity::Error),
+                    range: WorkspaceData::to_range(&data.inputs, input_reference),
+                    severity: Some(DiagnosticSeverity::ERROR),
                     code: None,
                     code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
@@ -620,20 +796,6 @@ fn to_diagnostic(
         }
         _ => None
     }
-}
-
-/// Translate an input reference to a LSP range
-fn to_range(data: &LoadedData, input_reference: InputReference) -> Range {
-    let end = data.inputs[input_reference.input_index]
-        .content
-        .get_position_for(input_reference.position, input_reference.length);
-    Range::new(
-        Position::new(
-            (input_reference.position.line - 1) as u32,
-            (input_reference.position.column - 1) as u32
-        ),
-        Position::new((end.line - 1) as u32, (end.column - 1) as u32)
-    )
 }
 
 #[test]

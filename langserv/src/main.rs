@@ -17,11 +17,12 @@
 
 //! Generator of lexers and parsers for the Hime runtime.
 
+pub mod symbols;
 pub mod workspace;
 
 use std::sync::Arc;
 
-use clap::{App, Arg, SubCommand};
+use clap::{Arg, Command};
 use futures::future::join_all;
 use tokio::sync::RwLock;
 use tower_lsp::jsonrpc::{Error, Result};
@@ -86,7 +87,7 @@ impl LanguageServer for Backend {
         Ok(InitializeResult {
             capabilities: ServerCapabilities {
                 text_document_sync: Some(TextDocumentSyncCapability::Kind(
-                    TextDocumentSyncKind::Full
+                    TextDocumentSyncKind::FULL
                 )),
                 workspace: Some(WorkspaceServerCapabilities {
                     workspace_folders: Some(WorkspaceFoldersServerCapabilities {
@@ -101,6 +102,7 @@ impl LanguageServer for Backend {
                         work_done_progress: Some(false)
                     }
                 }),
+                hover_provider: Some(HoverProviderCapability::Simple(true)),
                 ..ServerCapabilities::default()
             },
             server_info: Some(ServerInfo {
@@ -126,6 +128,23 @@ impl LanguageServer for Backend {
         let mut workspace = self.workspace.write().await;
         workspace.on_file_changes(params);
         self.execute();
+    }
+
+    async fn symbol(
+        &self,
+        params: WorkspaceSymbolParams
+    ) -> Result<Option<Vec<SymbolInformation>>> {
+        let workspace = self.workspace.read().await;
+        let data = workspace.lookup_symbols(&params.query);
+        if data.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(data))
+        }
+    }
+
+    async fn hover(&self, params: HoverParams) -> Result<Option<Hover>> {
+        Ok(None)
     }
 
     async fn execute_command(
@@ -166,7 +185,7 @@ async fn main() {
         eprintln!("Panic: {} : {}", location, message);
     }));
 
-    let matches = App::new("Hime Language Server")
+    let matches = Command::new("Hime Language Server")
         .version(
             format!(
                 "{} {} tag={} hash={}",
@@ -177,34 +196,34 @@ async fn main() {
         .author("Association Cénotélie <contact@cenotelie.fr>")
         .about("Language server for Hime gramamrs")
         .arg(
-            Arg::with_name("tcp")
+            Arg::new("tcp")
                 .long("tcp")
                 .help("Use a tcp stream to communicate with clients")
                 .takes_value(false)
                 .required(false)
         )
         .arg(
-            Arg::with_name("address")
+            Arg::new("address")
                 .value_name("ADDRESS")
                 .long("address")
-                .short("a")
+                .short('a')
                 .help("The address to listen on, if using a TCP stream")
                 .takes_value(true)
                 .required(false)
         )
         .arg(
-            Arg::with_name("port")
+            Arg::new("port")
                 .long("port")
-                .short("p")
+                .short('p')
                 .help("The TCP port to listen to, if using a TCP stream")
                 .takes_value(true)
                 .required(false)
         )
-        .subcommand(SubCommand::with_name("version").about("Display the version string"))
+        .subcommand(Command::new("version").about("Display the version string"))
         .get_matches();
 
     match matches.subcommand() {
-        ("version", _) => {
+        Some(("version", _)) => {
             println!(
                 "{} {} tag={} hash={}",
                 CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH
