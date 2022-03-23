@@ -44,13 +44,13 @@ pub struct Fixtures(pub Vec<Fixture>);
 
 impl Fixtures {
     /// Build the parsers for the fixtures
-    pub fn build(&self) -> Result<(), Errors> {
+    pub fn build(&self, filter: Option<&str>) -> Result<(), Errors> {
         let mut errors: Vec<Error> = Vec::new();
 
         // Load all grammars
         let mut grammars: Vec<Grammar> = Vec::new();
         for (index, fixture) in self.0.iter().enumerate() {
-            match fixture.grammars(index) {
+            match fixture.grammars(index, filter) {
                 Ok(mut fixture_grammars) => grammars.append(&mut fixture_grammars),
                 Err(mut fixture_errors) => errors.append(&mut fixture_errors)
             }
@@ -275,11 +275,11 @@ impl Fixtures {
     }
 
     /// Execute this fixture
-    pub fn execute(&self) -> Result<ExecutionResults, Error> {
+    pub fn execute(&self, filter: Option<&str>) -> Result<ExecutionResults, Error> {
         let results = self
             .0
             .iter()
-            .map(|fixture| fixture.execute())
+            .map(|fixture| fixture.execute(filter))
             .collect::<Result<Vec<_>, _>>()?;
         Ok(ExecutionResults(results))
     }
@@ -318,11 +318,19 @@ impl Fixture {
     }
 
     /// Gets the grammars to build for this fixture
-    pub fn grammars(&self, index: usize) -> Result<Vec<Grammar>, Vec<Error>> {
+    pub fn grammars(&self, index: usize, filter: Option<&str>) -> Result<Vec<Grammar>, Vec<Error>> {
         let ast = self.content.get_ast();
         let root = ast.get_root();
         let roots: Vec<(usize, AstNode)> = root
             .into_iter()
+            .filter(|test_node| match filter {
+                None => true,
+                Some(filter) => test_node
+                    .child(0)
+                    .get_value()
+                    .map(|name| name.contains(filter))
+                    .unwrap_or(true)
+            })
             .map(|test_node| (index, test_node.child(1)))
             .collect();
         let mut grammars = hime_sdk::loaders::load_parsed(&roots)?;
@@ -340,10 +348,11 @@ impl Fixture {
     }
 
     /// Execute this fixture
-    pub fn execute(&self) -> Result<FixtureResults, Error> {
+    pub fn execute(&self, filter: Option<&str>) -> Result<FixtureResults, Error> {
         let results = self
             .tests
             .iter()
+            .filter(|test| test.is_selected(filter))
             .map(|test| test.execute())
             .collect::<Result<Vec<_>, _>>()?;
         Ok(FixtureResults {
@@ -362,6 +371,17 @@ pub enum Test {
 }
 
 impl Test {
+    /// Checks whether this test should be executed
+    pub fn is_selected(&self, filter: Option<&str>) -> bool {
+        match filter {
+            None => true,
+            Some(filter) => match self {
+                Test::Output(inner) => inner.name.contains(filter),
+                Test::Parsing(inner) => inner.name.contains(filter)
+            }
+        }
+    }
+
     /// Execute this test
     pub fn execute(&self) -> Result<TestResult, Error> {
         match self {

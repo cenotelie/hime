@@ -60,12 +60,22 @@ const FIXTURES: [FixtureDef; 8] = [
 
 /// Main entry point
 fn main() {
+    let args = std::env::args().collect::<Vec<_>>();
+    let filter = match &args[..] {
+        [_] => None,
+        [_, filter] => Some(filter.as_str()),
+        _ => {
+            println!("Usage is: hime_tests_driver <filter>");
+            return;
+        }
+    };
+
     println!("Loading ...");
     let fixtures = on_errors(loaders::parse_fixtures(&FIXTURES));
     println!("Building ...");
-    on_errors(fixtures.build());
+    on_errors(fixtures.build(filter));
     println!("Executing tests ...");
-    match fixtures.execute() {
+    match fixtures.execute(filter) {
         Ok(results) => {
             let stats = results.get_stats();
             println!(
