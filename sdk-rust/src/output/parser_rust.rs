@@ -412,7 +412,7 @@ fn write_code_constructors(
         writeln!(writer)?;
         writeln!(
             writer,
-            "    let mut result = ParseResult<'static, 'static>::new(terminals, variables, virtuals, text);"
+            "    let mut result = ParseResult::new(terminals, variables, virtuals, text);"
         )?;
     }
     writeln!(writer, "    {{")?;
