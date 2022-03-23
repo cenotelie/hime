@@ -151,7 +151,7 @@ class GSS {
      * @return true if this instance has the required edge; otherwise, false
      */
     public boolean hasEdge(int generation, int from, int to) {
-        GSSGeneration data = nodeGenerations.get(generation);
+        GSSGeneration data = edgeGenerations.get(generation);
         for (int i = data.getStart(); i != data.getStart() + data.getCount(); i++) {
             GSSEdge edge = edges.get(i);
             if (edge.getFrom() == from && edge.getTo() == to)
