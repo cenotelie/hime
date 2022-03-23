@@ -94,3 +94,13 @@ test Issue052_CharacterClassEscapedHyphenEnd:
 	parser LALR1
 	on "-"
 	yields e(X)
+
+test Issue078_PingPong:
+	grammar Issue078_PingPong { options {Axiom="s";} terminals { PING->'PING'; PONG->'PONG'; } rules {
+		s    -> ping | pong;
+		ping -> PING pong | PING;
+		pong -> PONG ping | PONG;
+	} }
+	parser RNGLALR1
+	on "PINGPONGPINGPONGPING"
+	yields s(ping(PING pong(PONG ping(PING pong(PONG ping(PING))))))
