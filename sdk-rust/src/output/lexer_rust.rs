@@ -156,7 +156,7 @@ pub fn write(
         writeln!(
             writer,
             "        name: \"{}\"",
-            terminal.value.replace("\"", "\\\"")
+            terminal.value.replace('"', "\\\"")
         )?;
         write!(writer, "    }}")?;
     }

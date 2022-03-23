@@ -94,8 +94,7 @@ pub fn load(inputs: Vec<LoadInput>) -> Result<LoadedData, Errors> {
     let roots: Vec<(usize, AstNode)> = doc_roots
         .iter()
         .enumerate()
-        .map(|(index, &doc_root)| doc_root.into_iter().map(move |root| (index, root)))
-        .flatten()
+        .flat_map(|(index, &doc_root)| doc_root.into_iter().map(move |root| (index, root)))
         .collect();
     // get the grammars
     let (grammars, errors) = do_load_grammars(&roots);

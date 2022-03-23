@@ -228,14 +228,14 @@ pub fn get_namespace_net(input: &str) -> String {
         input
             .split("::")
             .filter(|part| part.is_empty())
-            .map(|part| to_upper_camel_case(part))
+            .map(to_upper_camel_case)
             .collect::<Vec<String>>()
             .join(".")
     } else if input.contains('.') {
         input
             .split('.')
             .filter(|part| part.is_empty())
-            .map(|part| to_upper_camel_case(part))
+            .map(to_upper_camel_case)
             .collect::<Vec<String>>()
             .join(".")
     } else {
@@ -249,14 +249,14 @@ pub fn get_namespace_java(input: &str) -> String {
         input
             .split("::")
             .filter(|part| part.is_empty())
-            .map(|part| to_snake_case(part))
+            .map(to_snake_case)
             .collect::<Vec<String>>()
             .join(".")
     } else if input.contains('.') {
         input
             .split('.')
             .filter(|part| part.is_empty())
-            .map(|part| to_snake_case(part))
+            .map(to_snake_case)
             .collect::<Vec<String>>()
             .join(".")
     } else {
@@ -270,14 +270,14 @@ pub fn get_namespace_rust(input: &str) -> String {
         input
             .split("::")
             .filter(|part| part.is_empty())
-            .map(|part| to_snake_case(part))
+            .map(to_snake_case)
             .collect::<Vec<String>>()
             .join("::")
     } else if input.contains('.') {
         input
             .split('.')
             .filter(|part| part.is_empty())
-            .map(|part| to_snake_case(part))
+            .map(to_snake_case)
             .collect::<Vec<String>>()
             .join("::")
     } else {

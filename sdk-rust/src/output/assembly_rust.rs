@@ -152,7 +152,7 @@ fn build_cargo_project(
         writeln!(
             writer,
             "hime_redist = {{ path = \"{}\" }}",
-            runtime.replace("\\", "\\\\")
+            runtime.replace('\\', "\\\\")
         )?;
     }
     let mut src_folder = project_folder.clone();

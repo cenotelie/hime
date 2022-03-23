@@ -550,8 +550,8 @@ impl ParsingTest {
             let value = hime_sdk::loaders::replace_escapees(value);
             // Reset escape sequences for single quotes and backslashes
             let value = value[1..(value.len() - 1)]
-                .replace("\\", "\\\\")
-                .replace("'", "\\'");
+                .replace('\\', "\\\\")
+                .replace('\'', "\\'");
             buffer.push('\'');
             buffer.push_str(&value);
             buffer.push('\'');

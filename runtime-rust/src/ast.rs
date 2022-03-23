@@ -235,8 +235,7 @@ impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
             .as_ref()
             .unwrap()
             .find_token_at(index)
-            .map(|token| self.find_node_for(&token))
-            .flatten()
+            .and_then(|token| self.find_node_for(&token))
     }
 
     /// Gets the AST node (if any) that has
@@ -246,8 +245,7 @@ impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
         let index = tokens.text.get_line_index(position.line) + position.column - 1;
         tokens
             .find_token_at(index)
-            .map(|token| self.find_node_for(&token))
-            .flatten()
+            .and_then(|token| self.find_node_for(&token))
     }
 
     /// Gets the parent of the specified node, if any

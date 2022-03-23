@@ -121,7 +121,7 @@ impl<'a: 'b, 'b, 'c> ContextFreeLexer<'a, 'b, 'c> {
                     &self.data.automaton,
                     self.data.separator_id,
                     self.data.recovery,
-                    &mut self.data.errors,
+                    self.data.errors,
                     index
                 );
             }
@@ -203,7 +203,7 @@ impl<'a: 'b, 'b, 'c> ContextSensitiveLexer<'a, 'b, 'c> {
                     &self.data.automaton,
                     self.data.separator_id,
                     self.data.recovery,
-                    &mut self.data.errors,
+                    self.data.errors,
                     self.input_index
                 );
             }

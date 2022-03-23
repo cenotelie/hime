@@ -51,7 +51,7 @@ pub fn parse_fixtures(fixtures: &[FixtureDef]) -> Result<Fixtures, Errors> {
         let errors: Vec<Error> = results
             .iter()
             .enumerate()
-            .map(|(index, r)| {
+            .flat_map(|(index, r)| {
                 r.errors.errors.iter().map(move |error| {
                     let position = error.get_position();
                     Error::Parsing(
@@ -64,7 +64,6 @@ pub fn parse_fixtures(fixtures: &[FixtureDef]) -> Result<Fixtures, Errors> {
                     )
                 })
             })
-            .flatten()
             .collect();
         Err(Errors {
             data: LoadedData {

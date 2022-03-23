@@ -397,12 +397,7 @@ impl Workspace {
         // we expect to have loaded data when calling this method,
         // otherwise we would not have an input reference in argument
         let data = self.data.as_ref().unwrap();
-        let (url, _doc) = self
-            .documents
-            .iter()
-            .skip(input_ref.input_index)
-            .next()
-            .unwrap();
+        let (url, _doc) = self.documents.iter().nth(input_ref.input_index).unwrap();
         Location {
             range: data.get_range(input_ref),
             uri: url.clone()

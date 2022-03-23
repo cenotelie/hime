@@ -211,12 +211,11 @@ impl LRContexts {
     pub fn get_context_opened_by(&self, terminal_id: u32) -> Option<u16> {
         self.openings
             .as_ref()
-            .map(|openings| {
+            .and_then(|openings| {
                 openings
                     .iter()
                     .find(|op| u32::from(op.identifier) == terminal_id)
             })
-            .flatten()
             .map(|op| op.context)
     }
 }

@@ -53,7 +53,7 @@ fn get_latet_blocks() -> Result<Vec<Block>, Box<dyn Error>> {
             if name.contains("Surrogate") {
                 continue;
             }
-            let name = name.replace(" ", "");
+            let name = name.replace(' ', "");
             blocks.push(Block::new_owned(name, begin, end));
         }
     }

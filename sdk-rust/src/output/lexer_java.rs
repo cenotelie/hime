@@ -181,7 +181,7 @@ pub fn write(
             writer,
             "new Symbol(0x{:04X}, \"{}\")",
             terminal.id,
-            terminal.value.replace("\"", "\\\"")
+            terminal.value.replace('"', "\\\"")
         )?;
     }
     writeln!(writer, " }};")?;
