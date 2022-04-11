@@ -1054,7 +1054,7 @@ struct Propagation {
 fn build_graph_lalr1_propagation_table(
     graph0: &Graph,
     grammar: &Grammar,
-    kernels: &mut Vec<StateKernel>
+    kernels: &mut [StateKernel]
 ) -> Vec<Propagation> {
     let mut propagation = Vec::new();
     for i in 0..kernels.len() {
@@ -1114,7 +1114,7 @@ fn build_graph_lalr1_propagation_table(
 }
 
 /// Executes the propagation for a LALR(1) graph
-fn build_graph_lalr1_propagate(kernels: &mut Vec<StateKernel>, table: &[Propagation]) {
+fn build_graph_lalr1_propagate(kernels: &mut [StateKernel], table: &[Propagation]) {
     let mut modifications = 1;
     while modifications != 0 {
         modifications = 0;

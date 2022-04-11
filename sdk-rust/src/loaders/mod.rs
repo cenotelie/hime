@@ -450,7 +450,7 @@ fn load_terminal_rule(
 fn load_nfa(
     input_index: usize,
     errors: &mut Vec<Error>,
-    references: &mut Vec<(usize, InputReference)>,
+    #[allow(clippy::ptr_arg)] references: &mut Vec<(usize, InputReference)>,
     grammar: &Grammar,
     node: AstNode
 ) -> NFA {
