@@ -57,6 +57,7 @@ fn get_latet_blocks() -> Result<Vec<Block>, Box<dyn Error>> {
             blocks.push(Block::new_owned(name, begin, end));
         }
     }
+    blocks.sort_unstable_by(|a, b| a.name.cmp(&b.name));
     Ok(blocks)
 }
 
@@ -100,7 +101,9 @@ fn get_latet_categories() -> Result<Vec<Category>, Box<dyn Error>> {
             .or_insert_with(|| Category::new_owned(current_name.clone()));
         category.add_span(begin, last);
     }
-    Ok(categories.into_iter().map(|(_, v)| v).collect())
+    let mut categories = categories.into_iter().map(|(_, v)| v).collect::<Vec<_>>();
+    categories.sort_unstable_by(|a, b| a.name.cmp(&b.name));
+    Ok(categories)
 }
 
 /// Generates the code for the Unicode blocks data
@@ -198,8 +201,14 @@ fn generate_categories_db(categories: &[Category]) -> Result<(), Box<dyn Error>>
         let lower_case = category.name.to_lowercase();
         writeln!(
             writer,
-            "    let mut cat_{} = Category::new(\"{}\");",
-            &lower_case, &category.name
+            "    let {}cat_{} = Category::new(\"{}\");",
+            if category.spans.is_empty() {
+                ""
+            } else {
+                "mut "
+            },
+            &lower_case,
+            &category.name
         )?;
         for span in &category.spans {
             writeln!(
