@@ -4,7 +4,7 @@ members = [
     "parseit",
     "sdk-rust",
     "sdk-debugger",
-    "unicode-gen",
+    "sdk-unicode-gen",
     "himecc",
     "tests-executor-rust",
     "tests-driver",
