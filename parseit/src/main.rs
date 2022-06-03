@@ -19,7 +19,7 @@
 
 use std::{env, io};
 
-use clap::{App, Arg};
+use clap::{Arg, Command};
 use hime_redist::result::ParseResult;
 
 /// The name of this program
@@ -33,7 +33,7 @@ pub const GIT_TAG: &str = env!("GIT_TAG");
 
 /// Main entry point
 fn main() {
-    let matches = App::new("Hime ParseIt")
+    let matches = Command::new("Hime ParseIt")
         .version(
             format!(
                 "{} {} tag={} hash={}",
@@ -44,14 +44,14 @@ fn main() {
         .author("Association Cénotélie <contact@cenotelie.fr>")
         .about("Command line to parse a piece of input using a packaged parser.")
         .arg(
-            Arg::with_name("library")
+            Arg::new("library")
                 .value_name("LIBRARY")
                 .help("Path to the compiled library containing the parser")
                 .takes_value(true)
                 .required(true)
         )
         .arg(
-            Arg::with_name("module")
+            Arg::new("module")
                 .value_name("MODULE")
                 .help("The module inside the library that contains the parser")
                 .takes_value(true)

@@ -22,7 +22,7 @@ use std::error::Error;
 use std::fs::File;
 use std::io::{BufReader, Read};
 
-use clap::{App, Arg, ArgMatches, SubCommand};
+use clap::{Arg, ArgMatches, Command};
 use hime_redist::lexers::automaton::{Automaton, DEAD_STATE};
 use hime_redist::parsers::lrk::LRkAutomaton;
 use hime_redist::parsers::{
@@ -43,7 +43,7 @@ pub const GIT_TAG: &str = env!("GIT_TAG");
 
 /// Main entry point
 fn main() -> Result<(), Box<dyn Error>> {
-    let matches = App::new("Hime SDK Debugger")
+    let matches = Command::new("Hime SDK Debugger")
         .version(
             format!(
                 "{} {} tag={} hash={}",
@@ -54,13 +54,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         .author("Association Cénotélie <contact@cenotelie.fr>")
         .about("Debugger for the SDK.")
         .subcommand(
-            SubCommand::with_name("print")
-                .help("Print compilation artifacts")
+            Command::new("print")
+                .override_help("Print compilation artifacts")
                 .subcommand(
-                    SubCommand::with_name("lexer")
-                        .help("Prints a lexer's automaton")
+                    Command::new("lexer")
+                        .override_help("Prints a lexer's automaton")
                         .arg(
-                            Arg::with_name("lexer_file")
+                            Arg::new("lexer_file")
                                 .value_name("FILE")
                                 .help("Path to the lexer's automaton")
                                 .takes_value(true)
@@ -68,25 +68,25 @@ fn main() -> Result<(), Box<dyn Error>> {
                         )
                 )
                 .subcommand(
-                    SubCommand::with_name("parser")
-                        .help("Prints a parser's automaton")
+                    Command::new("parser")
+                        .override_help("Prints a parser's automaton")
                         .arg(
-                            Arg::with_name("glr")
+                            Arg::new("glr")
                                 .long("glr")
                                 .help("Whether this is a GLR automaton")
                                 .takes_value(false)
                                 .required(false)
                         )
                         .arg(
-                            Arg::with_name("show_bytecode")
-                                .short("b")
+                            Arg::new("show_bytecode")
+                                .short('b')
                                 .long("bytecode")
                                 .help("Activate to show the bytecode of reductions")
                                 .takes_value(false)
                                 .required(false)
                         )
                         .arg(
-                            Arg::with_name("parser_file")
+                            Arg::new("parser_file")
                                 .value_name("FILE")
                                 .help("Path to the parser's automaton")
                                 .takes_value(true)
@@ -95,20 +95,20 @@ fn main() -> Result<(), Box<dyn Error>> {
                 )
         )
         .subcommand(
-            SubCommand::with_name("diff")
-                .help("Computes the diff between two artifacts")
+            Command::new("diff")
+                .override_help("Computes the diff between two artifacts")
                 .subcommand(
-                    SubCommand::with_name("lexer")
-                        .help("Computes the diff between two lexer automaton")
+                    Command::new("lexer")
+                        .override_help("Computes the diff between two lexer automaton")
                         .arg(
-                            Arg::with_name("file_left")
+                            Arg::new("file_left")
                                 .value_name("FROM")
                                 .help("Path to a lexer's automaton")
                                 .takes_value(true)
                                 .required(true)
                         )
                         .arg(
-                            Arg::with_name("file_right")
+                            Arg::new("file_right")
                                 .value_name("TO")
                                 .help("Path to a lexer's automaton")
                                 .takes_value(true)
@@ -116,24 +116,24 @@ fn main() -> Result<(), Box<dyn Error>> {
                         )
                 )
                 .subcommand(
-                    SubCommand::with_name("parser")
-                        .help("Computes the diff between two parser automaton")
+                    Command::new("parser")
+                        .override_help("Computes the diff between two parser automaton")
                         .arg(
-                            Arg::with_name("glr")
+                            Arg::new("glr")
                                 .long("glr")
                                 .help("Whether this is a GLR automaton")
                                 .takes_value(false)
                                 .required(false)
                         )
                         .arg(
-                            Arg::with_name("file_left")
+                            Arg::new("file_left")
                                 .value_name("FROM")
                                 .help("Path to a lexer's automaton")
                                 .takes_value(true)
                                 .required(true)
                         )
                         .arg(
-                            Arg::with_name("file_right")
+                            Arg::new("file_right")
                                 .value_name("TO")
                                 .help("Path to a lexer's automaton")
                                 .takes_value(true)
@@ -148,12 +148,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 /// Executes the command
 fn execute(matches: ArgMatches) -> Result<(), Box<dyn Error>> {
     match matches.subcommand() {
-        ("print", Some(matches)) => match matches.subcommand() {
-            ("lexer", Some(matches)) => {
+        Some(("print", matches)) => match matches.subcommand() {
+            Some(("lexer", matches)) => {
                 let file_name = matches.value_of("lexer_file").unwrap();
                 print_lexer(file_name)?;
             }
-            ("parser", Some(matches)) => {
+            Some(("parser", matches)) => {
                 let file_name = matches.value_of("parser_file").unwrap();
                 let is_glr = matches.is_present("glr");
                 let show_bytecode = matches.is_present("show_bytecode");
@@ -161,13 +161,13 @@ fn execute(matches: ArgMatches) -> Result<(), Box<dyn Error>> {
             }
             _ => panic!("invalid command")
         },
-        ("diff", Some(matches)) => match matches.subcommand() {
-            ("lexer", Some(matches)) => {
+        Some(("diff", matches)) => match matches.subcommand() {
+            Some(("lexer", matches)) => {
                 let file_left = matches.value_of("file_left").unwrap();
                 let file_right = matches.value_of("file_right").unwrap();
                 diff_lexer(file_left, file_right)?;
             }
-            ("parser", Some(matches)) => {
+            Some(("parser", matches)) => {
                 let is_glr = matches.is_present("glr");
                 let file_left = matches.value_of("file_left").unwrap();
                 let file_right = matches.value_of("file_right").unwrap();

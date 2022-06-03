@@ -12,4 +12,4 @@ edition = "2021"
 
 [dependencies]
 hime_redist = "4.0.0"
-clap = "2.33"
+clap = "3"
