@@ -1,4 +1,4 @@
-FROM buildpack-deps:20.04-curl
+FROM buildpack-deps:22.04-curl
 LABEL maintainer="Laurent Wouters <lwouters@cenotelie.fr>" vendor="Association Cénotélie" description="Hime Build environment"
 
 # Custom Home

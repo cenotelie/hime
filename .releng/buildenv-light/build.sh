@@ -8,7 +8,7 @@ ROOT="$(dirname "$RELENG")"
 HASH=$(git rev-parse HEAD)
 
 IMAGES=$(docker images | grep -o -E '^cenotelie/hime-build-env-light(\s)+latest' | wc -l)
-# if [ "$IMAGES" -lt "1" ]; then
+if [ "$IMAGES" -lt "1" ]; then
   echo "=> Building cenotelie/hime-build-env-light:latest"
   docker build --tag "cenotelie/hime-build-env-light:latest" --rm  --label changeset="$HASH" "$DIR"
-# fi
+fi
