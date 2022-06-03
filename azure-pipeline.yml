@@ -40,6 +40,8 @@ stages:
         sourceFolder: '$(Build.SourcesDirectory)/target/x86_64-unknown-linux-musl/release'
         contents: |
           himecc
+          hime_sdk_debugger
+          hime_parseit
           hime_langserv
         targetFolder: '$(Build.ArtifactStagingDirectory)'
         overWrite: true
@@ -66,6 +68,8 @@ stages:
         sourceFolder: '$(Build.SourcesDirectory)/target/release'
         contents: |
           himecc.exe
+          hime_sdk_debugger.exe
+          hime_parseit.exe
           hime_langserv.exe
         targetFolder: '$(Build.ArtifactStagingDirectory)'
         overWrite: true
@@ -91,6 +95,8 @@ stages:
         sourceFolder: '$(Build.SourcesDirectory)/target/release'
         contents: |
           himecc
+          hime_sdk_debugger
+          hime_parseit
           hime_langserv
         targetFolder: '$(Build.ArtifactStagingDirectory)'
         overWrite: true
