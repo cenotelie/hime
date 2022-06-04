@@ -10,7 +10,7 @@ readme = "README.md"
 keywords = ["hime", "parser", "lr", "glr", "rnglr"]
 categories = ["algorithms", "parsing", "parser-implementations", "text-processing"]
 license = "LGPL-3.0"
-include = ["README.md", "Cargo.toml", "src/**/*.rs"]
+include = ["README.md", "Cargo.toml", "build.rs", "src/**/*.rs"]
 edition = "2021"
 
 [[bin]]

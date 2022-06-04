@@ -3,11 +3,14 @@ name = "hime_parseit"
 version = "4.0.0"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Command line to parse a piece of input using a packaged parser."
+documentation = "https://cenotelie.fr/projects/hime"
 homepage = "https://cenotelie.fr/projects/hime"
 repository = "https://github.com/cenotelie/hime"
+readme = "README.md"
 keywords = ["hime", "parser", "generator", "lr", "glr", "rnglr"]
 categories = ["algorithms", "parsing", "parser-implementations", "text-processing"]
 license = "LGPL-3.0"
+include = ["README.md", "Cargo.toml", "build.rs", "src/**/*.rs"]
 edition = "2021"
 
 [dependencies]
