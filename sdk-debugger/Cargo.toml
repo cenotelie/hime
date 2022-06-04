@@ -2,14 +2,20 @@
 name = "hime_sdk_debugger"
 version = "4.0.0"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
-description = "Debugger for the SDK"
+description = "Introspection tool for parsers generated with himecc"
+documentation = "https://cenotelie.fr/projects/hime"
 homepage = "https://cenotelie.fr/projects/hime"
 repository = "https://github.com/cenotelie/hime"
+readme = "README.md"
 keywords = ["hime", "parser", "generator", "lr", "glr", "rnglr"]
 categories = ["algorithms", "parsing", "parser-implementations", "text-processing"]
 license = "LGPL-3.0"
+include = ["README.md", "Cargo.toml", "src/**/*.rs"]
 edition = "2021"
 
 [dependencies]
 hime_redist = "4.0.0"
 clap = "3"
+
+[badges]
+maintenance = { status = "actively-developed" }

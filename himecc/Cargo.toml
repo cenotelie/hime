@@ -2,7 +2,7 @@
 name = "hime_compiler"
 version = "4.0.0"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
-description = "Generator of lexers and parsers for the Hime runtime."
+description = "CLI tool for the generation of LR and GLR parsers for the Hime runtime."
 documentation = "https://cenotelie.fr/projects/hime"
 homepage = "https://cenotelie.fr/projects/hime"
 repository = "https://github.com/cenotelie/hime"

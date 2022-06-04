@@ -2,8 +2,8 @@
 
 The Rust implementation of the runtime for lexers and parsers generated with [Hime](https://github.com/cenotelie/hime).
 For more information about how to generate parsers using Hime, head to [Hime](https://cenotelie.fr/projects/hime).
-The code for this library is available on [GitHub](https://github.com/cenotelie/hime).
-The API documentation is available on [docs.rs](https://docs.rs/hime_redist/4.0.0/hime_redist/).
+The code for this library is available on [Github](https://github.com/cenotelie/hime).
+The API documentation is available on [docs.rs](https://docs.rs/hime_redist/latest/hime_redist/).
 This software is developed by the [Assocation Cénotélie](https://cenotelie.fr/), France.
 
 ## Usage ##
