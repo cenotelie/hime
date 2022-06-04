@@ -126,4 +126,4 @@ stages:
         source build-env.sh
         curl -o s3cli "https://cenotelie.s3.fr-par.scw.cloud/s3cli"
         chmod +x s3cli
-        ./s3cli -c $(s3config.secureFilePath) object uploadall --acl public-read -f target/ cenotelie hime/$LABEL
+        ./s3cli -c $(s3config.secureFilePath) object uploadall --acl public-read cenotelie "hime/$LABEL" --file target
