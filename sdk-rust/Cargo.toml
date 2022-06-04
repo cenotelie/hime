@@ -20,7 +20,7 @@ print_errors = ["ansi_term"]
 [dependencies]
 hime_redist = "4.0.0"
 lazy_static = "1.4"
-rand = "0.7"
+rand = "0.8"
 ansi_term = { version = "0.12", optional = true}
 
 [badges]
