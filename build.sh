@@ -1,41 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
 SCRIPT="$(readlink -f "$0")"
 ROOT="$(dirname "$SCRIPT")"
 
-# Gather version info
-VERSION=$(grep "version" "$ROOT/runtime-rust/Cargo.toml" | grep -o -E "([[:digit:]]+\\.[[:digit:]]+\\.[[:digit:]])+")
-HASH=$(git rev-parse HEAD)
-
-echo "Building Hime version $VERSION ($HASH)"
-
-echo "1. Checking Mono is installed ..."
-MONO=$(which mono)
-if [ -z "$MONO" ]
-then
-  echo "   => Mono is not installed!"
-  exit 1
-fi
-MONO=$(mono --version | grep 'version')
-echo "   => Found $MONO"
-
-echo "2. Checking .Net Framework 4.6.1 assemblies are installed ..."
-MONO461=/usr/lib/mono/4.6.1-api
-if [ ! -f "$MONO461/mscorlib.dll" ]; then
-  echo "   => Required Mono assemblies for .Net Framework 4.6.1 not found!"
-  exit 1
-fi
-echo "   => OK"
-
-echo "3. Checking .Net Framework 2.0 assemblies are installed ..."
-MONO20=/usr/lib/mono/2.0-api
-if [ ! -f "$MONO20/mscorlib.dll" ]; then
-  echo "   => Required Mono assemblies for .Net Framework 2.0 not found!"
-  exit 1
-fi
-echo "   => OK"
-
-
+source "$ROOT/build-env.sh"
+source "$ROOT/build-checks.sh"
 
 echo "-- Rust components --"
 cargo update
