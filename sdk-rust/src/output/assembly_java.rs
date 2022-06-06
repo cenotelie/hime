@@ -171,7 +171,7 @@ fn execute_mvn_command(
         .output()?;
     let stdout = String::from_utf8(output.stdout).unwrap();
     let stderr = String::from_utf8(output.stderr).unwrap();
-    if !stderr.is_empty() || stdout.contains("[ERROR]") {
+    if stdout.contains("[ERROR]") {
         let mut log = stderr;
         log.push_str(&stdout);
         return Err(Error::Msg(log));
