@@ -155,7 +155,7 @@ impl<'a> Text<'a> {
     }
 
     /// Initializes this text from a UTF-8 stream
-    pub fn from_utf8_stream<R: Read>(input: &mut R) -> Result<Text<'static>, std::io::Error> {
+    pub fn from_utf8_stream(input: &mut dyn Read) -> Result<Text<'static>, std::io::Error> {
         let mut content = String::new();
         input.read_to_string(&mut content)?;
         let lines = find_lines_in(content.char_indices());

@@ -680,7 +680,7 @@ pub fn parse_string(input: String) -> ParseResult<'static, 'static, 'static> {
 }
 
 /// Parses the specified stream of UTF-8 with this parser
-pub fn parse_utf8_stream<R: Read>(input: &mut R) -> ParseResult<'static, 'static, 'static> {
+pub fn parse_utf8_stream(input: &mut dyn Read) -> ParseResult<'static, 'static, 'static> {
     let text = Text::from_utf8_stream(input).unwrap();
     parse_text(text)
 }

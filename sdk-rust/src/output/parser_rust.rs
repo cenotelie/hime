@@ -259,7 +259,7 @@ fn write_code_constructors(
         }
         writeln!(
             writer,
-            "pub fn parse_utf8_stream<R: Read>(input: &mut R) -> ParseResult<'static, 'static, 'static> {{"
+            "pub fn parse_utf8_stream(input: &mut dyn Read) -> ParseResult<'static, 'static, 'static> {{"
         )?;
         writeln!(
             writer,
@@ -365,7 +365,7 @@ fn write_code_constructors(
         }
         writeln!(
             writer,
-            "pub fn parse_utf8_stream<R: Read>(input: &mut R) -> ParseResult<'static, 'static, 'static> {{"
+            "pub fn parse_utf8_stream(input: &mut dyn Read) -> ParseResult<'static, 'static, 'static> {{"
         )?;
         writeln!(
             writer,
@@ -384,7 +384,7 @@ fn write_code_constructors(
         }
         writeln!(
             writer,
-            "pub fn parse_utf8_stream_with<R: Read>(input: &mut R, actions: &mut dyn Actions) -> ParseResult<'static, 'static, 'static> {{"
+            "pub fn parse_utf8_stream_with(input: &mut dyn Read, actions: &mut dyn Actions) -> ParseResult<'static, 'static, 'static> {{"
         )?;
         writeln!(
             writer,

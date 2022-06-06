@@ -120,7 +120,7 @@ fn get_parsed_input(
 ) -> ParseResult<'static, 'static, 'static> {
     let mut function_name = String::new();
     function_name.push_str(parser_name);
-    function_name.push_str("_parse_utf8");
+    function_name.push_str("_parse_utf8_stream");
     let file = my_path.join("input.txt");
     let file_input = fs::File::open(file).unwrap();
     let mut input_reader = io::BufReader::new(file_input);
