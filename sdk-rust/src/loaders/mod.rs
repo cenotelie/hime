@@ -19,6 +19,7 @@
 
 pub mod hime_grammar;
 
+use std::borrow::Cow;
 use std::io::{self, Read};
 
 use hime_redist::ast::{Ast, AstNode};
@@ -44,7 +45,7 @@ use crate::{CharSpan, Input, InputReference, LoadedData, LoadedInput};
 pub struct LoadInput<'a>(String, Box<dyn Read + 'a>);
 
 /// Open all inputs
-pub fn open_all<'a>(inputs: &[Input<'a>]) -> Result<Vec<LoadInput<'a>>, Errors> {
+pub fn open_all<'t>(inputs: &[Input<'t>]) -> Result<Vec<LoadInput<'t>>, Errors<'t>> {
     let mut errors = Vec::new();
     let mut result = Vec::new();
     for input in inputs.iter() {
@@ -61,11 +62,11 @@ pub fn open_all<'a>(inputs: &[Input<'a>]) -> Result<Vec<LoadInput<'a>>, Errors> 
 }
 
 /// Build the loaded data structure
-fn build_loaded_data(
+fn build_loaded_data<'s, 't, 'a>(
     names: Vec<String>,
-    parse_results: Vec<ParseResult>,
+    parse_results: Vec<ParseResult<'s, 't, 'a>>,
     grammars: Vec<Grammar>
-) -> LoadedData {
+) -> LoadedData<'t> {
     LoadedData {
         inputs: names
             .into_iter()
@@ -80,7 +81,7 @@ fn build_loaded_data(
 }
 
 /// Loads all inputs into grammars
-pub fn load_inputs(inputs: &[Input]) -> Result<LoadedData, Errors> {
+pub fn load_inputs<'t>(inputs: &[Input<'t>]) -> Result<LoadedData<'t>, Errors<'t>> {
     load(open_all(inputs)?)
 }
 
@@ -137,9 +138,9 @@ fn do_load_grammars(roots: &[(usize, AstNode)]) -> (Vec<Grammar>, Vec<Error>) {
 }
 
 /// Resolves inheritance and load grammars
-fn resolve_inheritance<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd>(
-    completed: &mut Vec<Loader<'a, 'b, 'c, 'd>>,
-    to_resolve: &mut Vec<Loader<'a, 'b, 'c, 'd>>,
+fn resolve_inheritance<'s, 't, 'a>(
+    completed: &mut Vec<Loader<'s, 't, 'a>>,
+    to_resolve: &mut Vec<Loader<'s, 't, 'a>>,
     errors: &mut Vec<Error>
 ) {
     loop {
@@ -170,9 +171,9 @@ fn resolve_inheritance<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd>(
 fn parse_input_stream<'a>(
     content: Box<dyn Read + 'a>,
     input_index: usize
-) -> Result<ParseResult<'static, 'static>, (ParseResult<'static, 'static>, Vec<Error>)> {
+) -> Result<ParseResult<'static, 'a, 'static>, (ParseResult<'static, 'a, 'static>, Vec<Error>)> {
     let mut reader = io::BufReader::new(content);
-    let result = hime_grammar::parse_utf8(&mut reader);
+    let result = hime_grammar::parse_utf8_stream(&mut reader);
     let errors: Vec<Error> = result
         .errors
         .errors
@@ -226,26 +227,26 @@ fn parse_inputs(inputs: Vec<LoadInput>) -> Result<(Vec<String>, Vec<ParseResult>
 }
 
 /// Represents a loader for a grammar
-struct Loader<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> {
+struct Loader<'s, 't, 'a> {
     /// index of the input
     input_index: usize,
-    /// The parse result
-    root: AstNode<'a, 'b, 'c, 'd>,
+    /// The parse results
+    root: AstNode<'s, 't, 'a>,
     /// Lists of the inherited grammars
-    inherited: Vec<String>,
+    inherited: Vec<&'a str>,
     /// The resulting grammar
     grammar: Grammar,
     /// Flag for the global casing of the grammar
     case_insensitive: bool
 }
 
-impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Loader<'a, 'b, 'c, 'd> {
+impl<'s, 't, 'a> Loader<'s, 't, 'a> {
     /// Creates a new loader
     fn new(
         input_index: usize,
-        root: AstNode<'a, 'b, 'c, 'd>,
+        root: AstNode<'s, 't, 'a>,
         errors: &mut Vec<Error>
-    ) -> Loader<'a, 'b, 'c, 'd> {
+    ) -> Loader<'s, 't, 'a> {
         let input_ref = InputReference::from(input_index, &root.child(0));
         let name = root.child(0).get_value().unwrap();
         let inherited = root
@@ -257,7 +258,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Loader<'a, 'b, 'c, 'd> {
             input_index,
             root,
             inherited,
-            grammar: Grammar::new(input_ref, name),
+            grammar: Grammar::new(input_ref, name.to_string()),
             case_insensitive: false
         };
         if loader.is_solved() {
@@ -276,7 +277,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Loader<'a, 'b, 'c, 'd> {
                     // the dependency does not exist
                     errors.push(Error::GrammarNotDefined(
                         InputReference::from(self.input_index, &node),
-                        name
+                        name.to_string()
                     ));
                 }
             }
@@ -347,13 +348,13 @@ fn load_options(input_index: usize, grammar: &mut Grammar, node: AstNode) {
 /// Loads the grammar option in the given AST
 fn load_option(input_index: usize, grammar: &mut Grammar, node: AstNode) {
     let name = node.child(0).get_value().unwrap();
-    let value = replace_escapees(node.child(1).get_value().unwrap());
-    let value = value[1..(value.len() - 1)].to_string();
+    let value = node.child(1).get_value().unwrap();
+    let value = replace_escapees(&value[1..(value.len() - 1)]);
     grammar.add_option(
         InputReference::from(input_index, &node.child(0)),
         InputReference::from(input_index, &node.child(1)),
-        name,
-        value
+        name.to_string(),
+        value.into_owned()
     );
 }
 
@@ -400,9 +401,9 @@ fn load_terminal_rule_context(
     node: AstNode
 ) {
     let name = node.child(0).get_value().unwrap();
-    grammar.resolve_context(&name);
+    grammar.resolve_context(name);
     for child in node.into_iter().skip(1) {
-        load_terminal_rule(input_index, errors, grammar, child, &name, false);
+        load_terminal_rule(input_index, errors, grammar, child, name, false);
     }
 }
 
@@ -417,17 +418,17 @@ fn load_terminal_rule(
 ) {
     let node_name = node.child(0);
     let name = node_name.get_value().unwrap();
-    if grammar.get_terminal_for_name(&name).is_some() {
+    if grammar.get_terminal_for_name(name).is_some() {
         errors.push(Error::OverridingPreviousTerminal(
             InputReference::from(input_index, &node_name),
-            name
+            name.to_string()
         ));
         return;
     }
     let mut references = Vec::new();
     let nfa = load_nfa(input_index, errors, &mut references, grammar, node.child(1));
     let terminal = grammar.add_terminal_named(
-        name,
+        name.to_string(),
         InputReference::from(input_index, &node_name),
         nfa,
         context,
@@ -519,15 +520,14 @@ fn load_nfa(
 /// Builds a NFA from a piece of text
 fn load_nfa_simple_text(node: &AstNode) -> NFA {
     // build the raw piece of text
-    let mut value = node.get_value().unwrap();
+    let value = node.get_value().unwrap();
     let mut insensitive = false;
-    if value.starts_with('~') {
+    let value = replace_escapees(if value.starts_with('~') {
         insensitive = true;
-        value = value[2..(value.len() - 1)].to_string();
+        &value[2..(value.len() - 1)]
     } else {
-        value = value[1..(value.len() - 1)].to_string();
-    }
-    let value = replace_escapees(value);
+        &value[1..(value.len() - 1)]
+    });
 
     // build the result
     let mut nfa = NFA::new_minimal();
@@ -751,7 +751,7 @@ fn load_nfa_reference(
     node: AstNode
 ) -> NFA {
     let value = node.get_value().unwrap();
-    match grammar.get_terminal_for_name(&value) {
+    match grammar.get_terminal_for_name(value) {
         Some(terminal) => {
             references.push((terminal.id, InputReference::from(input_index, &node)));
             terminal.nfa.clone_no_finals()
@@ -759,7 +759,7 @@ fn load_nfa_reference(
         None => {
             errors.push(Error::SymbolNotFound(
                 InputReference::from(input_index, &node),
-                value
+                value.to_string()
             ));
             NFA::new_minimal()
         }
@@ -808,19 +808,19 @@ fn load_rules(input_index: usize, errors: &mut Vec<Error>, grammar: &mut Grammar
         let id = child.get_symbol().id;
         if id == hime_grammar::ID_VARIABLE_CF_RULE_SIMPLE {
             let name = child.child(0).get_value().unwrap();
-            grammar.add_variable(&name);
+            grammar.add_variable(name);
         } else if id == hime_grammar::ID_VARIABLE_CF_RULE_TEMPLATE {
             let name = child.child(0).get_value().unwrap();
             let arguments: Vec<TemplateRuleParam> = child
                 .child(1)
                 .into_iter()
                 .map(|n| TemplateRuleParam {
-                    name: n.get_value().unwrap(),
+                    name: n.get_value().unwrap().to_string(),
                     input_ref: InputReference::from(input_index, &n)
                 })
                 .collect();
             grammar.add_template_rule(
-                &name,
+                name,
                 InputReference::from(input_index, &node.child(0)),
                 arguments
             );
@@ -852,10 +852,10 @@ fn load_simple_rule(
     node: AstNode
 ) {
     let name = node.child(0).get_value().unwrap();
-    let head_sid = grammar.add_variable(&name).id;
+    let head_sid = grammar.add_variable(name).id;
     let definitions =
         load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(1));
-    let variable = grammar.add_variable(&name);
+    let variable = grammar.add_variable(name);
     for body in definitions.bodies.into_iter() {
         variable.add_rule(Rule::new(
             variable.id,
@@ -917,7 +917,7 @@ fn load_simple_rule_context(
     node: AstNode
 ) -> BodySet<RuleBody> {
     let name = node.child(0).get_value().unwrap();
-    let context_id = grammar.resolve_context(&name);
+    let context_id = grammar.resolve_context(name);
     let definitions =
         load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(1));
     let sub_var = grammar.generate_variable(head_sid);
@@ -1184,7 +1184,7 @@ fn load_simple_rule_atomic_action(
     node: AstNode
 ) -> BodySet<RuleBody> {
     let name = node.child(0).get_value().unwrap();
-    let id = grammar.add_action(&name).id;
+    let id = grammar.add_action(name).id;
     BodySet {
         bodies: vec![RuleBody::single(
             SymbolRef::Action(id),
@@ -1200,7 +1200,7 @@ fn load_simple_rule_atomic_virtual(
     node: AstNode
 ) -> BodySet<RuleBody> {
     let name = node.child(0).get_value().unwrap();
-    let name = replace_escapees(name[1..(name.len() - 1)].to_string());
+    let name = replace_escapees(&name[1..(name.len() - 1)]);
     let id = grammar.add_virtual(&name).id;
     BodySet {
         bodies: vec![RuleBody::single(
@@ -1218,7 +1218,7 @@ fn load_simple_rule_atomic_simple_ref(
     node: AstNode
 ) -> BodySet<RuleBody> {
     let name = node.child(0).get_value().unwrap();
-    match grammar.get_symbol(&name) {
+    match grammar.get_symbol(name) {
         Some(symbol_ref) => BodySet {
             bodies: vec![RuleBody::single(
                 symbol_ref,
@@ -1228,7 +1228,7 @@ fn load_simple_rule_atomic_simple_ref(
         None => {
             errors.push(Error::SymbolNotFound(
                 InputReference::from(input_index, &node.child(0)),
-                name
+                name.to_string()
             ));
             BodySet { bodies: Vec::new() }
         }
@@ -1251,7 +1251,7 @@ fn load_simple_rule_atomic_template_ref(
         })
         .collect();
     let symbol_ref = match grammar.instantiate_template_rule(
-        &name,
+        name,
         InputReference::from(input_index, &node.child(0)),
         arguments
     ) {
@@ -1278,14 +1278,14 @@ fn load_simple_rule_atomic_inline_text(
     // Construct the terminal name
     let value = node.get_value().unwrap();
     let start = if value.starts_with('~') { 2 } else { 1 };
-    let value = replace_escapees(value[start..(value.len() - 1)].to_string());
+    let value = replace_escapees(&value[start..(value.len() - 1)]);
     // Check for previous instance in the grammar
     let id = match grammar.get_terminal_for_value(&value) {
         None => {
             // Create the terminal
             let nfa = load_nfa_simple_text(&node);
             let terminal = grammar.add_terminal_anonymous(
-                value,
+                value.into_owned(),
                 InputReference::from(input_index, &node),
                 nfa
             );
@@ -1374,7 +1374,7 @@ fn load_template_rule_context(
 ) -> BodySet<TemplateRuleBody> {
     let name = node.child(0).get_value().unwrap();
     let input_ref = InputReference::from(input_index, &node);
-    let context_id = grammar.resolve_context(&name);
+    let context_id = grammar.resolve_context(name);
     let definitions =
         load_template_rule_definitions(input_index, errors, grammar, parameters, node.child(1));
 
@@ -1653,7 +1653,7 @@ fn load_template_rule_atomic_action(
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     let name = node.child(0).get_value().unwrap();
-    let id = grammar.add_action(&name).id;
+    let id = grammar.add_action(name).id;
     BodySet {
         bodies: vec![TemplateRuleBody::single(
             TemplateRuleSymbol::Symbol(SymbolRef::Action(id)),
@@ -1669,7 +1669,7 @@ fn load_template_rule_atomic_virtual(
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     let name = node.child(0).get_value().unwrap();
-    let name = replace_escapees(name[1..(name.len() - 1)].to_string());
+    let name = replace_escapees(&name[1..(name.len() - 1)]);
     let id = grammar.add_virtual(&name).id;
     BodySet {
         bodies: vec![TemplateRuleBody::single(
@@ -1696,7 +1696,7 @@ fn load_template_rule_atomic_simple_ref(
             )]
         };
     }
-    match grammar.get_symbol(&name) {
+    match grammar.get_symbol(name) {
         Some(symbol_ref) => BodySet {
             bodies: vec![TemplateRuleBody::single(
                 TemplateRuleSymbol::Symbol(symbol_ref),
@@ -1706,7 +1706,7 @@ fn load_template_rule_atomic_simple_ref(
         None => {
             errors.push(Error::SymbolNotFound(
                 InputReference::from(input_index, &node.child(0)),
-                name
+                name.to_string()
             ));
             BodySet { bodies: Vec::new() }
         }
@@ -1783,14 +1783,14 @@ fn load_template_rule_atomic_inline_text(
     // Construct the terminal name
     let value = node.get_value().unwrap();
     let start = if value.starts_with('~') { 2 } else { 1 };
-    let value = replace_escapees(value[start..(value.len() - 1)].to_string());
+    let value = replace_escapees(&value[start..(value.len() - 1)]);
     // Check for previous instance in the grammar
     let id = match grammar.get_terminal_for_value(&value) {
         None => {
             // Create the terminal
             let nfa = load_nfa_simple_text(&node);
             let terminal = grammar.add_terminal_anonymous(
-                value,
+                value.into_owned(),
                 InputReference::from(input_index, &node),
                 nfa
             );
@@ -1850,9 +1850,9 @@ fn get_char_value(value: &[char], i: usize) -> (char, usize) {
 }
 
 /// Replaces the escape sequences in the given piece of text by their value
-pub fn replace_escapees(value: String) -> String {
+pub fn replace_escapees(value: &str) -> Cow<str> {
     if !value.contains('\\') {
-        return value;
+        return Cow::Borrowed(value);
     }
     let chars: Vec<char> = value.chars().collect();
     let mut result = String::new();
@@ -1862,5 +1862,5 @@ pub fn replace_escapees(value: String) -> String {
         result.push(c);
         i += l;
     }
-    result
+    Cow::Owned(result)
 }

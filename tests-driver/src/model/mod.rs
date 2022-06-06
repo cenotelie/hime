@@ -290,14 +290,14 @@ pub struct Fixture {
     /// The fixture's name
     pub name: String,
     /// The inner content for this ficture
-    content: ParseResult<'static, 'static>,
+    content: ParseResult<'static, 'static, 'static>,
     /// The tests in the fixture
     pub tests: Vec<Test>
 }
 
 impl Fixture {
     /// Build a fixture from parsed content
-    pub fn from_content(content: ParseResult<'static, 'static>) -> Fixture {
+    pub fn from_content(content: ParseResult<'static, 'static, 'static>) -> Fixture {
         let ast = content.get_ast();
         let root = ast.get_root();
         let name = root.get_value().unwrap();
@@ -311,7 +311,7 @@ impl Fixture {
             });
         }
         Fixture {
-            name,
+            name: name.to_string(),
             content,
             tests
         }
@@ -419,9 +419,9 @@ impl OutputTest {
             })
             .collect();
         OutputTest {
-            name,
+            name: name.to_string(),
             index,
-            input,
+            input: input.to_string(),
             output
         }
     }
@@ -549,10 +549,10 @@ impl ParsingTest {
             String::new()
         };
         ParsingTest {
-            name,
+            name: name.to_string(),
             index,
             verb,
-            input,
+            input: input.to_string(),
             tree
         }
     }
@@ -560,11 +560,11 @@ impl ParsingTest {
     /// Serializes a tree into a string
     fn serialize_tree(node: AstNode, buffer: &mut String) {
         if let Some(value) = node.get_value() {
-            buffer.push_str(&value);
+            buffer.push_str(value);
         }
         let node_check = node.child(0);
         if node_check.children_count() > 0 {
-            buffer.push_str(&node_check.child(0).get_value().unwrap());
+            buffer.push_str(node_check.child(0).get_value().unwrap());
             let value = node_check.child(1).get_value().unwrap();
             // Decode the read value by replacing all the escape sequences
             let value = hime_sdk::loaders::replace_escapees(value);

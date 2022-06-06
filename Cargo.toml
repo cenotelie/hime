@@ -8,7 +8,7 @@ members = [
     "himecc",
     "tests-executor-rust",
     "tests-driver",
-    "langserv"
+    # "langserv"
 ]
 
 [patch.crates-io]

@@ -501,11 +501,11 @@ impl<'a> DFAPartition<'a> {
                     .find(|g: &&mut DFAStateGroup| state.same_finals(g.states[0]))
                 {
                     None => groups.push(DFAStateGroup::new(state)),
-                    Some(ref mut group) => group.states.push(state)
+                    Some(group) => group.states.push(state)
                 }
             } else {
                 // the state is not final
-                if let Some(ref mut group) = &mut non_finals {
+                if let Some(group) = non_finals.as_mut() {
                     group.states.push(state);
                 } else {
                     non_finals = Some(DFAStateGroup::new(state));

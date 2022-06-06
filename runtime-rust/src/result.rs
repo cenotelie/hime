@@ -26,39 +26,39 @@ use crate::text::Text;
 use crate::tokens::{TokenRepository, TokenRepositoryImpl};
 
 /// Represents the output of a parser
-pub struct ParseResult<'a: 'b, 'b> {
+pub struct ParseResult<'s, 't, 'a> {
     /// The table of grammar terminals
-    pub terminals: &'b [Symbol<'a>],
+    pub terminals: &'a [Symbol<'s>],
     /// The table of grammar variables
-    pub variables: &'b [Symbol<'a>],
+    pub variables: &'a [Symbol<'s>],
     /// The table of grammar virtuals
-    pub virtuals: &'b [Symbol<'a>],
+    pub virtuals: &'a [Symbol<'s>],
     /// The input text
-    pub text: Text,
+    pub text: Text<'t>,
     /// The errors found in the input
-    pub errors: ParseErrors<'a>,
+    pub errors: ParseErrors<'s>,
     /// The table of matched tokens
     pub tokens: TokenRepositoryImpl,
     /// The produced AST
     ast: AstImpl
 }
 
-impl<'a: 'b, 'b> ParseResult<'a, 'b> {
+impl<'s, 't, 'a> ParseResult<'s, 't, 'a> {
     /// Initialize a new parse result
     pub fn new(
-        terminals: &'b [Symbol<'a>],
-        variables: &'b [Symbol<'a>],
-        virtuals: &'b [Symbol<'a>],
-        text: Text
-    ) -> ParseResult<'a, 'b> {
+        terminals: &'a [Symbol<'s>],
+        variables: &'a [Symbol<'s>],
+        virtuals: &'a [Symbol<'s>],
+        text: Text<'t>
+    ) -> ParseResult<'s, 't, 'a> {
         ParseResult {
             terminals,
             variables,
             virtuals,
             text,
             errors: ParseErrors::default(),
-            tokens: TokenRepositoryImpl::new(),
-            ast: AstImpl::new()
+            tokens: TokenRepositoryImpl::default(),
+            ast: AstImpl::default()
         }
     }
 
@@ -73,7 +73,7 @@ impl<'a: 'b, 'b> ParseResult<'a, 'b> {
     }
 
     /// Gets the resulting AST
-    pub fn get_ast<'x>(&'x self) -> Ast<'a, 'b, 'x> {
+    pub fn get_ast<'x>(&'x self) -> Ast<'s, 't, 'x> {
         Ast::new(
             TokenRepository::new(self.terminals, &self.text, &self.tokens),
             self.variables,
@@ -86,9 +86,9 @@ impl<'a: 'b, 'b> ParseResult<'a, 'b> {
     pub fn get_parsing_data<'x>(
         &'x mut self
     ) -> (
-        TokenRepository<'a, 'b, 'x>,
-        &mut ParseErrors<'a>,
-        Ast<'a, 'b, 'x>
+        TokenRepository<'s, 't, 'x>,
+        &'x mut ParseErrors<'s>,
+        Ast<'s, 't, 'x>
     ) {
         (
             TokenRepository::new_mut(self.terminals, &self.text, &mut self.tokens),
@@ -98,7 +98,7 @@ impl<'a: 'b, 'b> ParseResult<'a, 'b> {
     }
 }
 
-impl<'a: 'b, 'b> Serialize for ParseResult<'a, 'b> {
+impl<'s, 't, 'a> Serialize for ParseResult<'s, 't, 'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer

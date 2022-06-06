@@ -40,7 +40,7 @@ pub struct Document {
     /// The document's URL
     pub url: Url,
     /// The content of the document in this version
-    pub content: String,
+    pub content: Option<String>,
     /// The current version
     pub version: Option<i32>,
     /// The diagnostics for the document
@@ -52,7 +52,7 @@ impl Document {
     pub fn new(url: Url, content: String) -> Document {
         Document {
             url,
-            content,
+            content: Some(content),
             version: None,
             diagnostics: Vec::new()
         }
@@ -63,7 +63,7 @@ impl Document {
 #[derive(Debug, Clone, Default)]
 pub struct WorkspaceData {
     /// The loaded inputs
-    pub inputs: Vec<LoadedInput>,
+    pub inputs: Vec<LoadedInput<'static>>,
     /// The loaded grammars
     pub grammars: Vec<Grammar>,
     /// The registry of symbols
@@ -201,7 +201,7 @@ impl Workspace {
         if let Some(document) = self.documents.get_mut(&event.text_document.uri) {
             for change in event.content_changes.into_iter() {
                 if change.range.is_none() && change.range_length.is_none() {
-                    document.content = change.text;
+                    document.content = Some(change.text);
                 }
             }
         }

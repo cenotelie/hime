@@ -23,7 +23,7 @@ use crate::utils::biglist::BigList;
 use crate::utils::EitherMut;
 
 /// Represents the metadata of a token
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Default)]
 struct TokenRepositoryCell {
     /// The terminal's index
     terminal: usize,
@@ -32,74 +32,42 @@ struct TokenRepositoryCell {
 }
 
 /// Implementation data of a repository of matched tokens
+#[derive(Debug, Default, Clone)]
 pub struct TokenRepositoryImpl {
     /// The token data in this content
     cells: BigList<TokenRepositoryCell>
 }
 
-impl Default for TokenRepositoryImpl {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl TokenRepositoryImpl {
-    /// Creates a new implementation of a token repository
-    pub fn new() -> TokenRepositoryImpl {
-        TokenRepositoryImpl {
-            cells: BigList::new(TokenRepositoryCell {
-                terminal: 0,
-                span: TextSpan {
-                    index: 0,
-                    length: 0
-                }
-            })
-        }
-    }
-}
-
 /// The proxy structure for a repository of matched tokens
-pub struct TokenRepository<'a: 'b, 'b, 'c> {
+pub struct TokenRepository<'s, 't, 'a> {
     /// The table of grammar terminals
-    pub terminals: &'b [Symbol<'a>],
+    pub terminals: &'a [Symbol<'s>],
     /// The input text
-    pub text: &'c Text,
+    pub text: &'a Text<'t>,
     /// The table of matched tokens
-    data: EitherMut<'c, TokenRepositoryImpl>
+    data: EitherMut<'a, TokenRepositoryImpl>
 }
 
 /// Represents a token as an output element of a lexer
-pub struct Token<'a: 'b + 'd, 'b: 'd, 'c, 'd> {
+#[derive(Copy, Clone)]
+pub struct Token<'s, 't, 'a> {
     /// The repository containing this token
-    repository: &'d TokenRepository<'a, 'b, 'c>,
+    repository: &'a TokenRepository<'s, 't, 'a>,
     /// The index of this token in the text
     pub index: usize
 }
 
-/// Implementation of `Clone` for `Token`
-impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> Clone for Token<'a, 'b, 'c, 'd> {
-    fn clone(&self) -> Self {
-        Token {
-            repository: self.repository,
-            index: self.index
-        }
-    }
-}
-
-/// Implementation of `Copy` for `Token`
-impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> Copy for Token<'a, 'b, 'c, 'd> {}
-
 /// the iterator over the tokens in a repository
-pub struct TokenRepositoryIterator<'a: 'b + 'd, 'b: 'd, 'c, 'd> {
+pub struct TokenRepositoryIterator<'s, 't, 'a> {
     /// The repository containing this token
-    repository: &'d TokenRepository<'a, 'b, 'c>,
+    repository: &'a TokenRepository<'s, 't, 'a>,
     /// The current index within the repository
     index: usize
 }
 
 /// Implementation of `Iterator` for `TokenRepositoryIterator`
-impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> Iterator for TokenRepositoryIterator<'a, 'b, 'c, 'd> {
-    type Item = Token<'a, 'b, 'c, 'd>;
+impl<'s, 't, 'a> Iterator for TokenRepositoryIterator<'s, 't, 'a> {
+    type Item = Token<'s, 't, 'a>;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index >= self.repository.data.cells.len() {
             None
@@ -114,13 +82,13 @@ impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> Iterator for TokenRepositoryIterator<'a, 'b, '
     }
 }
 
-impl<'a: 'b, 'b, 'c> TokenRepository<'a, 'b, 'c> {
+impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
     /// Creates a new repository
     pub fn new(
-        terminals: &'b [Symbol<'a>],
-        text: &'c Text,
-        tokens: &'c TokenRepositoryImpl
-    ) -> TokenRepository<'a, 'b, 'c> {
+        terminals: &'a [Symbol<'s>],
+        text: &'a Text<'t>,
+        tokens: &'a TokenRepositoryImpl
+    ) -> TokenRepository<'s, 't, 'a> {
         TokenRepository {
             terminals,
             text,
@@ -130,10 +98,10 @@ impl<'a: 'b, 'b, 'c> TokenRepository<'a, 'b, 'c> {
 
     /// Creates a new mutable repository
     pub fn new_mut(
-        terminals: &'b [Symbol<'a>],
-        text: &'c Text,
-        tokens: &'c mut TokenRepositoryImpl
-    ) -> TokenRepository<'a, 'b, 'c> {
+        terminals: &'a [Symbol<'s>],
+        text: &'a Text<'t>,
+        tokens: &'a mut TokenRepositoryImpl
+    ) -> TokenRepository<'s, 't, 'a> {
         TokenRepository {
             terminals,
             text,
@@ -168,7 +136,7 @@ impl<'a: 'b, 'b, 'c> TokenRepository<'a, 'b, 'c> {
     }
 
     /// Gets the i-th token
-    pub fn get_token<'x>(&'x self, index: usize) -> Token<'a, 'b, 'c, 'x> {
+    pub fn get_token(&'a self, index: usize) -> Token<'s, 't, 'a> {
         Token {
             repository: self,
             index
@@ -209,7 +177,7 @@ impl<'a: 'b, 'b, 'c> TokenRepository<'a, 'b, 'c> {
     }
 }
 
-impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> SemanticElementTrait<'a> for Token<'a, 'b, 'c, 'd> {
+impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for Token<'s, 't, 'a> {
     /// Gets the position in the input text of this element
     fn get_position(&self) -> Option<TextPosition> {
         Some(
@@ -225,7 +193,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> SemanticElementTrait<'a> for Token<'a, 'b, 'c,
     }
 
     /// Gets the context of this element in the input
-    fn get_context(&self) -> Option<TextContext> {
+    fn get_context(&self) -> Option<TextContext<'a>> {
         Some(self.repository.text.get_context_for(
             self.get_position().unwrap(),
             self.repository.data.cells[self.index].span.length
@@ -233,12 +201,12 @@ impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> SemanticElementTrait<'a> for Token<'a, 'b, 'c,
     }
 
     /// Gets the grammar symbol associated to this element
-    fn get_symbol(&self) -> Symbol<'a> {
+    fn get_symbol(&self) -> Symbol<'s> {
         self.repository.terminals[self.repository.data.cells[self.index].terminal]
     }
 
     /// Gets the value of this element, if any
-    fn get_value(&self) -> Option<String> {
+    fn get_value(&self) -> Option<&'a str> {
         Some(
             self.repository
                 .text

@@ -41,15 +41,15 @@ pub enum ParserAutomaton {
 
 /// Represents complete data for a parser
 #[derive(Clone)]
-pub struct InMemoryParser<'a> {
+pub struct InMemoryParser<'s> {
     /// The name of the original grammar
-    pub name: &'a str,
+    pub name: &'s str,
     /// The expected terminals
-    pub terminals: Vec<Symbol<'a>>,
+    pub terminals: Vec<Symbol<'s>>,
     /// The variables
-    pub variables: Vec<Symbol<'a>>,
+    pub variables: Vec<Symbol<'s>>,
     /// The virtuals
-    pub virtuals: Vec<Symbol<'a>>,
+    pub virtuals: Vec<Symbol<'s>>,
     /// The identifier of the separator terminal, if any
     pub separator: u32,
     /// The lexer's automaton
@@ -60,15 +60,11 @@ pub struct InMemoryParser<'a> {
     pub parser_automaton: ParserAutomaton
 }
 
-impl<'a> InMemoryParser<'a> {
+impl<'s> InMemoryParser<'s> {
     /// Parses an input parser
-    pub fn parse<'b>(&'b self, input: &str) -> ParseResult<'a, 'b>
-    where
-        'a: 'b
-    {
-        let text = Text::new(input);
-        let mut result: ParseResult<'a, 'b> =
-            ParseResult::new(&self.terminals, &self.variables, &self.virtuals, text);
+    pub fn parse<'a, 't>(&'a self, input: &'t str) -> ParseResult<'s, 't, 'a> {
+        let text = Text::from_str(input);
+        let mut result = ParseResult::new(&self.terminals, &self.variables, &self.virtuals, text);
         let mut my_actions = |_index: usize, _head: Symbol, _body: &dyn SemanticBody| ();
         {
             let data = result.get_parsing_data();
@@ -79,20 +75,17 @@ impl<'a> InMemoryParser<'a> {
     }
 
     /// Execute the parser
-    fn do_parse<'b, 'c>(
-        &'b self,
-        lexer: &'c mut Lexer<'a, 'b, 'c>,
-        ast: Ast<'a, 'b, 'c>,
-        actions: &'c mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
-    ) where
-        'a: 'b + 'c,
-        'b: 'c
-    {
+    fn do_parse<'a, 't>(
+        &'a self,
+        lexer: &'a mut Lexer<'s, 't, 'a>,
+        ast: Ast<'s, 't, 'a>,
+        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+    ) {
         let mut parser: Box<dyn Parser> = match &self.parser_automaton {
-            ParserAutomaton::Lrk(ref automaton) => {
+            ParserAutomaton::Lrk(automaton) => {
                 Box::new(LRkParser::new(lexer, automaton.clone(), ast, actions))
             }
-            ParserAutomaton::Rnglr(ref automaton) => {
+            ParserAutomaton::Rnglr(automaton) => {
                 Box::new(RNGLRParser::new(lexer, automaton.clone(), ast, actions))
             }
         };
@@ -100,15 +93,11 @@ impl<'a> InMemoryParser<'a> {
     }
 
     /// Creates a new lexer
-    fn new_lexer<'b, 'c>(
-        &'b self,
-        repository: TokenRepository<'a, 'b, 'c>,
-        errors: &'b mut ParseErrors<'a>
-    ) -> Lexer<'a, 'b, 'c>
-    where
-        'a: 'b + 'c,
-        'b: 'c
-    {
+    fn new_lexer<'a, 't>(
+        &'a self,
+        repository: TokenRepository<'s, 't, 'a>,
+        errors: &'a mut ParseErrors<'s>
+    ) -> Lexer<'s, 't, 'a> {
         if self.lexer_is_context_sensitive {
             Lexer::ContextFree(ContextFreeLexer::new(
                 repository,

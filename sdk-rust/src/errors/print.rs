@@ -57,7 +57,7 @@ fn line_number_width_terminal(
 }
 
 /// Gets the context for an input reference
-fn context_for(data: &LoadedData, input_ref: &InputReference) -> TextContext {
+fn context_for<'a>(data: &'a LoadedData, input_ref: &InputReference) -> TextContext<'a> {
     data.inputs[input_ref.input_index]
         .content
         .get_context_for(input_ref.position, input_ref.length)

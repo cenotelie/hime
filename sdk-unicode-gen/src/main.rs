@@ -77,7 +77,7 @@ fn get_latet_categories() -> Result<Vec<Category>, Box<dyn Error>> {
             let cp = u32::from_str_radix(&m[1], 16)?;
             let cat = &m[3];
             if Some(cat) != current_name.as_deref() {
-                if let Some(ref current_name) = &current_name {
+                if let Some(current_name) = current_name.as_ref() {
                     let category = categories
                         .entry(current_name.clone())
                         .or_insert_with(|| Category::new_owned(current_name.clone()));
@@ -93,8 +93,8 @@ fn get_latet_categories() -> Result<Vec<Category>, Box<dyn Error>> {
             last_codepoint = Some(cp);
         }
     }
-    if let (Some(ref current_name), Some(begin), Some(last)) =
-        (&current_name, current_span_begin, last_codepoint)
+    if let (Some(current_name), Some(begin), Some(last)) =
+        (current_name.as_ref(), current_span_begin, last_codepoint)
     {
         let category = categories
             .entry(current_name.clone())

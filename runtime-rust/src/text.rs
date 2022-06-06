@@ -17,14 +17,14 @@
 
 //! Module for text-handling APIs
 
+use std::borrow::Cow;
 use std::cmp::{Ord, Ordering};
 use std::fmt::{Display, Error, Formatter};
-use std::io::{BufReader, Read};
+use std::io::Read;
 use std::result::Result;
+use std::str::Chars;
 
 use serde_derive::{Deserialize, Serialize};
-
-use crate::utils::biglist::BigList;
 
 /// `Utf16C` represents a single UTF-16 code unit.
 /// A UTF-16 code unit is always represented as a 16 bits unsigned integer.
@@ -38,7 +38,7 @@ use crate::utils::biglist::BigList;
 pub type Utf16C = u16;
 
 /// Represents a span of text in an input as a starting index and length
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TextSpan {
     /// The starting index
     pub index: usize,
@@ -70,7 +70,7 @@ impl Display for TextSpan {
 }
 
 /// Represents a position in term of line and column in a text input
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TextPosition {
     /// The line number
     pub line: usize,
@@ -115,10 +115,10 @@ impl Display for TextPosition {
 /// content = "public Struct Context"
 /// pointer = "       ^^^^^^"
 /// ```
-#[derive(Debug, Clone)]
-pub struct TextContext {
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
+pub struct TextContext<'a> {
     /// The text content being represented
-    pub content: String,
+    pub content: &'a str,
     /// The pointer textual representation
     pub pointer: String
 }
@@ -127,55 +127,42 @@ pub struct TextContext {
 /// All line numbers and column numbers are 1-based.
 /// Indices in the content are 0-based.
 #[derive(Debug, Clone)]
-pub struct Text {
+pub struct Text<'a> {
     /// The full content of the input
-    content: BigList<Utf16C>,
+    content: Cow<'a, str>,
     /// Cache of the starting indices of each line within the text
     lines: Vec<usize>
 }
 
-impl Text {
+impl<'a> Text<'a> {
     /// Initializes this text
-    pub fn new(input: &str) -> Text {
-        let mut content = BigList::new(0);
-        for c in input.chars() {
-            let value = c as u32;
-            if value <= 0xFFFF {
-                content.push(value as u16);
-            } else {
-                let temp = value - 0x10000;
-                let lead = (temp >> 10) + 0xD800;
-                let trail = (temp & 0x03FF) + 0xDC00;
-                content.push(lead as Utf16C);
-                content.push(trail as Utf16C);
-            }
+    #[allow(clippy::should_implement_trait)]
+    pub fn from_str(content: &'a str) -> Text<'a> {
+        let lines = find_lines_in(content.char_indices());
+        Text {
+            content: Cow::Borrowed(content),
+            lines
         }
-        let lines = find_lines_in(content.iter());
-        Text { content, lines }
     }
 
-    /// Initializes this text from a UTF-16 stream
-    pub fn from_utf16_stream(input: &mut dyn Read, big_endian: bool) -> Text {
-        let reader = &mut BufReader::new(input);
-        let mut content = BigList::new(0);
-        let iterator = Utf16IteratorRaw::new(reader, big_endian);
-        for c in iterator {
-            content.push(c);
+    /// Initializes this text
+    pub fn from_string(content: String) -> Text<'static> {
+        let lines = find_lines_in(content.char_indices());
+        Text {
+            content: Cow::Owned(content),
+            lines
         }
-        let lines = find_lines_in(content.iter());
-        Text { content, lines }
     }
 
     /// Initializes this text from a UTF-8 stream
-    pub fn from_utf8_stream(input: &mut dyn Read) -> Text {
-        let reader = &mut BufReader::new(input);
-        let mut content = BigList::new(0);
-        let iterator = Utf16IteratorOverUtf8::new(reader);
-        for c in iterator {
-            content.push(c);
-        }
-        let lines = find_lines_in(content.iter());
-        Text { content, lines }
+    pub fn from_utf8_stream<R: Read>(input: &mut R) -> Result<Text<'static>, std::io::Error> {
+        let mut content = String::new();
+        input.read_to_string(&mut content)?;
+        let lines = find_lines_in(content.char_indices());
+        Ok(Text {
+            content: Cow::Owned(content),
+            lines
+        })
     }
 
     /// Gets the number of lines
@@ -199,18 +186,31 @@ impl Text {
     }
 
     /// Gets the character at the specified index
-    pub fn at(&self, index: usize) -> Utf16C {
-        self.content[index]
+    pub fn at(&self, index: usize) -> char {
+        self.content[index..].chars().next().unwrap()
     }
 
     /// Gets the substring beginning at the given index with the given length
-    pub fn get_value(&self, index: usize, length: usize) -> String {
-        utf16_to_string(&self.content, index, length)
+    pub fn get_value(&self, index: usize, length: usize) -> &str {
+        &self.content[index..(index + length)]
     }
 
     /// Get the substring corresponding to the specified span
-    pub fn get_value_for(&self, span: TextSpan) -> String {
+    pub fn get_value_for(&self, span: TextSpan) -> &str {
         self.get_value(span.index, span.length)
+    }
+
+    /// Get the substring corresponding to the text at the specified position and the given length
+    pub fn get_value_at(&self, position: TextPosition, length: usize) -> &str {
+        let from_line = &self.content[self.lines[position.line - 1]..];
+        let in_line_offset = from_line
+            .char_indices()
+            .take(position.column - 1)
+            .last()
+            .map(|(offset, c)| offset + c.len_utf8())
+            .unwrap_or_default();
+        let start = self.lines[position.line - 1] + in_line_offset;
+        &self.content[start..(start + length)]
     }
 
     /// Gets the starting index of the i-th line
@@ -228,16 +228,17 @@ impl Text {
     }
 
     /// Gets the string content of the i-th line
-    pub fn get_line_content(&self, line: usize) -> String {
+    pub fn get_line_content(&self, line: usize) -> &str {
         self.get_value(self.get_line_index(line), self.get_line_length(line))
     }
 
     /// Gets the position at the given index
     pub fn get_position_at(&self, index: usize) -> TextPosition {
         let line = find_line_at(&self.lines, index);
+        let nb_chars = self.content[self.lines[line]..index].chars().count();
         TextPosition {
             line: line + 1,
-            column: index - self.lines[line] + 1
+            column: nb_chars + 1
         }
     }
 
@@ -255,52 +256,38 @@ impl Text {
     /// Gets the context description for the current text at the specified position
     pub fn get_context_for(&self, position: TextPosition, length: usize) -> TextContext {
         // gather the data for the line
-        let line_index = self.get_line_index(position.line);
-        let line_length = self.get_line_length(position.line);
-        if line_length == 0 {
-            return TextContext {
-                content: String::from(""),
-                pointer: String::from("^")
-            };
+        let mut line_content = self.get_line_content(position.line);
+        let mut end = line_content.len();
+        while end != 0 {
+            let last = line_content.chars().last().unwrap();
+            if !is_line_ending_char(last) {
+                break;
+            }
+            end -= last.len_utf8();
+            line_content = &line_content[..end];
         }
-
-        // gather the start and end indices of the line's content to output
-        let mut end = line_index + line_length - 1;
-        while end != line_index + 1
-            && (self.content[end] == 0x000A
-                || self.content[end] == 0x000B
-                || self.content[end] == 0x000C
-                || self.content[end] == 0x000D
-                || self.content[end] == 0x0085
-                || self.content[end] == 0x2028
-                || self.content[end] == 0x2029)
-        {
-            end -= 1;
-        }
-        let mut start = line_index;
-        while start < end && is_white_space(self.content[start]) {
-            start += 1;
-        }
-        if line_index + position.column - 1 < start {
-            start = line_index;
-        }
-        if line_index + position.column - 1 > end {
-            end = line_index + line_length - 1;
-        }
-
+        let in_line_offset = line_content
+            .char_indices()
+            .take(position.column - 1)
+            .last()
+            .map(|(offset, c)| offset + c.len_utf8())
+            .unwrap_or_default();
+        let pointer_count = line_content[in_line_offset..]
+            .char_indices()
+            .take_while(|&(offset, _)| offset < length)
+            .count();
+        let pointer_blank_count = position.column - 1;
         // build the pointer
-        let mut pointer = String::new();
-        for i in start..(line_index + position.column - 1) {
-            pointer.push(if self.content[i] == 0x0009 { '\t' } else { ' ' });
+        let mut pointer = String::with_capacity(pointer_count + pointer_blank_count);
+        for _ in 0..pointer_blank_count {
+            pointer.push(' ');
         }
-        pointer.push('^');
-        for _i in 1..length {
+        for _ in 0..pointer_count {
             pointer.push('^');
         }
-
         // return the output
         TextContext {
-            content: utf16_to_string(&self.content, start, end - start + 1),
+            content: line_content,
             pointer
         }
     }
@@ -310,141 +297,49 @@ impl Text {
         let position = self.get_position_at(span.index);
         self.get_context_for(position, span.length)
     }
+
+    /// Gets an iterator over the UTF-16 codepoints starting at a location
+    pub fn iter_utf16_from(&self, from: usize) -> Utf16Iter {
+        Utf16Iter {
+            inner: self.content[from..].chars(),
+            next_cp: None
+        }
+    }
 }
 
-/// `Utf16IteratorRaw` provides an iterator of UTF-16 code units
-/// over an input of bytes assumed to represent UTF-16 code units
-struct Utf16IteratorRaw<'a> {
-    /// whether to use big-endian or little-endian
-    big_endian: bool,
-    /// The input reader
-    input: &'a mut dyn Read
+/// An iterator over UTF-16 code points in the input text
+/// This iterator yields a tuple (CP, length), where:
+/// * CP is a UTF-16 codepoint
+/// * length is the CP in the input
+pub struct Utf16Iter<'a> {
+    /// The inner iterator over chars
+    inner: Chars<'a>,
+    /// The next codepoint, if any
+    next_cp: Option<(Utf16C, usize)>
 }
 
-impl<'a> Iterator for Utf16IteratorRaw<'a> {
-    type Item = Utf16C;
+impl<'a> Iterator for Utf16Iter<'a> {
+    type Item = (Utf16C, usize);
+
     fn next(&mut self) -> Option<Self::Item> {
-        // read two bytes
-        let mut bytes: [u8; 2] = [0; 2];
-        let read = self.input.read(&mut bytes);
-        if read.is_err() || read.unwrap() < 2 {
-            return None;
-        }
-        if self.big_endian {
-            Some(u16::from(bytes[1]) << 8 | u16::from(bytes[0]))
-        } else {
-            Some(u16::from(bytes[0]) << 8 | u16::from(bytes[1]))
-        }
-    }
-}
-
-impl<'a> Utf16IteratorRaw<'a> {
-    /// Creates a new instance of the iterator
-    pub fn new(input: &'a mut dyn Read, big_endian: bool) -> Utf16IteratorRaw {
-        Utf16IteratorRaw { big_endian, input }
-    }
-}
-
-/// Provides an iterator of UTF-16 code points
-/// over an input of bytes assumed to represent UTF-8 code points
-struct Utf16IteratorOverUtf8<'a> {
-    /// The input reader
-    input: &'a mut dyn Read,
-    /// The next UTF-16 code point, if any
-    next: Option<Utf16C>
-}
-
-impl<'a> Utf16IteratorOverUtf8<'a> {
-    /// Reads the input into the buffer
-    fn read(input: &mut dyn Read, buffer: &mut [u8]) -> usize {
-        let read = input.read(buffer);
-        match read {
-            Err(e) => panic!("{}", e),
-            Ok(size) => size
-        }
-    }
-}
-
-impl<'a> Iterator for Utf16IteratorOverUtf8<'a> {
-    type Item = Utf16C;
-    fn next(&mut self) -> Option<Self::Item> {
-        // do we have a cached
-        if self.next.is_some() {
-            let result = self.next;
-            self.next = None;
-            return result;
-        }
-        // read the next byte
-        let mut bytes: [u8; 1] = [0; 1];
-        {
-            if Utf16IteratorOverUtf8::read(&mut self.input, &mut bytes) == 0 {
-                return None;
-            }
-        }
-        let b0 = bytes[0] as u8;
-
-        let c = match b0 {
-            _ if b0 >> 3 == 0b11110 => {
-                // this is 4 bytes encoding
-                let mut others: [u8; 3] = [0; 3];
-                if Utf16IteratorOverUtf8::read(&mut self.input, &mut others) < 3 {
-                    return None;
+        match self.next_cp.take() {
+            Some(r) => Some(r),
+            None => match self.inner.next() {
+                None => None,
+                Some(c) => {
+                    let length = c.len_utf8();
+                    let mut encoded = [0_u16; 2];
+                    c.encode_utf16(&mut encoded);
+                    if encoded[1] != 0 {
+                        // sequence
+                        self.next_cp = Some((encoded[1], length - 1));
+                        Some((encoded[0], 1))
+                    } else {
+                        Some((encoded[0], length))
+                    }
                 }
-                (u32::from(b0) & 0b0000_0111) << 18
-                    | (u32::from(others[0]) & 0b0011_1111) << 12
-                    | (u32::from(others[1]) & 0b0011_1111) << 6
-                    | (u32::from(others[2]) & 0b0011_1111)
             }
-            _ if b0 >> 4 == 0b1110 => {
-                // this is a 3 bytes encoding
-                let mut others: [u8; 2] = [0; 2];
-                if Utf16IteratorOverUtf8::read(&mut self.input, &mut others) < 2 {
-                    return None;
-                }
-                (u32::from(b0) & 0b0000_1111) << 12
-                    | (u32::from(others[0]) & 0b0011_1111) << 6
-                    | (u32::from(others[1]) & 0b0011_1111)
-            }
-            _ if b0 >> 5 == 0b110 => {
-                // this is a 2 bytes encoding
-                if Utf16IteratorOverUtf8::read(&mut self.input, &mut bytes) < 1 {
-                    return None;
-                }
-                (u32::from(b0) & 0b0001_1111) << 6 | (u32::from(bytes[0]) & 0b0011_1111)
-            }
-            _ if b0 >> 7 == 0 => {
-                // this is a 1 byte encoding
-                u32::from(b0)
-            }
-            _ => {
-                return None;
-            }
-        };
-
-        // now we have the decoded unicode character
-        // encode it in UTF-16
-        if (0xD800..0xE000).contains(&c) || c >= 0x0011_0000 {
-            // not a valid unicode character
-            return None;
         }
-        if c <= 0xFFFF {
-            // simple case
-            return Some(c as Utf16C);
-        }
-        // we need to encode
-        let temp = c - 0x10000;
-        let lead = (temp >> 10) + 0xD800;
-        let trail = (temp & 0x03FF) + 0xDC00;
-        // store the trail and return the lead
-        self.next = Some(trail as Utf16C);
-        Some(lead as Utf16C)
-    }
-}
-
-impl<'a> Utf16IteratorOverUtf8<'a> {
-    /// Creates a new instance of the iterator
-    pub fn new(input: &'a mut dyn Read) -> Utf16IteratorOverUtf8 {
-        Utf16IteratorOverUtf8 { input, next: None }
     }
 }
 
@@ -455,30 +350,36 @@ impl<'a> Utf16IteratorOverUtf8<'a> {
 /// [U+000D, U+????] (this is MacOS style \r, without \n after)
 /// Others:
 /// [?, U+000B], [?, U+000C], [?, U+0085], [?, U+2028], [?, U+2029]
-fn is_line_ending(c1: Utf16C, c2: Utf16C) -> bool {
-    (c2 == 0x000B || c2 == 0x000C || c2 == 0x0085 || c2 == 0x2028 || c2 == 0x2029)
-        || (c1 == 0x000D || c2 == 0x000A)
+fn is_line_ending(c1: char, c2: char) -> bool {
+    (c2 == '\u{000B}'
+        || c2 == '\u{000C}'
+        || c2 == '\u{0085}'
+        || c2 == '\u{2028}'
+        || c2 == '\u{2029}')
+        || (c1 == '\u{000D}' || c2 == '\u{000A}')
 }
 
-/// Determines whether the character is a whitespace
-fn is_white_space(c: Utf16C) -> bool {
-    c == 0x0020 || c == 0x0009 || c == 0x000B || c == 0x000C
+/// Determines whether the character is part of a line ending sequence
+fn is_line_ending_char(c: char) -> bool {
+    (c == '\u{000B}' || c == '\u{000C}' || c == '\u{0085}' || c == '\u{2028}' || c == '\u{2029}')
+        || c == '\u{000D}'
+        || c == '\u{000A}'
 }
 
 /// Finds all the lines in this content
-fn find_lines_in<T: Iterator<Item = Utf16C>>(iterator: T) -> Vec<usize> {
+fn find_lines_in<T: Iterator<Item = (usize, char)>>(iterator: T) -> Vec<usize> {
     let mut result = Vec::new();
-    let mut c1;
-    let mut c2 = 0;
+    let mut c1: char;
+    let mut c2: char = '\0';
     result.push(0);
-    for (i, x) in iterator.enumerate() {
+    for (offset, x) in iterator {
         c1 = c2;
         c2 = x;
         if is_line_ending(c1, c2) {
-            result.push(if c1 == 0x000D && c2 != 0x000A {
-                i
+            result.push(if c1 == '\u{000D}' && c2 != '\u{000A}' {
+                offset
             } else {
-                i + 1
+                offset + 1
             });
         }
     }
@@ -495,47 +396,113 @@ fn find_line_at(lines: &[usize], index: usize) -> usize {
     lines.len() - 1
 }
 
-/// Converts an excerpt of a UTF-16 buffer to a string
-fn utf16_to_string(content: &BigList<Utf16C>, start: usize, length: usize) -> String {
-    let mut buffer = Vec::with_capacity(length);
-    for i in start..(start + length) {
-        buffer.push(content[i]);
-    }
-    let result = String::from_utf16(&buffer);
-    result.unwrap_or_default()
-}
-
 #[test]
 fn test_text_lines() {
-    let text = Text::new("this is\na new line");
+    let text = Text::from_str("this is\na new line");
     assert_eq!(text.lines.len(), 2);
     assert_eq!(text.lines[0], 0);
     assert_eq!(text.lines[1], 8);
 }
 
 #[test]
-fn test_text_substring() {
-    let text = Text::new("this is\na new line");
-    assert_eq!(utf16_to_string(&text.content, 8, 5), "a new");
+fn test_text_at() {
+    let text = Text::from_str("this is\na new line");
+    assert_eq!(text.at(0), 't');
+    assert_eq!(text.at(8), 'a');
 }
 
 #[test]
-fn test_read_utf8() {
-    let bytes: [u8; 13] = [
-        0x78, 0xE2, 0x80, 0xA8, 0xE2, 0x80, 0xA8, 0x78, 0xE2, 0x80, 0xA8, 0x79, 0x78
-    ];
-    let mut content = Vec::new();
-    let reader = &mut bytes.as_ref();
-    let iterator = Utf16IteratorOverUtf8::new(reader);
-    for c in iterator {
-        content.push(c);
+fn test_text_get_value() {
+    let text = Text::from_str("this is\na new line");
+    assert_eq!(text.get_value(0, 3), "thi");
+    assert_eq!(text.get_value(8, 2), "a ");
+}
+
+#[test]
+fn test_text_get_value_at() {
+    let text = Text::from_str("this is\na new line");
+    assert_eq!(
+        text.get_value_at(TextPosition { line: 1, column: 1 }, 3),
+        "thi"
+    );
+    assert_eq!(
+        text.get_value_at(TextPosition { line: 2, column: 3 }, 3),
+        "new"
+    );
+}
+
+#[test]
+fn test_text_get_value_at_2() {
+    let text = Text::from_str("नमस्ते\nЗдравствуйте");
+    assert_eq!(
+        text.get_value_at(TextPosition { line: 1, column: 1 }, 6),
+        "नम"
+    );
+    assert_eq!(
+        text.get_value_at(TextPosition { line: 2, column: 3 }, 4),
+        "ра"
+    );
+}
+
+#[test]
+fn test_text_get_line_index() {
+    let text = Text::from_str("this is\na new line");
+    assert_eq!(text.get_line_index(1), 0);
+    assert_eq!(text.get_line_index(2), 8);
+}
+
+#[test]
+fn test_text_get_line_length() {
+    let text = Text::from_str("this is\na new line");
+    assert_eq!(text.get_line_length(1), 8);
+    assert_eq!(text.get_line_length(2), 10);
+}
+
+#[test]
+fn test_text_get_line_content() {
+    let text = Text::from_str("this is\na new line");
+    assert_eq!(text.get_line_content(1), "this is\n");
+    assert_eq!(text.get_line_content(2), "a new line");
+}
+
+#[test]
+fn test_text_get_position_at() {
+    let text = Text::from_str("this is\na new line");
+    for i in 0..8 {
+        assert_eq!(
+            text.get_position_at(i),
+            TextPosition {
+                line: 1,
+                column: i + 1
+            }
+        );
     }
-    assert_eq!(7, content.len());
-    assert_eq!(0x78, content[0]);
-    assert_eq!(0x2028, content[1]);
-    assert_eq!(0x2028, content[2]);
-    assert_eq!(0x78, content[3]);
-    assert_eq!(0x2028, content[4]);
-    assert_eq!(0x79, content[5]);
-    assert_eq!(0x78, content[6]);
+    for i in 8..text.content.len() {
+        assert_eq!(
+            text.get_position_at(i),
+            TextPosition {
+                line: 2,
+                column: i + 1 - 8
+            }
+        );
+    }
+}
+
+#[test]
+fn test_text_get_context_for() {
+    let text = Text::from_str("नमस्ते\nЗдравствуйте");
+    assert_eq!(
+        text.get_context_for(TextPosition { line: 1, column: 2 }, 6),
+        TextContext {
+            content: "नमस्ते",
+            pointer: String::from(" ^^")
+        }
+    );
+    assert_eq!(
+        text.get_context_for(TextPosition { line: 2, column: 3 }, 6),
+        TextContext {
+            content: "Здравствуйте",
+            pointer: String::from("  ^^^")
+        }
+    );
 }

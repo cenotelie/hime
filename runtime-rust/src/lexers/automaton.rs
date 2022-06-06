@@ -218,7 +218,8 @@ pub fn run_dfa(automaton: &Automaton, input: &Text, index: usize) -> Option<Toke
 
     let mut result = None;
     let mut state = 0;
-    let mut i = index;
+    let mut position = index;
+    let mut input_iter = input.iter_utf16_from(index);
 
     while state != DEAD_STATE {
         let state_data = automaton.get_state(state);
@@ -226,20 +227,23 @@ pub fn run_dfa(automaton: &Automaton, input: &Text, index: usize) -> Option<Toke
         if state_data.get_terminals_count() > 0 {
             result = Some(TokenMatch {
                 state,
-                length: (i - index) as u32
+                length: (position - index) as u32
             });
         }
         // No further transition => exit
         if state_data.is_dead_end() {
             break;
         }
-        // At the end of the buffer
-        if input.is_end(i) {
-            break;
+        match input_iter.next() {
+            None => {
+                // at end
+                break;
+            }
+            Some((current, l)) => {
+                position += l;
+                state = state_data.get_target_by(current);
+            }
         }
-        let current = input.at(i);
-        i += 1;
-        state = state_data.get_target_by(current);
     }
     result
 }

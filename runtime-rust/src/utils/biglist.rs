@@ -31,10 +31,7 @@ const INIT_CHUNK_COUNT: usize = CHUNKS_SIZE;
 
 /// Represents a list of items that is efficient in storage and addition.
 /// Items cannot be neither be removed nor inserted.
-#[derive(Clone)]
-pub struct BigList<T: Debug + Copy + Clone> {
-    /// the neutral element
-    neutral: T,
+pub struct BigList<T> {
     /// The data
     chunks: Vec<[T; CHUNKS_SIZE]>,
     /// The index of the current chunk
@@ -43,26 +40,35 @@ pub struct BigList<T: Debug + Copy + Clone> {
     cell_index: usize
 }
 
-impl<T: Debug + Copy + Clone> Debug for BigList<T> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        f.debug_struct("BigList").field("len", &self.len()).finish()
-    }
-}
-
-/// Implementation of BigList
-impl<T: Debug + Copy + Clone> BigList<T> {
-    /// Creates a (empty) list
-    pub fn new(neutral: T) -> BigList<T> {
+impl<T: Default + Copy> Default for BigList<T> {
+    fn default() -> Self {
         let mut my_chunks = Vec::with_capacity(INIT_CHUNK_COUNT);
-        my_chunks.push([neutral; CHUNKS_SIZE]);
+        my_chunks.push([T::default(); CHUNKS_SIZE]);
         BigList {
-            neutral,
             chunks: my_chunks,
             chunk_index: 0,
             cell_index: 0
         }
     }
+}
 
+impl<T> Debug for BigList<T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_struct("BigList").field("len", &self.len()).finish()
+    }
+}
+
+impl<T: Copy> Clone for BigList<T> {
+    fn clone(&self) -> Self {
+        Self {
+            chunks: self.chunks.clone(),
+            chunk_index: self.chunk_index,
+            cell_index: self.cell_index
+        }
+    }
+}
+
+impl<T> BigList<T> {
     /// Gets whether the list is empty
     pub fn is_empty(&self) -> bool {
         self.chunk_index == 0 && self.cell_index == 0
@@ -72,7 +78,10 @@ impl<T: Debug + Copy + Clone> BigList<T> {
     pub fn len(&self) -> usize {
         (self.chunk_index * CHUNKS_SIZE) + self.cell_index
     }
+}
 
+/// Implementation of BigList
+impl<T: Default + Copy> BigList<T> {
     /// Adds a value at the end of the list
     pub fn push(&mut self, value: T) -> usize {
         if self.cell_index == CHUNKS_SIZE {
@@ -89,7 +98,7 @@ impl<T: Debug + Copy + Clone> BigList<T> {
         if self.chunk_index == self.chunks.len() - 1 {
             // we are currently on the last chunk for the allocated ones
             // allocate a new one
-            self.chunks.push([self.neutral; CHUNKS_SIZE]);
+            self.chunks.push([T::default(); CHUNKS_SIZE]);
         }
         self.chunk_index += 1;
         self.cell_index = 0;
@@ -105,7 +114,7 @@ impl<T: Debug + Copy + Clone> BigList<T> {
 }
 
 /// Implementation of the indexer operator for immutable BigList
-impl<T: Debug + Copy + Clone> Index<usize> for BigList<T> {
+impl<T: Copy> Index<usize> for BigList<T> {
     type Output = T;
     fn index(&self, index: usize) -> &T {
         &self.chunks[index >> UPPER_SHIFT][index & LOWER_MASK]
@@ -113,14 +122,14 @@ impl<T: Debug + Copy + Clone> Index<usize> for BigList<T> {
 }
 
 /// Implementation of the indexer [] operator for mutable BigList
-impl<T: Debug + Copy + Clone> IndexMut<usize> for BigList<T> {
+impl<T: Copy> IndexMut<usize> for BigList<T> {
     fn index_mut(&mut self, index: usize) -> &mut T {
         &mut self.chunks[index >> UPPER_SHIFT][index & LOWER_MASK]
     }
 }
 
 /// An iterator over a BigList
-pub struct BigListIterator<'a, T: 'a + Debug + Copy + Clone> {
+pub struct BigListIterator<'a, T: 'a> {
     /// The parent list
     list: &'a BigList<T>,
     /// The current index within the list
@@ -128,7 +137,7 @@ pub struct BigListIterator<'a, T: 'a + Debug + Copy + Clone> {
 }
 
 /// Implementation of the `Iterator` trait for `BigListIterator`
-impl<'a, T: 'a + Debug + Copy + Clone> Iterator for BigListIterator<'a, T> {
+impl<'a, T: 'a + Copy> Iterator for BigListIterator<'a, T> {
     type Item = T;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index >= self.list.len() {
@@ -143,7 +152,7 @@ impl<'a, T: 'a + Debug + Copy + Clone> Iterator for BigListIterator<'a, T> {
 
 #[test]
 fn test_big_list() {
-    let mut list = BigList::new('\0');
+    let mut list = BigList::default();
     assert_eq!(list.len(), 0);
     list.push('t');
     assert_eq!(list.len(), 1);

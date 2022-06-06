@@ -28,18 +28,18 @@ use crate::tokens::TokenRepository;
 const DEFAULT_RECOVERY_MATCHING_DISTANCE: usize = 3;
 
 /// Runs the fuzzy DFA matcher
-fn run_fuzzy_matcher<'a: 'b, 'b, 'c, 'd>(
-    repository: &TokenRepository<'a, 'b, 'c>,
-    automaton: &'b Automaton,
+fn run_fuzzy_matcher<'s, 't, 'a>(
+    repository: &TokenRepository<'s, 't, 'a>,
+    automaton: &'a Automaton,
     separator_id: u32,
     recovery: usize,
-    errors: &'d mut ParseErrors<'a>,
+    errors: &'a mut ParseErrors<'s>,
     origin_index: usize
 ) -> Option<TokenMatch> {
     if recovery == 0 {
         errors.push_error_unexpected_char(ParseErrorUnexpectedChar::new(
             repository.text.get_position_at(origin_index),
-            [repository.text.at(origin_index), 0]
+            repository.text.at(origin_index)
         ));
         None
     } else {
@@ -64,19 +64,19 @@ fn run_fuzzy_matcher<'a: 'b, 'b, 'c, 'd>(
 }
 
 /// Represents a context-free lexer (lexing rules do not depend on the context)
-pub struct ContextFreeLexer<'a: 'b, 'b, 'c> {
+pub struct ContextFreeLexer<'s, 't, 'a> {
     /// The lexer's innner data
-    data: LexerData<'a, 'b, 'c>
+    data: LexerData<'s, 't, 'a>
 }
 
-impl<'a: 'b, 'b, 'c> ContextFreeLexer<'a, 'b, 'c> {
+impl<'s, 't, 'a> ContextFreeLexer<'s, 't, 'a> {
     /// Creates a new lexer
     pub fn new(
-        repository: TokenRepository<'a, 'b, 'c>,
-        errors: &'c mut ParseErrors<'a>,
+        repository: TokenRepository<'s, 't, 'a>,
+        errors: &'a mut ParseErrors<'s>,
         automaton: Automaton,
         separator_id: u32
-    ) -> ContextFreeLexer<'a, 'b, 'c> {
+    ) -> ContextFreeLexer<'s, 't, 'a> {
         ContextFreeLexer {
             data: LexerData {
                 repository,
@@ -156,21 +156,21 @@ impl<'a: 'b, 'b, 'c> ContextFreeLexer<'a, 'b, 'c> {
 }
 
 /// Represents a context-sensitive lexer (lexing rules do not depend on the context)
-pub struct ContextSensitiveLexer<'a: 'b, 'b, 'c> {
+pub struct ContextSensitiveLexer<'s, 't, 'a> {
     /// The lexer's innner data
-    data: LexerData<'a, 'b, 'c>,
+    data: LexerData<'s, 't, 'a>,
     /// The current index in the input
     input_index: usize
 }
 
-impl<'a: 'b, 'b, 'c> ContextSensitiveLexer<'a, 'b, 'c> {
+impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
     /// Creates a new lexer
     pub fn new(
-        repository: TokenRepository<'a, 'b, 'c>,
-        errors: &'c mut ParseErrors<'a>,
+        repository: TokenRepository<'s, 't, 'a>,
+        errors: &'a mut ParseErrors<'s>,
         automaton: Automaton,
         separator_id: u32
-    ) -> ContextSensitiveLexer<'a, 'b, 'c> {
+    ) -> ContextSensitiveLexer<'s, 't, 'a> {
         ContextSensitiveLexer {
             data: LexerData {
                 repository,
@@ -280,24 +280,24 @@ impl<'a: 'b, 'b, 'c> ContextSensitiveLexer<'a, 'b, 'c> {
 }
 
 /// Represents a lexer
-pub enum Lexer<'a: 'b, 'b, 'c> {
+pub enum Lexer<'s, 't, 'a> {
     /// A context-free lexer
-    ContextFree(ContextFreeLexer<'a, 'b, 'c>),
+    ContextFree(ContextFreeLexer<'s, 't, 'a>),
     /// A context-sensitive lexer
-    ContextSensitive(ContextSensitiveLexer<'a, 'b, 'c>)
+    ContextSensitive(ContextSensitiveLexer<'s, 't, 'a>)
 }
 
-impl<'a: 'b, 'b, 'c> Lexer<'a, 'b, 'c> {
+impl<'s, 't, 'a> Lexer<'s, 't, 'a> {
     /// Gets the data for the lexer
-    pub fn get_data(&self) -> &LexerData<'a, 'b, 'c> {
+    pub fn get_data(&self) -> &LexerData<'s, 't, 'a> {
         match self {
-            Lexer::ContextFree(ref lexer) => &lexer.data,
-            Lexer::ContextSensitive(ref lexer) => &lexer.data
+            Lexer::ContextFree(lexer) => &lexer.data,
+            Lexer::ContextSensitive(lexer) => &lexer.data
         }
     }
 
     /// Gets the data for the lexer
-    pub fn get_data_mut(&mut self) -> &mut LexerData<'a, 'b, 'c> {
+    pub fn get_data_mut(&mut self) -> &mut LexerData<'s, 't, 'a> {
         match self {
             Lexer::ContextFree(ref mut lexer) => &mut lexer.data,
             Lexer::ContextSensitive(ref mut lexer) => &mut lexer.data

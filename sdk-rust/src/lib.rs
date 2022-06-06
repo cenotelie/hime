@@ -27,6 +27,7 @@ pub mod sdk;
 pub mod unicode;
 
 use std::cmp::Ordering;
+use std::fmt::Debug;
 use std::fs;
 use std::io::Read;
 
@@ -219,7 +220,7 @@ fn test_charspan_split() {
 pub enum Input<'a> {
     /// A file name
     FileName(String),
-    /// An raw input
+    /// Raw input
     Raw(&'a str)
 }
 
@@ -227,8 +228,8 @@ impl<'a> Input<'a> {
     /// Gets the input's name
     pub fn name(&self) -> String {
         match self {
-            Input::FileName(ref file_name) => file_name.clone(),
-            Input::Raw(_) => String::from("Raw input")
+            Input::FileName(file_name) => file_name.clone(),
+            Input::Raw(_) => String::from("raw input")
         }
     }
 
@@ -243,18 +244,18 @@ impl<'a> Input<'a> {
 
 /// The data for an input that has been loaded
 #[derive(Debug, Clone)]
-pub struct LoadedInput {
+pub struct LoadedInput<'t> {
     /// The input's name (file name)
     pub name: String,
     /// The input's content (full text)
-    pub content: Text
+    pub content: Text<'t>
 }
 
 /// The data resulting of loading inputs
 #[derive(Debug, Default, Clone)]
-pub struct LoadedData {
+pub struct LoadedData<'t> {
     /// The loaded inputs
-    pub inputs: Vec<LoadedInput>,
+    pub inputs: Vec<LoadedInput<'t>>,
     /// The loaded grammars
     pub grammars: Vec<Grammar>
 }
@@ -290,10 +291,7 @@ impl InputReference {
 
 impl InputReference {
     /// Build a reference from the specifiec input name and AST node
-    pub fn from<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd>(
-        input_index: usize,
-        node: &AstNode<'a, 'b, 'c, 'd>
-    ) -> InputReference {
+    pub fn from(input_index: usize, node: &AstNode<'_, '_, '_>) -> InputReference {
         let (position, span) = node.get_total_position_and_span().unwrap();
         InputReference {
             input_index,
@@ -379,7 +377,7 @@ pub enum Modifier {
 }
 
 /// Represents a compilation task for the generation of lexers and parsers from grammars
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default)]
 pub struct CompilationTask<'a> {
     /// The inputs
     pub inputs: Vec<Input<'a>>,
@@ -500,7 +498,7 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Executes this task
-    pub fn execute(&self) -> Result<LoadedData, Errors> {
+    pub fn execute(&self) -> Result<LoadedData<'a>, Errors<'a>> {
         let mut data = self.load()?;
         // select the grammars to build
         match &self.grammar_name {
@@ -533,7 +531,7 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Loads the data for this task
-    pub fn load(&self) -> Result<LoadedData, Errors> {
+    pub fn load(&self) -> Result<LoadedData<'a>, Errors<'a>> {
         let inputs = loaders::open_all(&self.inputs)?;
         loaders::load(inputs)
     }

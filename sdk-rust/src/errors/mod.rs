@@ -105,14 +105,14 @@ impl From<io::Error> for Error {
 
 /// A collection of errors
 #[derive(Debug)]
-pub struct Errors {
+pub struct Errors<'t> {
     /// The associated data
-    pub data: LoadedData,
+    pub data: LoadedData<'t>,
     /// The errors
     pub errors: Vec<Error>
 }
 
-impl Errors {
+impl<'t> Errors<'t> {
     /// Encapsulate the errors
     pub fn from(data: LoadedData, errors: Vec<Error>) -> Errors {
         Errors { data, errors }

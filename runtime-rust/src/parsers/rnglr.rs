@@ -174,7 +174,7 @@ impl RNGLRAutomaton {
     }
 
     /// Gets the expected terminals for the specified state
-    pub fn get_expected<'a>(&self, state: u32, terminals: &[Symbol<'a>]) -> LRExpected<'a> {
+    pub fn get_expected<'s>(&self, state: u32, terminals: &[Symbol<'s>]) -> LRExpected<'s> {
         let mut expected = LRExpected::new();
         for (column, terminal) in terminals.iter().enumerate() {
             let cell = self.cells[state as usize * self.columns_count + column];
@@ -195,7 +195,7 @@ impl RNGLRAutomaton {
 }
 
 /// Represents a label for a GSS edge
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone)]
 struct GSSLabel {
     /// The identifier of the SPPF node
     sppf_node: u32,
@@ -204,7 +204,7 @@ struct GSSLabel {
 }
 
 /// Represents an edge in a Graph-Structured Stack
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone)]
 struct GSSEdge {
     /// The index of the node from which this edge starts
     from: u32,
@@ -217,7 +217,7 @@ struct GSSEdge {
 /// Represents a generation in a Graph-Structured Stack
 /// Because GSS nodes and edges are always created sequentially,
 /// a generation basically describes a span in a buffer of GSS nodes or edges
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone)]
 struct GSSGeneration {
     /// The start index of this generation in the list of nodes
     start: usize,
@@ -302,17 +302,10 @@ impl GSS {
     /// Initializes the GSS
     pub fn new() -> GSS {
         GSS {
-            node_labels: BigList::new(0),
-            node_generations: BigList::new(GSSGeneration { start: 0, count: 0 }),
-            edges: BigList::new(GSSEdge {
-                from: 0,
-                to: 0,
-                label: GSSLabel {
-                    sppf_node: 0,
-                    symbol_id: SID_EPSILON
-                }
-            }),
-            edges_generations: BigList::new(GSSGeneration { start: 0, count: 0 }),
+            node_labels: BigList::default(),
+            node_generations: BigList::default(),
+            edges: BigList::default(),
+            edges_generations: BigList::default(),
             current_generation: 0
         }
     }
@@ -531,9 +524,9 @@ impl SPPFNodeVersion {
 
     /// Gets the number of children
     pub fn len(&self) -> usize {
-        match self.children {
+        match &self.children {
             None => 0,
-            Some(ref children) => children.len()
+            Some(children) => children.len()
         }
     }
 }
@@ -654,9 +647,9 @@ enum SPPFNode {
 
 impl SPPFNodeTrait for SPPFNode {
     fn get_original_symbol(&self) -> TableElemRef {
-        match *self {
-            SPPFNode::Normal(ref node) => node.original,
-            SPPFNode::Replaceable(ref node) => node.original
+        match self {
+            SPPFNode::Normal(node) => node.original,
+            SPPFNode::Replaceable(node) => node.original
         }
     }
 }
@@ -664,17 +657,17 @@ impl SPPFNodeTrait for SPPFNode {
 impl SPPFNode {
     /// Gets this node as a normal node
     pub fn as_normal(&self) -> &SPPFNodeNormal {
-        match *self {
-            SPPFNode::Normal(ref node) => node,
-            SPPFNode::Replaceable(ref _node) => panic!("Expected a normal node")
+        match self {
+            SPPFNode::Normal(node) => node,
+            SPPFNode::Replaceable(_node) => panic!("Expected a normal node")
         }
     }
 
     /// Gets this node as a normal node
     pub fn as_normal_mut(&mut self) -> &mut SPPFNodeNormal {
-        match *self {
-            SPPFNode::Normal(ref mut node) => node,
-            SPPFNode::Replaceable(ref _node) => panic!("Expected a normal node")
+        match self {
+            SPPFNode::Normal(node) => node,
+            SPPFNode::Replaceable(_node) => panic!("Expected a normal node")
         }
     }
 }
@@ -779,9 +772,9 @@ struct SPPFReduction {
 /// A SPPF is a compact representation of multiple variants of an AST at once.
 /// GLR algorithms originally builds the complete SPPF.
 /// However we only need to build one of the variant, i.e. an AST for the user.
-struct SPPFBuilder<'a: 'b, 'b, 'c> {
+struct SPPFBuilder<'s, 't, 'a, 'l> {
     /// Lexer associated to this parser
-    lexer: &'c mut Lexer<'a, 'b, 'c>,
+    lexer: &'l mut Lexer<'s, 't, 'a>,
     /// The history
     history: Vec<HistoryPart>,
     /// The SPPF being built
@@ -789,10 +782,10 @@ struct SPPFBuilder<'a: 'b, 'b, 'c> {
     /// The data of the current reduction
     reduction: Option<SPPFReduction>,
     /// The AST being built
-    result: Ast<'a, 'b, 'c>
+    result: Ast<'s, 't, 'a>
 }
 
-impl<'a: 'b, 'b, 'c> SemanticBody for SPPFBuilder<'a, 'b, 'c> {
+impl<'s, 't, 'a, 'l> SemanticBody for SPPFBuilder<'s, 't, 'a, 'l> {
     fn get_element_at(&self, index: usize) -> SemanticElement {
         let reduction = self.reduction.as_ref().expect("Not in a reduction");
         let reference = reduction.cache[reduction.handle_indices[index]];
@@ -816,12 +809,12 @@ impl<'a: 'b, 'b, 'c> SemanticBody for SPPFBuilder<'a, 'b, 'c> {
     }
 }
 
-impl<'a: 'b, 'b, 'c> SPPFBuilder<'a, 'b, 'c> {
+impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     /// Initializes the builder with the given stack size
     pub fn new(
-        lexer: &'c mut Lexer<'a, 'b, 'c>,
-        result: Ast<'a, 'b, 'c>
-    ) -> SPPFBuilder<'a, 'b, 'c> {
+        lexer: &'l mut Lexer<'s, 't, 'a>,
+        result: Ast<'s, 't, 'a>
+    ) -> SPPFBuilder<'s, 't, 'a, 'l> {
         SPPFBuilder {
             lexer,
             history: Vec::new(),
@@ -904,16 +897,16 @@ impl<'a: 'b, 'b, 'c> SPPFBuilder<'a, 'b, 'c> {
             return;
         }
         let node = sppf.get_node(sppf_node);
-        match *node {
-            SPPFNode::Normal(ref normal) => {
+        match node {
+            SPPFNode::Normal(normal) => {
                 // this is a simple reference to an existing SPPF node
                 SPPFBuilder::reduction_add_to_cache_node(reduction, normal, sppf_node, action);
             }
-            SPPFNode::Replaceable(ref replaceable) => {
+            SPPFNode::Replaceable(replaceable) => {
                 // this is replaceable sub-tree
-                match replaceable.children {
+                match &replaceable.children {
                     None => {}
-                    Some(ref children) => {
+                    Some(children) => {
                         let actions = replaceable.actions.as_ref().unwrap();
                         for i in 0..children.len() {
                             SPPFBuilder::reduction_add_to_cache(
@@ -945,9 +938,9 @@ impl<'a: 'b, 'b, 'c> SPPFBuilder<'a, 'b, 'c> {
         reduction.handle_indices.push(reduction.cache.len() - 1);
         reduction.handle_actions.push(action);
         // copy the children
-        match node.versions[0].children {
+        match &node.versions[0].children {
             None => {}
-            Some(ref children) => {
+            Some(children) => {
                 for child in children.iter() {
                     reduction.cache.push(*child);
                 }
@@ -1109,13 +1102,13 @@ impl<'a: 'b, 'b, 'c> SPPFBuilder<'a, 'b, 'c> {
     fn build_final_ast(sppf: &SPPF, reference: SPPFNodeRef, result: &mut Ast) -> AstCell {
         let node = sppf.get_node(reference.node_id as usize).as_normal();
         let version = &node.versions[reference.version as usize];
-        match version.children {
+        match &version.children {
             None => AstCell {
                 label: version.label,
                 first: 0,
                 count: 0
             },
-            Some(ref children) => {
+            Some(children) => {
                 let mut buffer = Vec::with_capacity(children.len());
                 for child in children.iter() {
                     buffer.push(SPPFBuilder::build_final_ast(sppf, *child, result));
@@ -1155,7 +1148,7 @@ struct RNGLRShift {
     to: usize
 }
 
-struct RNGLRParserData<'a: 'b, 'b, 'c> {
+struct RNGLRParserData<'s, 'a> {
     /// The parser's automaton
     automaton: RNGLRAutomaton,
     /// The GSS for this parser
@@ -1167,12 +1160,12 @@ struct RNGLRParserData<'a: 'b, 'b, 'c> {
     /// The queue of shift operations
     shifts: VecDeque<RNGLRShift>,
     /// The grammar variables
-    variables: &'b [Symbol<'a>],
+    variables: &'a [Symbol<'s>],
     /// The semantic actions
-    actions: &'c mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+    actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
 }
 
-impl<'a: 'b, 'b, 'c> ContextProvider for RNGLRParserData<'a, 'b, 'c> {
+impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
     /// Gets the priority of the specified context required by the specified terminal
     /// The priority is an unsigned integer. The lesser the value the higher the priority.
     /// The absence of value represents the unavailability of the required context.
@@ -1381,12 +1374,12 @@ impl<'a: 'b, 'b, 'c> ContextProvider for RNGLRParserData<'a, 'b, 'c> {
     }
 }
 
-impl<'a: 'b, 'b, 'c> RNGLRParserData<'a, 'b, 'c> {
+impl<'s, 'a> RNGLRParserData<'s, 'a> {
     /// Gets the terminal's identifier for the next token
     fn get_next_token_id(&self) -> u32 {
-        match self.next_token {
+        match self.next_token.as_ref() {
             None => SID_EPSILON,
-            Some(ref kernel) => kernel.terminal_id
+            Some(kernel) => kernel.terminal_id
         }
     }
 
@@ -1574,23 +1567,23 @@ impl<'a: 'b, 'b, 'c> RNGLRParserData<'a, 'b, 'c> {
 }
 
 /// Represents a base for all RNGLR parsers
-pub struct RNGLRParser<'a: 'b, 'b, 'c> {
+pub struct RNGLRParser<'s, 't, 'a, 'l> {
     /// The parser's data
-    data: RNGLRParserData<'a, 'b, 'c>,
+    data: RNGLRParserData<'s, 'a>,
     /// The AST builder
-    builder: SPPFBuilder<'a, 'b, 'c>,
+    builder: SPPFBuilder<'s, 't, 'a, 'l>,
     /// The sub-trees for the constant nullable variables
     nullables: Vec<usize>
 }
 
-impl<'a: 'b, 'b, 'c> RNGLRParser<'a, 'b, 'c> {
+impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
     /// Initializes a new instance of the parser
     pub fn new(
-        lexer: &'c mut Lexer<'a, 'b, 'c>,
+        lexer: &'l mut Lexer<'s, 't, 'a>,
         automaton: RNGLRAutomaton,
-        ast: Ast<'a, 'b, 'c>,
-        actions: &'c mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
-    ) -> RNGLRParser<'a, 'b, 'c> {
+        ast: Ast<'s, 't, 'a>,
+        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+    ) -> RNGLRParser<'s, 't, 'a, 'l> {
         let mut parser = RNGLRParser {
             data: RNGLRParserData {
                 automaton,
@@ -1616,7 +1609,7 @@ impl<'a: 'b, 'b, 'c> RNGLRParser<'a, 'b, 'c> {
 
     /// Builds the constant sub-trees of nullable variables
     fn build_nullables(
-        builder: &mut SPPFBuilder<'a, 'b, 'c>,
+        builder: &mut SPPFBuilder<'s, 't, 'a, 'l>,
         actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
         nullables: &mut Vec<usize>,
         automaton: &RNGLRAutomaton,
@@ -1727,7 +1720,7 @@ impl<'a: 'b, 'b, 'c> RNGLRParser<'a, 'b, 'c> {
 
     /// Builds the SPPF
     fn build_sppf(
-        builder: &mut SPPFBuilder<'a, 'b, 'c>,
+        builder: &mut SPPFBuilder<'s, 't, 'a, 'l>,
         actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
         nullables: &[usize],
         generation: usize,
@@ -1941,7 +1934,7 @@ impl<'a: 'b, 'b, 'c> RNGLRParser<'a, 'b, 'c> {
     }
 
     /// Builds the unexpected token error
-    fn build_error(&self, kernel: TokenKernel, stem: usize) -> ParseErrorUnexpectedToken<'a> {
+    fn build_error(&self, kernel: TokenKernel, stem: usize) -> ParseErrorUnexpectedToken<'s> {
         let token = self
             .builder
             .lexer
@@ -1979,14 +1972,14 @@ impl<'a: 'b, 'b, 'c> RNGLRParser<'a, 'b, 'c> {
         ParseErrorUnexpectedToken::new(
             token.get_position().unwrap(),
             token.get_span().unwrap().length,
-            token.get_value().unwrap(),
+            token.get_value().unwrap().to_string(),
             token.get_symbol(),
             my_expected
         )
     }
 }
 
-impl<'a: 'b, 'b, 'c> Parser for RNGLRParser<'a, 'b, 'c> {
+impl<'s, 't, 'a, 'l> Parser for RNGLRParser<'s, 't, 'a, 'l> {
     fn parse(&mut self) {
         let mut generation = self.data.gss.create_generation();
         let state0 = self.data.gss.create_node(0);

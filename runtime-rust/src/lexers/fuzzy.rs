@@ -20,10 +20,7 @@
 use std::mem::take;
 
 use super::automaton::{Automaton, AutomatonState, TokenMatch, DEAD_STATE};
-use crate::errors::{
-    ParseErrorEndOfInput, ParseErrorIncorrectEncodingSequence, ParseErrorUnexpectedChar,
-    ParseErrors
-};
+use crate::errors::{ParseErrorEndOfInput, ParseErrorUnexpectedChar, ParseErrors};
 use crate::text::{Text, Utf16C};
 
 /// Represents a DFA stack head
@@ -75,7 +72,7 @@ impl FuzzyMatcherHead {
         }
     }
 
-    /// Gets the Levenshtein distance of this head form the input
+    /// Gets the Levenshtein distance of this head from the input
     pub fn get_distance(&self) -> usize {
         if self.errors.is_none() {
             0
@@ -94,15 +91,15 @@ impl FuzzyMatcherHead {
 /// This matcher uses the Levenshtein distance to match the input ahead against the current DFA automaton.
 /// The matcher favors solutions that are the closest to the original input.
 /// When multiple solutions are at the same Levenshtein distance to the input, the longest one is preferred.
-pub struct FuzzyMatcher<'a: 'd, 'b, 'c, 'd> {
+pub struct FuzzyMatcher<'s, 't, 'a> {
     /// This lexer's automaton
-    automaton: &'b Automaton,
+    automaton: &'a Automaton,
     /// Terminal index of the SEPARATOR terminal
     separator: u32,
     /// The input text
-    text: &'c Text,
+    text: &'a Text<'t>,
     /// Delegate for raising errors
-    errors: &'d mut ParseErrors<'a>,
+    errors: &'a mut ParseErrors<'s>,
     /// The maximum Levenshtein distance between the input and the DFA
     max_distance: usize,
     /// The index in the input from which the error was raised
@@ -170,16 +167,16 @@ impl FuzzyMatcherResult {
     }
 }
 
-impl<'a: 'd, 'b, 'c, 'd> FuzzyMatcher<'a, 'b, 'c, 'd> {
+impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
     /// Initializes this matcher
     pub fn new(
-        automaton: &'b Automaton,
+        automaton: &'a Automaton,
         separator: u32,
-        text: &'c Text,
-        errors: &'d mut ParseErrors<'a>,
+        text: &'a Text<'t>,
+        errors: &'a mut ParseErrors<'s>,
         max_distance: usize,
         origin_index: usize
-    ) -> FuzzyMatcher<'a, 'b, 'c, 'd> {
+    ) -> FuzzyMatcher<'s, 't, 'a> {
         FuzzyMatcher {
             automaton,
             separator,
@@ -192,36 +189,35 @@ impl<'a: 'd, 'b, 'c, 'd> FuzzyMatcher<'a, 'b, 'c, 'd> {
 
     /// Runs this matcher
     pub fn run(&mut self) -> Option<TokenMatch> {
-        let mut offset = 0;
-        let mut at_end = self.text.is_end(self.origin_index + offset);
-        let mut current = if at_end {
-            0
-        } else {
-            self.text.at(self.origin_index + offset)
+        let mut iter = self.text.iter_utf16_from(self.origin_index);
+        let (current, length) = match iter.next() {
+            None => (None, 0),
+            Some((current, length)) => (Some(current), length)
         };
+        let mut offset = length;
+
         let mut result = FuzzyMatcherResult::new();
         {
             let head_begin = FuzzyMatcherHead::new(0);
-            if at_end {
-                self.inspect_at_end(&mut result, &head_begin, offset);
-            } else {
+            if let Some(current) = current {
                 self.inspect(&mut result, &head_begin, offset, current);
+            } else {
+                self.inspect_at_end(&mut result, &head_begin, offset);
             }
         }
         while !result.heads.is_empty() {
-            offset += 1;
-            at_end = self.text.is_end(self.origin_index + offset);
-            current = if at_end {
-                0
-            } else {
-                self.text.at(self.origin_index + offset)
+            let (current, length) = match iter.next() {
+                None => (None, 0),
+                Some((current, length)) => (Some(current), length)
             };
+            offset += length;
+
             let generation = take(&mut result.heads);
             for head in generation {
-                if at_end {
-                    self.inspect_at_end(&mut result, &head, offset);
-                } else {
+                if let Some(current) = current {
                     self.inspect(&mut result, &head, offset, current);
+                } else {
+                    self.inspect_at_end(&mut result, &head, offset);
                 }
             }
         }
@@ -254,73 +250,16 @@ impl<'a: 'd, 'b, 'c, 'd> FuzzyMatcher<'a, 'b, 'c, 'd> {
         if self.text.is_end(index) {
             // the end of input was not expected
             // there is necessarily some input before because an empty input would have matched the $
-            let c = self.text.at(index - 1);
-            if (0xD800..=0xDBFF).contains(&c) {
-                // a trailing UTF-16 high surrogate
-                self.errors.push_error_no_low_utf16_surrogate(
-                    ParseErrorIncorrectEncodingSequence::new(
-                        self.text.get_position_at(index - 1),
-                        false,
-                        c
-                    )
-                );
-            } else {
-                // usual unexpected end of input
-                self.errors
-                    .push_error_eoi(ParseErrorEndOfInput::new(self.text.get_position_at(index)));
-            }
+            // usual unexpected end of input
+            self.errors
+                .push_error_eoi(ParseErrorEndOfInput::new(self.text.get_position_at(index)));
         } else {
-            let c = self.text.at(index);
-            if (0xD800..=0xDBFF).contains(&c) && !self.text.is_end(index + 1) {
-                // a UTF-16 high surrogate
-                // if next next character is a low surrogate, also get it
-                let c2 = self.text.at(index + 1);
-                if (0xDC00..=0xDFFF).contains(&c2) {
-                    // an unexpected high and low surrogate pair
-                    self.errors
-                        .push_error_unexpected_char(ParseErrorUnexpectedChar::new(
-                            self.text.get_position_at(index),
-                            [c, c2]
-                        ));
-                } else {
-                    // high surrogate without the low surrogate
-                    self.errors.push_error_no_low_utf16_surrogate(
-                        ParseErrorIncorrectEncodingSequence::new(
-                            self.text.get_position_at(index),
-                            false,
-                            c
-                        )
-                    );
-                }
-            } else if (0xDC00..=0xDFFF).contains(&c) && index > 0 {
-                // a UTF-16 low surrogate
-                // if the previous character is a high surrogate, also get it
-                let c2 = self.text.at(index - 1);
-                if (0xD800..=0xDBFF).contains(&c2) {
-                    // an unexpected high and low surrogate pair
-                    self.errors
-                        .push_error_unexpected_char(ParseErrorUnexpectedChar::new(
-                            self.text.get_position_at(index - 1),
-                            [c2, c]
-                        ));
-                } else {
-                    // a low surrogate without the high surrogate
-                    self.errors.push_error_no_high_utf16_surrogate(
-                        ParseErrorIncorrectEncodingSequence::new(
-                            self.text.get_position_at(index),
-                            true,
-                            c
-                        )
-                    );
-                }
-            } else {
-                // a simple unexpected character
-                self.errors
-                    .push_error_unexpected_char(ParseErrorUnexpectedChar::new(
-                        self.text.get_position_at(index),
-                        [c, 0]
-                    ));
-            }
+            // a simple unexpected character
+            self.errors
+                .push_error_unexpected_char(ParseErrorUnexpectedChar::new(
+                    self.text.get_position_at(index),
+                    self.text.at(index)
+                ));
         }
     }
 
@@ -329,7 +268,7 @@ impl<'a: 'd, 'b, 'c, 'd> FuzzyMatcher<'a, 'b, 'c, 'd> {
         self.errors
             .push_error_unexpected_char(ParseErrorUnexpectedChar::new(
                 self.text.get_position_at(self.origin_index),
-                [self.text.at(self.origin_index), 0]
+                self.text.at(self.origin_index)
             ));
         None
     }

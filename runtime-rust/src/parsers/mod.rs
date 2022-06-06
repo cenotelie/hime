@@ -176,14 +176,14 @@ impl LRContexts {
 
     /// Registers a new context
     pub fn add(&mut self, identifier: u16, context: u16) {
-        match self.openings {
+        match self.openings.as_mut() {
             None => {
                 self.openings = Some(vec![LRContextOpening {
                     identifier,
                     context
                 }]);
             }
-            Some(ref mut data) => {
+            Some(data) => {
                 data.push(LRContextOpening {
                     identifier,
                     context
@@ -194,9 +194,9 @@ impl LRContexts {
 
     /// Gets whether the specified context opens by a transition using the specified terminal ID
     pub fn opens(&self, terminal_id: u32, context: u16) -> bool {
-        match self.openings {
+        match self.openings.as_ref() {
             None => false,
-            Some(ref data) => {
+            Some(data) => {
                 for x in data.iter() {
                     if u32::from(x.identifier) == terminal_id && x.context == context {
                         return true;
@@ -291,16 +291,16 @@ impl LRProduction {
 
 /// Container for the expected terminals for a LR state
 #[derive(Default)]
-pub struct LRExpected<'a> {
+pub struct LRExpected<'s> {
     /// The terminals expected for shift actions
-    pub shifts: Vec<Symbol<'a>>,
+    pub shifts: Vec<Symbol<'s>>,
     /// The terminals expected for reduction actions
-    pub reductions: Vec<Symbol<'a>>
+    pub reductions: Vec<Symbol<'s>>
 }
 
-impl<'a> LRExpected<'a> {
+impl<'s> LRExpected<'s> {
     /// Initializes this container
-    pub fn new() -> LRExpected<'a> {
+    pub fn new() -> LRExpected<'s> {
         LRExpected {
             shifts: Vec::new(),
             reductions: Vec::new()
@@ -309,7 +309,7 @@ impl<'a> LRExpected<'a> {
 
     /// Adds the specified terminal as expected on a shift action
     /// If the terminal is already added to the reduction collection it is removed from it.
-    pub fn add_unique_shift(&mut self, terminal: Symbol<'a>) {
+    pub fn add_unique_shift(&mut self, terminal: Symbol<'s>) {
         let position = self.reductions.iter().position(|x| *x == terminal);
         if let Some(index) = position {
             self.reductions.remove(index);
@@ -321,7 +321,7 @@ impl<'a> LRExpected<'a> {
 
     /// Adds the specified terminal as expected on a reduction action
     /// If the terminal is in the shift collection, nothing happens.
-    pub fn add_unique_reduction(&mut self, terminal: Symbol<'a>) {
+    pub fn add_unique_reduction(&mut self, terminal: Symbol<'s>) {
         if !self.shifts.contains(&terminal) && !self.reductions.contains(&terminal) {
             self.reductions.push(terminal);
         }

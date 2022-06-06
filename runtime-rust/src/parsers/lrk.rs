@@ -119,7 +119,7 @@ impl LRkAutomaton {
     }
 
     /// Gets the expected terminals for the specified state
-    pub fn get_expected<'a>(&self, state: u32, terminals: &[Symbol<'a>]) -> LRExpected<'a> {
+    pub fn get_expected<'s>(&self, state: u32, terminals: &[Symbol<'s>]) -> LRExpected<'s> {
         let mut expected = LRExpected::new();
         let mut offset = self.columns_count * state as usize * 2;
         for terminal in terminals.iter() {
@@ -155,24 +155,24 @@ impl LRkAstReduction {
 }
 
 /// Represents the builder of Parse Trees for LR(k) parsers
-struct LRkAstBuilder<'a: 'b, 'b, 'c> {
+struct LRkAstBuilder<'s, 't, 'a> {
     /// Lexer associated to this parser
-    lexer: &'c mut Lexer<'a, 'b, 'c>,
+    lexer: &'a mut Lexer<'s, 't, 'a>,
     /// The stack of semantic objects
     stack: Vec<SubTree>,
     /// The AST being built
-    result: Ast<'a, 'b, 'c>,
+    result: Ast<'s, 't, 'a>,
     /// The reduction handle represented as the indices of the sub-trees in the cache
     handle: Vec<usize>,
     /// The data of the current reduction
     reduction: Option<LRkAstReduction>
 }
 
-impl<'a: 'b, 'b, 'c> SemanticBody for LRkAstBuilder<'a, 'b, 'c> {
+impl<'s, 't, 'a> SemanticBody for LRkAstBuilder<'s, 't, 'a> {
     fn get_element_at(&self, index: usize) -> SemanticElement {
-        match self.reduction {
+        match &self.reduction {
             None => panic!("Not in a reduction"),
-            Some(ref data) => {
+            Some(data) => {
                 let label = data.cache.get_label_at(self.handle[index]);
                 match label.table_type() {
                     TableType::Token => SemanticElement::Token(
@@ -197,12 +197,12 @@ impl<'a: 'b, 'b, 'c> SemanticBody for LRkAstBuilder<'a, 'b, 'c> {
     }
 }
 
-impl<'a: 'b, 'b, 'c> LRkAstBuilder<'a, 'b, 'c> {
+impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
     /// Initializes the builder with the given stack size
     pub fn new(
-        lexer: &'c mut Lexer<'a, 'b, 'c>,
-        result: Ast<'a, 'b, 'c>
-    ) -> LRkAstBuilder<'a, 'b, 'c> {
+        lexer: &'a mut Lexer<'s, 't, 'a>,
+        result: Ast<'s, 't, 'a>
+    ) -> LRkAstBuilder<'s, 't, 'a> {
         LRkAstBuilder {
             lexer,
             stack: Vec::new(),
@@ -270,9 +270,9 @@ impl<'a: 'b, 'b, 'c> LRkAstBuilder<'a, 'b, 'c> {
 
     /// During a redution, pops the top symbol from the stack and gives it a tree action
     pub fn reduction_pop(&mut self, action: TreeAction) {
-        match self.reduction {
+        match self.reduction.as_mut() {
             None => panic!("Not in a reduction"),
-            Some(ref mut reduction) => {
+            Some(reduction) => {
                 let sub = &self.stack[self.stack.len() - reduction.length + reduction.pop_count];
                 LRkAstBuilder::reduction_add_sub(reduction, &mut self.handle, sub, action);
                 reduction.pop_count += 1;
@@ -283,9 +283,9 @@ impl<'a: 'b, 'b, 'c> LRkAstBuilder<'a, 'b, 'c> {
     /// During a reduction, inserts a virtual symbol
     pub fn reduction_add_virtual(&mut self, index: usize, action: TreeAction) {
         if action != TREE_ACTION_DROP {
-            match self.reduction {
+            match self.reduction.as_mut() {
                 None => panic!("Not in a reduction"),
-                Some(ref mut reduction) => {
+                Some(reduction) => {
                     let cache_index = reduction
                         .cache
                         .push(TableElemRef::new(TableType::Virtual, index), action);
@@ -298,9 +298,9 @@ impl<'a: 'b, 'b, 'c> LRkAstBuilder<'a, 'b, 'c> {
     /// Finalizes the reduction operation
     pub fn reduce(&mut self) {
         let stack_size = self.stack.len();
-        match self.reduction {
+        match self.reduction.as_mut() {
             None => panic!("Not in a reduction"),
-            Some(ref mut reduction) => {
+            Some(reduction) => {
                 if reduction.cache.get_action_at(0) == TREE_ACTION_REPLACE_BY_CHILDREN {
                     reduction.cache.set_children_count_at(0, self.handle.len());
                 } else {
@@ -384,18 +384,18 @@ struct LRkHead {
     identifier: u32
 }
 
-struct LRkParserData<'a: 'b, 'b, 'c> {
+struct LRkParserData<'s, 'a> {
     /// The parser's automaton
     automaton: LRkAutomaton,
     /// The parser's stack
     stack: Vec<LRkHead>,
     /// The grammar variables
-    variables: &'b [Symbol<'a>],
+    variables: &'a [Symbol<'s>],
     /// The semantic actions
-    actions: &'c mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+    actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
 }
 
-impl<'a: 'b, 'b, 'c> ContextProvider for LRkParserData<'a, 'b, 'c> {
+impl<'s, 'a> ContextProvider for LRkParserData<'s, 'a> {
     /// Gets the priority of the specified context required by the specified terminal
     /// The priority is an unsigned integer. The lesser the value the higher the priority.
     /// The absence of value represents the unavailability of the required context.
@@ -504,11 +504,11 @@ impl<'a: 'b, 'b, 'c> ContextProvider for LRkParserData<'a, 'b, 'c> {
     }
 }
 
-impl<'a: 'b, 'b, 'c> LRkParserData<'a, 'b, 'c> {
+impl<'s, 't, 'a> LRkParserData<'s, 'a> {
     /// Checks whether the specified terminal is indeed expected for a reduction
     /// This check is required because in the case of a base LALR graph,
     /// some terminals expected for reduction in the automaton are coming from other paths.
-    fn check_is_expected(&self, terminal: Symbol<'a>) -> bool {
+    fn check_is_expected(&self, terminal: Symbol<'s>) -> bool {
         // copy the stack to use for the simulation
         let mut my_stack = self.stack.clone();
         let mut action = self
@@ -580,9 +580,9 @@ impl<'a: 'b, 'b, 'c> LRkParserData<'a, 'b, 'c> {
     /// Executes the given LR reduction
     fn reduce(
         production: &LRProduction,
-        builder: &mut LRkAstBuilder<'a, 'b, 'c>,
+        builder: &mut LRkAstBuilder<'s, 't, 'a>,
         actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
-    ) -> Symbol<'a> {
+    ) -> Symbol<'s> {
         let variable = builder.result.variables[production.head];
         builder.reduction_prepare(
             production.head,
@@ -615,21 +615,21 @@ impl<'a: 'b, 'b, 'c> LRkParserData<'a, 'b, 'c> {
 }
 
 /// Represents a base for all LR(k) parsers
-pub struct LRkParser<'a: 'b, 'b, 'c> {
+pub struct LRkParser<'s, 't, 'a> {
     /// The parser's data
-    data: LRkParserData<'a, 'b, 'c>,
+    data: LRkParserData<'s, 'a>,
     /// The AST builder
-    builder: LRkAstBuilder<'a, 'b, 'c>
+    builder: LRkAstBuilder<'s, 't, 'a>
 }
 
-impl<'a: 'b, 'b, 'c> LRkParser<'a, 'b, 'c> {
+impl<'s, 't, 'a> LRkParser<'s, 't, 'a> {
     /// Initializes a new instance of the parser
     pub fn new(
-        lexer: &'c mut Lexer<'a, 'b, 'c>,
+        lexer: &'a mut Lexer<'s, 't, 'a>,
         automaton: LRkAutomaton,
-        ast: Ast<'a, 'b, 'c>,
-        actions: &'c mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
-    ) -> LRkParser<'a, 'b, 'c> {
+        ast: Ast<'s, 't, 'a>,
+        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+    ) -> LRkParser<'s, 't, 'a> {
         LRkParser {
             data: LRkParserData {
                 automaton,
@@ -640,7 +640,7 @@ impl<'a: 'b, 'b, 'c> LRkParser<'a, 'b, 'c> {
                 variables: ast.variables,
                 actions
             },
-            builder: LRkAstBuilder::<'a, 'b, 'c>::new(lexer, ast)
+            builder: LRkAstBuilder::<'s, 't, 'a>::new(lexer, ast)
         }
     }
 
@@ -651,7 +651,7 @@ impl<'a: 'b, 'b, 'c> LRkParser<'a, 'b, 'c> {
     }
 
     /// Builds the unexpected token error
-    fn build_error(&self, kernel: TokenKernel) -> ParseErrorUnexpectedToken<'a> {
+    fn build_error(&self, kernel: TokenKernel) -> ParseErrorUnexpectedToken<'s> {
         let token = self
             .builder
             .lexer
@@ -674,14 +674,14 @@ impl<'a: 'b, 'b, 'c> LRkParser<'a, 'b, 'c> {
         ParseErrorUnexpectedToken::new(
             token.get_position().unwrap(),
             token.get_span().unwrap().length,
-            token.get_value().unwrap(),
+            token.get_value().unwrap().to_string(),
             token.get_symbol(),
             my_expected
         )
     }
 }
 
-impl<'a: 'b, 'b, 'c> Parser for LRkParser<'a, 'b, 'c> {
+impl<'s, 't, 'a> Parser for LRkParser<'s, 't, 'a> {
     fn parse(&mut self) {
         let mut kernel_maybe = self.get_next_token();
         loop {

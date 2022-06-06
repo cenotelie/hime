@@ -73,7 +73,7 @@ pub struct ParseErrorUnexpectedChar {
     /// The error's position in the input text
     position: TextPosition,
     /// The unexpected character
-    unexpected: [Utf16C; 2]
+    unexpected: char
 }
 
 impl ParseErrorDataTrait for ParseErrorUnexpectedChar {
@@ -84,29 +84,16 @@ impl ParseErrorDataTrait for ParseErrorUnexpectedChar {
 
     /// Gets the error's length in the input (in number of characters)
     fn get_length(&self) -> usize {
-        if self.unexpected[1] == 0x00 {
-            1
-        } else {
-            2
-        }
+        self.unexpected.len_utf8()
     }
 
     /// Gets the error's message
     fn get_message(&self) -> String {
         let mut result = String::new();
         result.push_str("Unexpected character '");
-        if self.unexpected[1] == 0x00 {
-            result.push_str(&String::from_utf16(&self.unexpected[0..1]).unwrap());
-            result.push_str("' (U+");
-            result.push_str(&format!("{:X}", self.unexpected[0]));
-        } else {
-            let lead = u32::from(self.unexpected[0]);
-            let trail = u32::from(self.unexpected[1]);
-            let cp = ((trail - 0xDC00) | ((lead - 0xD800) << 10)) + 0x10000;
-            result.push_str(&String::from_utf16(&self.unexpected).unwrap());
-            result.push_str("' (U+");
-            result.push_str(&format!("{:X}", cp));
-        }
+        result.push(self.unexpected);
+        result.push_str("' (U+");
+        result.push_str(&format!("{:X}", self.unexpected as u32));
         result.push(')');
         result
     }
@@ -114,7 +101,7 @@ impl ParseErrorDataTrait for ParseErrorUnexpectedChar {
 
 impl ParseErrorUnexpectedChar {
     /// Creates a new error
-    pub fn new(position: TextPosition, unexpected: [Utf16C; 2]) -> ParseErrorUnexpectedChar {
+    pub fn new(position: TextPosition, unexpected: char) -> ParseErrorUnexpectedChar {
         ParseErrorUnexpectedChar {
             position,
             unexpected
@@ -123,6 +110,7 @@ impl ParseErrorUnexpectedChar {
 }
 
 /// Represents an incorrect encoding sequence error in the input of a lexer
+/// This kind of error cannot really be produced by the Rust runtime
 #[derive(Debug, Clone, Serialize)]
 pub struct ParseErrorIncorrectEncodingSequence {
     /// The error's position in the input text
@@ -180,20 +168,20 @@ impl ParseErrorIncorrectEncodingSequence {
 
 /// Represents an unexpected token error in a parser
 #[derive(Debug, Clone, Serialize)]
-pub struct ParseErrorUnexpectedToken<'a> {
+pub struct ParseErrorUnexpectedToken<'s> {
     /// The error's position in the input text
     position: TextPosition,
     /// The error's length in the input
     length: usize,
-    /// The value of the unexpected token
+    /// The value for the unexpected token
     value: String,
     /// The terminal symbol for the unexpected token
-    terminal: Symbol<'a>,
+    terminal: Symbol<'s>,
     /// The expected terminals
-    expected: Vec<Symbol<'a>>
+    expected: Vec<Symbol<'s>>
 }
 
-impl<'a> ParseErrorDataTrait for ParseErrorUnexpectedToken<'a> {
+impl<'s> ParseErrorDataTrait for ParseErrorUnexpectedToken<'s> {
     /// Gets the error's position in the input
     fn get_position(&self) -> TextPosition {
         self.position
@@ -223,15 +211,15 @@ impl<'a> ParseErrorDataTrait for ParseErrorUnexpectedToken<'a> {
     }
 }
 
-impl<'a> ParseErrorUnexpectedToken<'a> {
+impl<'s> ParseErrorUnexpectedToken<'s> {
     /// Initializes this error
     pub fn new(
         position: TextPosition,
         length: usize,
         value: String,
-        terminal: Symbol<'a>,
-        expected: Vec<Symbol<'a>>
-    ) -> ParseErrorUnexpectedToken<'a> {
+        terminal: Symbol<'s>,
+        expected: Vec<Symbol<'s>>
+    ) -> ParseErrorUnexpectedToken<'s> {
         ParseErrorUnexpectedToken {
             position,
             length,
@@ -245,70 +233,70 @@ impl<'a> ParseErrorUnexpectedToken<'a> {
 /// Represents a lexical or syntactic error
 #[derive(Debug, Clone, Serialize)]
 #[serde(tag = "type")]
-pub enum ParseError<'a> {
+pub enum ParseError<'s> {
     /// Lexical error occurring when the end of input has been encountered while more characters were expected
     UnexpectedEndOfInput(ParseErrorEndOfInput),
     /// Lexical error occurring when an unexpected character is encountered in the input preventing to match tokens
     UnexpectedChar(ParseErrorUnexpectedChar),
     /// Syntactic error occurring when an unexpected token is encountered by the parser
-    UnexpectedToken(ParseErrorUnexpectedToken<'a>),
+    UnexpectedToken(ParseErrorUnexpectedToken<'s>),
     /// Lexical error occurring when the low surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
     IncorrectUTF16NoLowSurrogate(ParseErrorIncorrectEncodingSequence),
     /// Lexical error occurring when the high surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
     IncorrectUTF16NoHighSurrogate(ParseErrorIncorrectEncodingSequence)
 }
 
-impl<'a> ParseErrorDataTrait for ParseError<'a> {
+impl<'s> ParseErrorDataTrait for ParseError<'s> {
     /// Gets the error's position in the input
     fn get_position(&self) -> TextPosition {
-        match *self {
-            ParseError::UnexpectedEndOfInput(ref x) => x.get_position(),
-            ParseError::UnexpectedChar(ref x) => x.get_position(),
-            ParseError::UnexpectedToken(ref x) => x.get_position(),
-            ParseError::IncorrectUTF16NoLowSurrogate(ref x) => x.get_position(),
-            ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_position()
+        match self {
+            ParseError::UnexpectedEndOfInput(x) => x.get_position(),
+            ParseError::UnexpectedChar(x) => x.get_position(),
+            ParseError::UnexpectedToken(x) => x.get_position(),
+            ParseError::IncorrectUTF16NoLowSurrogate(x) => x.get_position(),
+            ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_position()
         }
     }
 
     /// Gets the error's length in the input (in number of characters)
     fn get_length(&self) -> usize {
-        match *self {
-            ParseError::UnexpectedEndOfInput(ref x) => x.get_length(),
-            ParseError::UnexpectedChar(ref x) => x.get_length(),
-            ParseError::UnexpectedToken(ref x) => x.get_length(),
-            ParseError::IncorrectUTF16NoLowSurrogate(ref x) => x.get_length(),
-            ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_length()
+        match self {
+            ParseError::UnexpectedEndOfInput(x) => x.get_length(),
+            ParseError::UnexpectedChar(x) => x.get_length(),
+            ParseError::UnexpectedToken(x) => x.get_length(),
+            ParseError::IncorrectUTF16NoLowSurrogate(x) => x.get_length(),
+            ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_length()
         }
     }
 
     /// Gets the error's message
     fn get_message(&self) -> String {
-        match *self {
-            ParseError::UnexpectedEndOfInput(ref x) => x.get_message(),
-            ParseError::UnexpectedChar(ref x) => x.get_message(),
-            ParseError::UnexpectedToken(ref x) => x.get_message(),
-            ParseError::IncorrectUTF16NoLowSurrogate(ref x) => x.get_message(),
-            ParseError::IncorrectUTF16NoHighSurrogate(ref x) => x.get_message()
+        match self {
+            ParseError::UnexpectedEndOfInput(x) => x.get_message(),
+            ParseError::UnexpectedChar(x) => x.get_message(),
+            ParseError::UnexpectedToken(x) => x.get_message(),
+            ParseError::IncorrectUTF16NoLowSurrogate(x) => x.get_message(),
+            ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_message()
         }
     }
 }
 
-impl<'a> Display for ParseError<'a> {
+impl<'s> Display for ParseError<'s> {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(f, "@{} {}", self.get_position(), self.get_message())
     }
 }
 
-impl<'a> std::error::Error for ParseError<'a> {}
+impl<'s> std::error::Error for ParseError<'s> {}
 
 /// Represents an entity that can handle lexical and syntactic errors
 #[derive(Default, Clone)]
-pub struct ParseErrors<'a> {
+pub struct ParseErrors<'s> {
     /// The overall errors
-    pub errors: Vec<ParseError<'a>>
+    pub errors: Vec<ParseError<'s>>
 }
 
-impl<'a> ParseErrors<'a> {
+impl<'s> ParseErrors<'s> {
     /// Handles the end-of-input error
     pub fn push_error_eoi(&mut self, error: ParseErrorEndOfInput) {
         self.errors.push(ParseError::UnexpectedEndOfInput(error));
@@ -320,7 +308,7 @@ impl<'a> ParseErrors<'a> {
     }
 
     /// Handles the unexpected token error
-    pub fn push_error_unexpected_token(&mut self, error: ParseErrorUnexpectedToken<'a>) {
+    pub fn push_error_unexpected_token(&mut self, error: ParseErrorUnexpectedToken<'s>) {
         self.errors.push(ParseError::UnexpectedToken(error));
     }
 

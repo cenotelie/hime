@@ -95,11 +95,11 @@ fn get_parser_library_name(my_path: &path::Path) -> path::PathBuf {
 }
 
 /// Gets the serialized expected AST
-fn get_expected_ast(my_path: &path::Path) -> ParseResult<'static, 'static> {
+fn get_expected_ast(my_path: &path::Path) -> ParseResult<'static, 'static, 'static> {
     let file = my_path.join("expected.txt");
     let file_input = fs::File::open(file).unwrap();
     let mut input_reader = io::BufReader::new(file_input);
-    expected_tree::parse_utf8(&mut input_reader)
+    expected_tree::parse_utf8_stream(&mut input_reader)
 }
 
 /// Gets the serialized expected output
@@ -117,7 +117,7 @@ fn get_parsed_input(
     my_path: &path::Path,
     library: &libloading::Library,
     parser_name: &str
-) -> ParseResult<'static, 'static> {
+) -> ParseResult<'static, 'static, 'static> {
     let mut function_name = String::new();
     function_name.push_str(parser_name);
     function_name.push_str("_parse_utf8");
@@ -125,8 +125,9 @@ fn get_parsed_input(
     let file_input = fs::File::open(file).unwrap();
     let mut input_reader = io::BufReader::new(file_input);
     unsafe {
-        let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResult<'static, 'static>> =
-            library.get(function_name.as_bytes()).unwrap();
+        let parser: libloading::Symbol<
+            fn(&mut dyn io::Read) -> ParseResult<'static, 'static, 'static>
+        > = library.get(function_name.as_bytes()).unwrap();
         parser(&mut input_reader)
     }
 }
@@ -305,7 +306,7 @@ fn execute_test_outputs(
 /// Compare the specified AST node to the expected node
 fn compare(expected: AstNode, node: AstNode) -> bool {
     let name = expected.get_value().expect("Malformed expected AST");
-    if !node.get_symbol().name.eq(&name) {
+    if !node.get_symbol().name.eq(name) {
         return false;
     }
     let expected_children = expected.children();
@@ -387,7 +388,7 @@ fn print_obtained(node: AstNode, crossings: Vec<bool>) {
 }
 
 /// Un-escapes a value
-fn unescape(value: String) -> String {
+fn unescape(value: &str) -> String {
     let mut result = String::new();
     let mut on_escape = false;
     for c in value.chars().skip(1) {

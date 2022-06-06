@@ -62,7 +62,7 @@ impl ContextProvider for DefaultContextProvider {
 }
 
 /// Represents the kernel of a token, i.e. the identifying information of a token
-#[derive(Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone)]
 pub struct TokenKernel {
     /// The identifier of the matched terminal
     pub terminal_id: u32,
@@ -71,11 +71,11 @@ pub struct TokenKernel {
 }
 
 /// Represents a context-free lexer (lexing rules do not depend on the context)
-pub struct LexerData<'a: 'b, 'b, 'c> {
+pub struct LexerData<'s, 't, 'a> {
     /// The token repository for this lexer
-    pub repository: TokenRepository<'a, 'b, 'c>,
+    pub repository: TokenRepository<'s, 't, 'a>,
     /// The repository for errors
-    pub errors: &'c mut ParseErrors<'a>,
+    pub errors: &'a mut ParseErrors<'s>,
     /// The DFA automaton for this lexer
     pub automaton: Automaton,
     /// Whether the lexer has run yet
@@ -90,37 +90,3 @@ pub struct LexerData<'a: 'b, 'b, 'c> {
 }
 
 pub use impls::Lexer;
-
-/*
-/// The public interface of a lexer
-pub trait Lexer<'a: 'b, 'b, 'c> {
-    /// Gets the data for the lexer
-    fn get_data(&self) -> &LexerData<'a, 'b, 'c>;
-
-    /// Gets the data for the lexer
-    fn get_data_mut(&mut self) -> &mut LexerData<'a, 'b, 'c>;
-
-    /// Gets the next token in the input
-    fn get_next_token(&mut self, contexts: &dyn ContextProvider) -> Option<TokenKernel>;
-}
-
-impl<'a: 'b, 'b, 'c, T> Lexer<'a, 'b, 'c> for T
-where
-    T: Deref<Target = Lexer<'a, 'b, 'c> + 'c> + DerefMut<Target = Lexer<'a, 'b, 'c> + 'c>
-{
-    /// Gets the data for the lexer
-    fn get_data(&self) -> &LexerData<'a, 'b, 'c> {
-        self.deref().get_data()
-    }
-
-    /// Gets the data for the lexer
-    fn get_data_mut(&mut self) -> &mut LexerData<'a, 'b, 'c> {
-        self.deref_mut().get_data_mut()
-    }
-
-    /// Gets the next token in the input
-    fn get_next_token(&mut self, contexts: &dyn ContextProvider) -> Option<TokenKernel> {
-        self.deref_mut().get_next_token(contexts)
-    }
-}
-*/

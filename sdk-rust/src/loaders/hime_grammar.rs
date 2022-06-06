@@ -546,42 +546,42 @@ pub const VIRTUALS: &[Symbol] = &[
 ];
 
 /// Parses the specified string with this parser
-pub fn parse_string(input: &str) -> ParseResult<'static, 'static> {
-    let text = Text::new(input);
+pub fn parse_str<'t>(input: &'t str) -> ParseResult<'static, 't, 'static> {
+    let text = Text::from_str(input);
     parse_text(text)
 }
 
-/// Parses the specified stream of UTF-16 with this parser
-pub fn parse_utf16(input: &mut dyn Read, big_endian: bool) -> ParseResult<'static, 'static> {
-    let text = Text::from_utf16_stream(input, big_endian);
+/// Parses the specified string with this parser
+pub fn parse_string(input: String) -> ParseResult<'static, 'static, 'static> {
+    let text = Text::from_string(input);
     parse_text(text)
 }
 
-/// Parses the specified stream of UTF-16 with this parser
-pub fn parse_utf8(input: &mut dyn Read) -> ParseResult<'static, 'static> {
-    let text = Text::from_utf8_stream(input);
+/// Parses the specified stream of UTF-8 with this parser
+pub fn parse_utf8_stream<R: Read>(input: &mut R) -> ParseResult<'static, 'static, 'static> {
+    let text = Text::from_utf8_stream(input).unwrap();
     parse_text(text)
 }
 
 /// Parses the specified text with this parser
-fn parse_text(text: Text) -> ParseResult<'static, 'static> {
+fn parse_text<'t>(text: Text<'t>) -> ParseResult<'static, 't, 'static> {
     parse_text_with(text, TERMINALS, VARIABLES, VIRTUALS)
 }
 
 /// Parses the specified text with this parser
-fn parse_text_with<'a: 'b, 'b>(
-    text: Text,
-    terminals: &'b [Symbol<'a>],
-    variables: &'b [Symbol<'a>],
-    virtuals: &'b [Symbol<'a>]
-) -> ParseResult<'a, 'b> {
+fn parse_text_with<'s, 't, 'a>(
+    text: Text<'t>,
+    terminals: &'a [Symbol<'s>],
+    variables: &'a [Symbol<'s>],
+    virtuals: &'a [Symbol<'s>]
+) -> ParseResult<'s, 't, 'a> {
     let mut my_actions = |_index: usize, _head: Symbol, _body: &dyn SemanticBody| ();
     let mut result = ParseResult::new(terminals, variables, virtuals, text);
     {
-        let data = result.get_parsing_data();
-        let mut lexer = new_lexer(data.0, data.1);
+        let (tokens, errors, ast) = result.get_parsing_data();
+        let mut lexer = new_lexer(tokens, errors);
         let automaton = LRkAutomaton::new(PARSER_AUTOMATON);
-        let mut parser = LRkParser::new(&mut lexer, automaton, data.2, &mut my_actions);
+        let mut parser = LRkParser::new(&mut lexer, automaton, ast, &mut my_actions);
         parser.parse();
     }
     result

@@ -59,7 +59,7 @@ impl<'a> Display for Symbol<'a> {
 }
 
 /// A trait for a parsing element
-pub trait SemanticElementTrait<'a> {
+pub trait SemanticElementTrait<'s, 'a> {
     /// Gets the position in the input text of this element
     fn get_position(&self) -> Option<TextPosition>;
 
@@ -67,82 +67,82 @@ pub trait SemanticElementTrait<'a> {
     fn get_span(&self) -> Option<TextSpan>;
 
     /// Gets the context of this element in the input
-    fn get_context(&self) -> Option<TextContext>;
+    fn get_context(&self) -> Option<TextContext<'a>>;
 
     /// Gets the grammar symbol associated to this element
-    fn get_symbol(&self) -> Symbol<'a>;
+    fn get_symbol(&self) -> Symbol<'s>;
 
     /// Gets the value of this element, if any
-    fn get_value(&self) -> Option<String>;
+    fn get_value(&self) -> Option<&'a str>;
 }
 
 /// Represents an element of parsing data
-pub enum SemanticElement<'a: 'b + 'd, 'b: 'd, 'c, 'd> {
+pub enum SemanticElement<'s, 't, 'a> {
     /// A token, i.e. a piece of text matched by a lexer
-    Token(Token<'a, 'b, 'c, 'd>),
+    Token(Token<'s, 't, 'a>),
     /// A terminal symbol, defined in the original grammar
-    Terminal(Symbol<'a>),
+    Terminal(Symbol<'s>),
     /// A variable symbol defined in the original grammar
-    Variable(Symbol<'a>),
+    Variable(Symbol<'s>),
     /// A virtual symbol, defined in the original grammar
-    Virtual(Symbol<'a>)
+    Virtual(Symbol<'s>)
 }
 
-impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> SemanticElementTrait<'a> for SemanticElement<'a, 'b, 'c, 'd> {
+impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for SemanticElement<'s, 't, 'a> {
     fn get_position(&self) -> Option<TextPosition> {
-        match *self {
-            SemanticElement::Token(ref token) => token.get_position(),
-            SemanticElement::Terminal(ref _symbol) => None,
-            SemanticElement::Variable(ref _symbol) => None,
-            SemanticElement::Virtual(ref _symbol) => None
+        match self {
+            SemanticElement::Token(token) => token.get_position(),
+            SemanticElement::Terminal(_symbol) => None,
+            SemanticElement::Variable(_symbol) => None,
+            SemanticElement::Virtual(_symbol) => None
         }
     }
 
     fn get_span(&self) -> Option<TextSpan> {
-        match *self {
-            SemanticElement::Token(ref token) => token.get_span(),
-            SemanticElement::Terminal(ref _symbol) => None,
-            SemanticElement::Variable(ref _symbol) => None,
-            SemanticElement::Virtual(ref _symbol) => None
+        match self {
+            SemanticElement::Token(token) => token.get_span(),
+            SemanticElement::Terminal(_symbol) => None,
+            SemanticElement::Variable(_symbol) => None,
+            SemanticElement::Virtual(_symbol) => None
         }
     }
 
-    fn get_context(&self) -> Option<TextContext> {
-        match *self {
-            SemanticElement::Token(ref token) => token.get_context(),
-            SemanticElement::Terminal(ref _symbol) => None,
-            SemanticElement::Variable(ref _symbol) => None,
-            SemanticElement::Virtual(ref _symbol) => None
+    fn get_context(&self) -> Option<TextContext<'a>> {
+        match self {
+            SemanticElement::Token(token) => token.get_context(),
+            SemanticElement::Terminal(_symbol) => None,
+            SemanticElement::Variable(_symbol) => None,
+            SemanticElement::Virtual(_symbol) => None
         }
     }
 
-    fn get_symbol(&self) -> Symbol<'a> {
-        match *self {
-            SemanticElement::Token(ref token) => token.get_symbol(),
-            SemanticElement::Terminal(ref symbol) => *symbol,
-            SemanticElement::Variable(ref symbol) => *symbol,
-            SemanticElement::Virtual(ref symbol) => *symbol
+    fn get_symbol(&self) -> Symbol<'s> {
+        match self {
+            SemanticElement::Token(token) => token.get_symbol(),
+            SemanticElement::Terminal(symbol) => *symbol,
+            SemanticElement::Variable(symbol) => *symbol,
+            SemanticElement::Virtual(symbol) => *symbol
         }
     }
 
-    fn get_value(&self) -> Option<String> {
-        match *self {
-            SemanticElement::Token(ref token) => token.get_value(),
-            SemanticElement::Terminal(ref _symbol) => None,
-            SemanticElement::Variable(ref _symbol) => None,
-            SemanticElement::Virtual(ref _symbol) => None
+    fn get_value(&self) -> Option<&'a str> {
+        match self {
+            SemanticElement::Token(token) => token.get_value(),
+            SemanticElement::Terminal(_symbol) => None,
+            SemanticElement::Variable(_symbol) => None,
+            SemanticElement::Virtual(_symbol) => None
         }
     }
 }
 
-impl<'a: 'b + 'd, 'b: 'd, 'c, 'd> SemanticElement<'a, 'b, 'c, 'd> {
+impl<'s, 't, 'a> SemanticElement<'s, 't, 'a> {
     /// Gets the type of the associated symbol
     pub fn get_symbol_type(&self) -> SymbolType {
-        match *self {
-            SemanticElement::Token(ref _token) => SymbolType::Terminal,
-            SemanticElement::Terminal(ref _symbol) => SymbolType::Terminal,
-            SemanticElement::Variable(ref _symbol) => SymbolType::Variable,
-            SemanticElement::Virtual(ref _symbol) => SymbolType::Virtual
+        match self {
+            SemanticElement::Token(_token) => SymbolType::Terminal,
+            SemanticElement::Terminal(_symbol) => SymbolType::Terminal,
+            SemanticElement::Variable(_symbol) => SymbolType::Variable,
+            SemanticElement::Virtual(_symbol) => SymbolType::Virtual
         }
     }
 }

@@ -137,7 +137,7 @@ fn build_cargo_project(
     let project_folder = output::temporary_folder();
     fs::create_dir_all(&project_folder)?;
     output::export_resource(&project_folder, "Cargo.toml", MANIFEST)?;
-    if let Some(ref runtime) = task.output_target_runtime_path {
+    if let Some(runtime) = task.output_target_runtime_path.as_ref() {
         let mut file_path = project_folder.clone();
         file_path.push("Cargo.toml");
         let mut writer = BufWriter::new(

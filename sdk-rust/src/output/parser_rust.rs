@@ -218,36 +218,30 @@ fn write_code_constructors(
     automaton_type: &str,
     parser_type: &str
 ) -> Result<(), Error> {
-    writeln!(writer, "/// Parses the specified string with this parser")?;
-    if output_assembly {
-        writeln!(writer, "#[no_mangle]")?;
-        writeln!(writer, "#[export_name = \"{}_parse_string\"]", nmespace)?;
-    }
-    writeln!(
-        writer,
-        "pub fn parse_string(input: &str) -> ParseResult<'static, 'static> {{"
-    )?;
     if grammar.actions.is_empty() {
-        writeln!(writer, "    let text = Text::new(input);")?;
-        writeln!(writer, "    parse_text(text)")?;
-        writeln!(writer, "}}")?;
-        writeln!(writer)?;
-        writeln!(
-            writer,
-            "/// Parses the specified stream of UTF-16 with this parser"
-        )?;
+        writeln!(writer, "/// Parses the specified string with this parser")?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
-            writeln!(writer, "#[export_name = \"{}_parse_utf16\"]", nmespace)?;
+            writeln!(writer, "#[export_name = \"{}_parse_str\"]", nmespace)?;
         }
         writeln!(
             writer,
-            "pub fn parse_utf16(input: &mut dyn Read, big_endian: bool) -> ParseResult<'static, 'static> {{"
+            "pub fn parse_str<'t>(input: &'t str) -> ParseResult<'static, 't, 'static> {{"
         )?;
+        writeln!(writer, "    let text = Text::from_str(input);")?;
+        writeln!(writer, "    parse_text(text)")?;
+        writeln!(writer, "}}")?;
+        writeln!(writer)?;
+        writeln!(writer, "/// Parses the specified string with this parser")?;
+        if output_assembly {
+            writeln!(writer, "#[no_mangle]")?;
+            writeln!(writer, "#[export_name = \"{}_parse_string\"]", nmespace)?;
+        }
         writeln!(
             writer,
-            "    let text = Text::from_utf16_stream(input, big_endian);"
+            "pub fn parse_string(input: String) -> ParseResult<'static, 'static, 'static> {{"
         )?;
+        writeln!(writer, "    let text = Text::from_string(input);")?;
         writeln!(writer, "    parse_text(text)")?;
         writeln!(writer, "}}")?;
         writeln!(writer)?;
@@ -257,20 +251,27 @@ fn write_code_constructors(
         )?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
-            writeln!(writer, "#[export_name = \"{}_parse_utf8\"]", nmespace)?;
+            writeln!(
+                writer,
+                "#[export_name = \"{}_parse_utf8_stream\"]",
+                nmespace
+            )?;
         }
         writeln!(
             writer,
-            "pub fn parse_utf8(input: &mut dyn Read) -> ParseResult<'static, 'static> {{"
+            "pub fn parse_utf8_stream<R: Read>(input: &mut R) -> ParseResult<'static, 'static, 'static> {{"
         )?;
-        writeln!(writer, "    let text = Text::from_utf8_stream(input);")?;
+        writeln!(
+            writer,
+            "    let text = Text::from_utf8_stream(input).unwrap();"
+        )?;
         writeln!(writer, "    parse_text(text)")?;
         writeln!(writer, "}}")?;
         writeln!(writer)?;
         writeln!(writer, "/// Parses the specified text with this parser")?;
         writeln!(
             writer,
-            "fn parse_text(text: Text) -> ParseResult<'static, 'static> {{"
+            "fn parse_text<'t>(text: Text<'t>) -> ParseResult<'static, 't, 'static> {{"
         )?;
         writeln!(
             writer,
@@ -279,12 +280,12 @@ fn write_code_constructors(
         writeln!(writer, "}}")?;
         writeln!(writer)?;
         writeln!(writer, "/// Parses the specified text with this parser")?;
-        writeln!(writer, "fn parse_text_with<'a: 'b, 'b>(")?;
-        writeln!(writer, "    text: Text,")?;
-        writeln!(writer, "    terminals: &'b [Symbol<'a>],")?;
-        writeln!(writer, "    variables: &'b [Symbol<'a>],")?;
-        writeln!(writer, "    virtuals: &'b [Symbol<'a>]")?;
-        writeln!(writer, ") -> ParseResult<'a, 'b> {{")?;
+        writeln!(writer, "fn parse_text_with<'s, 't, 'a>(")?;
+        writeln!(writer, "    text: Text<'t>,")?;
+        writeln!(writer, "    terminals: &'a [Symbol<'s>],")?;
+        writeln!(writer, "    variables: &'a [Symbol<'s>],")?;
+        writeln!(writer, "    virtuals: &'a [Symbol<'s>]")?;
+        writeln!(writer, ") -> ParseResult<'s, 't, 'a> {{")?;
         writeln!(
             writer,
             "    let mut my_actions = |_index: usize, _head: Symbol, _body: &dyn SemanticBody| ();"
@@ -294,8 +295,43 @@ fn write_code_constructors(
             "    let mut result = ParseResult::new(terminals, variables, virtuals, text);"
         )?;
     } else {
-        writeln!(writer, "    let mut actions = NoActions {{}};")?;
-        writeln!(writer, "    parse_string_with(input, &mut actions)")?;
+        writeln!(writer, "/// Parses the specified string with this parser")?;
+        if output_assembly {
+            writeln!(writer, "#[no_mangle]")?;
+            writeln!(writer, "#[export_name = \"{}_parse_str\"]", nmespace)?;
+        }
+        writeln!(
+            writer,
+            "pub fn parse_str<'t>(input: &'t str) -> ParseResult<'static, 't, 'static> {{"
+        )?;
+        writeln!(writer, "    let text = Text::from_str(input);")?;
+        writeln!(writer, "    parse_text(text, &mut NoActions {{}})")?;
+        writeln!(writer, "}}")?;
+        writeln!(writer)?;
+        writeln!(writer, "/// Parses the specified string with this parser")?;
+        if output_assembly {
+            writeln!(writer, "#[no_mangle]")?;
+            writeln!(writer, "#[export_name = \"{}_parse_str_with\"]", nmespace)?;
+        }
+        writeln!(
+            writer,
+            "pub fn parse_str_with<'t>(input: &'t str, actions: &mut dyn Actions) -> ParseResult<'static, 't, 'static> {{"
+        )?;
+        writeln!(writer, "    let text = Text::from_str(input);")?;
+        writeln!(writer, "    parse_text(text, actions)")?;
+        writeln!(writer, "}}")?;
+        writeln!(writer)?;
+        writeln!(writer, "/// Parses the specified string with this parser")?;
+        if output_assembly {
+            writeln!(writer, "#[no_mangle]")?;
+            writeln!(writer, "#[export_name = \"{}_parse_string\"]", nmespace)?;
+        }
+        writeln!(
+            writer,
+            "pub fn parse_string(input: String) -> ParseResult<'static, 'static, 'static> {{"
+        )?;
+        writeln!(writer, "    let text = Text::from_string(input);")?;
+        writeln!(writer, "    parse_text(text, , &mut NoActions {{}})")?;
         writeln!(writer, "}}")?;
         writeln!(writer)?;
         writeln!(writer, "/// Parses the specified string with this parser")?;
@@ -309,44 +345,9 @@ fn write_code_constructors(
         }
         writeln!(
             writer,
-            "pub fn parse_string_with(input: &str, actions: &mut dyn Actions) -> ParseResult<'static, 'static> {{"
+            "pub fn parse_string_with(input: String, actions: &mut dyn Actions) -> ParseResult<'static, 'static, 'static> {{"
         )?;
-        writeln!(writer, "    let text = Text::new(input);")?;
-        writeln!(writer, "    parse_text(text, actions)")?;
-        writeln!(writer, "}}")?;
-        writeln!(writer)?;
-        writeln!(
-            writer,
-            "/// Parses the specified stream of UTF-16 with this parser"
-        )?;
-        if output_assembly {
-            writeln!(writer, "#[no_mangle]")?;
-            writeln!(writer, "#[export_name = \"{}_parse_utf16\"]", nmespace)?;
-        }
-        writeln!(
-            writer,
-            "pub fn parse_utf16(input: &mut dyn Read, big_endian: bool) -> ParseResult<'static, 'static> {{"
-        )?;
-        writeln!(writer, "    let mut actions = NoActions {{}};")?;
-        writeln!(
-            writer,
-            "    parse_utf16_with(input, big_endian, &mut actions)"
-        )?;
-        writeln!(writer, "}}")?;
-        writeln!(writer)?;
-        writeln!(
-            writer,
-            "/// Parses the specified stream of UTF-16 with this parser"
-        )?;
-        if output_assembly {
-            writeln!(writer, "#[no_mangle]")?;
-            writeln!(writer, "#[export_name = \"{}_parse_utf16_with\"]", nmespace)?;
-        }
-        writeln!(writer, "pub fn parse_utf16_with(input: &mut dyn Read, big_endian: bool, actions: &mut dyn Actions) -> ParseResult<'static, 'static> {{")?;
-        writeln!(
-            writer,
-            "    let text = Text::from_utf16_stream(input, big_endian);"
-        )?;
+        writeln!(writer, "    let text = Text::from_string(input);")?;
         writeln!(writer, "    parse_text(text, actions)")?;
         writeln!(writer, "}}")?;
         writeln!(writer)?;
@@ -356,33 +357,46 @@ fn write_code_constructors(
         )?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
-            writeln!(writer, "#[export_name = \"{}_parse_utf8\"]", nmespace)?;
+            writeln!(
+                writer,
+                "#[export_name = \"{}_parse_utf8_stream\"]",
+                nmespace
+            )?;
         }
         writeln!(
             writer,
-            "pub fn parse_utf8(input: &mut dyn Read) -> ParseResult<'static, 'static> {{"
+            "pub fn parse_utf8_stream<R: Read>(input: &mut R) -> ParseResult<'static, 'static, 'static> {{"
         )?;
-        writeln!(writer, "    let mut actions = NoActions {{}};")?;
-        writeln!(writer, "    parse_utf8_with(input, &mut actions)")?;
+        writeln!(
+            writer,
+            "    let text = Text::from_utf8_stream(input).unwrap();"
+        )?;
+        writeln!(writer, "    parse_text(text, &mut NoActions {{}})")?;
         writeln!(writer, "}}")?;
         writeln!(writer)?;
-        writeln!(
-            writer,
-            "/// Parses the specified stream of UTF-8 with this parser"
-        )?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
-            writeln!(writer, "#[export_name = \"{}_parse_utf8_with\"]", nmespace)?;
+            writeln!(
+                writer,
+                "#[export_name = \"{}_parse_utf8_stream_with\"]",
+                nmespace
+            )?;
         }
-        writeln!(writer, "pub fn parse_utf8_with(input: &mut dyn Read, actions: &mut dyn Actions) -> ParseResult<'static, 'static> {{")?;
-        writeln!(writer, "    let text = Text::from_utf8_stream(input);")?;
+        writeln!(
+            writer,
+            "pub fn parse_utf8_stream_with<R: Read>(input: &mut R, actions: &mut dyn Actions) -> ParseResult<'static, 'static, 'static> {{"
+        )?;
+        writeln!(
+            writer,
+            "    let text = Text::from_utf8_stream(input).unwrap();"
+        )?;
         writeln!(writer, "    parse_text(text, actions)")?;
         writeln!(writer, "}}")?;
         writeln!(writer)?;
         writeln!(writer, "/// Parses the specified text with this parser")?;
         writeln!(
             writer,
-            "fn parse_text(text: Text, actions: &mut dyn Actions) -> ParseResult<'static, 'static> {{"
+            "fn parse_text<'t>(text: Text<'t>, actions: &mut dyn Actions) -> ParseResult<'static, 't, 'static> {{"
         )?;
         writeln!(
             writer,
@@ -391,13 +405,13 @@ fn write_code_constructors(
         writeln!(writer, "}}")?;
         writeln!(writer)?;
         writeln!(writer, "/// Parses the specified text with this parser")?;
-        writeln!(writer, "fn parse_text_with<'a: 'b, 'b>(")?;
-        writeln!(writer, "    text: Text,")?;
-        writeln!(writer, "    terminals: &'b [Symbol<'a>],")?;
-        writeln!(writer, "    variables: &'b [Symbol<'a>],")?;
-        writeln!(writer, "    virtuals: &'b [Symbol<'a>],")?;
+        writeln!(writer, "fn parse_text_with<'s, 't, 'a>(")?;
+        writeln!(writer, "    text: Text<'t>,")?;
+        writeln!(writer, "    terminals: &'a [Symbol<'s>],")?;
+        writeln!(writer, "    variables: &'a [Symbol<'s>],")?;
+        writeln!(writer, "    virtuals: &'a [Symbol<'s>],")?;
         writeln!(writer, "    actions: &mut dyn Actions")?;
-        writeln!(writer, ") -> ParseResult<'a, 'b> {{")?;
+        writeln!(writer, ") -> ParseResult<'s, 't, 'a> {{")?;
         writeln!(writer, "    let mut my_actions = |index: usize, head: Symbol, body: &dyn SemanticBody| match index {{")?;
         for (index, action) in grammar.actions.iter().enumerate() {
             writeln!(

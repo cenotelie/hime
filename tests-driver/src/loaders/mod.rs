@@ -39,7 +39,7 @@ pub fn parse_fixtures(fixtures: &[FixtureDef]) -> Result<Fixtures, Errors> {
         .iter()
         .map(|FixtureDef(_, content)| {
             let mut reader = BufReader::new(*content);
-            fixture::parse_utf8(&mut reader)
+            fixture::parse_utf8_stream(&mut reader)
         })
         .collect();
     let is_ok = results.iter().all(|r| r.is_success());

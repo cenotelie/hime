@@ -53,7 +53,7 @@ impl From<usize> for TableType {
 }
 
 /// Represents a compact reference to an element in a table
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Default, Copy, Clone, Eq, PartialEq)]
 pub struct TableElemRef {
     /// The backend data
     data: usize
@@ -79,7 +79,7 @@ impl TableElemRef {
 }
 
 /// Represents a cell in an AST inner structure
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone)]
 pub struct AstCell {
     /// The node's label
     pub label: TableElemRef,
@@ -112,6 +112,7 @@ impl AstCell {
 /// Implementation of a simple AST with a tree structure
 /// The nodes are stored in sequential arrays where the children of a node are an inner sequence.
 /// The linkage is represented by each node storing its number of children and the index of its first child.
+#[derive(Debug, Default, Clone)]
 pub struct AstImpl {
     /// The nodes' labels
     nodes: BigList<AstCell>,
@@ -120,48 +121,34 @@ pub struct AstImpl {
 }
 
 impl AstImpl {
-    /// Creates a new implementation
-    pub fn new() -> AstImpl {
-        AstImpl {
-            nodes: BigList::new(AstCell::new(TableElemRef::new(TableType::None, 0), 0, 0)),
-            root: None
-        }
-    }
-
     /// Gets whether a root has been defined for this AST
     pub fn has_root(&self) -> bool {
         self.root.is_some()
     }
 }
 
-impl Default for AstImpl {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Represents a simple AST with a tree structure
 /// The nodes are stored in sequential arrays where the children of a node are an inner sequence.
 /// The linkage is represented by each node storing its number of children and the index of its first child.
-pub struct Ast<'a: 'b, 'b, 'c> {
+pub struct Ast<'s, 't, 'a> {
     /// The table of tokens
-    tokens: Option<TokenRepository<'a, 'b, 'c>>,
+    tokens: Option<TokenRepository<'s, 't, 'a>>,
     /// The table of variables
-    pub variables: &'b [Symbol<'a>],
+    pub variables: &'a [Symbol<'s>],
     /// The table of virtuals
-    pub virtuals: &'b [Symbol<'a>],
+    pub virtuals: &'a [Symbol<'s>],
     /// The data of the implementation
-    data: EitherMut<'c, AstImpl>
+    data: EitherMut<'a, AstImpl>
 }
 
-impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
+impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     /// Creates a new AST proxy structure
     pub fn new(
-        tokens: TokenRepository<'a, 'b, 'c>,
-        variables: &'b [Symbol<'a>],
-        virtuals: &'b [Symbol<'a>],
-        data: &'c AstImpl
-    ) -> Ast<'a, 'b, 'c> {
+        tokens: TokenRepository<'s, 't, 'a>,
+        variables: &'a [Symbol<'s>],
+        virtuals: &'a [Symbol<'s>],
+        data: &'a AstImpl
+    ) -> Ast<'s, 't, 'a> {
         Ast {
             tokens: Some(tokens),
             variables,
@@ -172,10 +159,10 @@ impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
 
     /// Creates a new AST proxy structure
     pub fn new_mut(
-        variables: &'b [Symbol<'a>],
-        virtuals: &'b [Symbol<'a>],
-        data: &'c mut AstImpl
-    ) -> Ast<'a, 'b, 'c> {
+        variables: &'a [Symbol<'s>],
+        virtuals: &'a [Symbol<'s>],
+        data: &'a mut AstImpl
+    ) -> Ast<'s, 't, 'a> {
         Ast {
             tokens: None,
             variables,
@@ -185,7 +172,7 @@ impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
     }
 
     /// Gets the i-th token in the associated repository
-    fn get_token<'x>(&'x self, index: usize) -> Token<'a, 'b, 'c, 'x> {
+    fn get_token(&'a self, index: usize) -> Token<'s, 't, 'a> {
         self.tokens
             .as_ref()
             .expect("Missing token repository")
@@ -249,7 +236,7 @@ impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
     }
 
     /// Gets the parent of the specified node, if any
-    pub fn find_parent_of<'x>(&'x self, node: usize) -> Option<AstNode<'a, 'b, 'c, 'x>> {
+    pub fn find_parent_of(&'a self, node: usize) -> Option<AstNode<'s, 't, 'a>> {
         // self.data.root?;
         self.data
             .nodes
@@ -358,14 +345,14 @@ impl<'a: 'b, 'b, 'c> Ast<'a, 'b, 'c> {
 
 /// Represents a node in an Abstract Syntax Tree
 #[derive(Copy, Clone)]
-pub struct AstNode<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> {
+pub struct AstNode<'s, 't, 'a> {
     /// The original parse tree
-    tree: &'d Ast<'a, 'b, 'c>,
+    tree: &'a Ast<'s, 't, 'a>,
     /// The index of this node in the parse tree
     index: usize
 }
 
-impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> AstNode<'a, 'b, 'c, 'd> {
+impl<'s, 't, 'a> AstNode<'s, 't, 'a> {
     /// Gets the identifier of this node
     pub fn id(&self) -> usize {
         self.index
@@ -381,12 +368,12 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> AstNode<'a, 'b, 'c, 'd> {
     }
 
     /// Gets the parent of this node, if any
-    pub fn parent(&self) -> Option<AstNode<'a, 'b, 'c, 'd>> {
+    pub fn parent(&self) -> Option<AstNode<'s, 't, 'a>> {
         self.tree.find_parent_of(self.index)
     }
 
     /// Gets the children of this node
-    pub fn children(&self) -> AstFamily<'a, 'b, 'c, 'd> {
+    pub fn children(&self) -> AstFamily<'s, 't, 'a> {
         AstFamily {
             tree: self.tree,
             parent: self.index
@@ -394,7 +381,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> AstNode<'a, 'b, 'c, 'd> {
     }
 
     /// Gets the i-th child
-    pub fn child(&self, index: usize) -> AstNode<'a, 'b, 'c, 'd> {
+    pub fn child(&self, index: usize) -> AstNode<'s, 't, 'a> {
         let cell = self.tree.data.nodes[self.index];
         AstNode {
             tree: self.tree,
@@ -418,7 +405,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> AstNode<'a, 'b, 'c, 'd> {
     }
 }
 
-impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> SemanticElementTrait<'a> for AstNode<'a, 'b, 'c, 'd> {
+impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for AstNode<'s, 't, 'a> {
     /// Gets the position in the input text of this element
     fn get_position(&self) -> Option<TextPosition> {
         self.tree.get_position_at(&self.tree.data, self.index)
@@ -430,7 +417,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> SemanticElementTrait<'a> for AstNode<'a, '
     }
 
     /// Gets the context of this element in the input
-    fn get_context(&self) -> Option<TextContext> {
+    fn get_context(&self) -> Option<TextContext<'a>> {
         let cell = self.tree.data.nodes[self.index];
         match cell.label.table_type() {
             TableType::Token => {
@@ -442,7 +429,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> SemanticElementTrait<'a> for AstNode<'a, '
     }
 
     /// Gets the grammar symbol associated to this element
-    fn get_symbol(&self) -> Symbol<'a> {
+    fn get_symbol(&self) -> Symbol<'s> {
         let cell = self.tree.data.nodes[self.index];
         match cell.label.table_type() {
             TableType::Token => {
@@ -452,16 +439,16 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> SemanticElementTrait<'a> for AstNode<'a, '
             TableType::Variable => self.tree.variables[cell.label.index()],
             TableType::Virtual => self.tree.virtuals[cell.label.index()],
             TableType::None => {
-                match self.tree.tokens {
+                match &self.tree.tokens {
                     None => panic!("Missing token repository"),
-                    Some(ref repository) => repository.terminals[0] // terminal epsilon
+                    Some(repository) => repository.terminals[0] // terminal epsilon
                 }
             }
         }
     }
 
     /// Gets the value of this element, if any
-    fn get_value(&self) -> Option<String> {
+    fn get_value(&self) -> Option<&'a str> {
         let cell = self.tree.data.nodes[self.index];
         match cell.label.table_type() {
             TableType::Token => {
@@ -473,19 +460,17 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> SemanticElementTrait<'a> for AstNode<'a, '
     }
 }
 
-impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> PartialEq<AstNode<'a, 'b, 'c, 'd>>
-    for AstNode<'a, 'b, 'c, 'd>
-{
-    fn eq(&self, other: &AstNode<'a, 'b, 'c, 'd>) -> bool {
+impl<'s, 't, 'a> PartialEq<AstNode<'s, 't, 'a>> for AstNode<'s, 't, 'a> {
+    fn eq(&self, other: &AstNode<'s, 't, 'a>) -> bool {
         self.index == other.index
     }
 }
 
-impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Eq for AstNode<'a, 'b, 'c, 'd> {}
+impl<'s, 't, 'a> Eq for AstNode<'s, 't, 'a> {}
 
-impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> IntoIterator for AstNode<'a, 'b, 'c, 'd> {
-    type Item = AstNode<'a, 'b, 'c, 'd>;
-    type IntoIter = AstFamilyIterator<'a, 'b, 'c, 'd>;
+impl<'s, 't, 'a> IntoIterator for AstNode<'s, 't, 'a> {
+    type Item = AstNode<'s, 't, 'a>;
+    type IntoIter = AstFamilyIterator<'s, 't, 'a>;
 
     fn into_iter(self) -> Self::IntoIter {
         let cell = self.tree.data.nodes[self.index];
@@ -497,7 +482,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> IntoIterator for AstNode<'a, 'b, 'c, 'd> {
     }
 }
 
-impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Display for AstNode<'a, 'b, 'c, 'd> {
+impl<'s, 't, 'a> Display for AstNode<'s, 't, 'a> {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         let cell = self.tree.data.nodes[self.index];
         match cell.label.table_type() {
@@ -515,9 +500,9 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Display for AstNode<'a, 'b, 'c, 'd> {
                 let symbol = self.tree.virtuals[cell.label.index()];
                 write!(f, "{}", symbol.name)
             }
-            TableType::None => match self.tree.tokens {
+            TableType::None => match &self.tree.tokens {
                 None => panic!("Missing token repository"),
-                Some(ref repository) => {
+                Some(repository) => {
                     let symbol = repository.terminals[0];
                     write!(f, "{}", symbol.name)
                 }
@@ -526,7 +511,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Display for AstNode<'a, 'b, 'c, 'd> {
     }
 }
 
-impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Serialize for AstNode<'a, 'b, 'c, 'd> {
+impl<'s, 't, 'a> Serialize for AstNode<'s, 't, 'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer
@@ -543,17 +528,17 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Serialize for AstNode<'a, 'b, 'c, 'd> {
 
 /// Represents a family of children for an ASTNode
 #[derive(Clone)]
-pub struct AstFamily<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> {
+pub struct AstFamily<'s, 't, 'a> {
     /// The original parse tree
-    tree: &'d Ast<'a, 'b, 'c>,
+    tree: &'a Ast<'s, 't, 'a>,
     /// The index of the parent node in the parse tree
     parent: usize
 }
 
 /// Represents and iterator for adjacents in this graph
-pub struct AstFamilyIterator<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> {
+pub struct AstFamilyIterator<'s, 't, 'a> {
     /// The original parse tree
-    tree: &'d Ast<'a, 'b, 'c>,
+    tree: &'a Ast<'s, 't, 'a>,
     /// The index of the current child in the parse tree
     current: usize,
     /// the index of the last child (excluded) in the parse tree
@@ -561,8 +546,8 @@ pub struct AstFamilyIterator<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> {
 }
 
 /// Implementation of the `Iterator` trait for `AstFamilyIterator`
-impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Iterator for AstFamilyIterator<'a, 'b, 'c, 'd> {
-    type Item = AstNode<'a, 'b, 'c, 'd>;
+impl<'s, 't, 'a> Iterator for AstFamilyIterator<'s, 't, 'a> {
+    type Item = AstNode<'s, 't, 'a>;
     fn next(&mut self) -> Option<Self::Item> {
         if self.current >= self.end {
             None
@@ -582,7 +567,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Iterator for AstFamilyIterator<'a, 'b, 'c,
     }
 }
 
-impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> DoubleEndedIterator for AstFamilyIterator<'a, 'b, 'c, 'd> {
+impl<'s, 't, 'a> DoubleEndedIterator for AstFamilyIterator<'s, 't, 'a> {
     fn next_back(&mut self) -> Option<Self::Item> {
         if self.current >= self.end {
             None
@@ -597,12 +582,12 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> DoubleEndedIterator for AstFamilyIterator<
     }
 }
 
-impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> ExactSizeIterator for AstFamilyIterator<'a, 'b, 'c, 'd> {}
-impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> FusedIterator for AstFamilyIterator<'a, 'b, 'c, 'd> {}
+impl<'s, 't, 'a> ExactSizeIterator for AstFamilyIterator<'s, 't, 'a> {}
+impl<'s, 't, 'a> FusedIterator for AstFamilyIterator<'s, 't, 'a> {}
 
-impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> IntoIterator for AstFamily<'a, 'b, 'c, 'd> {
-    type Item = AstNode<'a, 'b, 'c, 'd>;
-    type IntoIter = AstFamilyIterator<'a, 'b, 'c, 'd>;
+impl<'s, 't, 'a> IntoIterator for AstFamily<'s, 't, 'a> {
+    type Item = AstNode<'s, 't, 'a>;
+    type IntoIter = AstFamilyIterator<'s, 't, 'a>;
 
     fn into_iter(self) -> Self::IntoIter {
         let cell = self.tree.data.nodes[self.parent];
@@ -614,7 +599,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> IntoIterator for AstFamily<'a, 'b, 'c, 'd>
     }
 }
 
-impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> AstFamily<'a, 'b, 'c, 'd> {
+impl<'s, 't, 'a> AstFamily<'s, 't, 'a> {
     /// Gets whether the family is empty
     pub fn is_empty(&self) -> bool {
         self.tree.data.nodes[self.parent].count == 0
@@ -645,7 +630,7 @@ impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> AstFamily<'a, 'b, 'c, 'd> {
     }
 }
 
-impl<'a: 'b + 'd, 'b: 'd, 'c: 'd, 'd> Serialize for AstFamily<'a, 'b, 'c, 'd> {
+impl<'s, 't, 'a> Serialize for AstFamily<'s, 't, 'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer

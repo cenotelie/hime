@@ -158,10 +158,9 @@ impl LanguageServer for Backend {
                     Err(Error::invalid_params("Expected exactly 2 parameters"))
                 } else {
                     match (&params.arguments[0], &params.arguments[1]) {
-                        (
-                            serde_json::Value::String(ref grammar),
-                            serde_json::Value::String(ref input)
-                        ) => workspace.test(grammar, input),
+                        (serde_json::Value::String(grammar), serde_json::Value::String(input)) => {
+                            workspace.test(grammar, input)
+                        }
                         _ => Err(Error::invalid_params("Expected exactly 2 parameters"))
                     }
                 }
