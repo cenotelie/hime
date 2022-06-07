@@ -4,7 +4,7 @@
     <groupId>fr.cenotelie.hime</groupId>
     <artifactId>hime-redist</artifactId>
     <packaging>bundle</packaging>
-    <version>4.1.0</version>
+    <version>4.1.1-SNAPSHOT</version>
     <name>Hime Runtime</name>
     <description>Redistributable Java runtime for the parsers generated with Hime</description>
     <url>https://cenotelie.fr/projects/hime</url>
@@ -30,7 +30,7 @@
         <connection>scm:git:https://github.com/cenotelie/hime</connection>
         <developerConnection>scm:git:ssh://git@github.com:cenotelie/hime</developerConnection>
         <url>https://github.com/cenotelie/hime</url>
-        <tag>v4.1.0</tag>
+        <tag>HEAD</tag>
     </scm>
     <distributionManagement>
         <snapshotRepository>
