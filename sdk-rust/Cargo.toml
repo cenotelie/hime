@@ -1,6 +1,6 @@
 [package]
 name = "hime_sdk"
-version = "4.0.1"
+version = "4.1.0"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Development kit for the generation of LR and RNGLR parsers programmatically or in command line. Full API for the manipulation of context-free grammars."
 documentation = "https://cenotelie.fr/projects/hime"
