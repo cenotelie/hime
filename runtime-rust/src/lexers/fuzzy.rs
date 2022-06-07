@@ -194,7 +194,7 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
             None => (None, 0),
             Some((current, length)) => (Some(current), length)
         };
-        let mut offset = length;
+        let mut offset = 0;
 
         let mut result = FuzzyMatcherResult::new();
         {
@@ -205,13 +205,12 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
                 self.inspect_at_end(&mut result, &head_begin, offset);
             }
         }
+        offset += length;
         while !result.heads.is_empty() {
             let (current, length) = match iter.next() {
                 None => (None, 0),
                 Some((current, length)) => (Some(current), length)
             };
-            offset += length;
-
             let generation = take(&mut result.heads);
             for head in generation {
                 if let Some(current) = current {
@@ -220,6 +219,7 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
                     self.inspect_at_end(&mut result, &head, offset);
                 }
             }
+            offset += length;
         }
         if result.match_length == 0 {
             self.on_failure()

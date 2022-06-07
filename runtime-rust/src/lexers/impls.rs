@@ -149,7 +149,7 @@ impl<'s, 't, 'a> ContextFreeLexer<'s, 't, 'a> {
                 }
             } else {
                 // skip this character
-                index += 1;
+                index += self.data.repository.text.at(index).len_utf8();
             }
         }
     }
@@ -238,7 +238,7 @@ impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
                 }
             } else {
                 // skip this character
-                self.input_index += 1;
+                self.input_index += self.data.repository.text.at(self.input_index).len_utf8();
             }
         }
     }

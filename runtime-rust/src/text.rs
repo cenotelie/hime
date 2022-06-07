@@ -257,6 +257,7 @@ impl<'a> Text<'a> {
     pub fn get_context_for(&self, position: TextPosition, length: usize) -> TextContext {
         // gather the data for the line
         let mut line_content = self.get_line_content(position.line);
+        // remove the line ending
         let mut end = line_content.len();
         while end != 0 {
             let last = line_content.chars().last().unwrap();
@@ -266,21 +267,37 @@ impl<'a> Text<'a> {
             end -= last.len_utf8();
             line_content = &line_content[..end];
         }
+        // remove the heading white space
+        let mut removed_heading = 0;
+        loop {
+            match line_content.chars().next() {
+                None => break,
+                Some(c) => {
+                    if c.is_whitespace() {
+                        line_content = &line_content[c.len_utf8()..];
+                        removed_heading += 1;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
         let in_line_offset = line_content
             .char_indices()
-            .take(position.column - 1)
+            .take(position.column - 1 - removed_heading)
             .last()
             .map(|(offset, c)| offset + c.len_utf8())
             .unwrap_or_default();
         let pointer_count = line_content[in_line_offset..]
             .char_indices()
             .take_while(|&(offset, _)| offset < length)
-            .count();
-        let pointer_blank_count = position.column - 1;
+            .count()
+            .max(1);
+        let pointer_blank_count = position.column - 1 - removed_heading;
         // build the pointer
         let mut pointer = String::with_capacity(pointer_count + pointer_blank_count);
-        for _ in 0..pointer_blank_count {
-            pointer.push(' ');
+        for c in line_content.chars().take(pointer_blank_count) {
+            pointer.push(if c == '\t' { '\t' } else { ' ' });
         }
         for _ in 0..pointer_count {
             pointer.push('^');
@@ -332,8 +349,8 @@ impl<'a> Iterator for Utf16Iter<'a> {
                     c.encode_utf16(&mut encoded);
                     if encoded[1] != 0 {
                         // sequence
-                        self.next_cp = Some((encoded[1], length - 1));
-                        Some((encoded[0], 1))
+                        self.next_cp = Some((encoded[1], length));
+                        Some((encoded[0], 0))
                     } else {
                         Some((encoded[0], length))
                     }
@@ -379,7 +396,7 @@ fn find_lines_in<T: Iterator<Item = (usize, char)>>(iterator: T) -> Vec<usize> {
             result.push(if c1 == '\u{000D}' && c2 != '\u{000A}' {
                 offset
             } else {
-                offset + 1
+                offset + x.len_utf8()
             });
         }
     }
@@ -503,6 +520,54 @@ fn test_text_get_context_for() {
         TextContext {
             content: "Здравствуйте",
             pointer: String::from("  ^^^")
+        }
+    );
+}
+
+#[test]
+fn test_text_get_context_for_on_empty_last() {
+    let text = Text::from_str("x\n");
+    assert_eq!(
+        text.get_context_for(TextPosition { line: 2, column: 1 }, 0),
+        TextContext {
+            content: "",
+            pointer: String::from("^")
+        }
+    );
+}
+
+#[test]
+fn test_text_get_context_for_no_leading() {
+    let text = Text::from_str("x\n\n  xxyx\nx");
+    assert_eq!(
+        text.get_context_for(TextPosition { line: 3, column: 5 }, 1),
+        TextContext {
+            content: "xxyx",
+            pointer: String::from("  ^")
+        }
+    );
+}
+
+#[test]
+fn test_text_get_context_for_inner_tab() {
+    let text = Text::from_str("x\n\nx\txyx\nx");
+    assert_eq!(
+        text.get_context_for(TextPosition { line: 3, column: 4 }, 1),
+        TextContext {
+            content: "x\txyx",
+            pointer: String::from(" \t ^")
+        }
+    );
+}
+
+#[test]
+fn test_text_get_context_for_no_leading_tab() {
+    let text = Text::from_str("x\n\n\txxyx\nx");
+    assert_eq!(
+        text.get_context_for(TextPosition { line: 3, column: 4 }, 1),
+        TextContext {
+            content: "xxyx",
+            pointer: String::from("  ^")
         }
     );
 }
