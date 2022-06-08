@@ -620,7 +620,7 @@ impl<'s, 't, 'a> AstFamily<'s, 't, 'a> {
     }
 
     /// Gets an iterator over this family
-    pub fn iter(&self) -> AstFamilyIterator {
+    pub fn iter(&self) -> AstFamilyIterator<'s, 't, 'a> {
         let cell = self.tree.data.nodes[self.parent];
         AstFamilyIterator {
             tree: self.tree,
