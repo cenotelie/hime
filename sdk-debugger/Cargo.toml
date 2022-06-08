@@ -1,6 +1,6 @@
 [package]
 name = "hime_sdk_debugger"
-version = "4.1.2"
+version = "4.1.3"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Introspection tool for parsers generated with himecc"
 documentation = "https://cenotelie.fr/projects/hime"

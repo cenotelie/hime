@@ -1,6 +1,6 @@
 [package]
 name = "hime_parseit"
-version = "4.1.2"
+version = "4.1.3"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Command line to parse a piece of input using a packaged parser."
 documentation = "https://cenotelie.fr/projects/hime"
