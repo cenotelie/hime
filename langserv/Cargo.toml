@@ -1,6 +1,6 @@
 [package]
 name = "hime_langserv"
-version = "4.1.1"
+version = "4.1.2"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Language server for Hime grammars"
 documentation = "https://cenotelie.fr/projects/hime"

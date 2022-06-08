@@ -1,6 +1,6 @@
 [package]
 name = "hime_tests_driver"
-version = "4.1.1"
+version = "4.1.2"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Main driver for the test suits"
 homepage = "https://cenotelie.fr/projects/hime"
@@ -12,7 +12,7 @@ edition = "2021"
 
 [dependencies]
 hime_redist = "4.0.0"
-hime_sdk = { version = "4.1.1", features = ["print_errors"] }
+hime_sdk = { version = "4.1.2", features = ["print_errors"] }
 libloading = "0.7"
 # Used for tests debugging
 # hime_generated = { path = "../tests-results/hime_generated-3.3.1" }
