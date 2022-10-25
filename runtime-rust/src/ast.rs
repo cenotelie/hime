@@ -611,7 +611,7 @@ impl<'s, 't, 'a> AstFamily<'s, 't, 'a> {
     }
 
     /// Gets the i-th child
-    pub fn at(&self, index: usize) -> AstNode {
+    pub fn at(&self, index: usize) -> AstNode<'s, 't, 'a> {
         let cell = self.tree.data.nodes[self.parent];
         AstNode {
             tree: self.tree,
