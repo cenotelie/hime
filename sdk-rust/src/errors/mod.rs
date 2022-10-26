@@ -117,4 +117,17 @@ impl<'t> Errors<'t> {
     pub fn from(data: LoadedData, errors: Vec<Error>) -> Errors {
         Errors { data, errors }
     }
+
+    /// Transforms into an owned static version of the data
+    pub fn into_static(self) -> Errors<'static> {
+        errors_into_static(self)
+    }
+}
+
+/// Transforms into an owned static version of the data
+fn errors_into_static<'t>(errors: Errors<'t>) -> Errors<'static> {
+    Errors {
+        data: errors.data.into_static(),
+        errors: errors.errors
+    }
 }

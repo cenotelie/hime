@@ -251,6 +251,21 @@ pub struct LoadedInput<'t> {
     pub content: Text<'t>
 }
 
+/// Transforms into an owned static version of the data
+fn loaded_input_into_static<'t>(input: LoadedInput<'t>) -> LoadedInput<'static> {
+    LoadedInput {
+        name: input.name,
+        content: input.content.into_static()
+    }
+}
+
+impl<'t> LoadedInput<'t> {
+    /// Transforms into an owned static version of the data
+    pub fn into_static(self) -> LoadedInput<'static> {
+        loaded_input_into_static(self)
+    }
+}
+
 /// The data resulting of loading inputs
 #[derive(Debug, Default, Clone)]
 pub struct LoadedData<'t> {
@@ -258,6 +273,25 @@ pub struct LoadedData<'t> {
     pub inputs: Vec<LoadedInput<'t>>,
     /// The loaded grammars
     pub grammars: Vec<Grammar>
+}
+
+/// Transforms into an owned static version of the data
+fn loaded_data_into_static<'t>(data: LoadedData<'t>) -> LoadedData<'static> {
+    LoadedData {
+        inputs: data
+            .inputs
+            .into_iter()
+            .map(loaded_input_into_static)
+            .collect(),
+        grammars: data.grammars
+    }
+}
+
+impl<'t> LoadedData<'t> {
+    /// Transforms into an owned static version of the data
+    pub fn into_static(self) -> LoadedData<'static> {
+        loaded_data_into_static(self)
+    }
 }
 
 /// Reference to an input

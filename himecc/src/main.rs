@@ -202,7 +202,7 @@ pub fn main() {
 }
 
 /// Executes the normal operation of the compiler
-fn execute_normal(task: CompilationTask<'_>) -> Result<(), Errors<'_>> {
+fn execute_normal(task: CompilationTask) -> Result<(), Errors> {
     task.execute()?;
     Ok(())
 }

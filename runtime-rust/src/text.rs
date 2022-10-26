@@ -135,6 +135,14 @@ pub struct Text<'a> {
 }
 
 impl<'a> Text<'a> {
+    /// Transforms into an owned static version of the data
+    pub fn into_static(self) -> Text<'static> {
+        Text {
+            content: Cow::Owned(self.content.to_string()),
+            lines: self.lines
+        }
+    }
+
     /// Initializes this text
     #[allow(clippy::should_implement_trait)]
     pub fn from_str(content: &'a str) -> Text<'a> {

@@ -170,10 +170,9 @@ impl Workspace {
         let mut reader = BufReader::new(File::open(path)?);
         let mut content = String::new();
         reader.read_to_string(&mut content)?;
-        let uri2 = uri.clone();
         self.documents
-            .entry(uri)
-            .or_insert_with(move || Document::new(uri2, content));
+            .entry(uri.clone())
+            .or_insert_with(move || Document::new(uri, content));
         Ok(())
     }
 
@@ -214,11 +213,14 @@ impl Workspace {
         let mut documents: Vec<&mut Document> =
             self.documents.iter_mut().map(|(_, doc)| doc).collect();
         for doc in documents.iter_mut() {
-            task.inputs.push(Input::Raw(&doc.content));
             doc.diagnostics.clear();
+            if let Some(content) = doc.content.as_ref() {
+                task.inputs.push(Input::Raw(content));
+            }
         }
         match task.load() {
-            Ok(mut data) => {
+            Ok(data) => {
+                let mut data = data.into_static();
                 let mut errors = Vec::new();
                 for (index, grammar) in data.grammars.iter_mut().enumerate() {
                     if let Err(mut errs) = task.generate_in_memory(grammar, index) {
@@ -231,14 +233,14 @@ impl Workspace {
                     }
                 }
                 let symbols = SymbolRegistry::from(&data.grammars);
-                let data = WorkspaceData {
+                self.data = Some(WorkspaceData {
                     inputs: data.inputs,
                     grammars: data.grammars,
                     symbols
-                };
-                self.data = Some(data);
+                });
             }
             Err(errors) => {
+                let errors = errors.into_static();
                 for error in errors.errors.iter() {
                     if let Some((index, diag)) = to_diagnostic(&documents, &errors.data, error) {
                         documents[index].diagnostics.push(diag);

@@ -20,6 +20,7 @@
 pub mod symbols;
 pub mod workspace;
 
+use std::ops::Deref;
 use std::sync::Arc;
 
 use clap::{Arg, Command};
@@ -143,7 +144,7 @@ impl LanguageServer for Backend {
         }
     }
 
-    async fn hover(&self, params: HoverParams) -> Result<Option<Hover>> {
+    async fn hover(&self, _params: HoverParams) -> Result<Option<Hover>> {
         Ok(None)
     }
 
@@ -184,21 +185,21 @@ async fn main() {
         eprintln!("Panic: {} : {}", location, message);
     }));
 
-    let matches = Command::new("Hime Language Server")
-        .version(
-            format!(
-                "{} {} tag={} hash={}",
-                CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH
-            )
-            .as_str()
+    let version = Box::leak::<'static>(
+        format!(
+            "{} {} tag={} hash={}",
+            CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH
         )
+        .into_boxed_str()
+    );
+    let matches = Command::new("Hime Language Server")
+        .version(version as &str)
         .author("Association Cénotélie <contact@cenotelie.fr>")
         .about("Language server for Hime gramamrs")
         .arg(
             Arg::new("tcp")
                 .long("tcp")
                 .help("Use a tcp stream to communicate with clients")
-                .takes_value(false)
                 .required(false)
         )
         .arg(
@@ -207,15 +208,14 @@ async fn main() {
                 .long("address")
                 .short('a')
                 .help("The address to listen on, if using a TCP stream")
-                .takes_value(true)
                 .required(false)
         )
         .arg(
             Arg::new("port")
+                .value_name("PORT")
                 .long("port")
                 .short('p')
                 .help("The TCP port to listen to, if using a TCP stream")
-                .takes_value(true)
                 .required(false)
         )
         .subcommand(Command::new("version").about("Display the version string"))
@@ -229,10 +229,13 @@ async fn main() {
             )
         }
         _ => {
-            if matches.is_present("tcp") {
-                let address = matches.value_of("address").unwrap_or("127.0.0.1");
+            if matches.get_flag("tcp") {
+                let address = matches
+                    .get_one::<String>("address")
+                    .map(Deref::deref)
+                    .unwrap_or("127.0.0.1");
                 let port = matches
-                    .value_of("port")
+                    .get_one::<String>("port")
                     .map(|v| v.parse::<u16>())
                     .transpose()
                     .unwrap_or_default()
@@ -243,19 +246,13 @@ async fn main() {
                     .unwrap();
                 let (stream, _) = listener.accept().await.unwrap();
                 let (read, write) = tokio::io::split(stream);
-                let (service, messages) = LspService::new(Backend::new);
-                Server::new(read, write)
-                    .interleave(messages)
-                    .serve(service)
-                    .await;
+                let (service, socket) = LspService::new(Backend::new);
+                Server::new(read, write, socket).serve(service).await;
             } else {
                 let stdin = tokio::io::stdin();
                 let stdout = tokio::io::stdout();
-                let (service, messages) = LspService::new(Backend::new);
-                Server::new(stdin, stdout)
-                    .interleave(messages)
-                    .serve(service)
-                    .await;
+                let (service, socket) = LspService::new(Backend::new);
+                Server::new(stdin, stdout, socket).serve(service).await;
             }
         }
     }
