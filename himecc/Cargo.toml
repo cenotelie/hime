@@ -1,6 +1,6 @@
 [package]
 name = "hime_compiler"
-version = "4.1.3"
+version = "4.2.0"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "CLI tool for the generation of LR and GLR parsers for the Hime runtime."
 documentation = "https://cenotelie.fr/projects/hime"
@@ -19,7 +19,7 @@ path = "src/main.rs"
 
 [dependencies]
 hime_redist = "4.0.0"
-hime_sdk = { version = "4.1.3", features = ["print_errors"] }
+hime_sdk = { version = "4.2.0", features = ["print_errors"] }
 clap = "3"
 serde_json = "1"
 
