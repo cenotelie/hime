@@ -9,18 +9,17 @@ The Hime parser generator is a parser generator that targets the .Net platform, 
 * Robust runtime implementations in .Net, Java and Rust published in public repositories (Nuget, Maven Central, crates.io).
 * Strong emphasis on the separation of data and code. Hime forbids the inclusion of inline code in its grammar definitions in order to have very readable grammars that can be easily understood, debugged, improved. It is still possible to have custom code invoked during parsing with semantic actions.
 
-The generated parsers can be embedded on software that target:
+The generated parsers can be embedded in software that target:
 
+* Native platforms (Windows, Linux, MacOS) with Rust.
 * The .Net platform:
 	* Any implementation of [.Net Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) 1.0, including the [.Net Framework](https://www.microsoft.com/net/download/framework) 4.5 and up (installed by default on Windows 8 and up), [.Net Core](https://www.microsoft.com/net/core) 1.0 and up, [Mono](http://www.mono-project.com/) 4.6 and up, etc.
 	* [.Net Framework](https://www.microsoft.com/net/download/framework) 2.0 and up (installed by default on Windows Vista and up); or compatible implementations such as [Mono](http://www.mono-project.com/).
 * The JVM, with a JRE 7 or later installed.
-* Native platforms (Windows, Linux, MacOS) with Rust.
 
-The parser generator (himecc) can run on:
+**The parser generator (himecc) has native builds for Windows, MacOS and Linux.**
 
-* Any implementation of [.Net Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) 2.0, including the [.Net Framework](https://www.microsoft.com/net/download/framework) 4.6.1 and up (installed by default on Windows 10), [.Net Core](https://www.microsoft.com/net/core) 2.0 and up, [Mono](http://www.mono-project.com/) 5.2 and up, etc.
-* [.Net Framework](https://www.microsoft.com/net/download/framework) 2.0 and up (installed by default on Windows Vista and up); or compatible implementations such as [Mono](http://www.mono-project.com/).
+> **Note**: For the production of compiled parser assemblies in .Net, the .Net framework is required.
 
 > **Note**: For the production of compiled parser assemblies in Java, Maven is required.
 
@@ -30,10 +29,11 @@ The parser generator (himecc) can run on:
 ## Products ##
 
 * [.Net Runtime on NuGet](https://www.nuget.org/packages/Hime.Redist/)
-* [.Net SDK on NuGet](https://www.nuget.org/packages/Hime.Redist/)
 * [Java Runtime on Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fr.cenotelie.hime%22)
 * [Rust Runtime on crates.io](https://crates.io/crates/hime_redist)
-* [Downloadable distribution](https://github.com/cenotelie/hime/downloads/), including all runtimes and the generator (himecc).
+* [Rust SDK on crates.io](https://crates.io/crates/hime_sdk)
+* [Hime compiler on crates.io](https://crates.io/crates/hime_compiler)
+* [Hime compiler builds for Windows, MacOS, Linux](https://github.com/cenotelie/hime/downloads/).
 
 ## How do I use this software? ##
 
@@ -44,13 +44,12 @@ The parser generator (himecc) can run on:
 ## Repository structure ##
 
 * Software components
-	* `runtime-net`: Contains the C# sources for the .Net implementation of the runtime library.
-	* `runtime-java`: Contains the Java sources for the Java implementation of the runtime library.
-	* `runtime-rust`: Contains the Rust sources for the Rust implementation of the runtime library.
-	* `sdk-net`: Contains the C# sources of the SDK API, i.e. the parser generator.
-	* `himecc`: Contains the C# sources of the .Net CLI interface of the parser generator (himecc).
-	* `parseit-net`: Sources of the .Net version of the CLI tool for parsing bits of texts using a previously generated parser assembly.
-	* `parseit-rust`: Sources of the Rust version of the CLI tool for parsing bits of texts using a previously generated parser assembly.
+	* `runtime-net`: .Net implementation of the runtime.
+	* `runtime-java`: Java implementation of the runtime.
+	* `runtime-rust`: Rust implementation of the runtime.
+	* `sdk-rust`: Rust implementation of the SDK for parser generation.
+	* `himecc`: Rust implementation of the parser generator CLI.
+	* `parseit`: Rust implementation of the tool for parsing bits of texts using a previously generated parser assembly.
 	* `tests-driver`: Sources of the tests driver for all runtime tests.
 	* `tests-executor-net`: Sources of the test executor for the .Net runtime implementation.
 	* `tests-executor-java`: Sources of the test executor for the Java runtime implementation.
@@ -65,13 +64,7 @@ The parser generator (himecc) can run on:
 To build the code and execute all tests, run
 
 ```
-$ sh .releng/build.sh
-```
-
-To build all the release artifacts (requires a GPG key), run
-
-```
-$ sh .releng/release.sh
+$ sh build.sh
 ```
 
 This requires:

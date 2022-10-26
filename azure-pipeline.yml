@@ -19,7 +19,7 @@ stages:
   - job: Build
     displayName: Build and test
     pool:
-      name: Scaleway
+      vmImage: 'ubuntu-latest'
     container: cenotelie/hime-build-env:latest
     steps:
     - script: ./build.sh
@@ -29,7 +29,7 @@ stages:
   jobs:
   - job: linux
     pool:
-      name: Scaleway
+      vmImage: 'ubuntu-latest'
     container: cenotelie/hime-build-env-light:latest
     steps:
     - script: |
@@ -110,7 +110,7 @@ stages:
   jobs:
   - job: Publish
     pool:
-      name: Scaleway
+      vmImage: 'ubuntu-latest'
     steps:
     - script: |
         mkdir target
@@ -126,4 +126,4 @@ stages:
         source build-env.sh
         curl -o s3cli "https://cenotelie.s3.fr-par.scw.cloud/s3cli"
         chmod +x s3cli
-        ./s3cli -c $(s3config.secureFilePath) object uploadall --acl public-read cenotelie "hime/$LABEL" --file target
+        ./build-publish-s3.sh $(s3config.secureFilePath)
