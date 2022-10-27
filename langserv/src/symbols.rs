@@ -38,11 +38,17 @@ impl SymbolRegistryElement {
     pub fn is_at_location(&self, location: &InputReference) -> bool {
         self.definitions
             .iter()
+            .chain(self.references.iter())
             .any(|input_ref| input_ref.overlaps_with(location))
-            || self
-                .references
-                .iter()
-                .any(|input_ref| input_ref.overlaps_with(location))
+    }
+
+    /// Gets the full reference to this symbol at a location
+    pub fn get_full_reference(&self, location: &InputReference) -> Option<InputReference> {
+        self.definitions
+            .iter()
+            .chain(self.references.iter())
+            .find(|r| r.overlaps_with(location))
+            .copied()
     }
 }
 
@@ -77,7 +83,11 @@ impl SymbolRegistry {
                             }
                         );
                     }
-                    for variable in grammar.variables.iter() {
+                    for variable in grammar
+                        .variables
+                        .iter()
+                        .filter(|var| var.generated_for.is_none())
+                    {
                         map.insert(
                             SymbolRef::Variable(variable.id),
                             SymbolRegistryElement {

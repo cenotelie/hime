@@ -171,8 +171,17 @@ impl LanguageServer for Backend {
         ))
     }
 
-    async fn hover(&self, _params: HoverParams) -> Result<Option<Hover>> {
-        Ok(None)
+    async fn hover(&self, params: HoverParams) -> Result<Option<Hover>> {
+        let workspace = self.workspace.read().await;
+        Ok(workspace.get_symbol_description_at(
+            params
+                .text_document_position_params
+                .text_document
+                .uri
+                .as_str(),
+            params.text_document_position_params.position.line,
+            params.text_document_position_params.position.character
+        ))
     }
 
     async fn execute_command(

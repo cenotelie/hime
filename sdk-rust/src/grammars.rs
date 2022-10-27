@@ -36,6 +36,9 @@ pub trait Symbol {
 
     /// Gets the name of this symbol
     fn get_name(&self) -> &str;
+
+    /// Gets a description for this symbol
+    fn get_description(&self) -> String;
 }
 
 /// A reference to a terminal in a terminal rule
@@ -86,6 +89,19 @@ impl Symbol for Terminal {
     /// Gets the name of this symbol
     fn get_name(&self) -> &str {
         &self.name
+    }
+
+    /// Gets a description for this symbol
+    fn get_description(&self) -> String {
+        if self.is_anonymous {
+            format!("Inline terminal `{}`", &self.value)
+        } else {
+            format!(
+                "Terminal {}`{}`",
+                if self.is_fragment { "(fragment) " } else { "" },
+                self.name
+            )
+        }
     }
 }
 
@@ -253,6 +269,11 @@ impl Symbol for Virtual {
     fn get_name(&self) -> &str {
         &self.name
     }
+
+    /// Gets a description for this symbol
+    fn get_description(&self) -> String {
+        format!("Virtual symbol `{}`", &self.name)
+    }
 }
 
 impl PartialEq for Virtual {
@@ -288,6 +309,11 @@ impl Symbol for Action {
     /// Gets the name of this symbol
     fn get_name(&self) -> &str {
         &self.name
+    }
+
+    /// Gets a description for this symbol
+    fn get_description(&self) -> String {
+        format!("Action `{}`", &self.name)
     }
 }
 
@@ -383,6 +409,11 @@ impl Symbol for Variable {
     /// Gets the name of this symbol
     fn get_name(&self) -> &str {
         &self.name
+    }
+
+    /// Gets a description for this symbol
+    fn get_description(&self) -> String {
+        format!("Variable `{}`", &self.name)
     }
 }
 
@@ -1423,6 +1454,11 @@ impl Grammar {
         }
     }
 
+    /// Gets the virtual with the specified identifier
+    pub fn get_virtual(&self, sid: usize) -> Option<&Virtual> {
+        self.virtuals.iter().find(|v| v.id == sid)
+    }
+
     /// Adds a virtual symbol with the given name to this grammar
     pub fn add_virtual(&mut self, name: &str) -> &mut Virtual {
         if let Some(index) = self.virtuals.iter().position(|v| v.name == name) {
@@ -1441,6 +1477,11 @@ impl Grammar {
             let sid = self.next_sid + other.id - 3;
             self.virtuals.push(Virtual::new(sid, other.name.clone()));
         }
+    }
+
+    /// Gets the action with the specified identifier
+    pub fn get_action(&self, sid: usize) -> Option<&Action> {
+        self.actions.iter().find(|v| v.id == sid)
     }
 
     /// Adds an action symbol with the given name to this grammar

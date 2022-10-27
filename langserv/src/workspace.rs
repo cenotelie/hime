@@ -23,14 +23,16 @@ use std::path::{Path, PathBuf};
 
 use hime_redist::text::TextPosition;
 use hime_sdk::errors::Error;
-use hime_sdk::grammars::{Grammar, RuleBodyElement, SymbolRef, OPTION_AXIOM, OPTION_SEPARATOR};
+use hime_sdk::grammars::{
+    Grammar, RuleBodyElement, Symbol, SymbolRef, OPTION_AXIOM, OPTION_SEPARATOR
+};
 use hime_sdk::{CompilationTask, Input, InputReference, LoadedData, LoadedInput};
 use serde_json::Value;
 use tower_lsp::jsonrpc::Error as JsonRpcError;
 use tower_lsp::lsp_types::{
     Diagnostic, DiagnosticRelatedInformation, DiagnosticSeverity, DidChangeTextDocumentParams,
-    FileChangeType, FileEvent, GotoDefinitionResponse, Location, Position, Range,
-    SymbolInformation, SymbolKind, Url
+    FileChangeType, FileEvent, GotoDefinitionResponse, Hover, HoverContents, Location,
+    MarkedString, Position, Range, SymbolInformation, SymbolKind, Url
 };
 
 use crate::symbols::{SymbolRegistry, SymbolRegistryElement};
@@ -420,6 +422,59 @@ impl Workspace {
             references.push(self.get_location(*input_ref));
         }
         Some(references)
+    }
+
+    /// Gets the description of the symbol at a location
+    pub fn get_symbol_description_at(
+        &self,
+        doc_uri: &str,
+        line: u32,
+        character: u32
+    ) -> Option<Hover> {
+        let doc_index = self
+            .documents
+            .iter()
+            .enumerate()
+            .find(|(_, doc)| doc.url.as_str() == doc_uri)?
+            .0;
+        let input_ref = InputReference {
+            input_index: doc_index,
+            position: TextPosition {
+                line: line as usize + 1,
+                column: character as usize + 1
+            },
+            length: 0
+        };
+        let data = self.data.as_ref()?;
+        let symbol = data.find_symbol_at(input_ref)?;
+        let content = match symbol.symbol_ref {
+            SymbolRef::Dummy => String::from("<dummy>"),
+            SymbolRef::Epsilon => String::from("<epsilon>"),
+            SymbolRef::Dollar => String::from("<dollar>"),
+            SymbolRef::NullTerminal => String::from("<null>"),
+            SymbolRef::Terminal(sid) => data.grammars[symbol.grammar_index]
+                .get_terminal(sid)
+                .unwrap()
+                .get_description(),
+            SymbolRef::Variable(sid) => data.grammars[symbol.grammar_index]
+                .get_variable(sid)
+                .unwrap()
+                .get_description(),
+            SymbolRef::Virtual(sid) => data.grammars[symbol.grammar_index]
+                .get_virtual(sid)
+                .unwrap()
+                .get_description(),
+            SymbolRef::Action(sid) => data.grammars[symbol.grammar_index]
+                .get_action(sid)
+                .unwrap()
+                .get_description()
+        };
+        Some(Hover {
+            contents: HoverContents::Scalar(MarkedString::String(content)),
+            range: symbol
+                .get_full_reference(&input_ref)
+                .map(|input_ref| self.get_location(input_ref).range)
+        })
     }
 
     /// Tests an input against a grammar
