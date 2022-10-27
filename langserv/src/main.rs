@@ -23,7 +23,7 @@ pub mod workspace;
 use std::ops::Deref;
 use std::sync::Arc;
 
-use clap::{Arg, Command};
+use clap::{Arg, ArgAction, Command};
 use futures::future::join_all;
 use tokio::sync::RwLock;
 use tower_lsp::jsonrpc::{Error, Result};
@@ -62,8 +62,8 @@ impl Backend {
     async fn worker(workspace: Arc<RwLock<Workspace>>, client: Arc<Client>) {
         let mut workspace = workspace.write().await;
         workspace.lint();
-        join_all(workspace.documents.iter().map(|(uri, doc)| {
-            client.publish_diagnostics(uri.clone(), doc.diagnostics.clone(), doc.version)
+        join_all(workspace.documents.iter().map(|doc| {
+            client.publish_diagnostics(doc.url.clone(), doc.diagnostics.clone(), doc.version)
         }))
         .await;
     }
@@ -104,6 +104,8 @@ impl LanguageServer for Backend {
                     }
                 }),
                 hover_provider: Some(HoverProviderCapability::Simple(true)),
+                definition_provider: Some(OneOf::Left(true)),
+                references_provider: Some(OneOf::Left(true)),
                 ..ServerCapabilities::default()
             },
             server_info: Some(ServerInfo {
@@ -144,6 +146,31 @@ impl LanguageServer for Backend {
         }
     }
 
+    async fn goto_definition(
+        &self,
+        params: GotoDefinitionParams
+    ) -> Result<Option<GotoDefinitionResponse>> {
+        let workspace = self.workspace.read().await;
+        Ok(workspace.get_definition_at(
+            params
+                .text_document_position_params
+                .text_document
+                .uri
+                .as_str(),
+            params.text_document_position_params.position.line,
+            params.text_document_position_params.position.character
+        ))
+    }
+
+    async fn references(&self, params: ReferenceParams) -> Result<Option<Vec<Location>>> {
+        let workspace = self.workspace.read().await;
+        Ok(workspace.get_references_at(
+            params.text_document_position.text_document.uri.as_str(),
+            params.text_document_position.position.line,
+            params.text_document_position.position.character
+        ))
+    }
+
     async fn hover(&self, _params: HoverParams) -> Result<Option<Hover>> {
         Ok(None)
     }
@@ -153,7 +180,7 @@ impl LanguageServer for Backend {
         params: ExecuteCommandParams
     ) -> Result<Option<serde_json::Value>> {
         let workspace = self.workspace.read().await;
-        match &params.command[..] {
+        match params.command.as_str() {
             "test" => {
                 if params.arguments.len() != 2 {
                     Err(Error::invalid_params("Expected exactly 2 parameters"))
@@ -201,6 +228,7 @@ async fn main() {
                 .long("tcp")
                 .help("Use a tcp stream to communicate with clients")
                 .required(false)
+                .action(ArgAction::SetTrue)
         )
         .arg(
             Arg::new("address")

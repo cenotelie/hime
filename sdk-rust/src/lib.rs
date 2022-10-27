@@ -321,9 +321,7 @@ impl InputReference {
             6
         }
     }
-}
 
-impl InputReference {
     /// Build a reference from the specifiec input name and AST node
     pub fn from(input_index: usize, node: &AstNode<'_, '_, '_>) -> InputReference {
         let (position, span) = node.get_total_position_and_span().unwrap();
@@ -332,6 +330,14 @@ impl InputReference {
             position,
             length: span.length
         }
+    }
+
+    /// Checks whether this input reference overlaps with another one
+    pub fn overlaps_with(&self, other: &InputReference) -> bool {
+        self.input_index == other.input_index
+            && self.position.line == other.position.line
+            && !(self.position.column + self.length <= other.position.column
+                || other.position.column + other.length <= self.position.column)
     }
 }
 

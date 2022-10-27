@@ -17,11 +17,11 @@
 
 //! Module for the definition of a server-side workspace
 
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufReader, ErrorKind, Read};
 use std::path::{Path, PathBuf};
 
+use hime_redist::text::TextPosition;
 use hime_sdk::errors::Error;
 use hime_sdk::grammars::{Grammar, RuleBodyElement, SymbolRef, OPTION_AXIOM, OPTION_SEPARATOR};
 use hime_sdk::{CompilationTask, Input, InputReference, LoadedData, LoadedInput};
@@ -29,10 +29,11 @@ use serde_json::Value;
 use tower_lsp::jsonrpc::Error as JsonRpcError;
 use tower_lsp::lsp_types::{
     Diagnostic, DiagnosticRelatedInformation, DiagnosticSeverity, DidChangeTextDocumentParams,
-    FileChangeType, FileEvent, Location, Position, Range, SymbolInformation, SymbolKind, Url
+    FileChangeType, FileEvent, GotoDefinitionResponse, Location, Position, Range,
+    SymbolInformation, SymbolKind, Url
 };
 
-use crate::symbols::SymbolRegistry;
+use crate::symbols::{SymbolRegistry, SymbolRegistryElement};
 
 /// Represents a document in a workspace
 #[derive(Debug, Clone)]
@@ -89,6 +90,18 @@ impl WorkspaceData {
             Position::new((end.line - 1) as u32, (end.column - 1) as u32)
         )
     }
+
+    /// Gets the symbol at a location in an input
+    fn find_symbol_at(&self, location: InputReference) -> Option<&SymbolRegistryElement> {
+        for symbols in self.symbols.grammars.iter() {
+            for symbol in symbols.values() {
+                if symbol.is_at_location(&location) {
+                    return Some(symbol);
+                }
+            }
+        }
+        None
+    }
 }
 
 /// Represents the current workspace for a server
@@ -97,7 +110,7 @@ pub struct Workspace {
     /// The root URL for the workspace
     pub root: Option<Url>,
     /// The documents in the workspace
-    pub documents: HashMap<Url, Document>,
+    pub documents: Vec<Document>,
     /// The currently loaded data, if any
     pub data: Option<WorkspaceData>
 }
@@ -170,9 +183,9 @@ impl Workspace {
         let mut reader = BufReader::new(File::open(path)?);
         let mut content = String::new();
         reader.read_to_string(&mut content)?;
-        self.documents
-            .entry(uri.clone())
-            .or_insert_with(move || Document::new(uri, content));
+        if self.documents.iter().all(|doc| doc.url != uri) {
+            self.documents.push(Document::new(uri, content));
+        }
         Ok(())
     }
 
@@ -187,7 +200,7 @@ impl Workspace {
                     // TODO: handle this
                 }
                 FileChangeType::DELETED => {
-                    self.documents.remove(&event.uri);
+                    self.documents.retain(|doc| doc.url != event.uri);
                 }
                 _ => {}
             }
@@ -197,7 +210,11 @@ impl Workspace {
 
     /// Synchronizes on changes
     pub fn on_file_changes(&mut self, event: DidChangeTextDocumentParams) {
-        if let Some(document) = self.documents.get_mut(&event.text_document.uri) {
+        if let Some(document) = self
+            .documents
+            .iter_mut()
+            .find(|doc| doc.url == event.text_document.uri)
+        {
             for change in event.content_changes.into_iter() {
                 if change.range.is_none() && change.range_length.is_none() {
                     document.content = Some(change.text);
@@ -210,9 +227,7 @@ impl Workspace {
     pub fn lint(&mut self) {
         self.data = None;
         let mut task = CompilationTask::default();
-        let mut documents: Vec<&mut Document> =
-            self.documents.iter_mut().map(|(_, doc)| doc).collect();
-        for doc in documents.iter_mut() {
+        for doc in self.documents.iter_mut() {
             doc.diagnostics.clear();
             if let Some(content) = doc.content.as_ref() {
                 task.inputs.push(Input::Raw(content));
@@ -228,8 +243,8 @@ impl Workspace {
                     }
                 }
                 for error in errors.iter() {
-                    if let Some((index, diag)) = to_diagnostic(&documents, &data, error) {
-                        documents[index].diagnostics.push(diag);
+                    if let Some((index, diag)) = to_diagnostic(&mut self.documents, &data, error) {
+                        self.documents[index].diagnostics.push(diag);
                     }
                 }
                 let symbols = SymbolRegistry::from(&data.grammars);
@@ -242,8 +257,10 @@ impl Workspace {
             Err(errors) => {
                 let errors = errors.into_static();
                 for error in errors.errors.iter() {
-                    if let Some((index, diag)) = to_diagnostic(&documents, &errors.data, error) {
-                        documents[index].diagnostics.push(diag);
+                    if let Some((index, diag)) =
+                        to_diagnostic(&mut self.documents, &errors.data, error)
+                    {
+                        self.documents[index].diagnostics.push(diag);
                     }
                 }
             }
@@ -332,6 +349,79 @@ impl Workspace {
         }
     }
 
+    /// Gets the definition of a symbol at a location
+    pub fn get_definition_at(
+        &self,
+        doc_uri: &str,
+        line: u32,
+        character: u32
+    ) -> Option<GotoDefinitionResponse> {
+        let doc_index = self
+            .documents
+            .iter()
+            .enumerate()
+            .find(|(_, doc)| doc.url.as_str() == doc_uri)?
+            .0;
+        let input_ref = InputReference {
+            input_index: doc_index,
+            position: TextPosition {
+                line: line as usize + 1,
+                column: character as usize + 1
+            },
+            length: 0
+        };
+        let data = self.data.as_ref()?;
+        let symbol = data.find_symbol_at(input_ref)?;
+        if symbol.definitions.is_empty() {
+            None
+        } else if symbol.definitions.len() == 1 {
+            Some(GotoDefinitionResponse::Scalar(
+                self.get_location(symbol.definitions[0])
+            ))
+        } else {
+            Some(GotoDefinitionResponse::Array(
+                symbol
+                    .definitions
+                    .iter()
+                    .map(|input_ref| self.get_location(*input_ref))
+                    .collect()
+            ))
+        }
+    }
+
+    /// Gets all the references to a symbol at a location
+    pub fn get_references_at(
+        &self,
+        doc_uri: &str,
+        line: u32,
+        character: u32
+    ) -> Option<Vec<Location>> {
+        let doc_index = self
+            .documents
+            .iter()
+            .enumerate()
+            .find(|(_, doc)| doc.url.as_str() == doc_uri)?
+            .0;
+        let input_ref = InputReference {
+            input_index: doc_index,
+            position: TextPosition {
+                line: line as usize + 1,
+                column: character as usize + 1
+            },
+            length: 0
+        };
+        let data = self.data.as_ref()?;
+        let symbol = data.find_symbol_at(input_ref)?;
+        let mut references = Vec::new();
+        for input_ref in symbol.definitions.iter() {
+            references.push(self.get_location(*input_ref));
+        }
+        for input_ref in symbol.references.iter() {
+            references.push(self.get_location(*input_ref));
+        }
+        Some(references)
+    }
+
     /// Tests an input against a grammar
     pub fn test(&self, grammar_name: &str, input: &str) -> Result<Option<Value>, JsonRpcError> {
         match &self.data {
@@ -399,17 +489,17 @@ impl Workspace {
         // we expect to have loaded data when calling this method,
         // otherwise we would not have an input reference in argument
         let data = self.data.as_ref().unwrap();
-        let (url, _doc) = self.documents.iter().nth(input_ref.input_index).unwrap();
+        let document = &self.documents[input_ref.input_index];
         Location {
             range: data.get_range(input_ref),
-            uri: url.clone()
+            uri: document.url.clone()
         }
     }
 }
 
 /// Converts an error to a diagnostic
 fn to_diagnostic(
-    documents: &[&mut Document],
+    documents: &mut [Document],
     data: &LoadedData,
     error: &Error
 ) -> Option<(usize, Diagnostic)> {
@@ -800,8 +890,8 @@ fn test_scan_workspace_in() -> io::Result<()> {
     let mut workspace = Workspace::default();
     let root = std::env::current_dir()?.parent().unwrap().to_owned();
     workspace.scan_workspace_in(&root)?;
-    for (uri, _) in workspace.documents.iter() {
-        println!("{}", uri);
+    for doc in workspace.documents.iter() {
+        println!("{}", &doc.url);
     }
     assert_eq!(workspace.documents.is_empty(), false);
     Ok(())
@@ -816,8 +906,8 @@ fn test_scan_workspace() -> io::Result<()> {
         Err(_) => panic!("Failed to convert current dir to Url")
     };
     workspace.scan_workspace(url)?;
-    for (uri, _) in workspace.documents.iter() {
-        println!("{}", uri);
+    for doc in workspace.documents.iter() {
+        println!("{}", &doc.url);
     }
     assert_eq!(workspace.documents.is_empty(), false);
     Ok(())

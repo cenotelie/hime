@@ -26,11 +26,24 @@ pub struct SymbolRegistryElement {
     /// The index of the defining grammar
     pub grammar_index: usize,
     /// Reference to the symbol
-    pub smybol_ref: SymbolRef,
+    pub symbol_ref: SymbolRef,
     /// The input reference for its definition
     pub definitions: Vec<InputReference>,
     /// All the usage references
     pub references: Vec<InputReference>
+}
+
+impl SymbolRegistryElement {
+    /// Gets whether this symbol is at a location
+    pub fn is_at_location(&self, location: &InputReference) -> bool {
+        self.definitions
+            .iter()
+            .any(|input_ref| input_ref.overlaps_with(location))
+            || self
+                .references
+                .iter()
+                .any(|input_ref| input_ref.overlaps_with(location))
+    }
 }
 
 /// A registry of symbols and their references
@@ -54,7 +67,7 @@ impl SymbolRegistry {
                             SymbolRef::Terminal(terminal.id),
                             SymbolRegistryElement {
                                 grammar_index,
-                                smybol_ref: SymbolRef::Terminal(terminal.id),
+                                symbol_ref: SymbolRef::Terminal(terminal.id),
                                 definitions: vec![terminal.input_ref],
                                 references: terminal
                                     .terminal_references
@@ -69,7 +82,7 @@ impl SymbolRegistry {
                             SymbolRef::Variable(variable.id),
                             SymbolRegistryElement {
                                 grammar_index,
-                                smybol_ref: SymbolRef::Variable(variable.id),
+                                symbol_ref: SymbolRef::Variable(variable.id),
                                 definitions: variable
                                     .rules
                                     .iter()
@@ -84,7 +97,7 @@ impl SymbolRegistry {
                             SymbolRef::Virtual(symbol.id),
                             SymbolRegistryElement {
                                 grammar_index,
-                                smybol_ref: SymbolRef::Virtual(symbol.id),
+                                symbol_ref: SymbolRef::Virtual(symbol.id),
                                 definitions: Vec::new(),
                                 references: Vec::new()
                             }
@@ -95,7 +108,7 @@ impl SymbolRegistry {
                             SymbolRef::Action(symbol.id),
                             SymbolRegistryElement {
                                 grammar_index,
-                                smybol_ref: SymbolRef::Action(symbol.id),
+                                symbol_ref: SymbolRef::Action(symbol.id),
                                 definitions: Vec::new(),
                                 references: Vec::new()
                             }
