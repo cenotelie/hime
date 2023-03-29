@@ -126,7 +126,9 @@ pub fn get_line_number_width(error: &Error, data: &LoadedData) -> usize {
                 .map(|item| {
                     let rule = item.rule.get_rule_in(&data.grammars[*grammar_index]);
                     let choice = &rule.body.choices[0];
-                    if item.position >= choice.elements.len() {
+                    if choice.elements.is_empty() {
+                        0
+                    } else if item.position >= choice.elements.len() {
                         // at the end
                         choice.elements[choice.elements.len() - 1]
                             .input_ref
@@ -562,7 +564,9 @@ fn print_lr_conflict_item_reduce(
     let choice = &rule.body.choices[0];
     let lookahead = item.lookaheads.get(terminal).unwrap();
     let value = grammar.get_symbol_value(terminal.into());
-    if item.position >= choice.elements.len() {
+    if choice.elements.is_empty() {
+        // do not display this choice
+    } else if item.position >= choice.elements.len() {
         let input_ref = choice.elements[choice.elements.len() - 1]
             .input_ref
             .unwrap();
