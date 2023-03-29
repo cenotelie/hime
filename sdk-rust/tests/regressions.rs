@@ -1,4 +1,5 @@
 use hime_sdk::errors::print::{get_line_number_width, print_error};
+use hime_sdk::output::helper::{get_namespace_java, get_namespace_net, get_namespace_rust};
 use hime_sdk::{CompilationTask, Input, ParsingMethod};
 
 /// [Github issue #79](https://github.com/cenotelie/hime/issues/79)
@@ -30,4 +31,15 @@ fn test_errors_display() {
         let width = get_line_number_width(error, &data);
         print_error(error, width, &data);
     }
+}
+
+/// [Github issue #79](https://github.com/cenotelie/hime/issues/79)
+#[test]
+fn test_namespace_transformation() {
+    assert_eq!(get_namespace_java("a.b.c"), String::from("a.b.c"));
+    assert_eq!(get_namespace_java("a::b::c"), String::from("a.b.c"));
+    assert_eq!(get_namespace_net("a.b.c"), String::from("A.B.C"));
+    assert_eq!(get_namespace_net("a::b::c"), String::from("A.B.C"));
+    assert_eq!(get_namespace_rust("a.b.c"), String::from("a::b::c"));
+    assert_eq!(get_namespace_rust("a::b::c"), String::from("a::b::c"));
 }
