@@ -38,6 +38,7 @@ use serde_derive::{Deserialize, Serialize};
 pub type Utf16C = u16;
 
 /// Represents a span of text in an input as a starting index and length
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TextSpan {
     /// The starting index
@@ -70,6 +71,7 @@ impl Display for TextSpan {
 }
 
 /// Represents a position in term of line and column in a text input
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TextPosition {
     /// The 1-base line number
@@ -115,6 +117,7 @@ impl Display for TextPosition {
 /// content = "public Struct Context"
 /// pointer = "       ^^^^^^"
 /// ```
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct TextContext<'a> {
     /// The text content being represented
@@ -136,6 +139,7 @@ pub struct Text<'a> {
 
 impl<'a> Text<'a> {
     /// Transforms into an owned static version of the data
+    #[must_use]
     pub fn into_static(self) -> Text<'static> {
         Text {
             content: Cow::Owned(self.content.to_string()),
@@ -145,6 +149,7 @@ impl<'a> Text<'a> {
 
     /// Initializes this text
     #[allow(clippy::should_implement_trait)]
+    #[must_use]
     pub fn from_str(content: &'a str) -> Text<'a> {
         let lines = find_lines_in(content.char_indices());
         Text {
@@ -154,6 +159,7 @@ impl<'a> Text<'a> {
     }
 
     /// Initializes this text
+    #[must_use]
     pub fn from_string(content: String) -> Text<'static> {
         let lines = find_lines_in(content.char_indices());
         Text {
@@ -163,6 +169,10 @@ impl<'a> Text<'a> {
     }
 
     /// Initializes this text from a UTF-8 stream
+    ///
+    /// # Errors
+    ///
+    /// Return an error when reading the input fails.
     pub fn from_utf8_stream(input: &mut dyn Read) -> Result<Text<'static>, std::io::Error> {
         let mut content = String::new();
         input.read_to_string(&mut content)?;
@@ -174,47 +184,60 @@ impl<'a> Text<'a> {
     }
 
     /// Gets the number of lines
+    #[must_use]
     pub fn get_line_count(&self) -> usize {
         self.lines.len()
     }
 
     /// Gets whether the text is empty
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.content.is_empty()
     }
 
     /// Gets the size in number of characters
+    #[must_use]
     pub fn len(&self) -> usize {
         self.content.len()
     }
 
     /// Gets whether the specified index is after the end of the text represented by this object
+    #[must_use]
     pub fn is_end(&self, index: usize) -> bool {
         index >= self.content.len()
     }
 
     /// Gets the character at the specified index
+    ///
+    /// # Panics
+    ///
+    /// Panic when index is at or beyond the end of the content
+    #[must_use]
     pub fn at(&self, index: usize) -> char {
         self.content[index..].chars().next().unwrap()
     }
 
     /// Gets the substring beginning at the given index with the given length
+    #[must_use]
     pub fn get_value(&self, index: usize, length: usize) -> &str {
         &self.content[index..(index + length)]
     }
 
     /// Get the substring corresponding to the specified span
+    #[must_use]
     pub fn get_value_for(&self, span: TextSpan) -> &str {
         self.get_value(span.index, span.length)
     }
 
     /// Get the substring corresponding to the text at the specified position and the given length
+    #[must_use]
     pub fn get_value_at(&self, position: TextPosition, length: usize) -> &str {
         let start = self.get_index_at(position);
         &self.content[start..(start + length)]
     }
 
     /// Gets the index within the content of the specified position
+    #[must_use]
     pub fn get_index_at(&self, position: TextPosition) -> usize {
         let from_line = &self.content[self.lines[position.line - 1]..];
         let in_line_offset = from_line
@@ -227,11 +250,13 @@ impl<'a> Text<'a> {
     }
 
     /// Gets the starting index of the i-th line
+    #[must_use]
     pub fn get_line_index(&self, line: usize) -> usize {
         self.lines[line - 1]
     }
 
     /// Gets the length of the i-th line
+    #[must_use]
     pub fn get_line_length(&self, line: usize) -> usize {
         if line == self.lines.len() {
             self.content.len() - self.lines[line - 1]
@@ -241,11 +266,13 @@ impl<'a> Text<'a> {
     }
 
     /// Gets the string content of the i-th line
+    #[must_use]
     pub fn get_line_content(&self, line: usize) -> &str {
         self.get_value(self.get_line_index(line), self.get_line_length(line))
     }
 
     /// Gets the position at the given index
+    #[must_use]
     pub fn get_position_at(&self, index: usize) -> TextPosition {
         let line = find_line_at(&self.lines, index);
         let nb_chars = self.content[self.lines[line]..index].chars().count();
@@ -256,30 +283,25 @@ impl<'a> Text<'a> {
     }
 
     /// Gets the position for a starting position and a length
+    #[must_use]
     pub fn get_position_for(&self, position: TextPosition, length: usize) -> TextPosition {
         let index = self.lines[position.line - 1] + position.column - 1 + length;
         self.get_position_at(index)
     }
 
     /// Gets the context description for the current text at the specified position
+    #[must_use]
     pub fn get_context_at(&self, position: TextPosition) -> TextContext {
         self.get_context_for(position, 1)
     }
 
     /// Gets the context description for the current text at the specified position
+    #[must_use]
     pub fn get_context_for(&self, position: TextPosition, length: usize) -> TextContext {
         // gather the data for the line
         let mut line_content = self.get_line_content(position.line);
         // remove the line ending
-        let mut end = line_content.len();
-        while end != 0 {
-            let last = line_content.chars().last().unwrap();
-            if !is_line_ending_char(last) {
-                break;
-            }
-            end -= last.len_utf8();
-            line_content = &line_content[..end];
-        }
+        line_content = line_content.trim_end_matches(is_line_ending_char);
         // remove the heading white space
         let mut removed_heading = 0;
         loop {
@@ -323,12 +345,14 @@ impl<'a> Text<'a> {
     }
 
     /// Gets the context description for the current text at the specified span
+    #[must_use]
     pub fn get_context_of(&self, span: TextSpan) -> TextContext {
         let position = self.get_position_at(span.index);
         self.get_context_for(position, span.length)
     }
 
     /// Gets an iterator over the UTF-16 codepoints starting at a location
+    #[must_use]
     pub fn iter_utf16_from(&self, from: usize) -> Utf16Iter {
         Utf16Iter {
             inner: self.content[from..].chars(),
@@ -360,12 +384,12 @@ impl<'a> Iterator for Utf16Iter<'a> {
                     let length = c.len_utf8();
                     let mut encoded = [0_u16; 2];
                     c.encode_utf16(&mut encoded);
-                    if encoded[1] != 0 {
+                    if encoded[1] == 0 {
+                        Some((encoded[0], length))
+                    } else {
                         // sequence
                         self.next_cp = Some((encoded[1], length));
                         Some((encoded[0], 0))
-                    } else {
-                        Some((encoded[0], length))
                     }
                 }
             }
@@ -377,7 +401,7 @@ impl<'a> Iterator for Utf16Iter<'a> {
 /// Recognized sequences are:
 /// [U+000D, U+000A] (this is Windows-style \r \n)
 /// [U+????, U+000A] (this is unix style \n)
-/// [U+000D, U+????] (this is MacOS style \r, without \n after)
+/// [U+000D, U+????] (this is `MacOS` style \r, without \n after)
 /// Others:
 /// [?, U+000B], [?, U+000C], [?, U+0085], [?, U+2028], [?, U+2029]
 fn is_line_ending(c1: char, c2: char) -> bool {

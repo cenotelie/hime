@@ -252,7 +252,7 @@ pub struct LoadedInput<'t> {
 }
 
 /// Transforms into an owned static version of the data
-fn loaded_input_into_static<'t>(input: LoadedInput<'t>) -> LoadedInput<'static> {
+fn loaded_input_into_static(input: LoadedInput<'_>) -> LoadedInput<'static> {
     LoadedInput {
         name: input.name,
         content: input.content.into_static()
@@ -276,7 +276,7 @@ pub struct LoadedData<'t> {
 }
 
 /// Transforms into an owned static version of the data
-fn loaded_data_into_static<'t>(data: LoadedData<'t>) -> LoadedData<'static> {
+fn loaded_data_into_static(data: LoadedData<'_>) -> LoadedData<'static> {
     LoadedData {
         inputs: data
             .inputs
@@ -612,9 +612,9 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Outputs the grammar artifacts
-    fn execute_grammar_artifacts<'g>(
+    fn execute_grammar_artifacts(
         &self,
-        grammars: &'g [Grammar],
+        grammars: &[Grammar],
         data: &[BuildData]
     ) -> Result<(), Vec<Error>> {
         let mut errors = Vec::new();
@@ -632,9 +632,9 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Build an assembly for the relevant grammars
-    fn execute_output_assembly<'g>(
+    fn execute_output_assembly(
         &self,
-        grammars: &'g [Grammar],
+        grammars: &[Grammar],
         target: Runtime,
         errors: &mut Vec<Error>
     ) {

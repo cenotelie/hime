@@ -26,6 +26,7 @@ use crate::text::Text;
 use crate::tokens::{TokenRepository, TokenRepositoryImpl};
 
 /// Represents the output of a parser
+#[allow(clippy::module_name_repetitions)]
 pub struct ParseResult<'s, 't, 'a> {
     /// The table of grammar terminals
     pub terminals: &'a [Symbol<'s>],
@@ -45,6 +46,7 @@ pub struct ParseResult<'s, 't, 'a> {
 
 impl<'s, 't, 'a> ParseResult<'s, 't, 'a> {
     /// Initialize a new parse result
+    #[must_use]
     pub fn new(
         terminals: &'a [Symbol<'s>],
         variables: &'a [Symbol<'s>],
@@ -63,16 +65,19 @@ impl<'s, 't, 'a> ParseResult<'s, 't, 'a> {
     }
 
     /// Gets whether this result denotes a successful parsing
+    #[must_use]
     pub fn is_success(&self) -> bool {
         self.ast.has_root()
     }
 
     /// Gets the token repository associated with this result
+    #[must_use]
     pub fn get_tokens(&self) -> TokenRepository {
         TokenRepository::new(self.terminals, &self.text, &self.tokens)
     }
 
     /// Gets the resulting AST
+    #[must_use]
     pub fn get_ast<'x>(&'x self) -> Ast<'s, 't, 'x> {
         Ast::new(
             TokenRepository::new(self.terminals, &self.text, &self.tokens),
@@ -83,6 +88,7 @@ impl<'s, 't, 'a> ParseResult<'s, 't, 'a> {
     }
 
     /// Gets the mutable data required for parsing
+    #[must_use]
     pub fn get_parsing_data<'x>(
         &'x mut self
     ) -> (

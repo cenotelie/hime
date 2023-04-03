@@ -27,12 +27,15 @@ use crate::text::{TextPosition, Utf16C};
 /// Common trait for data about an error
 pub trait ParseErrorDataTrait {
     /// Gets the error's position in the input
+    #[must_use]
     fn get_position(&self) -> TextPosition;
 
     /// Gets the error's length in the input (in number of characters)
+    #[must_use]
     fn get_length(&self) -> usize;
 
     /// Gets the error's message
+    #[must_use]
     fn get_message(&self) -> String;
 }
 
@@ -62,6 +65,7 @@ impl ParseErrorDataTrait for ParseErrorEndOfInput {
 
 impl ParseErrorEndOfInput {
     /// Creates a new error
+    #[must_use]
     pub fn new(position: TextPosition) -> ParseErrorEndOfInput {
         ParseErrorEndOfInput { position }
     }
@@ -101,6 +105,7 @@ impl ParseErrorDataTrait for ParseErrorUnexpectedChar {
 
 impl ParseErrorUnexpectedChar {
     /// Creates a new error
+    #[must_use]
     pub fn new(position: TextPosition, unexpected: char) -> ParseErrorUnexpectedChar {
         ParseErrorUnexpectedChar {
             position,
@@ -153,6 +158,7 @@ impl ParseErrorDataTrait for ParseErrorIncorrectEncodingSequence {
 
 impl ParseErrorIncorrectEncodingSequence {
     /// Initializes this error
+    #[must_use]
     pub fn new(
         position: TextPosition,
         missing_high: bool,
@@ -213,6 +219,7 @@ impl<'s> ParseErrorDataTrait for ParseErrorUnexpectedToken<'s> {
 
 impl<'s> ParseErrorUnexpectedToken<'s> {
     /// Initializes this error
+    #[must_use]
     pub fn new(
         position: TextPosition,
         length: usize,
@@ -253,8 +260,8 @@ impl<'s> ParseErrorDataTrait for ParseError<'s> {
             ParseError::UnexpectedEndOfInput(x) => x.get_position(),
             ParseError::UnexpectedChar(x) => x.get_position(),
             ParseError::UnexpectedToken(x) => x.get_position(),
-            ParseError::IncorrectUTF16NoLowSurrogate(x) => x.get_position(),
-            ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_position()
+            ParseError::IncorrectUTF16NoLowSurrogate(x)
+            | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_position()
         }
     }
 
@@ -264,8 +271,8 @@ impl<'s> ParseErrorDataTrait for ParseError<'s> {
             ParseError::UnexpectedEndOfInput(x) => x.get_length(),
             ParseError::UnexpectedChar(x) => x.get_length(),
             ParseError::UnexpectedToken(x) => x.get_length(),
-            ParseError::IncorrectUTF16NoLowSurrogate(x) => x.get_length(),
-            ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_length()
+            ParseError::IncorrectUTF16NoLowSurrogate(x)
+            | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_length()
         }
     }
 
@@ -275,8 +282,8 @@ impl<'s> ParseErrorDataTrait for ParseError<'s> {
             ParseError::UnexpectedEndOfInput(x) => x.get_message(),
             ParseError::UnexpectedChar(x) => x.get_message(),
             ParseError::UnexpectedToken(x) => x.get_message(),
-            ParseError::IncorrectUTF16NoLowSurrogate(x) => x.get_message(),
-            ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_message()
+            ParseError::IncorrectUTF16NoLowSurrogate(x)
+            | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_message()
         }
     }
 }
@@ -290,6 +297,7 @@ impl<'s> Display for ParseError<'s> {
 impl<'s> std::error::Error for ParseError<'s> {}
 
 /// Represents an entity that can handle lexical and syntactic errors
+#[allow(clippy::module_name_repetitions)]
 #[derive(Default, Clone)]
 pub struct ParseErrors<'s> {
     /// The overall errors

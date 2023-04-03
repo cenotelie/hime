@@ -70,17 +70,19 @@ impl<T: Copy> Clone for BigList<T> {
 
 impl<T> BigList<T> {
     /// Gets whether the list is empty
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.chunk_index == 0 && self.cell_index == 0
     }
 
     /// Gets the list total length
+    #[must_use]
     pub fn len(&self) -> usize {
         (self.chunk_index * CHUNKS_SIZE) + self.cell_index
     }
 }
 
-/// Implementation of BigList
+/// Implementation of `BigList`
 impl<T: Default + Copy> BigList<T> {
     /// Adds a value at the end of the list
     pub fn push(&mut self, value: T) -> usize {
@@ -105,6 +107,7 @@ impl<T: Default + Copy> BigList<T> {
     }
 
     /// Gets an iterator over the list
+    #[must_use]
     pub fn iter(&self) -> BigListIterator<T> {
         BigListIterator {
             list: self,
@@ -113,7 +116,7 @@ impl<T: Default + Copy> BigList<T> {
     }
 }
 
-/// Implementation of the indexer operator for immutable BigList
+/// Implementation of the indexer operator for immutable `BigList`
 impl<T: Copy> Index<usize> for BigList<T> {
     type Output = T;
     fn index(&self, index: usize) -> &T {
@@ -121,14 +124,14 @@ impl<T: Copy> Index<usize> for BigList<T> {
     }
 }
 
-/// Implementation of the indexer [] operator for mutable BigList
+/// Implementation of the indexer [] operator for mutable `BigList`
 impl<T: Copy> IndexMut<usize> for BigList<T> {
     fn index_mut(&mut self, index: usize) -> &mut T {
         &mut self.chunks[index >> UPPER_SHIFT][index & LOWER_MASK]
     }
 }
 
-/// An iterator over a BigList
+/// An iterator over a `BigList`
 pub struct BigListIterator<'a, T: 'a> {
     /// The parent list
     list: &'a BigList<T>,

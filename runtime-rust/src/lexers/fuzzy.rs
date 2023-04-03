@@ -50,6 +50,7 @@ impl FuzzyMatcherHead {
     }
 
     /// Initializes this erroneous head from a previous one
+    #[allow(clippy::cast_possible_truncation)]
     pub fn new_error(
         previous: &FuzzyMatcherHead,
         state: u32,
@@ -91,6 +92,7 @@ impl FuzzyMatcherHead {
 /// This matcher uses the Levenshtein distance to match the input ahead against the current DFA automaton.
 /// The matcher favors solutions that are the closest to the original input.
 /// When multiple solutions are at the same Levenshtein distance to the input, the longest one is preferred.
+#[allow(clippy::module_name_repetitions)]
 pub struct FuzzyMatcher<'s, 't, 'a> {
     /// This lexer's automaton
     automaton: &'a Automaton,
@@ -224,12 +226,13 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
         if result.match_length == 0 {
             self.on_failure()
         } else {
-            self.on_success(&result)
+            Some(self.on_success(&result))
         }
     }
 
     /// Constructs the solution when succeeded to fix the error
-    fn on_success(&mut self, result: &FuzzyMatcherResult) -> Option<TokenMatch> {
+    #[allow(clippy::cast_possible_truncation)]
+    fn on_success(&mut self, result: &FuzzyMatcherResult) -> TokenMatch {
         let mut last_error_index = result.match_length + 1;
         for i in 0..result.match_head.as_ref().unwrap().get_distance() {
             let error_index =
@@ -239,10 +242,10 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
             }
             last_error_index = error_index;
         }
-        Some(TokenMatch {
+        TokenMatch {
             state: result.match_head.as_ref().unwrap().state,
             length: result.match_length as u32
-        })
+        }
     }
 
     /// Reports on the lexical error at the specified index
@@ -285,11 +288,11 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
         if state_data.get_terminals_count() > 0
             && u32::from(state_data.get_terminal(0).index) != self.separator
         {
-            self.on_matching_head(result, head, offset);
+            FuzzyMatcher::on_matching_head(result, head, offset);
         }
         if head.get_distance() < self.max_distance && !state_data.is_dead_end() {
             // lookup transitions
-            self.explore_transitions(result, head, &state_data, offset, false);
+            FuzzyMatcher::explore_transitions(result, head, &state_data, offset, false);
             self.explore_insertions(result, head, offset, false, 0);
         }
     }
@@ -307,7 +310,7 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
         if state_data.get_terminals_count() > 0
             && u32::from(state_data.get_terminal(0).index) != self.separator
         {
-            self.on_matching_head(result, head, offset);
+            FuzzyMatcher::on_matching_head(result, head, offset);
         }
         if head.get_distance() >= self.max_distance || state_data.is_dead_end() {
             // cannot stray further
@@ -322,13 +325,12 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
         // could try a drop
         result.push_head_error(head, head.state, offset);
         // lookup transitions
-        self.explore_transitions(result, head, &state_data, offset, false);
+        FuzzyMatcher::explore_transitions(result, head, &state_data, offset, false);
         self.explore_insertions(result, head, offset, false, current);
     }
 
     /// Explores a state transition
     fn explore_transitions(
-        &self,
         result: &mut FuzzyMatcherResult,
         head: &FuzzyMatcherHead,
         state_data: &AutomatonState,
@@ -338,11 +340,11 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
         for i in 0..256 {
             let target = state_data.get_cached_transition(i);
             if target != DEAD_STATE {
-                self.explore_transition_to_target(result, head, target, offset, at_end);
+                FuzzyMatcher::explore_transition_to_target(result, head, target, offset, at_end);
             }
         }
         for i in 0..state_data.get_bulk_transitions_count() {
-            self.explore_transition_to_target(
+            FuzzyMatcher::explore_transition_to_target(
                 result,
                 head,
                 state_data.get_bulk_transition(i).target,
@@ -354,7 +356,6 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
 
     /// Explores a state transition
     fn explore_transition_to_target(
-        &self,
         result: &mut FuzzyMatcherResult,
         head: &FuzzyMatcherHead,
         target: u32,
@@ -421,7 +422,7 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
         if state_data.get_terminals_count() > 0
             && u32::from(state_data.get_terminal(0).index) != self.separator
         {
-            self.on_matching_insertion(result, head, offset, state, distance);
+            FuzzyMatcher::on_matching_insertion(result, head, offset, state, distance);
         }
         if !at_end {
             let target = state_data.get_target_by(current);
@@ -431,17 +432,12 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
         }
         if distance < self.max_distance {
             // continue insertion
-            self.explore_transitions(result, head, &state_data, offset, at_end);
+            FuzzyMatcher::explore_transitions(result, head, &state_data, offset, at_end);
         }
     }
 
     /// When a matching head is encountered
-    fn on_matching_head(
-        &self,
-        result: &mut FuzzyMatcherResult,
-        head: &FuzzyMatcherHead,
-        offset: usize
-    ) {
+    fn on_matching_head(result: &mut FuzzyMatcherResult, head: &FuzzyMatcherHead, offset: usize) {
         if result.match_head.is_none() {
             result.match_head = Some(head.clone());
             result.match_length = offset;
@@ -458,7 +454,6 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
 
     /// When a matching insertion is encountered
     fn on_matching_insertion(
-        &self,
         result: &mut FuzzyMatcherResult,
         previous: &FuzzyMatcherHead,
         offset: usize,
@@ -486,6 +481,7 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
 }
 
 /// Computes the comparable length of the specified match
+#[allow(clippy::cast_possible_wrap)]
 fn get_comparable_length(head: &FuzzyMatcherHead, length: usize) -> isize {
     length as isize - head.get_distance() as isize
 }

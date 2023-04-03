@@ -28,7 +28,7 @@ use crate::tokens::TokenRepository;
 const DEFAULT_RECOVERY_MATCHING_DISTANCE: usize = 3;
 
 /// Runs the fuzzy DFA matcher
-#[allow(clippy::needless_lifetimes)]
+#[allow(clippy::needless_lifetimes, clippy::cast_possible_truncation)]
 fn run_fuzzy_matcher<'s, 't, 'a>(
     repository: &TokenRepository<'s, 't, 'a>,
     automaton: &'a Automaton,
@@ -92,6 +92,7 @@ impl<'s, 't, 'a> ContextFreeLexer<'s, 't, 'a> {
     }
 
     /// Gets the next token in the input
+    #[allow(clippy::cast_possible_truncation)]
     fn get_next_token(&mut self) -> Option<TokenKernel> {
         if !self.data.has_run {
             // lex all tokens now
@@ -133,21 +134,20 @@ impl<'s, 't, 'a> ContextFreeLexer<'s, 't, 'a> {
                     self.data.repository.add(1, index, 0);
                     // exit here
                     return;
-                } else {
-                    // matched something
-                    let terminal = self
-                        .data
-                        .automaton
-                        .get_state(the_match.state)
-                        .get_terminal(0)
-                        .index as usize;
-                    if self.data.repository.terminals[terminal].id != self.data.separator_id {
-                        self.data
-                            .repository
-                            .add(terminal, index, the_match.length as usize);
-                    }
-                    index += the_match.length as usize;
                 }
+                // matched something
+                let terminal = self
+                    .data
+                    .automaton
+                    .get_state(the_match.state)
+                    .get_terminal(0)
+                    .index as usize;
+                if self.data.repository.terminals[terminal].id != self.data.separator_id {
+                    self.data
+                        .repository
+                        .add(terminal, index, the_match.length as usize);
+                }
+                index += the_match.length as usize;
             } else {
                 // skip this character
                 index += self.data.repository.text.at(index).len_utf8();
@@ -187,6 +187,7 @@ impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
     }
 
     /// Gets the next token in the input
+    #[allow(clippy::cast_possible_truncation)]
     fn get_next_token(&mut self, contexts: &dyn ContextProvider) -> Option<TokenKernel> {
         if self.data.has_run {
             return None;
@@ -218,25 +219,23 @@ impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
                         terminal_id: SID_DOLLAR,
                         index: token_index as u32
                     });
-                } else {
-                    // matched something
-                    let terminal_index = self.get_terminal_for(the_match.state, contexts);
-                    let terminal_id = self.data.repository.terminals[terminal_index as usize].id;
-                    if terminal_id != self.data.separator_id {
-                        let token_index = self.data.repository.add(
-                            terminal_index as usize,
-                            self.input_index,
-                            the_match.length as usize
-                        );
-                        self.input_index += the_match.length as usize;
-                        return Some(TokenKernel {
-                            terminal_id,
-                            index: token_index as u32
-                        });
-                    } else {
-                        self.input_index += the_match.length as usize;
-                    }
                 }
+                // matched something
+                let terminal_index = self.get_terminal_for(the_match.state, contexts);
+                let terminal_id = self.data.repository.terminals[terminal_index as usize].id;
+                if terminal_id != self.data.separator_id {
+                    let token_index = self.data.repository.add(
+                        terminal_index as usize,
+                        self.input_index,
+                        the_match.length as usize
+                    );
+                    self.input_index += the_match.length as usize;
+                    return Some(TokenKernel {
+                        terminal_id,
+                        index: token_index as u32
+                    });
+                }
+                self.input_index += the_match.length as usize;
             } else {
                 // skip this character
                 self.input_index += self.data.repository.text.at(self.input_index).len_utf8();
@@ -290,6 +289,7 @@ pub enum Lexer<'s, 't, 'a> {
 
 impl<'s, 't, 'a> Lexer<'s, 't, 'a> {
     /// Gets the data for the lexer
+    #[must_use]
     pub fn get_data(&self) -> &LexerData<'s, 't, 'a> {
         match self {
             Lexer::ContextFree(lexer) => &lexer.data,

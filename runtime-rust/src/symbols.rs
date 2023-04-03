@@ -61,18 +61,23 @@ impl<'a> Display for Symbol<'a> {
 /// A trait for a parsing element
 pub trait SemanticElementTrait<'s, 'a> {
     /// Gets the position in the input text of this element
+    #[must_use]
     fn get_position(&self) -> Option<TextPosition>;
 
     /// Gets the span in the input text of this element
+    #[must_use]
     fn get_span(&self) -> Option<TextSpan>;
 
     /// Gets the context of this element in the input
+    #[must_use]
     fn get_context(&self) -> Option<TextContext<'a>>;
 
     /// Gets the grammar symbol associated to this element
+    #[must_use]
     fn get_symbol(&self) -> Symbol<'s>;
 
     /// Gets the value of this element, if any
+    #[must_use]
     fn get_value(&self) -> Option<&'a str>;
 }
 
@@ -119,9 +124,9 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for SemanticElement<'s, 't, 'a> {
     fn get_symbol(&self) -> Symbol<'s> {
         match self {
             SemanticElement::Token(token) => token.get_symbol(),
-            SemanticElement::Terminal(symbol) => *symbol,
-            SemanticElement::Variable(symbol) => *symbol,
-            SemanticElement::Virtual(symbol) => *symbol
+            SemanticElement::Terminal(symbol)
+            | SemanticElement::Variable(symbol)
+            | SemanticElement::Virtual(symbol) => *symbol
         }
     }
 
@@ -137,6 +142,7 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for SemanticElement<'s, 't, 'a> {
 
 impl<'s, 't, 'a> SemanticElement<'s, 't, 'a> {
     /// Gets the type of the associated symbol
+    #[must_use]
     pub fn get_symbol_type(&self) -> SymbolType {
         match self {
             SemanticElement::Token(_token) => SymbolType::Terminal,
@@ -150,9 +156,11 @@ impl<'s, 't, 'a> SemanticElement<'s, 't, 'a> {
 /// Represents the semantic body of a rule being reduced
 pub trait SemanticBody {
     /// Gets the symbol at the i-th index
+    #[must_use]
     fn get_element_at(&self, index: usize) -> SemanticElement;
 
     /// Gets the length of this body
+    #[must_use]
     fn length(&self) -> usize;
 }
 

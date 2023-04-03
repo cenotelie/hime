@@ -113,8 +113,7 @@ impl<'t> SourceCode for LoadedInput<'t> {
         context_lines_before: usize,
         context_lines_after: usize
     ) -> Result<Box<dyn SpanContents<'a> + 'a>, MietteError> {
-        let contents =
-            self.get_span_content(span.clone(), context_lines_before, context_lines_after);
+        let contents = self.get_span_content(*span, context_lines_before, context_lines_after);
         Ok(Box::new(contents))
     }
 }

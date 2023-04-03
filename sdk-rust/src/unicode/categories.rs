@@ -8,6 +8,7 @@ use std::collections::HashMap;
 use crate::unicode::Category;
 
 /// Gets all categories
+#[allow(clippy::similar_names)]
 pub fn get_categories() -> HashMap<&'static str, Category> {
     let mut db = HashMap::new();
     let mut cat_cc = Category::new("Cc");

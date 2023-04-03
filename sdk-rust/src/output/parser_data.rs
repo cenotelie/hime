@@ -360,7 +360,7 @@ pub fn write_parser_rnglr_data(
 
     // write the indexes for nullables production
     for index in nullables.into_iter() {
-        write_u16(writer, index as u16)?;
+        write_u16(writer, index)?;
     }
 
     Ok(())

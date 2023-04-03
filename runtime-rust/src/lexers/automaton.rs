@@ -18,7 +18,7 @@
 //! Module for lexers' automata
 
 use crate::text::{Text, Utf16C};
-use crate::utils::bin::*;
+use crate::utils::bin::{read_table_u16, read_table_u32, read_u32};
 
 /// Identifier of an invalid state in an automaton
 pub const DEAD_STATE: u32 = 0xFFFF;
@@ -34,6 +34,7 @@ pub struct MatchedTerminal {
 /// Represents a transition in the automaton of a lexer
 /// A transition is matched by a range of UTF-16 code points
 /// Its target is a state in the automaton
+#[allow(clippy::module_name_repetitions)]
 #[derive(Copy, Clone)]
 pub struct AutomatonTransition {
     /// Start of the range
@@ -46,6 +47,7 @@ pub struct AutomatonTransition {
 
 impl AutomatonTransition {
     /// Get whether this transition matches the specified character
+    #[must_use]
     pub fn matches(self, c: Utf16C) -> bool {
         c >= self.start && c <= self.end
     }
@@ -66,6 +68,7 @@ impl AutomatonTransition {
 /// u16: start of the range
 /// u16: end of the range
 /// u16: next state's index
+#[allow(clippy::module_name_repetitions)]
 #[derive(Copy, Clone)]
 pub struct AutomatonState<'a> {
     /// The automaton table
@@ -76,11 +79,13 @@ pub struct AutomatonState<'a> {
 
 impl<'a> AutomatonState<'a> {
     /// Gets the number of matched terminals in this state
+    #[must_use]
     pub fn get_terminals_count(&self) -> usize {
         self.table[self.offset] as usize
     }
 
     /// Gets the i-th matched terminal in this state
+    #[must_use]
     pub fn get_terminal(&self, index: usize) -> MatchedTerminal {
         MatchedTerminal {
             context: self.table[self.offset + index * 2 + 3],
@@ -95,16 +100,19 @@ impl<'a> AutomatonState<'a> {
     }
 
     /// Gets whether this state is a dead end (no more transition)
+    #[must_use]
     pub fn is_dead_end(&self) -> bool {
         self.table[self.offset + 1] == 0
     }
 
     /// Gets the number of non-cached transitions in this state
+    #[must_use]
     pub fn get_bulk_transitions_count(&self) -> usize {
         self.table[self.offset + 2] as usize
     }
 
     /// Gets the target of the cached transition for the specified value
+    #[must_use]
     pub fn get_cached_transition(&self, value: Utf16C) -> u32 {
         u32::from(
             self.table[self.offset + 3 + self.table[self.offset] as usize * 2 + value as usize]
@@ -119,6 +127,7 @@ impl<'a> AutomatonState<'a> {
     }
 
     /// Gets the i-th non-cached transition in this state
+    #[must_use]
     pub fn get_bulk_transition(&self, index: usize) -> AutomatonTransition {
         let offset = self.offset + 3 + self.table[self.offset] as usize * 2 + 256 + index * 3;
         AutomatonTransition {
@@ -135,6 +144,7 @@ impl<'a> AutomatonState<'a> {
     }
 
     /// Gets the target of a transition from this state on the specified value
+    #[must_use]
     pub fn get_target_by(&self, value: Utf16C) -> u32 {
         if value <= 255 {
             return self.get_cached_transition(value);
@@ -168,6 +178,7 @@ pub struct Automaton {
 
 impl Automaton {
     /// Initializes a new automaton from the given binary data
+    #[must_use]
     pub fn new(data: &[u8]) -> Automaton {
         let states_count = read_u32(data, 0) as usize;
         let table = read_table_u32(data, 4, states_count);
@@ -181,11 +192,13 @@ impl Automaton {
     }
 
     /// Gets the number of states in the automaton
+    #[must_use]
     pub fn get_states_count(&self) -> usize {
         self.states_count
     }
 
     /// Get the data of the specified state
+    #[must_use]
     pub fn get_state(&self, state: u32) -> AutomatonState {
         AutomatonState {
             table: &self.states,
@@ -194,6 +207,7 @@ impl Automaton {
     }
 
     /// Gets an iterator over the states
+    #[allow(clippy::cast_possible_truncation)]
     pub fn get_states(&self) -> impl Iterator<Item = AutomatonState<'_>> + '_ {
         (0..self.states_count).map(|i| self.get_state(i as u32))
     }
@@ -208,6 +222,8 @@ pub struct TokenMatch {
 }
 
 /// Runs the lexer's DFA to match a terminal in the input ahead
+#[must_use]
+#[allow(clippy::cast_possible_truncation)]
 pub fn run_dfa(automaton: &Automaton, input: &Text, index: usize) -> Option<TokenMatch> {
     if input.is_end(index) {
         return Some(TokenMatch {

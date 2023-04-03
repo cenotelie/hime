@@ -8,6 +8,7 @@ use std::collections::HashMap;
 use crate::unicode::Block;
 
 /// Gets all blocks
+#[allow(clippy::similar_names)]
 pub fn get_blocks() -> HashMap<&'static str, Block> {
     let mut db = HashMap::new();
     db.insert("Adlam", Block::new("Adlam", 0x1E900, 0x1E95F));

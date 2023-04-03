@@ -1323,7 +1323,7 @@ pub fn build_graph(
             for phrase in conflict.phrases.iter_mut() {
                 phrase.append(conflict.lookahead.terminal);
             }
-            errors.push(Error::LrConflict(grammar_index, conflict));
+            errors.push(Error::LrConflict(grammar_index, Box::new(conflict)));
         }
     }
     for error in find_context_errors(&graph, &inverse, grammar).into_iter() {

@@ -20,7 +20,14 @@
 use std::usize;
 
 use super::subtree::SubTree;
-use super::*;
+use super::{
+    get_op_code_base, get_op_code_tree_action, read_table_u16, read_u16, ContextProvider, LRAction,
+    LRActionCode, LRColumnMap, LRContexts, LRExpected, LRProduction, Parser, Symbol, TreeAction,
+    LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_NONE, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT,
+    LR_OP_CODE_BASE_ADD_VIRTUAL, LR_OP_CODE_BASE_SEMANTIC_ACTION, TREE_ACTION_DROP,
+    TREE_ACTION_NONE, TREE_ACTION_PROMOTE, TREE_ACTION_REPLACE_BY_CHILDREN,
+    TREE_ACTION_REPLACE_BY_EPSILON
+};
 use crate::ast::{Ast, TableElemRef, TableType};
 use crate::errors::ParseErrorUnexpectedToken;
 use crate::lexers::{Lexer, TokenKernel, DEFAULT_CONTEXT};
@@ -45,6 +52,7 @@ pub struct LRkAutomaton {
 
 impl LRkAutomaton {
     /// Initializes a new automaton from the given binary data
+    #[must_use]
     pub fn new(data: &[u8]) -> LRkAutomaton {
         let columns_count = read_u16(data, 0) as usize;
         let states_count = read_u16(data, 2) as usize;
@@ -58,7 +66,7 @@ impl LRkAutomaton {
             index += 2;
             for _j in 0..count {
                 context.add(read_u16(data, index), read_u16(data, index + 2));
-                index += 4
+                index += 4;
             }
             contexts.push(context);
         }
@@ -80,32 +88,38 @@ impl LRkAutomaton {
     }
 
     /// Gets the number of states in this automaton
+    #[must_use]
     pub fn get_states_count(&self) -> usize {
         self.states_count
     }
 
     /// Gets the number of columns in the LR table
+    #[must_use]
     pub fn get_columns_count(&self) -> usize {
         self.columns_count
     }
 
     /// Gets the symbol's identifier for a column
+    #[must_use]
     pub fn get_sid_for_column(&self, column: usize) -> u32 {
         self.columns_map.get_id_at(column)
     }
 
     /// Gets the contexts opened by the specified state
+    #[must_use]
     pub fn get_contexts(&self, state: u32) -> &LRContexts {
         &self.contexts[state as usize]
     }
 
     /// Gets the LR(k) action for the given state and sid
+    #[must_use]
     pub fn get_action(&self, state: u32, identifier: u32) -> LRAction {
         let column = self.columns_map.get(identifier) as usize;
         self.get_action_at(state, column)
     }
 
     /// Gets the LR(k) action for the given state and column
+    #[must_use]
     pub fn get_action_at(&self, state: u32, column: usize) -> LRAction {
         LRAction {
             table: &self.table,
@@ -114,11 +128,13 @@ impl LRkAutomaton {
     }
 
     /// Gets the i-th production
+    #[must_use]
     pub fn get_production(&self, index: usize) -> &LRProduction {
         &self.productions[index]
     }
 
     /// Gets the expected terminals for the specified state
+    #[must_use]
     pub fn get_expected<'s>(&self, state: u32, terminals: &[Symbol<'s>]) -> LRExpected<'s> {
         let mut expected = LRExpected::new();
         let mut offset = self.columns_count * state as usize * 2;
@@ -331,34 +347,31 @@ impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
         let mut insertion = 1;
         for item in handle.iter() {
             let item = *item;
-            match reduction.cache.get_action_at(item) {
-                TREE_ACTION_PROMOTE => {
-                    if promotion {
-                        // This is not the first promotion
-                        // Commit the previously promoted node's children
-                        reduction.cache.set_children_count_at(0, insertion - 1);
-                        reduction.cache.commit_children_of(0, result);
-                        // Re-put the previously promoted node in the cache
-                        reduction.cache.move_node(0, 1);
-                        insertion = 2;
-                    }
-                    promotion = true;
-                    // Save the new promoted node
-                    reduction.cache.move_node(item, 0);
-                    // Repack the children on the left if any
-                    let nb = reduction.cache.get_children_count_at(0);
-                    reduction.cache.move_range(item + 1, insertion, nb);
-                    insertion += nb;
+            if reduction.cache.get_action_at(item) == TREE_ACTION_PROMOTE {
+                if promotion {
+                    // This is not the first promotion
+                    // Commit the previously promoted node's children
+                    reduction.cache.set_children_count_at(0, insertion - 1);
+                    reduction.cache.commit_children_of(0, result);
+                    // Re-put the previously promoted node in the cache
+                    reduction.cache.move_node(0, 1);
+                    insertion = 2;
                 }
-                _ => {
-                    // Commit the children if any
-                    reduction.cache.commit_children_of(item, result);
-                    // Repack the sub-root on the left
-                    if insertion != item {
-                        reduction.cache.move_node(item, insertion);
-                    }
-                    insertion += 1;
+                promotion = true;
+                // Save the new promoted node
+                reduction.cache.move_node(item, 0);
+                // Repack the children on the left if any
+                let nb = reduction.cache.get_children_count_at(0);
+                reduction.cache.move_range(item + 1, insertion, nb);
+                insertion += nb;
+            } else {
+                // Commit the children if any
+                reduction.cache.commit_children_of(item, result);
+                // Repack the sub-root on the left
+                if insertion != item {
+                    reduction.cache.move_node(item, insertion);
                 }
+                insertion += 1;
             }
         }
         // finalize the sub-tree data
@@ -663,10 +676,10 @@ impl<'s, 't, 'a> LRkParser<'s, 't, 'a> {
             self.builder.lexer.get_data().repository.terminals
         );
         let mut my_expected = Vec::new();
-        for x in expected_on_head.shifts.iter() {
+        for x in &expected_on_head.shifts {
             my_expected.push(*x);
         }
-        for x in expected_on_head.reductions.iter() {
+        for x in &expected_on_head.reductions {
             if self.data.check_is_expected(*x) {
                 my_expected.push(*x);
             }

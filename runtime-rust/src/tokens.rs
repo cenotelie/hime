@@ -84,6 +84,7 @@ impl<'s, 't, 'a> Iterator for TokenRepositoryIterator<'s, 't, 'a> {
 
 impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
     /// Creates a new repository
+    #[must_use]
     pub fn new(
         terminals: &'a [Symbol<'s>],
         text: &'a Text<'t>,
@@ -97,6 +98,7 @@ impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
     }
 
     /// Creates a new mutable repository
+    #[must_use]
     pub fn new_mut(
         terminals: &'a [Symbol<'s>],
         text: &'a Text<'t>,
@@ -110,6 +112,7 @@ impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
     }
 
     /// Gets an iterator over the tokens
+    #[must_use]
     pub fn iter(&self) -> TokenRepositoryIterator {
         TokenRepositoryIterator {
             repository: self,
@@ -126,16 +129,19 @@ impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
     }
 
     /// Gets the number of tokens in this repository
+    #[must_use]
     pub fn get_tokens_count(&self) -> usize {
         self.data.cells.len()
     }
 
     /// Gets the terminal's identifier for the i-th token
+    #[must_use]
     pub fn get_symbol_id_for(&self, index: usize) -> u32 {
         self.terminals[self.data.cells[index].terminal].id
     }
 
     /// Gets the i-th token
+    #[must_use]
     pub fn get_token(&'a self, index: usize) -> Token<'s, 't, 'a> {
         Token {
             repository: self,
@@ -144,11 +150,13 @@ impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
     }
 
     /// Gets the number of tokens
+    #[must_use]
     pub fn get_count(&self) -> usize {
         self.data.cells.len()
     }
 
     /// Gets the token (if any) that contains the specified index in the input text
+    #[must_use]
     pub fn find_token_at(&self, index: usize) -> Option<Token> {
         let count = self.data.cells.len();
         if count == 0 {
@@ -179,6 +187,7 @@ impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
 
 impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for Token<'s, 't, 'a> {
     /// Gets the position in the input text of this element
+    #[must_use]
     fn get_position(&self) -> Option<TextPosition> {
         Some(
             self.repository
@@ -188,11 +197,13 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for Token<'s, 't, 'a> {
     }
 
     /// Gets the span in the input text of this element
+    #[must_use]
     fn get_span(&self) -> Option<TextSpan> {
         Some(self.repository.data.cells[self.index].span)
     }
 
     /// Gets the context of this element in the input
+    #[must_use]
     fn get_context(&self) -> Option<TextContext<'a>> {
         Some(self.repository.text.get_context_for(
             self.get_position().unwrap(),
@@ -201,11 +212,13 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for Token<'s, 't, 'a> {
     }
 
     /// Gets the grammar symbol associated to this element
+    #[must_use]
     fn get_symbol(&self) -> Symbol<'s> {
         self.repository.terminals[self.repository.data.cells[self.index].terminal]
     }
 
     /// Gets the value of this element, if any
+    #[must_use]
     fn get_value(&self) -> Option<&'a str> {
         Some(
             self.repository

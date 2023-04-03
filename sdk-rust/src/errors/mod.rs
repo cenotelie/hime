@@ -88,7 +88,7 @@ pub enum Error {
     /// The inherited grammar cannot be found
     GrammarNotDefined(InputReference, String),
     /// A conflict in a grammar
-    LrConflict(usize, Conflict),
+    LrConflict(usize, Box<Conflict>),
     /// A contextual terminal is used outside of its context
     TerminalOutsideContext(usize, ContextError),
     /// A terminal is used by the parser but cannot be produced by the lexer

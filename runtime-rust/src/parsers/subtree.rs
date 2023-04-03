@@ -37,6 +37,7 @@ pub struct SubTree {
 
 impl SubTree {
     /// Creates a new sub-tree with the expected size
+    #[must_use]
     pub fn new(size: usize) -> SubTree {
         SubTree {
             nodes: Vec::with_capacity(size),
@@ -45,6 +46,7 @@ impl SubTree {
     }
 
     /// Gets the label of the node at the given index
+    #[must_use]
     pub fn get_label_at(&self, index: usize) -> TableElemRef {
         self.nodes[index].label
     }
@@ -55,6 +57,7 @@ impl SubTree {
     }
 
     /// Gets the tree action applied onto the node at the given index
+    #[must_use]
     pub fn get_action_at(&self, index: usize) -> TreeAction {
         self.actions[index]
     }
@@ -65,16 +68,19 @@ impl SubTree {
     }
 
     /// Gets the number of children of the node at the given index
+    #[must_use]
     pub fn get_children_count_at(&self, index: usize) -> usize {
         self.nodes[index].count as usize
     }
 
     /// Sets the number of children of the node at the given index
+    #[allow(clippy::cast_possible_truncation)]
     pub fn set_children_count_at(&mut self, index: usize, count: usize) {
         self.nodes[index].count = count as u32;
     }
 
     /// Gets the total number of nodes in this sub-tree
+    #[must_use]
     pub fn get_size(&self) -> usize {
         if self.actions[0] == TREE_ACTION_REPLACE_BY_CHILDREN {
             let mut size = 1;
@@ -134,6 +140,7 @@ impl SubTree {
     /// Commits the children of a sub-tree in this buffer to the final ast
     /// If the index is 0, the root's children are committed, assuming this is a depth-1 sub-tree.
     /// If not, the children of the child at the given index are committed.
+    #[allow(clippy::cast_possible_truncation)]
     pub fn commit_children_of(&mut self, index: usize, ast: &mut Ast) {
         self.nodes[index].first =
             ast.store(&self.nodes, index + 1, self.nodes[index].count as usize) as u32;

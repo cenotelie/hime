@@ -23,7 +23,7 @@ pub mod subtree;
 
 use crate::lexers::ContextProvider;
 use crate::symbols::Symbol;
-use crate::utils::bin::*;
+use crate::utils::bin::{read_table_u16, read_u16, read_u32};
 
 /// The maximum number of errors
 pub const MAX_ERROR_COUNT: usize = 100;
@@ -57,11 +57,13 @@ pub const LR_OP_CODE_BASE_SEMANTIC_ACTION: LROpCode = 1 << 3;
 pub const LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE: LROpCode = 1 << 4;
 
 /// Gets the base LR op-code
+#[must_use]
 pub fn get_op_code_base(op_code: LROpCode) -> LROpCode {
     op_code & 0xFFFC
 }
 
 /// Gets the tree action encoded in the specified LR op-code
+#[must_use]
 pub fn get_op_code_tree_action(op_code: LROpCode) -> TreeAction {
     op_code & 0x0003
 }
@@ -99,6 +101,7 @@ struct LRColumnMap {
 
 impl LRColumnMap {
     /// Creates and loads a new column map
+    #[allow(clippy::cast_possible_truncation)]
     pub fn new(data: &[u8], offset: usize, column_count: usize) -> LRColumnMap {
         let mut result = LRColumnMap {
             cache: [0; 512],
@@ -136,6 +139,7 @@ impl LRColumnMap {
     }
 
     /// Gets the symbol's identifier for a column
+    #[allow(clippy::cast_possible_truncation)]
     pub fn get_id_at(&self, column: usize) -> u32 {
         let column = column as u16;
         for (id, c) in self.cache.iter().enumerate() {
@@ -143,9 +147,9 @@ impl LRColumnMap {
                 return id as u32;
             }
         }
-        for cell in self.others.iter() {
+        for cell in &self.others {
             if cell.column == column {
-                return cell.identifier as u32;
+                return u32::from(cell.identifier);
             }
         }
         0
@@ -170,6 +174,7 @@ pub struct LRContexts {
 
 impl LRContexts {
     /// Initializes empty contexts
+    #[must_use]
     pub fn new() -> LRContexts {
         LRContexts { openings: None }
     }
@@ -193,6 +198,7 @@ impl LRContexts {
     }
 
     /// Gets whether the specified context opens by a transition using the specified terminal ID
+    #[must_use]
     pub fn opens(&self, terminal_id: u32, context: u16) -> bool {
         match self.openings.as_ref() {
             None => false,
@@ -208,6 +214,7 @@ impl LRContexts {
     }
 
     /// Gets the context opened by a symbol, if any
+    #[must_use]
     pub fn get_context_opened_by(&self, terminal_id: u32) -> Option<u16> {
         self.openings
             .as_ref()
@@ -231,13 +238,15 @@ pub struct LRAction<'a> {
 
 impl<'a> LRAction<'a> {
     /// Gets the action code
+    #[must_use]
     pub fn get_code(&self) -> LRActionCode {
         self.table[self.offset]
     }
 
     /// Gets the data associated with the action
-    /// If the code is Reduce, it is the index of the LRProduction
+    /// If the code is Reduce, it is the index of the `LRProduction`
     /// If the code is Shift, it is the index of the next state
+    #[must_use]
     pub fn get_data(&self) -> u16 {
         self.table[self.offset + 1]
     }
@@ -251,7 +260,7 @@ impl<'a> LRAction<'a> {
 /// u8: reduction length
 /// u8: bytecode length in number of op-code
 /// --- production's bytecode
-/// array of LROpCode
+/// array of `LROpCode`
 #[derive(Clone)]
 pub struct LRProduction {
     /// Index of the rule's head in the parser's array of variables
@@ -300,6 +309,7 @@ pub struct LRExpected<'s> {
 
 impl<'s> LRExpected<'s> {
     /// Initializes this container
+    #[must_use]
     pub fn new() -> LRExpected<'s> {
         LRExpected {
             shifts: Vec::new(),

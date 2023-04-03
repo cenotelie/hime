@@ -61,6 +61,7 @@ pub struct TableElemRef {
 
 impl TableElemRef {
     /// Initializes this reference
+    #[must_use]
     pub fn new(t: TableType, index: usize) -> TableElemRef {
         TableElemRef {
             data: ((t as usize) << 30) | index
@@ -68,17 +69,20 @@ impl TableElemRef {
     }
 
     /// Gets the element's type
+    #[must_use]
     pub fn table_type(self) -> TableType {
         TableType::from(self.data >> 30)
     }
 
     /// Gets the element's index in its respective table
+    #[must_use]
     pub fn index(self) -> usize {
         self.data & 0x3FFF_FFFF
     }
 }
 
 /// Represents a cell in an AST inner structure
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct AstCell {
     /// The node's label
@@ -91,6 +95,7 @@ pub struct AstCell {
 
 impl AstCell {
     /// Initializes this node
+    #[must_use]
     pub fn new_empty(label: TableElemRef) -> AstCell {
         AstCell {
             label,
@@ -100,6 +105,7 @@ impl AstCell {
     }
 
     /// Initializes this node
+    #[must_use]
     pub fn new(label: TableElemRef, count: u32, first: u32) -> AstCell {
         AstCell {
             label,
@@ -112,6 +118,7 @@ impl AstCell {
 /// Implementation of a simple AST with a tree structure
 /// The nodes are stored in sequential arrays where the children of a node are an inner sequence.
 /// The linkage is represented by each node storing its number of children and the index of its first child.
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Default, Clone)]
 pub struct AstImpl {
     /// The nodes' labels
@@ -122,6 +129,7 @@ pub struct AstImpl {
 
 impl AstImpl {
     /// Gets whether a root has been defined for this AST
+    #[must_use]
     pub fn has_root(&self) -> bool {
         self.root.is_some()
     }
@@ -143,6 +151,7 @@ pub struct Ast<'s, 't, 'a> {
 
 impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     /// Creates a new AST proxy structure
+    #[must_use]
     pub fn new(
         tokens: TokenRepository<'s, 't, 'a>,
         variables: &'a [Symbol<'s>],
@@ -180,11 +189,13 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     }
 
     /// Gets whether a root has been defined for this AST
+    #[must_use]
     pub fn has_root(&self) -> bool {
         self.data.has_root()
     }
 
     /// Gets the root node of this tree
+    #[must_use]
     pub fn get_root(&self) -> AstNode {
         self.data
             .root
@@ -196,6 +207,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     }
 
     /// Gets a specific node in this tree
+    #[must_use]
     pub fn get_node(&self, id: usize) -> AstNode {
         AstNode {
             tree: self,
@@ -204,6 +216,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     }
 
     /// Gets the AST node (if any) that has the specified token as label
+    #[must_use]
     pub fn find_node_for(&self, token: &Token) -> Option<AstNode> {
         self.data
             .nodes
@@ -217,18 +230,19 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
 
     /// Gets the AST node (if any) that has
     /// a token label that contains the specified index in the input text
+    #[must_use]
     pub fn find_node_at_index(&self, index: usize) -> Option<AstNode> {
         self.tokens
-            .as_ref()
-            .unwrap()
+            .as_ref()?
             .find_token_at(index)
             .and_then(|token| self.find_node_for(&token))
     }
 
     /// Gets the AST node (if any) that has
     /// a token label that contains the specified index in the input text
+    #[must_use]
     pub fn find_node_at_position(&self, position: TextPosition) -> Option<AstNode> {
-        let tokens = self.tokens.as_ref().unwrap();
+        let tokens = self.tokens.as_ref()?;
         let index = tokens.text.get_line_index(position.line) + position.column - 1;
         tokens
             .find_token_at(index)
@@ -236,6 +250,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     }
 
     /// Gets the parent of the specified node, if any
+    #[must_use]
     pub fn find_parent_of(&'a self, node: usize) -> Option<AstNode<'s, 't, 'a>> {
         // self.data.root?;
         self.data
@@ -251,6 +266,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     }
 
     /// Gets the total span of sub-tree given its root and its position
+    #[must_use]
     pub fn get_total_position_and_span(&self, node: usize) -> Option<(TextPosition, TextSpan)> {
         let mut total_span: Option<TextSpan> = None;
         let mut position = TextPosition {
@@ -263,26 +279,28 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
                     position = p;
                 }
             }
-            if total_span.is_none() {
+            if let Some(total_span) = total_span.as_mut() {
+                if let Some(span) = self.get_span_at(data, current) {
+                    if span.index + span.length > total_span.index + total_span.length {
+                        let margin =
+                            (span.index + span.length) - (total_span.index + total_span.length);
+                        total_span.length += margin;
+                    }
+                    if span.index < total_span.index {
+                        let margin = total_span.index - span.index;
+                        total_span.length += margin;
+                        total_span.index -= margin;
+                    }
+                }
+            } else {
                 total_span = self.get_span_at(data, current);
-            } else if let Some(span) = self.get_span_at(data, current) {
-                let total_span = total_span.as_mut().unwrap();
-                if span.index + span.length > total_span.index + total_span.length {
-                    let margin =
-                        (span.index + span.length) - (total_span.index + total_span.length);
-                    total_span.length += margin;
-                }
-                if span.index < total_span.index {
-                    let margin = total_span.index - span.index;
-                    total_span.length += margin;
-                    total_span.index -= margin;
-                }
             }
         });
         total_span.map(|span| (position, span))
     }
 
     /// Gets the total span of sub-tree given its root
+    #[must_use]
     pub fn get_total_span(&self, node: usize) -> Option<TextSpan> {
         self.get_total_position_and_span(node).map(|(_, span)| span)
     }
@@ -301,6 +319,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     }
 
     /// Get the span of the symbol on a node
+    #[must_use]
     fn get_span_at(&self, data: &AstImpl, node: usize) -> Option<TextSpan> {
         let cell = data.nodes[node];
         match cell.label.table_type() {
@@ -313,6 +332,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     }
 
     /// Get the position of the symbol on a node
+    #[must_use]
     fn get_position_at(&self, data: &AstImpl, node: usize) -> Option<TextPosition> {
         let cell = data.nodes[node];
         match cell.label.table_type() {
@@ -344,6 +364,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
 }
 
 /// Represents a node in an Abstract Syntax Tree
+#[allow(clippy::module_name_repetitions)]
 #[derive(Copy, Clone)]
 pub struct AstNode<'s, 't, 'a> {
     /// The original parse tree
@@ -354,11 +375,13 @@ pub struct AstNode<'s, 't, 'a> {
 
 impl<'s, 't, 'a> AstNode<'s, 't, 'a> {
     /// Gets the identifier of this node
+    #[must_use]
     pub fn id(&self) -> usize {
         self.index
     }
 
     /// Gets the index of the token born by this node, if any
+    #[must_use]
     pub fn get_token_index(&self) -> Option<usize> {
         let cell = self.tree.data.nodes[self.index];
         match cell.label.table_type() {
@@ -368,11 +391,13 @@ impl<'s, 't, 'a> AstNode<'s, 't, 'a> {
     }
 
     /// Gets the parent of this node, if any
+    #[must_use]
     pub fn parent(&self) -> Option<AstNode<'s, 't, 'a>> {
         self.tree.find_parent_of(self.index)
     }
 
     /// Gets the children of this node
+    #[must_use]
     pub fn children(&self) -> AstFamily<'s, 't, 'a> {
         AstFamily {
             tree: self.tree,
@@ -381,6 +406,7 @@ impl<'s, 't, 'a> AstNode<'s, 't, 'a> {
     }
 
     /// Gets the i-th child
+    #[must_use]
     pub fn child(&self, index: usize) -> AstNode<'s, 't, 'a> {
         let cell = self.tree.data.nodes[self.index];
         AstNode {
@@ -390,16 +416,19 @@ impl<'s, 't, 'a> AstNode<'s, 't, 'a> {
     }
 
     /// Gets the number of children
+    #[must_use]
     pub fn children_count(&self) -> usize {
         self.tree.data.nodes[self.index].count as usize
     }
 
     /// Gets the total span for the sub-tree at this node
+    #[must_use]
     pub fn get_total_span(&self) -> Option<TextSpan> {
         self.tree.get_total_span(self.index)
     }
 
     /// Gets the total position and span for the sub-tree at this node
+    #[must_use]
     pub fn get_total_position_and_span(&self) -> Option<(TextPosition, TextSpan)> {
         self.tree.get_total_position_and_span(self.index)
     }
@@ -526,7 +555,8 @@ impl<'s, 't, 'a> Serialize for AstNode<'s, 't, 'a> {
     }
 }
 
-/// Represents a family of children for an ASTNode
+/// Represents a family of children for an `ASTNode`
+#[allow(clippy::module_name_repetitions)]
 #[derive(Clone)]
 pub struct AstFamily<'s, 't, 'a> {
     /// The original parse tree
@@ -536,6 +566,7 @@ pub struct AstFamily<'s, 't, 'a> {
 }
 
 /// Represents and iterator for adjacents in this graph
+#[allow(clippy::module_name_repetitions)]
 pub struct AstFamilyIterator<'s, 't, 'a> {
     /// The original parse tree
     tree: &'a Ast<'s, 't, 'a>,
@@ -601,16 +632,19 @@ impl<'s, 't, 'a> IntoIterator for AstFamily<'s, 't, 'a> {
 
 impl<'s, 't, 'a> AstFamily<'s, 't, 'a> {
     /// Gets whether the family is empty
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.tree.data.nodes[self.parent].count == 0
     }
 
     /// Gets the number of children in this family
+    #[must_use]
     pub fn len(&self) -> usize {
         self.tree.data.nodes[self.parent].count as usize
     }
 
     /// Gets the i-th child
+    #[must_use]
     pub fn at(&self, index: usize) -> AstNode<'s, 't, 'a> {
         let cell = self.tree.data.nodes[self.parent];
         AstNode {
@@ -620,6 +654,7 @@ impl<'s, 't, 'a> AstFamily<'s, 't, 'a> {
     }
 
     /// Gets an iterator over this family
+    #[must_use]
     pub fn iter(&self) -> AstFamilyIterator<'s, 't, 'a> {
         let cell = self.tree.data.nodes[self.parent];
         AstFamilyIterator {

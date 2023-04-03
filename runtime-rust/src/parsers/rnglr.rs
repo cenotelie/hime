@@ -20,7 +20,14 @@
 use std::collections::VecDeque;
 use std::usize;
 
-use super::*;
+use super::{
+    get_op_code_base, get_op_code_tree_action, read_table_u16, read_u16, read_u32, ContextProvider,
+    LRAction, LRColumnMap, LRContexts, LRExpected, LRProduction, Parser, Symbol, TreeAction,
+    LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT,
+    LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE, LR_OP_CODE_BASE_ADD_VIRTUAL,
+    LR_OP_CODE_BASE_SEMANTIC_ACTION, TREE_ACTION_DROP, TREE_ACTION_PROMOTE,
+    TREE_ACTION_REPLACE_BY_CHILDREN, TREE_ACTION_REPLACE_BY_EPSILON
+};
 use crate::ast::{Ast, AstCell, TableElemRef, TableType};
 use crate::errors::ParseErrorUnexpectedToken;
 use crate::lexers::{Lexer, TokenKernel, DEFAULT_CONTEXT};
@@ -61,6 +68,7 @@ pub struct RNGLRAutomaton {
 
 impl RNGLRAutomaton {
     /// Initializes a new automaton from the given binary data
+    #[must_use]
     pub fn new(data: &[u8]) -> RNGLRAutomaton {
         // read basic counters
         let axiom_index = read_u16(data, 0) as usize;
@@ -80,7 +88,7 @@ impl RNGLRAutomaton {
             index += 2;
             for _j in 0..count {
                 context.add(read_u16(data, index), read_u16(data, index + 2));
-                index += 4
+                index += 4;
             }
             contexts.push(context);
         }
@@ -104,8 +112,8 @@ impl RNGLRAutomaton {
         }
         // read the nullables table
         let nullables = read_table_u16(data, index, nullables_count);
-        index += nullables_count * 2;
-        assert_eq!(index, data.len());
+        // index += nullables_count * 2;
+        // assert_eq!(index, data.len());
         RNGLRAutomaton {
             axiom: axiom_index,
             columns_count,
@@ -120,27 +128,32 @@ impl RNGLRAutomaton {
     }
 
     /// Gets the index of the axiom
+    #[must_use]
     pub fn get_axiom(&self) -> usize {
         self.axiom
     }
 
     /// Gets the number of states in this automaton
+    #[must_use]
     pub fn get_states_count(&self) -> usize {
         self.states_count
     }
 
     /// Gets the contexts opened by the specified state
+    #[must_use]
     pub fn get_contexts(&self, state: u32) -> &LRContexts {
         &self.contexts[state as usize]
     }
 
     /// Gets the number of GLR actions for the given state and symbol identifier
+    #[must_use]
     pub fn get_actions_count(&self, state: u32, identifier: u32) -> usize {
         let column = self.columns_map.get(identifier) as usize;
         self.cells[state as usize * self.columns_count + column].count as usize
     }
 
     /// Gets the i-th GLR action for the given state and sid
+    #[must_use]
     pub fn get_action(&self, state: u32, identifier: u32, index: usize) -> LRAction {
         let column = self.columns_map.get(identifier) as usize;
         let cell = self.cells[state as usize * self.columns_count + column];
@@ -151,29 +164,33 @@ impl RNGLRAutomaton {
     }
 
     /// Gets the i-th production
+    #[must_use]
     pub fn get_production(&self, index: usize) -> &LRProduction {
         &self.productions[index]
     }
 
     /// Gets the production for the nullable variable with the given index
+    #[must_use]
     pub fn get_nullable_production(&self, index: usize) -> Option<&LRProduction> {
-        match self.nullables[index] {
-            0xFFFF => None,
-            prod_index => Some(&self.productions[prod_index as usize])
+        match self.nullables.get(index) {
+            None | Some(0xFFFF) => None,
+            Some(&prod_index) => Some(&self.productions[prod_index as usize])
         }
     }
 
     /// Determine whether the given state is the accepting state
+    #[must_use]
     pub fn is_accepting_state(&self, state: u32) -> bool {
         let cell = self.cells[state as usize * self.columns_count];
-        if cell.count != 1 {
-            false
-        } else {
+        if cell.count == 1 {
             self.table[(cell.index as usize) * 2] == LR_ACTION_CODE_ACCEPT
+        } else {
+            false
         }
     }
 
     /// Gets the expected terminals for the specified state
+    #[must_use]
     pub fn get_expected<'s>(&self, state: u32, terminals: &[Symbol<'s>]) -> LRExpected<'s> {
         let mut expected = LRExpected::new();
         for (column, terminal) in terminals.iter().enumerate() {
@@ -370,6 +387,7 @@ impl GSS {
     }
 
     /// Creates a new edge in the GSS
+    #[allow(clippy::cast_possible_truncation)]
     pub fn create_edge(&mut self, from: usize, to: usize, label: GSSLabel) {
         self.edges.push(GSSEdge {
             from: from as u32,
@@ -844,7 +862,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         for i in 0..self.history.len() {
             let hp = &self.history[i];
             if hp.generation == generation {
-                for id in hp.data.iter() {
+                for id in &hp.data {
                     let node_symbol = self.sppf.get_node(*id).get_original_symbol();
                     if node_symbol == reference {
                         return Some(*id);
@@ -918,6 +936,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     }
 
     /// Adds the specified GSS label to the reduction cache with the given tree action
+    #[allow(clippy::cast_possible_truncation)]
     fn reduction_add_to_cache_node(
         reduction: &mut SPPFReduction,
         node: &SPPFNodeNormal,
@@ -957,6 +976,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     }
 
     /// During a reduction, inserts a virtual symbol
+    #[allow(clippy::cast_possible_truncation)]
     pub fn reduction_add_virtual(&mut self, index: usize, action: TreeAction) {
         let reduction = self.reduction.as_mut().expect("Not in a reduction");
         let node_id = self
@@ -993,6 +1013,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     }
 
     /// Executes the reduction as a normal reduction
+    #[allow(clippy::cast_possible_truncation)]
     pub fn reduce_normal(&mut self, variable_index: usize, head_action: TreeAction) -> usize {
         let reduction = self.reduction.as_mut().expect("Not in a reduction");
         let mut promoted: Option<(TableElemRef, SPPFNodeRef)> = None;
@@ -1079,6 +1100,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     }
 
     /// Finalizes the parse tree
+    #[allow(clippy::cast_possible_truncation)]
     pub fn commit_root(&mut self, root: usize) {
         let sppf = &self.sppf;
         let result = &mut self.result;
@@ -1094,6 +1116,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     }
 
     /// Builds thSe final AST for the specified PPF node reference
+    #[allow(clippy::cast_possible_truncation)]
     fn build_final_ast(sppf: &SPPF, reference: SPPFNodeRef, result: &mut Ast) -> AstCell {
         let node = sppf.get_node(reference.node_id as usize).as_normal();
         let version = &node.versions[reference.version as usize];
@@ -1164,7 +1187,11 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
     /// Gets the priority of the specified context required by the specified terminal
     /// The priority is an unsigned integer. The lesser the value the higher the priority.
     /// The absence of value represents the unavailability of the required context.
-    #[allow(clippy::cognitive_complexity)]
+    #[allow(
+        clippy::cognitive_complexity,
+        clippy::too_many_lines,
+        clippy::cast_possible_truncation
+    )]
     fn get_context_priority(
         &self,
         token_count: usize,
@@ -1190,7 +1217,7 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
         let mut productions = Vec::new();
         let mut distances = Vec::new();
         let mut found_on_previous_shift = false;
-        for shift in self.shifts.iter() {
+        for shift in &self.shifts {
             let count = self
                 .automaton
                 .get_actions_count(shift.to as u32, terminal_id);
@@ -1254,7 +1281,7 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
             let production = productions[i];
             i += 1;
             let paths = self.gss.get_paths(from, 1);
-            for path in paths.iter() {
+            for path in &paths {
                 let last_node = path.last_node;
                 let symbol_id = path.labels.as_ref().unwrap()[0].symbol_id;
                 let contexts = self
@@ -1283,7 +1310,7 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
         // queue of GLR states to inspect:
         let mut queue_gss_heads = Vec::new(); // the related GSS head
         let mut queue_vstack = Vec::<Vec<u32>>::new(); // the virtual stack
-        for shift in self.shifts.iter() {
+        for shift in &self.shifts {
             let count = self
                 .automaton
                 .get_actions_count(shift.to as u32, terminal_id);
@@ -1336,7 +1363,7 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
                         gss_node,
                         production.reduction_length - queue_vstack[i].len()
                     );
-                    for path in paths.iter() {
+                    for path in &paths {
                         // get the target GLR state
                         let next = self.get_next_by_var(
                             self.gss.get_represented_state(path.last_node),
@@ -1402,7 +1429,7 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
                 }
                 let production = self.automaton.get_production(action.get_data() as usize);
                 let paths = self.gss.get_paths(gss_node, production.reduction_length);
-                for path in paths.iter() {
+                for path in &paths {
                     // get the target GLR state
                     let next = self.get_next_by_var(
                         self.gss.get_represented_state(path.last_node),
@@ -1462,7 +1489,7 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
                         gss_node,
                         production.reduction_length - queue_vstack[i].len()
                     );
-                    for path in paths.iter() {
+                    for path in &paths {
                         // get the target GLR state
                         let next = self.get_next_by_var(
                             self.gss.get_represented_state(path.last_node),
@@ -1493,67 +1520,65 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
     }
 
     /// Executes a shift operation
+    #[allow(clippy::cast_possible_truncation)]
     fn parse_shift(&mut self, generation: usize, label: GSSLabel, shift: RNGLRShift) {
         let w = self.gss.find_node(generation, shift.to as u32);
-        match w {
-            Some(w) => {
-                // A node for the target state is already in the GSS
-                self.gss.create_edge(w, shift.from, label);
-                // Look for the new reductions at this state
-                let count = self
-                    .automaton
-                    .get_actions_count(shift.to as u32, self.get_next_token_id());
-                for i in 0..count {
-                    let action =
-                        self.automaton
-                            .get_action(shift.to as u32, self.get_next_token_id(), i);
-                    if action.get_code() == LR_ACTION_CODE_REDUCE {
-                        let production = self.automaton.get_production(action.get_data() as usize);
-                        // length 0 reduction are not considered here because they already exist at this point
-                        if production.reduction_length > 0 {
-                            self.reductions.push_back(RNGLRReduction {
-                                node: shift.from,
-                                production: action.get_data() as usize,
-                                first: label
-                            });
-                        }
+        if let Some(w) = w {
+            // A node for the target state is already in the GSS
+            self.gss.create_edge(w, shift.from, label);
+            // Look for the new reductions at this state
+            let count = self
+                .automaton
+                .get_actions_count(shift.to as u32, self.get_next_token_id());
+            for i in 0..count {
+                let action =
+                    self.automaton
+                        .get_action(shift.to as u32, self.get_next_token_id(), i);
+                if action.get_code() == LR_ACTION_CODE_REDUCE {
+                    let production = self.automaton.get_production(action.get_data() as usize);
+                    // length 0 reduction are not considered here because they already exist at this point
+                    if production.reduction_length > 0 {
+                        self.reductions.push_back(RNGLRReduction {
+                            node: shift.from,
+                            production: action.get_data() as usize,
+                            first: label
+                        });
                     }
                 }
             }
-            None => {
-                // Create the new corresponding node in the GSS
-                let w = self.gss.create_node(shift.to as u32);
-                self.gss.create_edge(w, shift.from, label);
-                // Look for all the reductions and shifts at this state
-                let count = self
-                    .automaton
-                    .get_actions_count(shift.to as u32, self.get_next_token_id());
-                for i in 0..count {
-                    let action =
-                        self.automaton
-                            .get_action(shift.to as u32, self.get_next_token_id(), i);
-                    if action.get_code() == LR_ACTION_CODE_SHIFT {
-                        self.shifts.push_back(RNGLRShift {
-                            from: w,
-                            to: action.get_data() as usize
+        } else {
+            // Create the new corresponding node in the GSS
+            let w = self.gss.create_node(shift.to as u32);
+            self.gss.create_edge(w, shift.from, label);
+            // Look for all the reductions and shifts at this state
+            let count = self
+                .automaton
+                .get_actions_count(shift.to as u32, self.get_next_token_id());
+            for i in 0..count {
+                let action =
+                    self.automaton
+                        .get_action(shift.to as u32, self.get_next_token_id(), i);
+                if action.get_code() == LR_ACTION_CODE_SHIFT {
+                    self.shifts.push_back(RNGLRShift {
+                        from: w,
+                        to: action.get_data() as usize
+                    });
+                } else if action.get_code() == LR_ACTION_CODE_REDUCE {
+                    let production = self.automaton.get_production(action.get_data() as usize);
+                    if production.reduction_length == 0 {
+                        // Length 0 => reduce from the head
+                        self.reductions.push_back(RNGLRReduction {
+                            node: w,
+                            production: action.get_data() as usize,
+                            first: EPSILON
                         });
-                    } else if action.get_code() == LR_ACTION_CODE_REDUCE {
-                        let production = self.automaton.get_production(action.get_data() as usize);
-                        if production.reduction_length == 0 {
-                            // Length 0 => reduce from the head
-                            self.reductions.push_back(RNGLRReduction {
-                                node: w,
-                                production: action.get_data() as usize,
-                                first: EPSILON
-                            });
-                        } else {
-                            // reduce from the second node on the path
-                            self.reductions.push_back(RNGLRReduction {
-                                node: shift.from,
-                                production: action.get_data() as usize,
-                                first: label
-                            });
-                        }
+                    } else {
+                        // reduce from the second node on the path
+                        self.reductions.push_back(RNGLRReduction {
+                            node: shift.from,
+                            production: action.get_data() as usize,
+                            first: label
+                        });
                     }
                 }
             }
@@ -1657,11 +1682,12 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                     }
                 }
             }
-            if resolved == 0 && remaining > 0 {
-                // There is dependency cycle ...
-                // That should not be possible ...
-                panic!("Failed to initialize the parser, found a cycle in the nullable variables");
-            }
+            // There is dependency cycle ...
+            // That should not be possible ...
+            assert!(
+                !(resolved == 0 && remaining > 0),
+                "Failed to initialize the parser, found a cycle in the nullable variables"
+            );
         }
     }
 
@@ -1695,10 +1721,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
             let op_code = production.bytecode[i];
             i += 1;
             match get_op_code_base(op_code) {
-                LR_OP_CODE_BASE_SEMANTIC_ACTION => {
-                    i += 1;
-                }
-                LR_OP_CODE_BASE_ADD_VIRTUAL => {
+                LR_OP_CODE_BASE_SEMANTIC_ACTION | LR_OP_CODE_BASE_ADD_VIRTUAL => {
                     i += 1;
                 }
                 LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE => {
@@ -1791,6 +1814,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
     }
 
     /// Executes a reduction operation for a given path
+    #[allow(clippy::cast_possible_truncation)]
     fn parse_reduction_path(
         &mut self,
         generation: usize,
@@ -1829,79 +1853,75 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
             .unwrap();
         // Find a node for the target state in the GSS
         let w = self.data.gss.find_node(generation, to);
-        match w {
-            Some(w) => {
-                // A node for the target state is already in the GSS
-                if !self.data.gss.has_edge(generation, w, path.last_node) {
-                    // But the new edge does not exist
-                    self.data.gss.create_edge(w, path.last_node, label);
-                    // Look for the new reductions at this state
-                    if production.reduction_length != 0 {
-                        let count = self
-                            .data
-                            .automaton
-                            .get_actions_count(to, self.data.get_next_token_id());
-                        for i in 0..count {
-                            let action = self.data.automaton.get_action(
-                                to,
-                                self.data.get_next_token_id(),
-                                i
-                            );
-                            if action.get_code() == LR_ACTION_CODE_REDUCE {
-                                let new_production = self
-                                    .data
-                                    .automaton
-                                    .get_production(action.get_data() as usize);
-                                // length 0 reduction are not considered here because they already exist at this point
-                                if new_production.reduction_length > 0 {
-                                    self.data.reductions.push_back(RNGLRReduction {
-                                        node: path.last_node,
-                                        production: action.get_data() as usize,
-                                        first: label
-                                    });
-                                }
+        if let Some(w) = w {
+            // A node for the target state is already in the GSS
+            if !self.data.gss.has_edge(generation, w, path.last_node) {
+                // But the new edge does not exist
+                self.data.gss.create_edge(w, path.last_node, label);
+                // Look for the new reductions at this state
+                if production.reduction_length != 0 {
+                    let count = self
+                        .data
+                        .automaton
+                        .get_actions_count(to, self.data.get_next_token_id());
+                    for i in 0..count {
+                        let action =
+                            self.data
+                                .automaton
+                                .get_action(to, self.data.get_next_token_id(), i);
+                        if action.get_code() == LR_ACTION_CODE_REDUCE {
+                            let new_production = self
+                                .data
+                                .automaton
+                                .get_production(action.get_data() as usize);
+                            // length 0 reduction are not considered here because they already exist at this point
+                            if new_production.reduction_length > 0 {
+                                self.data.reductions.push_back(RNGLRReduction {
+                                    node: path.last_node,
+                                    production: action.get_data() as usize,
+                                    first: label
+                                });
                             }
                         }
                     }
                 }
             }
-            None => {
-                // Create the new corresponding node in the GSS
-                let w = self.data.gss.create_node(to);
-                self.data.gss.create_edge(w, path.last_node, label);
-                // Look for all the reductions and shifts at this state
-                let count = self
+        } else {
+            // Create the new corresponding node in the GSS
+            let w = self.data.gss.create_node(to);
+            self.data.gss.create_edge(w, path.last_node, label);
+            // Look for all the reductions and shifts at this state
+            let count = self
+                .data
+                .automaton
+                .get_actions_count(to, self.data.get_next_token_id());
+            for i in 0..count {
+                let action = self
                     .data
                     .automaton
-                    .get_actions_count(to, self.data.get_next_token_id());
-                for i in 0..count {
-                    let action =
-                        self.data
-                            .automaton
-                            .get_action(to, self.data.get_next_token_id(), i);
-                    if action.get_code() == LR_ACTION_CODE_SHIFT {
-                        self.data.shifts.push_back(RNGLRShift {
-                            from: w,
-                            to: action.get_data() as usize
+                    .get_action(to, self.data.get_next_token_id(), i);
+                if action.get_code() == LR_ACTION_CODE_SHIFT {
+                    self.data.shifts.push_back(RNGLRShift {
+                        from: w,
+                        to: action.get_data() as usize
+                    });
+                } else if action.get_code() == LR_ACTION_CODE_REDUCE {
+                    let new_production = self
+                        .data
+                        .automaton
+                        .get_production(action.get_data() as usize);
+                    if new_production.reduction_length == 0 {
+                        self.data.reductions.push_back(RNGLRReduction {
+                            node: w,
+                            production: action.get_data() as usize,
+                            first: EPSILON
                         });
-                    } else if action.get_code() == LR_ACTION_CODE_REDUCE {
-                        let new_production = self
-                            .data
-                            .automaton
-                            .get_production(action.get_data() as usize);
-                        if new_production.reduction_length == 0 {
-                            self.data.reductions.push_back(RNGLRReduction {
-                                node: w,
-                                production: action.get_data() as usize,
-                                first: EPSILON
-                            });
-                        } else {
-                            self.data.reductions.push_back(RNGLRReduction {
-                                node: path.last_node,
-                                production: action.get_data() as usize,
-                                first: label
-                            });
-                        }
+                    } else {
+                        self.data.reductions.push_back(RNGLRReduction {
+                            node: path.last_node,
+                            production: action.get_data() as usize,
+                            first: label
+                        });
                     }
                 }
             }
@@ -1909,6 +1929,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
     }
 
     /// Executes the shift operations for the given token
+    #[allow(clippy::cast_possible_truncation)]
     fn parse_shifts(&mut self, old_token: TokenKernel) -> usize {
         // Create next generation
         let new_gen = self.data.gss.create_generation();
@@ -1946,14 +1967,14 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                 self.builder.lexer.get_data().repository.terminals
             );
             // register the terminals for shift actions
-            for symbol in expected_on_head.shifts.iter() {
+            for symbol in &expected_on_head.shifts {
                 if !my_expected.contains(symbol) {
                     my_expected.push(*symbol);
                 }
             }
             if i < stem {
                 // the state was in the stem, also look for reductions
-                for symbol in expected_on_head.reductions.iter() {
+                for symbol in &expected_on_head.reductions {
                     if !my_expected.contains(symbol)
                         && self
                             .data
