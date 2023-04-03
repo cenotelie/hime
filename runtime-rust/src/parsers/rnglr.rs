@@ -328,12 +328,7 @@ impl GSS {
     /// Finds in the given generation a node representing the given GLR state
     pub fn find_node(&self, generation: usize, state: u32) -> Option<usize> {
         let data = self.node_generations[generation];
-        for i in data.start..(data.start + data.count) {
-            if self.node_labels[i] == state {
-                return Some(i);
-            }
-        }
-        None
+        (data.start..(data.start + data.count)).find(|&i| self.node_labels[i] == state)
     }
 
     /// Determines whether this instance has the required edge

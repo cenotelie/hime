@@ -28,6 +28,7 @@ use crate::tokens::TokenRepository;
 const DEFAULT_RECOVERY_MATCHING_DISTANCE: usize = 3;
 
 /// Runs the fuzzy DFA matcher
+#[allow(clippy::needless_lifetimes)]
 fn run_fuzzy_matcher<'s, 't, 'a>(
     repository: &TokenRepository<'s, 't, 'a>,
     automaton: &'a Automaton,
