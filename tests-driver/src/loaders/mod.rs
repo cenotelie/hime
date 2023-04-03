@@ -66,7 +66,7 @@ pub fn parse_fixtures(fixtures: &[FixtureDef]) -> Result<Fixtures, Errors> {
             })
             .collect();
         Err(Errors {
-            data: LoadedData {
+            context: LoadedData {
                 inputs: results
                     .into_iter()
                     .zip(fixtures.iter())

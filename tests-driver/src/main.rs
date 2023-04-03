@@ -17,7 +17,10 @@
 
 //! Main module
 
+use std::fmt::{Display, Formatter};
+
 use hime_sdk::errors::Errors;
+use miette::{EyreContext, MietteHandler};
 use model::FixtureDef;
 
 mod loaders;
@@ -100,8 +103,22 @@ fn on_errors<T>(result: Result<T, Errors>) -> T {
     match result {
         Ok(r) => r,
         Err(errors) => {
-            hime_sdk::errors::print::print_errors(&errors);
+            println!("{}", TestErrors(errors));
             std::process::exit(1);
         }
+    }
+}
+
+/// Encapsulate SDK errors to implement Display with specific error formatting
+struct TestErrors<'t>(Errors<'t>);
+
+impl<'t> Display for TestErrors<'t> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let handler = MietteHandler::default();
+        for error in self.0.errors.iter() {
+            let contextualized = error.with_context(&self.0.context);
+            handler.debug(&contextualized, f)?;
+        }
+        Ok(())
     }
 }

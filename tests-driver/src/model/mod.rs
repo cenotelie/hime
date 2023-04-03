@@ -266,7 +266,7 @@ impl Fixtures {
     /// Build errors
     fn build_errors(&self, grammars: Vec<Grammar>, errors: Vec<Error>) -> Errors {
         Errors {
-            data: LoadedData {
+            context: LoadedData {
                 inputs: self.get_loaded_inputs(),
                 grammars
             },

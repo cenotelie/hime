@@ -17,12 +17,14 @@
 
 //! Generator of lexers and parsers for the Hime runtime.
 
+use std::fmt::{Display, Formatter};
 use std::io::{self, Read};
 use std::{env, process};
 
 use clap::{Arg, Command};
 use hime_sdk::errors::{Error, Errors};
 use hime_sdk::{CompilationTask, Input, Mode, Modifier, ParsingMethod, Runtime};
+use miette::{EyreContext, MietteHandler};
 
 /// The name of this program
 pub const CRATE_NAME: &str = env!("CARGO_PKG_NAME");
@@ -33,7 +35,7 @@ pub const GIT_HASH: &str = env!("GIT_HASH");
 /// The git tag that was used to build the application
 pub const GIT_TAG: &str = env!("GIT_TAG");
 
-pub fn main() {
+pub fn main() -> miette::Result<()> {
     let matches = Command::new("Hime Parser Generator")
         .version(format!("{} {} tag={} hash={}", CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH).as_str())
         .author("Association Cénotélie <contact@cenotelie.fr>")
@@ -46,7 +48,6 @@ pub fn main() {
                 .help("The output mode.")
                 .takes_value(true)
                 .required(false)
-                .default_value("sources")
                 .possible_values(&[
                     "sources",
                     "assembly",
@@ -61,7 +62,6 @@ pub fn main() {
                 .help("The target runtime.")
                 .takes_value(true)
                 .required(false)
-                .default_value("net")
                 .possible_values(&[
                     "net",
                     "java",
@@ -94,7 +94,6 @@ pub fn main() {
                 .help("The access modifier for the generated code.")
                 .takes_value(true)
                 .required(false)
-                .default_value("internal")
                 .possible_values(&[
                     "internal",
                     "public"
@@ -117,7 +116,6 @@ pub fn main() {
                 .help("The parsing method to use.")
                 .takes_value(true)
                 .required(false)
-                .default_value("lalr1")
                 .possible_values(&[
                     "lr0",
                     "lr1",
@@ -194,7 +192,7 @@ pub fn main() {
         execute_normal(task)
     };
     if let Err(errors) = result {
-        hime_sdk::errors::print::print_errors(&errors);
+        println!("{}", HimeCcErrors(errors));
         process::exit(1);
     } else {
         process::exit(0);
@@ -258,4 +256,18 @@ fn execute_test(task: CompilationTask) -> Result<(), Errors> {
         }
     };
     Ok(())
+}
+
+/// Encapsulate SDK errors to implement Display with specific error formatting
+struct HimeCcErrors<'t>(Errors<'t>);
+
+impl<'t> Display for HimeCcErrors<'t> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let handler = MietteHandler::default();
+        for error in self.0.errors.iter() {
+            let contextualized = error.with_context(&self.0.context);
+            handler.debug(&contextualized, f)?;
+        }
+        Ok(())
+    }
 }

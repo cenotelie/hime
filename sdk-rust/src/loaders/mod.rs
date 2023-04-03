@@ -418,10 +418,11 @@ fn load_terminal_rule(
 ) {
     let node_name = node.child(0);
     let name = node_name.get_value().unwrap();
-    if grammar.get_terminal_for_name(name).is_some() {
+    if let Some(previous) = grammar.get_terminal_for_name(name) {
         errors.push(Error::OverridingPreviousTerminal(
             InputReference::from(input_index, &node_name),
-            name.to_string()
+            name.to_string(),
+            previous.input_ref
         ));
         return;
     }
@@ -605,7 +606,7 @@ fn load_nfa_class(input_index: usize, errors: &mut Vec<Error>, node: AstNode) ->
         if b >= 0xFFFF {
             errors.push(Error::UnsupportedNonPlane0InCharacterClass(
                 InputReference::from(input_index, &node.clone()),
-                b
+                char::from_u32(b as u32).unwrap()
             ));
         }
         if i + 2 <= chars.len() && chars[i] == '-' {
@@ -616,7 +617,7 @@ fn load_nfa_class(input_index: usize, errors: &mut Vec<Error>, node: AstNode) ->
             if b >= 0xFFFF {
                 errors.push(Error::UnsupportedNonPlane0InCharacterClass(
                     InputReference::from(input_index, &node.clone()),
-                    e
+                    char::from_u32(e as u32).unwrap()
                 ));
             }
             i += l2;

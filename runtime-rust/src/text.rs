@@ -72,9 +72,9 @@ impl Display for TextSpan {
 /// Represents a position in term of line and column in a text input
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TextPosition {
-    /// The line number
+    /// The 1-base line number
     pub line: usize,
-    /// The column number
+    /// The 1-base column number
     pub column: usize
 }
 
@@ -210,6 +210,12 @@ impl<'a> Text<'a> {
 
     /// Get the substring corresponding to the text at the specified position and the given length
     pub fn get_value_at(&self, position: TextPosition, length: usize) -> &str {
+        let start = self.get_index_at(position);
+        &self.content[start..(start + length)]
+    }
+
+    /// Gets the index within the content of the specified position
+    pub fn get_index_at(&self, position: TextPosition) -> usize {
         let from_line = &self.content[self.lines[position.line - 1]..];
         let in_line_offset = from_line
             .char_indices()
@@ -217,8 +223,7 @@ impl<'a> Text<'a> {
             .last()
             .map(|(offset, c)| offset + c.len_utf8())
             .unwrap_or_default();
-        let start = self.lines[position.line - 1] + in_line_offset;
-        &self.content[start..(start + length)]
+        self.lines[position.line - 1] + in_line_offset
     }
 
     /// Gets the starting index of the i-th line
