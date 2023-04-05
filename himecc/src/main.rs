@@ -35,9 +35,10 @@ pub const GIT_HASH: &str = env!("GIT_HASH");
 /// The git tag that was used to build the application
 pub const GIT_TAG: &str = env!("GIT_TAG");
 
+#[allow(clippy::too_many_lines)]
 pub fn main() -> miette::Result<()> {
     let matches = Command::new("Hime Parser Generator")
-        .version(format!("{} {} tag={} hash={}", CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH).as_str())
+        .version(format!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}").as_str())
         .author("Association Cénotélie <contact@cenotelie.fr>")
         .about("Generator of lexers and parsers for the Hime runtime.")
         .arg(
@@ -48,7 +49,7 @@ pub fn main() -> miette::Result<()> {
                 .help("The output mode.")
                 .takes_value(true)
                 .required(false)
-                .possible_values(&[
+                .possible_values([
                     "sources",
                     "assembly",
                     "all"
@@ -62,7 +63,7 @@ pub fn main() -> miette::Result<()> {
                 .help("The target runtime.")
                 .takes_value(true)
                 .required(false)
-                .possible_values(&[
+                .possible_values([
                     "net",
                     "java",
                     "rust"
@@ -94,7 +95,7 @@ pub fn main() -> miette::Result<()> {
                 .help("The access modifier for the generated code.")
                 .takes_value(true)
                 .required(false)
-                .possible_values(&[
+                .possible_values([
                     "internal",
                     "public"
                 ])
@@ -116,7 +117,7 @@ pub fn main() -> miette::Result<()> {
                 .help("The parsing method to use.")
                 .takes_value(true)
                 .required(false)
-                .possible_values(&[
+                .possible_values([
                     "lr0",
                     "lr1",
                     "lalr1",
@@ -164,14 +165,18 @@ pub fn main() -> miette::Result<()> {
     }
     task.output_target_runtime_path = matches
         .value_of("output_target_runtime_path")
-        .map(|v| v.to_string());
-    task.output_path = matches.value_of("output_path").map(|v| v.to_string());
+        .map(std::string::ToString::to_string);
+    task.output_path = matches
+        .value_of("output_path")
+        .map(std::string::ToString::to_string);
     match matches.value_of("output_access") {
         Some("internal") => task.output_modifier = Some(Modifier::Internal),
         Some("public") => task.output_modifier = Some(Modifier::Public),
         _ => {}
     }
-    task.output_namespace = matches.value_of("output_namespace").map(|v| v.to_string());
+    task.output_namespace = matches
+        .value_of("output_namespace")
+        .map(std::string::ToString::to_string);
     match matches.value_of("parsing_method") {
         Some("lr0") => task.method = Some(ParsingMethod::LR0),
         Some("lr1") => task.method = Some(ParsingMethod::LR1),
@@ -180,16 +185,18 @@ pub fn main() -> miette::Result<()> {
         Some("rnglalr1") => task.method = Some(ParsingMethod::RNGLALR1),
         _ => {}
     }
-    task.grammar_name = matches.value_of("grammar_name").map(|v| v.to_string());
+    task.grammar_name = matches
+        .value_of("grammar_name")
+        .map(std::string::ToString::to_string);
     if let Some(inputs) = matches.values_of("inputs") {
         for input in inputs {
             task.inputs.push(Input::FileName(input.to_string()));
         }
     }
     let result = if matches.is_present("test") {
-        execute_test(task)
+        execute_test(&task)
     } else {
-        execute_normal(task)
+        execute_normal(&task)
     };
     if let Err(errors) = result {
         println!("{}", HimeCcErrors(errors));
@@ -200,16 +207,16 @@ pub fn main() -> miette::Result<()> {
 }
 
 /// Executes the normal operation of the compiler
-fn execute_normal(task: CompilationTask) -> Result<(), Errors> {
+fn execute_normal<'a>(task: &CompilationTask<'a>) -> Result<(), Errors<'a>> {
     task.execute()?;
     Ok(())
 }
 
 /// Executes the compiler in test mode
 /// Compiles the target grammar in-memory
-/// Test it against the input read from std::in
+/// Test it against the input read from `std::in`
 /// Output the result
-fn execute_test(task: CompilationTask) -> Result<(), Errors> {
+fn execute_test<'a>(task: &CompilationTask<'a>) -> Result<(), Errors<'a>> {
     let mut data = task.load()?;
     if data.grammars.is_empty() || (data.grammars.len() > 1 && task.grammar_name.is_none()) {
         return Err(Errors::from(data, vec![Error::GrammarNotSpecified]));
@@ -228,7 +235,7 @@ fn execute_test(task: CompilationTask) -> Result<(), Errors> {
             None => {
                 return Err(Errors::from(
                     data,
-                    vec![Error::GrammarNotFound(name.to_owned())]
+                    vec![Error::GrammarNotFound(name.clone())]
                 ));
             }
         }
@@ -264,7 +271,7 @@ struct HimeCcErrors<'t>(Errors<'t>);
 impl<'t> Display for HimeCcErrors<'t> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let handler = MietteHandler::default();
-        for error in self.0.errors.iter() {
+        for error in &self.0.errors {
             let contextualized = error.with_context(&self.0.context);
             handler.debug(&contextualized, f)?;
         }
