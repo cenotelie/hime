@@ -106,6 +106,9 @@ impl LanguageServer for Backend {
                 hover_provider: Some(HoverProviderCapability::Simple(true)),
                 definition_provider: Some(OneOf::Left(true)),
                 references_provider: Some(OneOf::Left(true)),
+                code_lens_provider: Some(CodeLensOptions {
+                    resolve_provider: None
+                }),
                 ..ServerCapabilities::default()
             },
             server_info: Some(ServerInfo {
@@ -184,19 +187,24 @@ impl LanguageServer for Backend {
         ))
     }
 
+    async fn code_lens(&self, params: CodeLensParams) -> Result<Option<Vec<CodeLens>>> {
+        let workspace = self.workspace.read().await;
+        Ok(workspace.get_code_lens(params.text_document.uri.as_str()))
+    }
+
     async fn execute_command(
         &self,
         params: ExecuteCommandParams
     ) -> Result<Option<serde_json::Value>> {
         let workspace = self.workspace.read().await;
         match params.command.as_str() {
-            "test" => {
+            "hime.parse" => {
                 if params.arguments.len() != 2 {
                     Err(Error::invalid_params("Expected exactly 2 parameters"))
                 } else {
                     match (&params.arguments[0], &params.arguments[1]) {
                         (serde_json::Value::String(grammar), serde_json::Value::String(input)) => {
-                            workspace.test(grammar, input)
+                            workspace.parse_input(grammar, input)
                         }
                         _ => Err(Error::invalid_params("Expected exactly 2 parameters"))
                     }

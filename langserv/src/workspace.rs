@@ -30,9 +30,9 @@ use hime_sdk::{CompilationTask, Input, InputReference, LoadedData, LoadedInput};
 use serde_json::Value;
 use tower_lsp::jsonrpc::Error as JsonRpcError;
 use tower_lsp::lsp_types::{
-    Diagnostic, DiagnosticRelatedInformation, DiagnosticSeverity, DidChangeTextDocumentParams,
-    FileChangeType, FileEvent, GotoDefinitionResponse, Hover, HoverContents, Location,
-    MarkedString, Position, Range, SymbolInformation, SymbolKind, Url
+    CodeLens, Command, Diagnostic, DiagnosticRelatedInformation, DiagnosticSeverity,
+    DidChangeTextDocumentParams, FileChangeType, FileEvent, GotoDefinitionResponse, Hover,
+    HoverContents, Location, MarkedString, Position, Range, SymbolInformation, SymbolKind, Url
 };
 
 use crate::symbols::{SymbolRegistry, SymbolRegistryElement};
@@ -260,7 +260,7 @@ impl Workspace {
                 let errors = errors.into_static();
                 for error in errors.errors.iter() {
                     if let Some((index, diag)) =
-                        to_diagnostic(&mut self.documents, &errors.data, error)
+                        to_diagnostic(&mut self.documents, &errors.context, error)
                     {
                         self.documents[index].diagnostics.push(diag);
                     }
@@ -477,8 +477,42 @@ impl Workspace {
         })
     }
 
+    /// Gets the code lens for a document
+    pub fn get_code_lens(&self, doc_uri: &str) -> Option<Vec<CodeLens>> {
+        let doc_index = self
+            .documents
+            .iter()
+            .enumerate()
+            .find(|(_, doc)| doc.url.as_str() == doc_uri)?
+            .0;
+        let data = self.data.as_ref()?;
+        let mut result = Vec::new();
+        for grammar in data.grammars.iter() {
+            if grammar.input_ref.input_index == doc_index {
+                result.push(CodeLens {
+                    range: self.get_location(grammar.input_ref).range,
+                    command: Some(Command {
+                        command: String::from("hime.playground"),
+                        title: String::from("Test grammar on input"),
+                        arguments: Some(vec![Value::String(grammar.name.clone())])
+                    }),
+                    data: None
+                });
+            }
+        }
+        if result.is_empty() {
+            None
+        } else {
+            Some(result)
+        }
+    }
+
     /// Tests an input against a grammar
-    pub fn test(&self, grammar_name: &str, input: &str) -> Result<Option<Value>, JsonRpcError> {
+    pub fn parse_input(
+        &self,
+        grammar_name: &str,
+        input: &str
+    ) -> Result<Option<Value>, JsonRpcError> {
         match &self.data {
             Some(data) => match data
                 .grammars
@@ -818,7 +852,7 @@ fn to_diagnostic(
                 data: None
             }
         )),
-        Error::OverridingPreviousTerminal(input_reference, name) => Some((
+        Error::OverridingPreviousTerminal(input_reference, name, _previous) => Some((
             input_reference.input_index,
             Diagnostic {
                 range: WorkspaceData::to_range(&data.inputs, *input_reference),
