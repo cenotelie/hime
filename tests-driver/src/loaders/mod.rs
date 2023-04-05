@@ -42,7 +42,7 @@ pub fn parse_fixtures(fixtures: &[FixtureDef]) -> Result<Fixtures, Errors> {
             fixture::parse_utf8_stream(&mut reader)
         })
         .collect();
-    let is_ok = results.iter().all(|r| r.is_success());
+    let is_ok = results.iter().all(ParseResult::is_success);
     if is_ok {
         Ok(Fixtures(
             results.into_iter().map(Fixture::from_content).collect()
@@ -71,7 +71,7 @@ pub fn parse_fixtures(fixtures: &[FixtureDef]) -> Result<Fixtures, Errors> {
                     .into_iter()
                     .zip(fixtures.iter())
                     .map(|(r, FixtureDef(name, _))| LoadedInput {
-                        name: name.to_string(),
+                        name: (*name).to_string(),
                         content: r.text
                     })
                     .collect(),

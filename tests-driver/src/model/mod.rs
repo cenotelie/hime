@@ -66,9 +66,9 @@ impl Fixtures {
         }
 
         if errors.is_empty() {
-            self.build_net(&grammars, &grammars_data, &mut errors);
-            self.build_java(&grammars, &grammars_data, &mut errors);
-            self.build_rust(&grammars, &grammars_data, &mut errors);
+            Self::build_net(&grammars, &grammars_data, &mut errors);
+            Self::build_java(&grammars, &grammars_data, &mut errors);
+            Self::build_rust(&grammars, &grammars_data, &mut errors);
         }
         if errors.is_empty() {
             Ok(())
@@ -78,21 +78,15 @@ impl Fixtures {
     }
 
     /// Build the Rust parsers for the fixtures
-    fn build_rust(
-        &self,
-        grammars: &[Grammar],
-        grammars_data: &[BuildData],
-        errors: &mut Vec<Error>
-    ) {
+    fn build_rust(grammars: &[Grammar], grammars_data: &[BuildData], errors: &mut Vec<Error>) {
         println!("Building Rust test parsers");
-        if let Err(e) = self.build_rust_inner(grammars, grammars_data, errors) {
+        if let Err(e) = Self::build_rust_inner(grammars, grammars_data, errors) {
             errors.push(e);
         }
     }
 
     /// Build the Rust parsers for the fixtures
     fn build_rust_inner(
-        &self,
         grammars: &[Grammar],
         grammars_data: &[BuildData],
         errors: &mut Vec<Error>
@@ -106,7 +100,7 @@ impl Fixtures {
             mode: Some(Mode::SourcesAndAssembly),
             output_target: Some(Runtime::Rust),
             output_path: Some(temp_dir.to_str().unwrap().to_string()),
-            output_target_runtime_path: runtime_path.to_str().map(|s| s.to_string()),
+            output_target_runtime_path: runtime_path.to_str().map(ToString::to_string),
             ..CompilationTask::default()
         };
 
@@ -136,21 +130,15 @@ impl Fixtures {
     }
 
     /// Build the .Net parsers for the fixtures
-    fn build_net(
-        &self,
-        grammars: &[Grammar],
-        grammars_data: &[BuildData],
-        errors: &mut Vec<Error>
-    ) {
+    fn build_net(grammars: &[Grammar], grammars_data: &[BuildData], errors: &mut Vec<Error>) {
         println!("Building .Net test parsers");
-        if let Err(e) = self.build_net_inner(grammars, grammars_data, errors) {
+        if let Err(e) = Self::build_net_inner(grammars, grammars_data, errors) {
             errors.push(e);
         }
     }
 
     /// Build the .Net parsers for the fixtures
     fn build_net_inner(
-        &self,
         grammars: &[Grammar],
         grammars_data: &[BuildData],
         errors: &mut Vec<Error>
@@ -164,7 +152,7 @@ impl Fixtures {
             mode: Some(Mode::SourcesAndAssembly),
             output_target: Some(Runtime::Net),
             output_path: Some(temp_dir.to_str().unwrap().to_string()),
-            output_target_runtime_path: runtime_path.to_str().map(|s| s.to_string()),
+            output_target_runtime_path: runtime_path.to_str().map(ToString::to_string),
             ..CompilationTask::default()
         };
 
@@ -192,21 +180,15 @@ impl Fixtures {
     }
 
     /// Build the Java parsers for the fixtures
-    fn build_java(
-        &self,
-        grammars: &[Grammar],
-        grammars_data: &[BuildData],
-        errors: &mut Vec<Error>
-    ) {
+    fn build_java(grammars: &[Grammar], grammars_data: &[BuildData], errors: &mut Vec<Error>) {
         println!("Building Java test parsers");
-        if let Err(e) = self.build_java_inner(grammars, grammars_data, errors) {
+        if let Err(e) = Self::build_java_inner(grammars, grammars_data, errors) {
             errors.push(e);
         }
     }
 
     /// Build the Java parsers for the fixtures
     fn build_java_inner(
-        &self,
         grammars: &[Grammar],
         grammars_data: &[BuildData],
         errors: &mut Vec<Error>
@@ -221,9 +203,9 @@ impl Fixtures {
             output_target: Some(Runtime::Java),
             output_modifier: Some(Modifier::Public),
             output_path: Some(temp_dir.to_str().unwrap().to_string()),
-            output_target_runtime_path: runtime_path.to_str().map(|s| s.to_string()),
+            output_target_runtime_path: runtime_path.to_str().map(ToString::to_string),
             java_maven_repository: match std::env::var("HOME") {
-                Ok(home) => Some(format!("{}/.m2/repository", home)),
+                Ok(home) => Some(format!("{home}/.m2/repository")),
                 Err(_) => None
             },
             ..CompilationTask::default()
@@ -328,8 +310,7 @@ impl Fixture {
                 Some(filter) => test_node
                     .child(0)
                     .get_value()
-                    .map(|name| name.contains(filter))
-                    .unwrap_or(true)
+                    .map_or(true, |name| name.contains(filter))
             })
             .map(|test_node| (index, test_node.child(1)))
             .collect();
@@ -342,7 +323,7 @@ impl Fixture {
                 reference,
                 OPTION_METHOD.to_string(),
                 method_node.get_value().unwrap().to_lowercase()
-            )
+            );
         }
         Ok(grammars)
     }
@@ -353,7 +334,7 @@ impl Fixture {
             .tests
             .iter()
             .filter(|test| test.is_selected(filter))
-            .map(|test| test.execute())
+            .map(Test::execute)
             .collect::<Result<Vec<_>, _>>()?;
         Ok(FixtureResults {
             name: self.name.clone(),
@@ -435,7 +416,7 @@ impl OutputTest {
         }
         {
             let mut expected_file = BufWriter::new(File::create("expected.txt")?);
-            for line in self.output.iter() {
+            for line in &self.output {
                 writeln!(expected_file, "{}", &line[1..line.len() - 1])?;
             }
             expected_file.flush()?;
@@ -674,7 +655,6 @@ fn execute_command(
     let status = match output.status.code() {
         Some(0) => TestResultStatus::Success,
         Some(1) => TestResultStatus::Failure,
-        Some(2) => TestResultStatus::Error,
         _ => TestResultStatus::Error
     };
     Ok(TestResultOnRuntime {
@@ -733,7 +713,7 @@ fn get_local_dir() -> PathBuf {
 /// Gets the path to the repository's root
 fn get_repo_root() -> PathBuf {
     let mut path = get_local_dir();
-    if path.file_name().map(|s| s.to_str()) == Some(Some("tests-results")) {
+    if path.file_name().map(std::ffi::OsStr::to_str) == Some(Some("tests-results")) {
         // we are in tests-results
         path.pop();
     }

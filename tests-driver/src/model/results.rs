@@ -98,13 +98,14 @@ impl Statistics {
 }
 
 /// The results of the execution of tests
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Default, Clone)]
 pub struct ExecutionResults(pub Vec<FixtureResults>);
 
 impl ExecutionResults {
     /// Gets the statistics for this execution
     pub fn get_stats(&self) -> Statistics {
-        self.0.iter().map(|t| t.get_stats()).sum()
+        self.0.iter().map(FixtureResults::get_stats).sum()
     }
 
     /// Export the results as XML
@@ -129,7 +130,7 @@ impl ExecutionResults {
         write!(writer, " failures=\"{}\"", stats.failure)?;
         write!(writer, " time=\"{}\"", stats.spent_time.as_secs_f32())?;
         writeln!(writer, ">")?;
-        for fixture in self.0.iter() {
+        for fixture in &self.0 {
             fixture.write_xml(writer)?;
         }
         writeln!(writer, "</testsuite>")?;
@@ -138,6 +139,7 @@ impl ExecutionResults {
 }
 
 /// The results for the tests on a fixture
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone)]
 pub struct FixtureResults {
     /// The fixture's name
@@ -149,7 +151,7 @@ pub struct FixtureResults {
 impl FixtureResults {
     /// Gets the statistics for this fixture
     pub fn get_stats(&self) -> Statistics {
-        self.tests.iter().map(|t| t.get_stats()).sum()
+        self.tests.iter().map(TestResult::get_stats).sum()
     }
 
     /// Writes the test result as XML
@@ -163,7 +165,7 @@ impl FixtureResults {
         write!(writer, " failures=\"{}\"", stats.failure)?;
         write!(writer, " time=\"{}\"", stats.spent_time.as_secs_f32())?;
         writeln!(writer, ">")?;
-        for test in self.tests.iter() {
+        for test in &self.tests {
             test.write_xml(writer)?;
         }
         writeln!(writer, "  </testsuite>")?;
@@ -189,17 +191,17 @@ impl TestResult {
     pub fn get_stats(&self) -> Statistics {
         self.dot_net
             .as_ref()
-            .map(|r| r.get_stats())
+            .map(TestResultOnRuntime::get_stats)
             .unwrap_or_default()
             + self
                 .java
                 .as_ref()
-                .map(|r| r.get_stats())
+                .map(TestResultOnRuntime::get_stats)
                 .unwrap_or_default()
             + self
                 .rust
                 .as_ref()
-                .map(|r| r.get_stats())
+                .map(TestResultOnRuntime::get_stats)
                 .unwrap_or_default()
     }
 

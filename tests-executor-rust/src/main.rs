@@ -160,7 +160,7 @@ fn execute_test_matches(
         return RESULT_FAILURE_PARSING;
     }
     let real_result = get_parsed_input(my_path, library, parser_name);
-    for error in real_result.errors.errors.iter() {
+    for error in &real_result.errors.errors {
         println!("{}", error.get_message());
         let context = real_result.text.get_context_at(error.get_position());
         println!("{}", context.content);
@@ -181,9 +181,9 @@ fn execute_test_matches(
         RESULT_SUCCESS
     } else {
         println!("Produced AST does not match the expected one, expected:");
-        print_expected(expected.get_ast().get_root(), Vec::new());
+        print_expected(expected.get_ast().get_root(), &[]);
         println!("got:");
-        print_obtained(real_result.get_ast().get_root(), Vec::new());
+        print_obtained(real_result.get_ast().get_root(), &[]);
         RESULT_FAILURE_VERB
     }
 }
@@ -200,7 +200,7 @@ fn execute_test_no_matches(
         return RESULT_FAILURE_PARSING;
     }
     let real_result = get_parsed_input(my_path, library, parser_name);
-    for error in real_result.errors.errors.iter() {
+    for error in &real_result.errors.errors {
         println!("{}", error.get_message());
         let context = real_result.text.get_context_at(error.get_position());
         println!("{}", context.content);
@@ -256,7 +256,7 @@ fn execute_test_outputs(
         if real_result.is_success() && real_result.errors.errors.is_empty() {
             return RESULT_SUCCESS;
         }
-        for error in real_result.errors.errors.iter() {
+        for error in &real_result.errors.errors {
             println!("{}", error.get_message());
             let context = real_result.text.get_context_at(error.get_position());
             println!("{}", context.content);
@@ -267,18 +267,18 @@ fn execute_test_outputs(
     }
 
     let mut i = 0;
-    for error in real_result.errors.errors.iter() {
-        let message = format!("{}", error);
+    for error in &real_result.errors.errors {
+        let message = format!("{error}");
         let context = real_result.text.get_context_at(error.get_position());
         if i + 2 >= expected_lines.len() {
             println!("Unexpected error:");
-            println!("{}", message);
+            println!("{message}");
             println!("{}", context.content);
             println!("{}", context.pointer);
             return RESULT_FAILURE_VERB;
         }
         if !message.starts_with(expected_lines[i]) {
-            println!("Unexpected output: {}", message);
+            println!("Unexpected output: {message}");
             println!("Expected prefix  : {}", expected_lines[i]);
             return RESULT_FAILURE_VERB;
         }
@@ -298,7 +298,7 @@ fn execute_test_outputs(
         return RESULT_SUCCESS;
     }
     for line in expected_lines.iter().skip(i) {
-        println!("Missing output: {}", line);
+        println!("Missing output: {line}");
     }
     RESULT_FAILURE_VERB
 }
@@ -346,7 +346,7 @@ fn compare(expected: AstNode, node: AstNode) -> bool {
 }
 
 /// Prints a simple AST
-fn print_expected(node: AstNode, crossings: Vec<bool>) {
+fn print_expected(node: AstNode, crossings: &[bool]) {
     let mut i = 0;
     if !crossings.is_empty() {
         while i < crossings.len() - 1 {
@@ -355,19 +355,19 @@ fn print_expected(node: AstNode, crossings: Vec<bool>) {
         }
         print!("+-> ");
     }
-    println!("{:}", node);
+    println!("{node:}");
     i = 0;
     let children = node.child(1).children();
     while i < children.len() {
-        let mut child_crossings = crossings.clone();
+        let mut child_crossings = crossings.to_owned();
         child_crossings.push(i < children.len() - 1);
-        print_expected(children.at(i), child_crossings);
+        print_expected(children.at(i), &child_crossings);
         i += 1;
     }
 }
 
 /// Prints a simple AST
-fn print_obtained(node: AstNode, crossings: Vec<bool>) {
+fn print_obtained(node: AstNode, crossings: &[bool]) {
     let mut i = 0;
     if !crossings.is_empty() {
         while i < crossings.len() - 1 {
@@ -376,13 +376,13 @@ fn print_obtained(node: AstNode, crossings: Vec<bool>) {
         }
         print!("+-> ");
     }
-    println!("{:}", node);
+    println!("{node:}");
     i = 0;
     let children = node.children();
     while i < children.len() {
-        let mut child_crossings = crossings.clone();
+        let mut child_crossings = crossings.to_owned();
         child_crossings.push(i < children.len() - 1);
-        print_obtained(children.at(i), child_crossings);
+        print_obtained(children.at(i), &child_crossings);
         i += 1;
     }
 }
@@ -398,7 +398,7 @@ fn unescape(value: &str) -> String {
                     result.push('\\');
                     on_escape = false;
                 } else {
-                    on_escape = true
+                    on_escape = true;
                 }
             }
             c => {
@@ -416,7 +416,7 @@ fn unescape(value: &str) -> String {
 /// Recognized sequences are:
 /// [U+000D, U+000A] (this is Windows-style \r \n)
 /// [U+????, U+000A] (this is unix style \n)
-/// [U+000D, U+????] (this is MacOS style \r, without \n after)
+/// [U+000D, U+????] (this is `MacOS` style \r, without \n after)
 /// Others:
 /// [?, U+000B], [?, U+000C], [?, U+0085], [?, U+2028], [?, U+2029]
 fn is_line_ending(c1: char, c2: char) -> bool {

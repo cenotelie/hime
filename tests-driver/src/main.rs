@@ -89,11 +89,11 @@ fn main() {
                 stats.total()
             );
             if let Err(e) = results.export_xml() {
-                println!("{:?}", e);
+                println!("{e:?}");
             }
         }
         Err(e) => {
-            println!("{:?}", e);
+            println!("{e:?}");
         }
     }
 }
@@ -115,7 +115,7 @@ struct TestErrors<'t>(Errors<'t>);
 impl<'t> Display for TestErrors<'t> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let handler = MietteHandler::default();
-        for error in self.0.errors.iter() {
+        for error in &self.0.errors {
             let contextualized = error.with_context(&self.0.context);
             handler.debug(&contextualized, f)?;
         }
