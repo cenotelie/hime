@@ -101,7 +101,7 @@ fn get_latet_categories() -> Result<Vec<Category>, Box<dyn Error>> {
             .or_insert_with(|| Category::new_owned(current_name.clone()));
         category.add_span(begin, last);
     }
-    let mut categories = categories.into_iter().map(|(_, v)| v).collect::<Vec<_>>();
+    let mut categories = categories.into_values().collect::<Vec<_>>();
     categories.sort_unstable_by(|a, b| a.name.cmp(&b.name));
     Ok(categories)
 }
@@ -146,9 +146,9 @@ fn generate_blocks_tests(blocks: &[Block]) -> Result<(), Box<dyn Error>> {
         let cs_name = block.name.replace('-', "");
         let value = block.span.begin.value();
         let value = if value <= 0xFFFF {
-            format!("\\u{:04X}", value)
+            format!("\\u{value:04X}")
         } else {
-            format!("\\u{:08X}", value)
+            format!("\\u{value:08X}")
         };
         writeln!(writer)?;
         writeln!(writer, "test Test_UnicodeBlock_{}_LeftBound:", &cs_name)?;
@@ -158,9 +158,9 @@ fn generate_blocks_tests(blocks: &[Block]) -> Result<(), Box<dyn Error>> {
         writeln!(writer, "\tyields e(X='{}')", &value)?;
         let value = block.span.end.value();
         let value = if value <= 0xFFFF {
-            format!("\\u{:04X}", value)
+            format!("\\u{value:04X}")
         } else {
-            format!("\\u{:08X}", value)
+            format!("\\u{value:08X}")
         };
         writeln!(writer)?;
         writeln!(writer, "test Test_UnicodeBlock_{}_RightBound:", &cs_name)?;
@@ -220,7 +220,7 @@ fn generate_categories_db(categories: &[Category]) -> Result<(), Box<dyn Error>>
             )?;
         }
     }
-    for (key, categories) in aggragated.iter() {
+    for (key, categories) in &aggragated {
         let lower_case = key.to_lowercase();
         writeln!(
             writer,
@@ -253,11 +253,8 @@ fn generate_categories_db(categories: &[Category]) -> Result<(), Box<dyn Error>>
     Ok(())
 }
 
-pub fn main() {
-    println!(
-        "{} {} tag={} hash={}",
-        CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH
-    );
+fn main() {
+    println!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}");
     println!("Retrieving and building blocks db ...");
     let blocks = get_latet_blocks().unwrap();
     println!("Generating blocks db ...");

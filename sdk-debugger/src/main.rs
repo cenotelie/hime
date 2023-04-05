@@ -44,13 +44,7 @@ pub const GIT_TAG: &str = env!("GIT_TAG");
 /// Main entry point
 fn main() -> Result<(), Box<dyn Error>> {
     let matches = Command::new("Hime SDK Debugger")
-        .version(
-            format!(
-                "{} {} tag={} hash={}",
-                CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH
-            )
-            .as_str()
-        )
+        .version(format!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}").as_str())
         .author("Association Cénotélie <contact@cenotelie.fr>")
         .about("Debugger for the SDK.")
         .subcommand(
@@ -142,11 +136,11 @@ fn main() -> Result<(), Box<dyn Error>> {
                 )
         )
         .get_matches();
-    execute(matches)
+    execute(&matches)
 }
 
 /// Executes the command
-fn execute(matches: ArgMatches) -> Result<(), Box<dyn Error>> {
+fn execute(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     match matches.subcommand() {
         Some(("print", matches)) => match matches.subcommand() {
             Some(("lexer", matches)) => {
@@ -184,7 +178,7 @@ fn execute(matches: ArgMatches) -> Result<(), Box<dyn Error>> {
 fn print_lexer(file_name: &str) -> Result<(), Box<dyn Error>> {
     let automaton = load_automaton_lexer(file_name)?;
     for (i, state) in automaton.get_states().enumerate() {
-        print!("state {}", i);
+        print!("state {i}");
         let terminals = state.get_terminals_count();
         for i in 0..terminals {
             if i == 0 {
@@ -199,7 +193,7 @@ fn print_lexer(file_name: &str) -> Result<(), Box<dyn Error>> {
             }
         }
         if terminals > 0 {
-            print!("]")
+            print!("]");
         }
         println!();
         for i in 0..256 {
@@ -208,7 +202,7 @@ fn print_lexer(file_name: &str) -> Result<(), Box<dyn Error>> {
                 println!(
                     "    0x{:X} ('{}') -> {}",
                     i,
-                    char::from_u32(i as u32).unwrap(),
+                    char::from_u32(u32::from(i)).unwrap(),
                     next
                 );
             }
@@ -227,13 +221,14 @@ fn print_parser(file_name: &str, is_glr: bool, show_bytecode: bool) -> Result<()
 }
 
 /// Prints a parser's automaton
+#[allow(clippy::cast_possible_truncation)]
 fn print_parser_lrk(file_name: &str, show_bytecode: bool) -> Result<(), Box<dyn Error>> {
     let automaton = load_automaton_lrk(file_name)?;
     let states = automaton.get_states_count() as u32;
     let columns = automaton.get_columns_count();
     for state in 0..states {
         let contexts = automaton.get_contexts(state);
-        println!("state {}", state);
+        println!("state {state}");
         for c in 0..columns {
             let action = automaton.get_action_at(state, c);
             match action.get_code() {
@@ -242,7 +237,7 @@ fn print_parser_lrk(file_name: &str, show_bytecode: bool) -> Result<(), Box<dyn 
                     if let Some(context) =
                         contexts.get_context_opened_by(automaton.get_sid_for_column(c))
                     {
-                        print!(", open context {}", context);
+                        print!(", open context {context}");
                     }
                     println!();
                 }
@@ -262,7 +257,7 @@ fn print_parser_lrk(file_name: &str, show_bytecode: bool) -> Result<(), Box<dyn 
                     if let Some(context) =
                         contexts.get_context_opened_by(automaton.get_sid_for_column(c))
                     {
-                        print!(", open context {}", context);
+                        print!(", open context {context}");
                     }
                     println!();
                     if show_bytecode {
@@ -286,12 +281,12 @@ fn print_parser_lrk(file_name: &str, show_bytecode: bool) -> Result<(), Box<dyn 
                                 LR_OP_CODE_BASE_SEMANTIC_ACTION => {
                                     let index = reduction.bytecode[i];
                                     i += 1;
-                                    print!("action {}", index);
+                                    print!("action {index}");
                                 }
                                 LR_OP_CODE_BASE_ADD_VIRTUAL => {
                                     let index = reduction.bytecode[i];
                                     i += 1;
-                                    print!("virtual {}", index);
+                                    print!("virtual {index}");
                                     match get_op_code_tree_action(op_code) {
                                         TREE_ACTION_DROP => print!("!"),
                                         TREE_ACTION_PROMOTE => print!("^"),
@@ -305,7 +300,7 @@ fn print_parser_lrk(file_name: &str, show_bytecode: bool) -> Result<(), Box<dyn 
                     }
                 }
                 LR_ACTION_CODE_ACCEPT => {
-                    println!("    on 0x{:X}, accept", c);
+                    println!("    on 0x{c:X}, accept");
                 }
                 _ => {}
             }
@@ -320,6 +315,7 @@ fn print_parser_glr(_file_name: &str, _show_bytecode: bool) -> Result<(), Box<dy
 }
 
 /// Computes the diff between two lexer automaton
+#[allow(clippy::cast_possible_truncation)]
 fn diff_lexer(file_left: &str, file_right: &str) -> Result<(), Box<dyn Error>> {
     let automaton_left = load_automaton_lexer(file_left)?;
     let automaton_right = load_automaton_lexer(file_right)?;
@@ -329,13 +325,13 @@ fn diff_lexer(file_left: &str, file_right: &str) -> Result<(), Box<dyn Error>> {
     for (s_left, state_left) in automaton_left.get_states().enumerate() {
         let s_right = map_left_right[s_left];
         if s_right == 0 && s_left != 0 {
-            println!("State {} on left is unmapped on right", s_left);
+            println!("State {s_left} on left is unmapped on right");
             continue;
         }
         let state_right = automaton_right.get_state(s_right as u32);
         let terminals_left = state_left.get_terminals().collect::<Vec<_>>();
         let terminals_right = state_right.get_terminals().collect::<Vec<_>>();
-        for term_left in terminals_left.iter() {
+        for term_left in &terminals_left {
             match terminals_right.iter().find(|t| t.index == term_left.index) {
                 Some(term_right) => {
                     if term_left.context != term_right.context {
@@ -353,7 +349,7 @@ fn diff_lexer(file_left: &str, file_right: &str) -> Result<(), Box<dyn Error>> {
                 }
             }
         }
-        for term_right in terminals_right.iter() {
+        for term_right in &terminals_right {
             if terminals_left.iter().any(|r| r.index == term_right.index) {
                 println!(
                     "State ({}, {}) is final for terminal 0x{:X} on the right, not the left",
@@ -368,14 +364,12 @@ fn diff_lexer(file_left: &str, file_right: &str) -> Result<(), Box<dyn Error>> {
                 (DEAD_STATE, DEAD_STATE) => {}
                 (_, DEAD_STATE) => {
                     println!(
-                        "State ({}, {}) has a transition on 0x{:X} on the left, not on the right",
-                        s_left, s_right, i
+                        "State ({s_left}, {s_right}) has a transition on 0x{i:X} on the left, not on the right"
                     );
                 }
                 (DEAD_STATE, _) => {
                     println!(
-                        "State ({}, {}) has a transition on 0x{:X} on the right, not on the left",
-                        s_left, s_right, i
+                        "State ({s_left}, {s_right}) has a transition on 0x{i:X} on the right, not on the left"
                     );
                 }
                 (next_left, next_right) => {
@@ -387,7 +381,7 @@ fn diff_lexer(file_left: &str, file_right: &str) -> Result<(), Box<dyn Error>> {
     }
     for (s_right, &s_left) in map_right_left.iter().enumerate() {
         if s_left == 0 && s_right != 0 {
-            println!("State {} on right is unmapped on left", s_right);
+            println!("State {s_right} on right is unmapped on left");
         }
     }
     Ok(())
@@ -403,6 +397,7 @@ fn diff_parser(file_left: &str, file_right: &str, is_glr: bool) -> Result<(), Bo
 }
 
 /// Computes the diff between two parser automaton
+#[allow(clippy::cast_possible_truncation, clippy::too_many_lines)]
 fn diff_parser_lrk(file_left: &str, file_right: &str) -> Result<(), Box<dyn Error>> {
     let automaton_left = load_automaton_lrk(file_left)?;
     let states_left = automaton_left.get_states_count();
@@ -416,7 +411,7 @@ fn diff_parser_lrk(file_left: &str, file_right: &str) -> Result<(), Box<dyn Erro
     for s_left in 0..states_left {
         let s_right = map_left_right[s_left];
         if s_right == 0 && s_left != 0 {
-            println!("State {} on left is unmapped on right", s_left);
+            println!("State {s_left} on left is unmapped on right");
             continue;
         }
         let contexts_left = automaton_left.get_contexts(s_left as u32);
@@ -437,19 +432,17 @@ fn diff_parser_lrk(file_left: &str, file_right: &str) -> Result<(), Box<dyn Erro
                         (None, None) => {}
                         (Some(from), Some(to)) => {
                             if from != to {
-                                println!("States ({},{}), on 0x{:X}, shift opens different contexts: {} and {}", s_left, s_right, c, from, to);
+                                println!("States ({s_left},{s_right}), on 0x{c:X}, shift opens different contexts: {from} and {to}");
                             }
                         }
                         (Some(from), None) => {
                             println!(
-                                "States ({},{}), on 0x{:X}, left opens context {}, right do not",
-                                s_left, s_right, c, from
+                                "States ({s_left},{s_right}), on 0x{c:X}, left opens context {from}, right do not"
                             );
                         }
                         (None, Some(to)) => {
                             println!(
-                                "States ({},{}), on 0x{:X}, right opens context {}, left do not",
-                                s_left, s_right, c, to
+                                "States ({s_left},{s_right}), on 0x{c:X}, right opens context {to}, left do not"
                             );
                         }
                     }
@@ -467,20 +460,17 @@ fn diff_parser_lrk(file_left: &str, file_right: &str) -> Result<(), Box<dyn Erro
                     }
                     if reduction_left.head_action != reduction_right.head_action {
                         println!(
-                            "States ({},{}), on 0x{:X}, left and right have different head actions on reduction",
-                            s_left, s_right, c
+                            "States ({s_left},{s_right}), on 0x{c:X}, left and right have different head actions on reduction"
                         );
                     }
                     if reduction_left.reduction_length != reduction_right.reduction_length {
                         println!(
-                            "States ({},{}), on 0x{:X}, left and right have different reduction length",
-                            s_left, s_right, c
+                            "States ({s_left},{s_right}), on 0x{c:X}, left and right have different reduction length"
                         );
                     }
                     if reduction_left.bytecode.len() != reduction_right.bytecode.len() {
                         println!(
-                            "States ({},{}), on 0x{:X}, left and right have different reduction bytecode length",
-                            s_left, s_right, c
+                            "States ({s_left},{s_right}), on 0x{c:X}, left and right have different reduction bytecode length"
                         );
                     }
                     let different = reduction_left
@@ -491,13 +481,12 @@ fn diff_parser_lrk(file_left: &str, file_right: &str) -> Result<(), Box<dyn Erro
                         .any(|(l, r)| l != r);
                     if different {
                         println!(
-                            "States ({},{}), on 0x{:X}, left and right have different reduction bytecode",
-                            s_left, s_right, c
+                            "States ({s_left},{s_right}), on 0x{c:X}, left and right have different reduction bytecode"
                         );
                     }
                 }
-                (LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_ACCEPT) => {}
-                (LR_ACTION_CODE_NONE, LR_ACTION_CODE_NONE) => {}
+                (LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_ACCEPT)
+                | (LR_ACTION_CODE_NONE, LR_ACTION_CODE_NONE) => {}
                 (code_left, code_right) => {
                     println!(
                         "States ({}, {}) have different actions: {} and {}",
@@ -538,7 +527,7 @@ fn diff_parser_lrk(file_left: &str, file_right: &str) -> Result<(), Box<dyn Erro
     }
     for (s_right, &s_left) in map_right_left.iter().enumerate() {
         if s_left == 0 && s_right != 0 {
-            println!("State {} on right is unmapped on left", s_right);
+            println!("State {s_right} on right is unmapped on left");
         }
     }
     Ok(())

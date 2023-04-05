@@ -17,7 +17,7 @@
 
 //! Module for the management of errors in the SDK
 
-// #[cfg(feature = "print_errors")]
+#[cfg(feature = "print_errors")]
 pub mod print;
 
 use std::fmt::{Display, Formatter};

@@ -34,13 +34,7 @@ pub const GIT_TAG: &str = env!("GIT_TAG");
 /// Main entry point
 fn main() {
     let matches = Command::new("Hime ParseIt")
-        .version(
-            format!(
-                "{} {} tag={} hash={}",
-                CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH
-            )
-            .as_str()
-        )
+        .version(format!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}").as_str())
         .author("Association Cénotélie <contact@cenotelie.fr>")
         .about("Command line to parse a piece of input using a packaged parser.")
         .arg(
@@ -75,6 +69,6 @@ fn do_parse(input: &mut dyn io::Read, lib_name: &str, parser_module: &str) {
         let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResult> =
             library.get(function_name.as_bytes()).unwrap();
         let result = parser(input);
-        serde_json::to_writer(std::io::stdout(), &result).unwrap()
+        serde_json::to_writer(std::io::stdout(), &result).unwrap();
     }
 }
