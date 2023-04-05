@@ -27,7 +27,14 @@ use clap::{Arg, ArgAction, Command};
 use futures::future::join_all;
 use tokio::sync::RwLock;
 use tower_lsp::jsonrpc::{Error, Result};
-use tower_lsp::lsp_types::*;
+use tower_lsp::lsp_types::{
+    CodeLens, CodeLensOptions, CodeLensParams, DidChangeTextDocumentParams,
+    DidChangeWatchedFilesParams, ExecuteCommandOptions, ExecuteCommandParams, GotoDefinitionParams,
+    GotoDefinitionResponse, Hover, HoverParams, HoverProviderCapability, InitializeParams,
+    InitializeResult, Location, OneOf, ReferenceParams, ServerCapabilities, ServerInfo,
+    SymbolInformation, TextDocumentSyncCapability, TextDocumentSyncKind, WorkDoneProgressOptions,
+    WorkspaceFoldersServerCapabilities, WorkspaceServerCapabilities, WorkspaceSymbolParams
+};
 use tower_lsp::{Client, LanguageServer, LspService, Server};
 use workspace::Workspace;
 
@@ -199,15 +206,15 @@ impl LanguageServer for Backend {
         let workspace = self.workspace.read().await;
         match params.command.as_str() {
             "hime.parse" => {
-                if params.arguments.len() != 2 {
-                    Err(Error::invalid_params("Expected exactly 2 parameters"))
-                } else {
+                if params.arguments.len() == 2 {
                     match (&params.arguments[0], &params.arguments[1]) {
                         (serde_json::Value::String(grammar), serde_json::Value::String(input)) => {
                             workspace.parse_input(grammar, input)
                         }
                         _ => Err(Error::invalid_params("Expected exactly 2 parameters"))
                     }
+                } else {
+                    Err(Error::invalid_params("Expected exactly 2 parameters"))
                 }
             }
             _ => Err(Error::method_not_found())
@@ -223,18 +230,14 @@ async fn main() {
             None => String::from("unknown")
         };
         let message = match info.payload().downcast_ref::<String>() {
-            Some(message) => message.to_owned(),
+            Some(message) => message.clone(),
             None => String::from("no message")
         };
-        eprintln!("Panic: {} : {}", location, message);
+        eprintln!("Panic: {location} : {message}");
     }));
 
     let version = Box::leak::<'static>(
-        format!(
-            "{} {} tag={} hash={}",
-            CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH
-        )
-        .into_boxed_str()
+        format!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}").into_boxed_str()
     );
     let matches = Command::new("Hime Language Server")
         .version(version as &str)
@@ -268,25 +271,21 @@ async fn main() {
 
     match matches.subcommand() {
         Some(("version", _)) => {
-            println!(
-                "{} {} tag={} hash={}",
-                CRATE_NAME, CRATE_VERSION, GIT_TAG, GIT_HASH
-            )
+            println!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}");
         }
         _ => {
             if matches.get_flag("tcp") {
                 let address = matches
                     .get_one::<String>("address")
-                    .map(Deref::deref)
-                    .unwrap_or("127.0.0.1");
+                    .map_or("127.0.0.1", Deref::deref);
                 let port = matches
                     .get_one::<String>("port")
                     .map(|v| v.parse::<u16>())
                     .transpose()
                     .unwrap_or_default()
                     .unwrap_or(9257);
-                println!("Listening on {}:{}", address, port);
-                let listener = tokio::net::TcpListener::bind(format!("{}:{}", address, port))
+                println!("Listening on {address}:{port}");
+                let listener = tokio::net::TcpListener::bind(format!("{address}:{port}"))
                     .await
                     .unwrap();
                 let (stream, _) = listener.accept().await.unwrap();

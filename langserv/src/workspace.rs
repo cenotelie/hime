@@ -52,6 +52,7 @@ pub struct Document {
 
 impl Document {
     /// Creates a new document
+    #[must_use]
     pub fn new(url: Url, content: String) -> Document {
         Document {
             url,
@@ -63,6 +64,7 @@ impl Document {
 }
 
 /// The data associated to the workspace
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, Default)]
 pub struct WorkspaceData {
     /// The loaded inputs
@@ -75,11 +77,13 @@ pub struct WorkspaceData {
 
 impl WorkspaceData {
     /// Translate an input reference to a LSP range
+    #[must_use]
     pub fn get_range(&self, input_reference: InputReference) -> Range {
         WorkspaceData::to_range(&self.inputs, input_reference)
     }
 
     /// Translate an input reference to a LSP range
+    #[allow(clippy::cast_possible_truncation)]
     fn to_range(inputs: &[LoadedInput], input_reference: InputReference) -> Range {
         let end = inputs[input_reference.input_index]
             .content
@@ -95,7 +99,7 @@ impl WorkspaceData {
 
     /// Gets the symbol at a location in an input
     fn find_symbol_at(&self, location: InputReference) -> Option<&SymbolRegistryElement> {
-        for symbols in self.symbols.grammars.iter() {
+        for symbols in &self.symbols.grammars {
             for symbol in symbols.values() {
                 if symbol.is_at_location(&location) {
                     return Some(symbol);
@@ -119,6 +123,10 @@ pub struct Workspace {
 
 impl Workspace {
     /// Scans the current workspace for relevant documents
+    ///
+    /// # Errors
+    ///
+    /// Return an `std::io::Error` when reading files fail
     pub fn scan_workspace(&mut self, root: Url) -> io::Result<()> {
         let path = PathBuf::from(root.path());
         if path.exists() {
@@ -162,14 +170,11 @@ impl Workspace {
 
     /// Resolves a document
     fn resolve_document_path(&mut self, path: &Path) -> io::Result<()> {
-        let uri = match Url::from_file_path(path.canonicalize()?) {
-            Ok(uri) => uri,
-            Err(_) => {
-                return Err(io::Error::new(
-                    ErrorKind::NotFound,
-                    String::from("Path cannot be converted to Url")
-                ))
-            }
+        let Ok(uri) = Url::from_file_path(path.canonicalize()?) else {
+            return Err(io::Error::new(
+                ErrorKind::NotFound,
+                String::from("Path cannot be converted to Url")
+            ))
         };
         self.resolve_document(uri, path)
     }
@@ -192,6 +197,10 @@ impl Workspace {
     }
 
     /// Synchronises on file events
+    ///
+    /// # Errors
+    ///
+    /// Return an `std::io::Error` when reading files fail
     pub fn on_file_events(&mut self, events: &[FileEvent]) -> io::Result<()> {
         for event in events.iter() {
             match event.typ {
@@ -217,7 +226,7 @@ impl Workspace {
             .iter_mut()
             .find(|doc| doc.url == event.text_document.uri)
         {
-            for change in event.content_changes.into_iter() {
+            for change in event.content_changes {
                 if change.range.is_none() && change.range_length.is_none() {
                     document.content = Some(change.text);
                 }
@@ -229,7 +238,7 @@ impl Workspace {
     pub fn lint(&mut self) {
         self.data = None;
         let mut task = CompilationTask::default();
-        for doc in self.documents.iter_mut() {
+        for doc in &mut self.documents {
             doc.diagnostics.clear();
             if let Some(content) = doc.content.as_ref() {
                 task.inputs.push(Input::Raw(content));
@@ -244,7 +253,7 @@ impl Workspace {
                         errors.append(&mut errs);
                     }
                 }
-                for error in errors.iter() {
+                for error in &errors {
                     if let Some((index, diag)) = to_diagnostic(&mut self.documents, &data, error) {
                         self.documents[index].diagnostics.push(diag);
                     }
@@ -258,7 +267,7 @@ impl Workspace {
             }
             Err(errors) => {
                 let errors = errors.into_static();
-                for error in errors.errors.iter() {
+                for error in &errors.errors {
                     if let Some((index, diag)) =
                         to_diagnostic(&mut self.documents, &errors.context, error)
                     {
@@ -270,6 +279,7 @@ impl Workspace {
     }
 
     /// Lookups information for symbols matching the query
+    #[must_use]
     pub fn lookup_symbols(&self, query: &str) -> Vec<SymbolInformation> {
         let mut result = Vec::new();
         if let Some(data) = self.data.as_ref() {
@@ -281,7 +291,7 @@ impl Workspace {
                 }
             } else if parts.len() == 1 {
                 // lookup in all grammars
-                for grammar in data.grammars.iter() {
+                for grammar in &data.grammars {
                     self.lookup_symbols_in(grammar, &mut result, parts[0]);
                 }
             }
@@ -303,7 +313,7 @@ impl Workspace {
                 grammar.input_ref
             ));
         }
-        for terminal in grammar.terminals.iter() {
+        for terminal in &grammar.terminals {
             if !terminal.is_anonymous && terminal.name.contains(query) {
                 buffer.push(self.new_symbol(
                     format!("{}.{}", grammar.name, terminal.name),
@@ -312,7 +322,7 @@ impl Workspace {
                 ));
             }
         }
-        for variable in grammar.variables.iter() {
+        for variable in &grammar.variables {
             if variable.generated_for.is_none() && variable.name.contains(query) {
                 if let Some(rule) = variable.rules.first() {
                     buffer.push(self.new_symbol(
@@ -323,10 +333,10 @@ impl Workspace {
                 }
             }
         }
-        for symbol in grammar.virtuals.iter() {
+        for symbol in &grammar.virtuals {
             if symbol.name.contains(query) {
                 if let Some(element) =
-                    self.lookup_symbol_in_rules(grammar, SymbolRef::Virtual(symbol.id))
+                    Self::lookup_symbol_in_rules(grammar, SymbolRef::Virtual(symbol.id))
                 {
                     buffer.push(self.new_symbol(
                         format!("{}.{}", grammar.name, symbol.name),
@@ -336,10 +346,10 @@ impl Workspace {
                 }
             }
         }
-        for symbol in grammar.actions.iter() {
+        for symbol in &grammar.actions {
             if symbol.name.contains(query) {
                 if let Some(element) =
-                    self.lookup_symbol_in_rules(grammar, SymbolRef::Action(symbol.id))
+                    Self::lookup_symbol_in_rules(grammar, SymbolRef::Action(symbol.id))
                 {
                     buffer.push(self.new_symbol(
                         format!("{}.{}", grammar.name, symbol.name),
@@ -352,6 +362,7 @@ impl Workspace {
     }
 
     /// Gets the definition of a symbol at a location
+    #[must_use]
     pub fn get_definition_at(
         &self,
         doc_uri: &str,
@@ -392,6 +403,7 @@ impl Workspace {
     }
 
     /// Gets all the references to a symbol at a location
+    #[must_use]
     pub fn get_references_at(
         &self,
         doc_uri: &str,
@@ -415,16 +427,21 @@ impl Workspace {
         let data = self.data.as_ref()?;
         let symbol = data.find_symbol_at(input_ref)?;
         let mut references = Vec::new();
-        for input_ref in symbol.definitions.iter() {
+        for input_ref in &symbol.definitions {
             references.push(self.get_location(*input_ref));
         }
-        for input_ref in symbol.references.iter() {
+        for input_ref in &symbol.references {
             references.push(self.get_location(*input_ref));
         }
         Some(references)
     }
 
     /// Gets the description of the symbol at a location
+    ///
+    /// # Panics
+    ///
+    /// Panics when a symbol cannot be found in the grammar
+    #[must_use]
     pub fn get_symbol_description_at(
         &self,
         doc_uri: &str,
@@ -478,6 +495,7 @@ impl Workspace {
     }
 
     /// Gets the code lens for a document
+    #[must_use]
     pub fn get_code_lens(&self, doc_uri: &str) -> Option<Vec<CodeLens>> {
         let doc_index = self
             .documents
@@ -487,7 +505,7 @@ impl Workspace {
             .0;
         let data = self.data.as_ref()?;
         let mut result = Vec::new();
-        for grammar in data.grammars.iter() {
+        for grammar in &data.grammars {
             if grammar.input_ref.input_index == doc_index {
                 result.push(CodeLens {
                     range: self.get_location(grammar.input_ref).range,
@@ -508,6 +526,14 @@ impl Workspace {
     }
 
     /// Tests an input against a grammar
+    ///
+    /// # Errors
+    ///
+    /// Return a `JsonRpcError` for parsing errors
+    ///
+    /// # Panics
+    ///
+    /// Panic when serialization/deserialization fails
     pub fn parse_input(
         &self,
         grammar_name: &str,
@@ -526,7 +552,7 @@ impl Workspace {
                     match task.generate_in_memory(&mut grammar, grammar_index) {
                         Ok(parser) => {
                             let result = parser.parse(input);
-                            Ok(Some(serde_json::to_value(&result).unwrap()))
+                            Ok(Some(serde_json::to_value(result).unwrap()))
                         }
                         Err(_) => Ok(None)
                     }
@@ -538,14 +564,10 @@ impl Workspace {
     }
 
     /// Finds a symbol in a rule
-    fn lookup_symbol_in_rules(
-        &self,
-        grammar: &Grammar,
-        symbol_ref: SymbolRef
-    ) -> Option<RuleBodyElement> {
-        for variable in grammar.variables.iter() {
-            for rule in variable.rules.iter() {
-                for element in rule.body.elements.iter() {
+    fn lookup_symbol_in_rules(grammar: &Grammar, symbol_ref: SymbolRef) -> Option<RuleBodyElement> {
+        for variable in &grammar.variables {
+            for rule in &variable.rules {
+                for element in &rule.body.elements {
                     if element.symbol == symbol_ref && element.input_ref.is_some() {
                         return Some(*element);
                     }
@@ -587,6 +609,7 @@ impl Workspace {
 }
 
 /// Converts an error to a diagnostic
+#[allow(clippy::too_many_lines)]
 fn to_diagnostic(
     documents: &mut [Document],
     data: &LoadedData,
@@ -623,7 +646,7 @@ fn to_diagnostic(
                     code: None,
                     code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
-                    message: format!("Invalid value for grammar option `{}`{}", name, expected),
+                    message: format!("Invalid value for grammar option `{name}`{expected}"),
                     related_information: None,
                     tags: None,
                     data: None
@@ -711,7 +734,8 @@ fn to_diagnostic(
                 }
             ))
         }
-        Error::SeparatorCannotBeMatched(grammar_index, error) => {
+        Error::SeparatorCannotBeMatched(grammar_index, error)
+        | Error::TerminalCannotBeMatched(grammar_index, error) => {
             let terminal = data.grammars[*grammar_index]
                 .get_terminal(error.terminal.sid())
                 .unwrap();
@@ -742,7 +766,7 @@ fn to_diagnostic(
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
-                message: format!("Cannot find template rule `{}`", name),
+                message: format!("Cannot find template rule `{name}`"),
                 related_information: None,
                 tags: None,
                 data: None
@@ -756,10 +780,7 @@ fn to_diagnostic(
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
-                message: format!(
-                    "Template expected {} arguments, {} given",
-                    expected, provided
-                ),
+                message: format!("Template expected {expected} arguments, {provided} given"),
                 related_information: None,
                 tags: None,
                 data: None
@@ -773,7 +794,7 @@ fn to_diagnostic(
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
-                message: format!("Cannot find symbol `{}`", name),
+                message: format!("Cannot find symbol `{name}`"),
                 related_information: None,
                 tags: None,
                 data: None
@@ -801,7 +822,7 @@ fn to_diagnostic(
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
-                message: format!("Unknown unicode block `{}`", name),
+                message: format!("Unknown unicode block `{name}`"),
                 related_information: None,
                 tags: None,
                 data: None
@@ -815,7 +836,7 @@ fn to_diagnostic(
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
-                message: format!("Unknown unicode category `{}`", name),
+                message: format!("Unknown unicode category `{name}`"),
                 related_information: None,
                 tags: None,
                 data: None
@@ -830,8 +851,7 @@ fn to_diagnostic(
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
                 message: format!(
-                    "Unsupported non-plane 0 Unicode character ({0}) in character class",
-                    c
+                    "Unsupported non-plane 0 Unicode character ({c}) in character class"
                 ),
                 related_information: None,
                 tags: None,
@@ -846,7 +866,7 @@ fn to_diagnostic(
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
-                message: format!("The value U+{:0X} is not a supported unicode code point", c),
+                message: format!("The value U+{c:0X} is not a supported unicode code point"),
                 related_information: None,
                 tags: None,
                 data: None
@@ -860,7 +880,7 @@ fn to_diagnostic(
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
-                message: format!("Overriding the previous definition of `{}`", name),
+                message: format!("Overriding the previous definition of `{name}`"),
                 related_information: None,
                 tags: None,
                 data: None
@@ -874,7 +894,7 @@ fn to_diagnostic(
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
-                message: format!("Grammar `{}` is not defined", name),
+                message: format!("Grammar `{name}` is not defined"),
                 related_information: None,
                 tags: None,
                 data: None
@@ -924,29 +944,6 @@ fn to_diagnostic(
                 }
             ))
         }
-        Error::TerminalCannotBeMatched(grammar_index, error) => {
-            let terminal = data.grammars[*grammar_index]
-                .get_terminal(error.terminal.sid())
-                .unwrap();
-            let input_reference = terminal.input_ref;
-            Some((
-                input_reference.input_index,
-                Diagnostic {
-                    range: WorkspaceData::to_range(&data.inputs, input_reference),
-                    severity: Some(DiagnosticSeverity::ERROR),
-                    code: None,
-                    code_description: None,
-                    source: Some(super::CRATE_NAME.to_string()),
-                    message: format!(
-                        "Token `{}` is expected but can never be matched",
-                        &terminal.name
-                    ),
-                    related_information: None,
-                    tags: None,
-                    data: None
-                }
-            ))
-        }
         Error::TerminalMatchesEmpty(grammar_index, terminal_ref) => {
             let terminal = data.grammars[*grammar_index]
                 .get_terminal(terminal_ref.sid())
@@ -979,7 +976,7 @@ fn test_scan_workspace_in() -> io::Result<()> {
     let mut workspace = Workspace::default();
     let root = std::env::current_dir()?.parent().unwrap().to_owned();
     workspace.scan_workspace_in(&root)?;
-    for doc in workspace.documents.iter() {
+    for doc in &workspace.documents {
         println!("{}", &doc.url);
     }
     assert_eq!(workspace.documents.is_empty(), false);
@@ -995,7 +992,7 @@ fn test_scan_workspace() -> io::Result<()> {
         Err(_) => panic!("Failed to convert current dir to Url")
     };
     workspace.scan_workspace(url)?;
-    for doc in workspace.documents.iter() {
+    for doc in &workspace.documents {
         println!("{}", &doc.url);
     }
     assert_eq!(workspace.documents.is_empty(), false);

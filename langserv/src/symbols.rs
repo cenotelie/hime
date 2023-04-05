@@ -35,6 +35,7 @@ pub struct SymbolRegistryElement {
 
 impl SymbolRegistryElement {
     /// Gets whether this symbol is at a location
+    #[must_use]
     pub fn is_at_location(&self, location: &InputReference) -> bool {
         self.definitions
             .iter()
@@ -43,6 +44,7 @@ impl SymbolRegistryElement {
     }
 
     /// Gets the full reference to this symbol at a location
+    #[must_use]
     pub fn get_full_reference(&self, location: &InputReference) -> Option<InputReference> {
         self.definitions
             .iter()
@@ -61,6 +63,7 @@ pub struct SymbolRegistry {
 
 impl SymbolRegistry {
     /// Initializes a registry from grammars
+    #[must_use]
     pub fn from(grammars: &[Grammar]) -> SymbolRegistry {
         SymbolRegistry {
             grammars: grammars
@@ -68,7 +71,7 @@ impl SymbolRegistry {
                 .enumerate()
                 .map(|(grammar_index, grammar)| {
                     let mut map = HashMap::new();
-                    for terminal in grammar.terminals.iter() {
+                    for terminal in &grammar.terminals {
                         map.insert(
                             SymbolRef::Terminal(terminal.id),
                             SymbolRegistryElement {
@@ -102,7 +105,7 @@ impl SymbolRegistry {
                             }
                         );
                     }
-                    for symbol in grammar.virtuals.iter() {
+                    for symbol in &grammar.virtuals {
                         map.insert(
                             SymbolRef::Virtual(symbol.id),
                             SymbolRegistryElement {
@@ -113,7 +116,7 @@ impl SymbolRegistry {
                             }
                         );
                     }
-                    for symbol in grammar.actions.iter() {
+                    for symbol in &grammar.actions {
                         map.insert(
                             SymbolRef::Action(symbol.id),
                             SymbolRegistryElement {
@@ -125,9 +128,9 @@ impl SymbolRegistry {
                         );
                     }
                     // retrieve all references in syntactic rules
-                    for variable in grammar.variables.iter() {
-                        for rule in variable.rules.iter() {
-                            for element in rule.body.elements.iter() {
+                    for variable in &grammar.variables {
+                        for rule in &variable.rules {
+                            for element in &rule.body.elements {
                                 if let Some(input_ref) = element.input_ref {
                                     if let Some(entry) = map.get_mut(&element.symbol) {
                                         entry.references.push(input_ref);
