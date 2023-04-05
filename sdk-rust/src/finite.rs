@@ -37,6 +37,11 @@ pub enum FinalItem {
 
 impl FinalItem {
     /// Gets the sid for the referenced item
+    ///
+    /// # Panics
+    ///
+    /// Panic when the final item does not reference a terminal
+    #[must_use]
     pub fn sid(self) -> usize {
         if let FinalItem::Terminal(id, _) = self {
             id
@@ -46,6 +51,7 @@ impl FinalItem {
     }
 
     /// Gets the priority of this item
+    #[must_use]
     pub fn priority(self) -> usize {
         match self {
             FinalItem::Dummy => 0,
@@ -54,6 +60,11 @@ impl FinalItem {
     }
 
     /// Get the final item from the terminal reference
+    ///
+    /// # Panics
+    ///
+    /// Panic when the terminal cannot be turned into a DFA final item
+    #[must_use]
     pub fn from(terminal: TerminalRef, context: usize) -> FinalItem {
         match terminal {
             TerminalRef::Dummy => FinalItem::Dummy,
@@ -97,6 +108,7 @@ pub struct DFAState {
 
 impl DFAState {
     /// Initializes this state
+    #[must_use]
     pub fn new(id: usize) -> DFAState {
         DFAState {
             id,
@@ -106,11 +118,13 @@ impl DFAState {
     }
 
     /// Gets whether this state is final (i.e. it is marked with final items)
+    #[must_use]
     pub fn is_final(&self) -> bool {
         !self.items.is_empty()
     }
 
     /// Determines if the two states have the same marks
+    #[must_use]
     pub fn same_finals(&self, other: &DFAState) -> bool {
         if self.items.len() != other.items.len() {
             return false;
@@ -145,11 +159,13 @@ impl DFAState {
     }
 
     /// Gets the child state by the specified transition
+    #[must_use]
     pub fn get_child_by(&self, value: CharSpan) -> Option<usize> {
         self.transitions.get(&value).copied()
     }
 
     /// Determines whether this state has the specified transition
+    #[must_use]
     pub fn has_transition(&self, value: CharSpan) -> bool {
         self.transitions.contains_key(&value)
     }
@@ -172,11 +188,11 @@ impl DFAState {
     /// Repacks all the transitions from this state to remove overlaps between the transitions' values
     pub fn repack_transitions(&mut self) {
         let mut inverse = HashMap::new();
-        for (value, next) in self.transitions.iter() {
+        for (value, next) in &self.transitions {
             inverse.entry(*next).or_insert_with(Vec::new).push(*value);
         }
         self.transitions.clear();
-        for (next, mut values) in inverse.into_iter() {
+        for (next, mut values) in inverse {
             values.sort();
             let mut len = values.len();
             let mut i = 0;
@@ -199,7 +215,7 @@ impl DFAState {
                 }
                 i += 1;
             }
-            for value in values.into_iter() {
+            for value in values {
                 self.transitions.insert(value, next);
             }
         }
@@ -245,6 +261,7 @@ struct DFAPartition<'a> {
 
 impl DFA {
     /// Initializes this dfa as equivalent to the given nfa
+    #[must_use]
     pub fn from_nfa(mut nfa: NFA) -> DFA {
         // Create the first NFA set, add the entry and close it
         let mut nfa_init = NFAStateSet::new();
@@ -261,26 +278,23 @@ impl DFA {
             // Get the transitions for the set
             let transitions = nfa_sets[i].get_transitions(&nfa);
             // For each transition
-            for (value, child_set) in transitions.into_iter() {
-                match nfa_sets
+            for (value, child_set) in transitions {
+                if let Some((index, _)) = nfa_sets
                     .iter_mut()
                     .enumerate()
                     .find(|(_, set)| *set == &child_set)
                 {
-                    Some((index, _)) => {
-                        // An existing equivalent set is already present
-                        states[i].add_transition(value, index);
-                    }
-                    None => {
-                        // The child is not already present
-                        let id = states.len();
-                        // Add to the sets list
-                        nfa_sets.push(child_set);
-                        // Create the corresponding DFA state
-                        states.push(DFAState::new(id));
-                        // Setup transition
-                        states[i].add_transition(value, id);
-                    }
+                    // An existing equivalent set is already present
+                    states[i].add_transition(value, index);
+                } else {
+                    // The child is not already present
+                    let id = states.len();
+                    // Add to the sets list
+                    nfa_sets.push(child_set);
+                    // Create the corresponding DFA state
+                    states.push(DFAState::new(id));
+                    // Setup transition
+                    states[i].add_transition(value, id);
                 }
             }
             // Add finals
@@ -291,16 +305,19 @@ impl DFA {
     }
 
     /// Gets the number of states in this automaton
+    #[must_use]
     pub fn len(&self) -> usize {
         self.states.len()
     }
 
     /// Gets whether the DFA has no state
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.states.is_empty()
     }
 
     /// Initializes a DFA with a list of existing states
+    #[must_use]
     pub fn from_states(states: Vec<DFAState>) -> DFA {
         DFA { states }
     }
@@ -314,7 +331,7 @@ impl DFA {
 
     /// Repacks the transitions of all the states in this automaton
     pub fn repack_transitions(&mut self) {
-        for state in self.states.iter_mut() {
+        for state in &mut self.states {
             state.repack_transitions();
         }
     }
@@ -330,7 +347,7 @@ impl DFA {
         }
 
         // prune transitions
-        for index in finals.iter() {
+        for index in &finals {
             let state = &mut self.states[*index];
             state
                 .transitions
@@ -353,6 +370,7 @@ impl DFA {
     }
 
     /// Gets the minimal automaton equivalent to this ine
+    #[must_use]
     pub fn minimize(&self) -> DFA {
         let mut current = DFAPartition::from_dfa(self);
         let mut new_partition = current.refine(self);
@@ -366,13 +384,14 @@ impl DFA {
     }
 
     /// Gets the expected terminals in the DFA
+    #[must_use]
     pub fn get_expected(&self) -> TerminalSet {
         let mut expected = TerminalSet::default();
         expected.add(TerminalRef::Epsilon);
         expected.add(TerminalRef::Dollar);
-        for state in self.states.iter() {
+        for state in &self.states {
             let mut contexts = Vec::new();
-            for item in state.items.iter() {
+            for item in &state.items {
                 if let FinalItem::Terminal(id, context) = item {
                     if !contexts.contains(context) {
                         contexts.push(*context);
@@ -386,13 +405,14 @@ impl DFA {
     }
 
     /// Gets all the terminals that override the given one in final states
+    #[must_use]
     pub fn get_overriders(&self, terminal: TerminalRef, context: usize) -> Vec<TerminalRef> {
         let mut overriders = TerminalSet::default();
         let terminal_final = FinalItem::from(terminal, context);
-        for state in self.states.iter() {
+        for state in &self.states {
             if state.items.contains(&terminal_final) {
                 // separator is final of this state
-                for item in state.items.iter() {
+                for item in &state.items {
                     if item == &terminal_final {
                         break;
                     }
@@ -492,7 +512,7 @@ impl<'a> DFAPartition<'a> {
         // Partition the DFA states between final and non-finals
         let mut non_finals: Option<DFAStateGroup<'a>> = None;
         // For each state in the DFA
-        for state in dfa.states.iter() {
+        for state in &dfa.states {
             if state.is_final() {
                 // the state is final
                 // Look for a corresponding group in the existing ones
@@ -537,7 +557,7 @@ impl<'a> DFAPartition<'a> {
             return false;
         }
         // For each transition from state 1
-        for (key, n1) in s1.transitions.iter() {
+        for (key, n1) in &s1.transitions {
             // If state 2 does not have a transition with the same value : not same group
             match s2.transitions.get(key) {
                 None => {
@@ -570,7 +590,7 @@ impl<'a> DFAPartition<'a> {
         let mut new_partition = DFAPartition::new();
         // For each group in the current partition
         // Split the group and add the resulting groups to the new partition
-        for group in self.groups.iter() {
+        for group in &self.groups {
             let mut temp_partition = self.split(dfa, group);
             new_partition.groups.append(&mut temp_partition.groups);
         }
@@ -580,7 +600,7 @@ impl<'a> DFAPartition<'a> {
     /// Splits this partition with the group
     fn split(&self, dfa: &DFA, group: &DFAStateGroup<'a>) -> DFAPartition<'a> {
         let mut result = DFAPartition::new();
-        for state in group.states.iter() {
+        for state in &group.states {
             result.add_state(dfa, state, self);
         }
         result
@@ -604,7 +624,7 @@ impl<'a> DFAPartition<'a> {
             .map(|(index, group)| {
                 let mut state = DFAState::new(index);
                 // Add the terminal from the group to the new state
-                for item in group.states[0].items.iter() {
+                for item in &group.states[0].items {
                     state.items.push(*item);
                 }
                 state.items.sort();
@@ -613,7 +633,7 @@ impl<'a> DFAPartition<'a> {
             .collect();
         // Do linkage
         for (index, group) in self.groups.iter().enumerate() {
-            for (key, next) in group.states[0].transitions.iter() {
+            for (key, next) in &group.states[0].transitions {
                 let next_group = self.group_of(&dfa.states[*next]);
                 states[index].transitions.insert(*key, next_group);
             }
@@ -646,6 +666,7 @@ pub struct NFAState {
 
 impl NFAState {
     /// Initializes this state
+    #[must_use]
     pub fn new(id: usize) -> NFAState {
         NFAState {
             id,
@@ -656,11 +677,13 @@ impl NFAState {
     }
 
     /// Gets whether this state is final (i.e. it is marked with final items)
+    #[must_use]
     pub fn is_final(&self) -> bool {
         !self.items.is_empty()
     }
 
     /// Determines if the two states have the same marks
+    #[must_use]
     pub fn same_finals(&self, other: &NFAState) -> bool {
         if self.items.len() != other.items.len() {
             return false;
@@ -713,11 +736,11 @@ impl NFAState {
     }
 
     /// Normalize the transitions in this state with another state
-    pub fn normalize_with_other(&mut self, others: Vec<NFATransition>) -> bool {
+    pub fn normalize_with_other(&mut self, others: &[NFATransition]) -> bool {
         let mut modified = false;
         let mut i = 0;
         while i < self.transitions.len() {
-            for transition in others.iter() {
+            for transition in others {
                 modified |= self.normalize_split(i, transition.value);
             }
             i += 1;
@@ -768,6 +791,7 @@ pub struct NFA {
 
 impl NFA {
     /// Creates and initializes a minimal automaton with an entry state and a separate exit state
+    #[must_use]
     pub fn new_minimal() -> NFA {
         NFA {
             states: vec![NFAState::new(0), NFAState::new(1)],
@@ -777,6 +801,7 @@ impl NFA {
     }
 
     /// Create an optional NFA
+    #[must_use]
     pub fn new_optional(sub: &NFA) -> NFA {
         let mut result = sub.clone();
         result.bind_optional_of(sub.entry, sub.exit);
@@ -784,6 +809,7 @@ impl NFA {
     }
 
     /// Create an optional NFA
+    #[must_use]
     pub fn into_optional(self) -> NFA {
         let mut result = self;
         result.bind_optional_of(result.entry, result.exit);
@@ -799,6 +825,7 @@ impl NFA {
     }
 
     /// Creates an automaton that repeats the sub-automaton zero or more times
+    #[must_use]
     pub fn into_zero_or_more(self) -> NFA {
         let mut result = self;
         let sub_entry = result.entry;
@@ -812,6 +839,7 @@ impl NFA {
     }
 
     /// Creates an automaton that repeats the sub-automaton one or more times
+    #[must_use]
     pub fn into_one_or_more(self) -> NFA {
         let mut result = self;
         let sub_entry = result.entry;
@@ -824,6 +852,7 @@ impl NFA {
     }
 
     /// Creates an automaton that repeats the sub-automaton a number of times in the given range [min, max]
+    #[must_use]
     pub fn into_repeat_range(self, min: usize, max: usize) -> NFA {
         let mut result = NFA::new_minimal();
         let mut last = 0;
@@ -846,11 +875,12 @@ impl NFA {
     }
 
     /// Creates an automaton that is the union of the two sub-automaton
-    pub fn into_union_with(self, other: NFA) -> NFA {
+    #[must_use]
+    pub fn into_union_with(self, other: &NFA) -> NFA {
         let mut result = self;
         let left_entry = result.entry;
         let left_exit = result.exit;
-        let (right_entry, right_exit) = result.insert_sub_nfa(&other);
+        let (right_entry, right_exit) = result.insert_sub_nfa(other);
         let (entry, exit) = result.add_entry_exit();
         result.add_transition(entry, EPSILON, left_entry);
         result.add_transition(entry, EPSILON, right_entry);
@@ -860,11 +890,12 @@ impl NFA {
     }
 
     /// Creates an automaton that concatenates the two sub-automaton
-    pub fn into_concatenation(self, other: NFA) -> NFA {
+    #[must_use]
+    pub fn into_concatenation(self, other: &NFA) -> NFA {
         let mut result = self;
         let left_entry = result.entry;
         let left_exit = result.exit;
-        let (right_entry, right_exit) = result.insert_sub_nfa(&other);
+        let (right_entry, right_exit) = result.insert_sub_nfa(other);
         let (entry, exit) = result.add_entry_exit();
         result.add_transition(entry, EPSILON, left_entry);
         result.add_transition(left_exit, EPSILON, right_entry);
@@ -873,11 +904,13 @@ impl NFA {
     }
 
     /// Creates an automaton that is the difference between the left and right sub-automata
-    pub fn into_difference(self, other: NFA) -> NFA {
+    #[allow(clippy::similar_names)]
+    #[must_use]
+    pub fn into_difference(self, other: &NFA) -> NFA {
         let mut nfa = self;
         let left_entry = nfa.entry;
         let left_exit = nfa.exit;
-        let (right_entry, right_exit) = nfa.insert_sub_nfa(&other);
+        let (right_entry, right_exit) = nfa.insert_sub_nfa(other);
         let (entry, exit) = nfa.add_entry_exit();
         let exit_positive = nfa.add_state().id;
         let exit_negative = nfa.add_state().id;
@@ -894,7 +927,7 @@ impl NFA {
         dfa.prune();
         let mut nfa = NFA::from_dfa(&dfa);
         nfa.exit = nfa.add_state().id;
-        for state in nfa.states.iter_mut() {
+        for state in &mut nfa.states {
             if state.items.contains(&FinalItem::Dummy) {
                 state.clear_items();
                 state.add_transition(EPSILON, nfa.exit);
@@ -912,6 +945,7 @@ impl NFA {
 
     /// Initializes this automaton as a copy of the given DFA
     /// This automaton will not have an exit state
+    #[must_use]
     pub fn from_dfa(dfa: &DFA) -> NFA {
         NFA {
             states: dfa
@@ -937,11 +971,13 @@ impl NFA {
     }
 
     /// Gets the number of states in this automaton
+    #[must_use]
     pub fn len(&self) -> usize {
         self.states.len()
     }
 
     /// Gets whether the NFA has no state
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.states.is_empty()
     }
@@ -959,6 +995,7 @@ impl NFA {
     }
 
     /// Clone this automaton without the final items
+    #[must_use]
     pub fn clone_no_finals(&self) -> NFA {
         NFA {
             states: self
@@ -979,7 +1016,7 @@ impl NFA {
     /// Inserts all the states of the given automaton into this one
     pub fn insert_sub_nfa(&mut self, nfa: &NFA) -> (usize, usize) {
         let offset = self.states.len();
-        for state in nfa.states.iter() {
+        for state in &nfa.states {
             self.states.push(NFAState {
                 id: state.id + offset,
                 items: state.items.clone(),
@@ -1022,7 +1059,7 @@ impl NFAStateSet {
     fn close_normal(&mut self, nfa: &NFA) {
         let mut i = 0;
         while i < self.states.len() {
-            for transition in nfa.states[self.states[i]].transitions.iter() {
+            for transition in &nfa.states[self.states[i]].transitions {
                 if transition.value == EPSILON {
                     self.add_unique(nfa.states[transition.next].id);
                 }
@@ -1039,11 +1076,11 @@ impl NFAStateSet {
         // Look for a positive and a negative node
         let mut state_positive = None;
         let mut state_negative = None;
-        for state in self.states.iter() {
+        for state in &self.states {
             match nfa.states[*state].mark.cmp(&0) {
                 Ordering::Greater => state_positive = Some(*state),
                 Ordering::Less => state_negative = Some(*state),
-                _ => ()
+                Ordering::Equal => ()
             }
         }
         // With both negative and positive states
@@ -1063,8 +1100,8 @@ impl NFAStateSet {
     /// Gets all the final markers of all the states in this set
     fn get_finals(&self, nfa: &NFA) -> Vec<FinalItem> {
         let mut result = Vec::new();
-        for state in self.states.iter() {
-            for fi in nfa.states[*state].items.iter() {
+        for state in &self.states {
+            for fi in &nfa.states[*state].items {
                 result.push(*fi);
             }
         }
@@ -1074,8 +1111,8 @@ impl NFAStateSet {
     /// Builds transitions from this set to other sets
     fn get_transitions(&self, nfa: &NFA) -> Vec<(CharSpan, NFAStateSet)> {
         let mut transitions = HashMap::new();
-        for state in self.states.iter() {
-            for transition in nfa.states[*state].transitions.iter() {
+        for state in &self.states {
+            for transition in &nfa.states[*state].transitions {
                 if transition.value == EPSILON {
                     // If this is an ε-transition : pass
                     continue;
@@ -1088,7 +1125,7 @@ impl NFAStateSet {
             }
         }
         // Close all children
-        for (_, set) in transitions.iter_mut() {
+        for set in transitions.values_mut() {
             set.close_with_marks(nfa);
         }
         let mut transitions: Vec<(CharSpan, NFAStateSet)> = transitions.into_iter().collect();
@@ -1112,9 +1149,9 @@ impl NFAStateSet {
             let mut s2 = s1 + 1;
             while s2 < nb_states {
                 let transitions = nfa.states[self.states[s2]].transitions.clone();
-                modified |= nfa.states[self.states[s1]].normalize_with_other(transitions);
+                modified |= nfa.states[self.states[s1]].normalize_with_other(&transitions);
                 let transitions = nfa.states[self.states[s1]].transitions.clone();
-                modified |= nfa.states[self.states[s2]].normalize_with_other(transitions);
+                modified |= nfa.states[self.states[s2]].normalize_with_other(&transitions);
                 s2 += 1;
             }
             s1 += 1;

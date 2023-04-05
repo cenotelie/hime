@@ -40,24 +40,34 @@ pub struct CodePoint(u32);
 
 impl CodePoint {
     /// Initializes the code point
+    ///
+    /// # Panics
+    ///
+    /// Raise a panic when the value is not a valid code point
+    #[must_use]
     pub fn new(value: u32) -> CodePoint {
-        if (0xD800..=0xDFFF).contains(&value) || value >= 0x0011_0000 {
-            panic!("The value is not a valid Unicode character code point");
-        }
+        assert!(
+            !((0xD800..=0xDFFF).contains(&value) || value >= 0x0011_0000),
+            "The value is not a valid Unicode character code point"
+        );
         CodePoint(value)
     }
 
     /// Gets the code point value
+    #[must_use]
     pub fn value(self) -> u32 {
         self.0
     }
 
     /// Gets a value indicating whether this codepoint is in Unicode plane 0
+    #[must_use]
     pub fn is_plane0(self) -> bool {
         self.0 <= 0xFFFF
     }
 
     /// Gets the UTF-16 encoding of this code point
+    #[allow(clippy::cast_possible_truncation)]
+    #[must_use]
     pub fn get_utf16(self) -> [u16; 2] {
         if self.0 <= 0xFFFF {
             // plane 0
@@ -81,6 +91,7 @@ pub struct Span {
 
 impl Span {
     /// Initializes this character span
+    #[must_use]
     pub fn new(begin: u32, end: u32) -> Span {
         Span {
             begin: CodePoint::new(begin),
@@ -89,16 +100,19 @@ impl Span {
     }
 
     /// Gets the range's length in number of characters
+    #[must_use]
     pub fn len(self) -> u32 {
         self.end.0 - self.begin.0 + 1
     }
 
     /// Gets whether the range is empty
+    #[must_use]
     pub fn is_empty(self) -> bool {
         self.end.0 < self.begin.0
     }
 
     /// Gets a value indicating whether this codepoint is in Unicode plane 0
+    #[must_use]
     pub fn is_plane0(self) -> bool {
         self.begin.is_plane0() && self.end.is_plane0()
     }
@@ -115,6 +129,7 @@ pub struct Block {
 
 impl Block {
     /// Initializes this Unicode block
+    #[must_use]
     pub fn new(name: &str, begin: u32, end: u32) -> Block {
         Block {
             name: name.to_string(),
@@ -123,6 +138,7 @@ impl Block {
     }
 
     /// Initializes this Unicode block
+    #[must_use]
     pub fn new_owned(name: String, begin: u32, end: u32) -> Block {
         Block {
             name,
@@ -142,6 +158,7 @@ pub struct Category {
 
 impl Category {
     /// Represents a Unicode category
+    #[must_use]
     pub fn new(name: &'static str) -> Category {
         Category {
             name: name.to_string(),
@@ -150,6 +167,7 @@ impl Category {
     }
 
     /// Represents a Unicode category
+    #[must_use]
     pub fn new_owned(name: String) -> Category {
         Category {
             name,

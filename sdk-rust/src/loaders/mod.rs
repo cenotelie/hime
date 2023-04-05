@@ -45,6 +45,10 @@ use crate::{CharSpan, Input, InputReference, LoadedData, LoadedInput};
 pub struct LoadInput<'a>(String, Box<dyn Read + 'a>);
 
 /// Open all inputs
+///
+/// # Errors
+///
+/// Returns the parsing and loading errors
 pub fn open_all<'t>(inputs: &[Input<'t>]) -> Result<Vec<LoadInput<'t>>, Errors<'t>> {
     let mut errors = Vec::new();
     let mut result = Vec::new();
@@ -62,9 +66,9 @@ pub fn open_all<'t>(inputs: &[Input<'t>]) -> Result<Vec<LoadInput<'t>>, Errors<'
 }
 
 /// Build the loaded data structure
-fn build_loaded_data<'s, 't, 'a>(
+fn build_loaded_data<'t>(
     names: Vec<String>,
-    parse_results: Vec<ParseResult<'s, 't, 'a>>,
+    parse_results: Vec<ParseResult<'_, 't, '_>>,
     grammars: Vec<Grammar>
 ) -> LoadedData<'t> {
     LoadedData {
@@ -81,17 +85,28 @@ fn build_loaded_data<'s, 't, 'a>(
 }
 
 /// Loads all inputs into grammars
+///
+/// # Errors
+///
+/// Return the parsing and loading errors if any
 pub fn load_inputs<'t>(inputs: &[Input<'t>]) -> Result<LoadedData<'t>, Errors<'t>> {
     load(open_all(inputs)?)
 }
 
 /// Loads all inputs into grammars
+///
+/// # Errors
+///
+/// Return the parsing and loading errors if any
 pub fn load(inputs: Vec<LoadInput>) -> Result<LoadedData, Errors> {
     // parse
     let (names, results) = parse_inputs(inputs)?;
     // extract grammar roots
-    let asts: Vec<Ast> = results.iter().map(|r| r.get_ast()).collect();
-    let doc_roots: Vec<AstNode> = asts.iter().map(|ast| ast.get_root()).collect();
+    let asts: Vec<Ast> = results
+        .iter()
+        .map(hime_redist::result::ParseResult::get_ast)
+        .collect();
+    let doc_roots: Vec<AstNode> = asts.iter().map(hime_redist::ast::Ast::get_root).collect();
     let roots: Vec<(usize, AstNode)> = doc_roots
         .iter()
         .enumerate()
@@ -108,6 +123,10 @@ pub fn load(inputs: Vec<LoadInput>) -> Result<LoadedData, Errors> {
 }
 
 /// Loads grammars from AST roots
+///
+/// # Errors
+///
+/// Returns the parsing errors, if any
 pub fn load_parsed(roots: &[(usize, AstNode)]) -> Result<Vec<Grammar>, Vec<Error>> {
     let (grammars, errors) = do_load_grammars(roots);
     if errors.is_empty() {
@@ -168,12 +187,17 @@ fn resolve_inheritance<'s, 't, 'a>(
 }
 
 /// Parses the specified input stream
+#[allow(clippy::result_large_err)]
 fn parse_input_stream<'a>(
     content: Box<dyn Read + 'a>,
     input_index: usize
-) -> Result<ParseResult<'static, 'a, 'static>, (ParseResult<'static, 'a, 'static>, Vec<Error>)> {
+) -> Result<
+    ParseResult<'static, 'a, 'static>,
+    (Option<ParseResult<'static, 'a, 'static>>, Vec<Error>)
+> {
     let mut reader = io::BufReader::new(content);
-    let result = hime_grammar::parse_utf8_stream(&mut reader);
+    let result =
+        hime_grammar::parse_utf8_stream(&mut reader).map_err(|e| (None, vec![Error::Io(e)]))?;
     let errors: Vec<Error> = result
         .errors
         .errors
@@ -193,7 +217,7 @@ fn parse_input_stream<'a>(
     if errors.is_empty() {
         Ok(result)
     } else {
-        Err((result, errors))
+        Err((Some(result), errors))
     }
 }
 
@@ -210,19 +234,21 @@ fn parse_inputs(inputs: Vec<LoadInput>) -> Result<(Vec<String>, Vec<ParseResult>
                 results.push(result);
             }
             Err((result, mut sub_errors)) => {
-                results.push(result);
+                if let Some(result) = result {
+                    results.push(result);
+                }
                 has_errors = true;
-                errors.append(&mut sub_errors)
+                errors.append(&mut sub_errors);
             }
         }
     }
-    if !has_errors {
-        Ok((names, results))
-    } else {
+    if has_errors {
         Err(Errors::from(
             build_loaded_data(names, results, Vec::new()),
             errors
         ))
+    } else {
+        Ok((names, results))
     }
 }
 
@@ -328,8 +354,7 @@ impl<'s, 't, 'a> Loader<'s, 't, 'a> {
                 hime_grammar::ID_TERMINAL_BLOCK_RULES => {
                     load_rules(self.input_index, errors, &mut self.grammar, node);
                 }
-                hime_grammar::ID_TERMINAL_NAME => {}
-                hime_grammar::ID_VARIABLE_GRAMMAR_PARENCY => {}
+                hime_grammar::ID_TERMINAL_NAME | hime_grammar::ID_VARIABLE_GRAMMAR_PARENCY => {}
                 _ => {
                     panic!("Unrecognized symbol: {}", node.get_symbol().name);
                 }
@@ -438,7 +463,7 @@ fn load_terminal_rule(
     terminal.nfa.states[terminal.nfa.exit]
         .add_item(FinalItem::Terminal(terminal.id, terminal.context));
     let referring_id = terminal.id;
-    for (referred_id, input_ref) in references.into_iter() {
+    for (referred_id, input_ref) in references {
         if let Some(referred) = grammar.get_terminal_mut(referred_id) {
             referred.terminal_references.push(TerminalReference {
                 referring_id,
@@ -490,12 +515,12 @@ fn load_nfa(
         hime_grammar::ID_TERMINAL_OPERATOR_UNION => {
             let left = load_nfa(input_index, errors, references, grammar, node.child(0));
             let right = load_nfa(input_index, errors, references, grammar, node.child(1));
-            left.into_union_with(right)
+            left.into_union_with(&right)
         }
         hime_grammar::ID_TERMINAL_OPERATOR_DIFFERENCE => {
             let left = load_nfa(input_index, errors, references, grammar, node.child(0));
             let right = load_nfa(input_index, errors, references, grammar, node.child(1));
-            left.into_difference(right)
+            left.into_difference(&right)
         }
         hime_grammar::ID_VIRTUAL_RANGE => {
             let inner = load_nfa(input_index, errors, references, grammar, node.child(0));
@@ -510,7 +535,7 @@ fn load_nfa(
         hime_grammar::ID_VIRTUAL_CONCAT => {
             let left = load_nfa(input_index, errors, references, grammar, node.child(0));
             let right = load_nfa(input_index, errors, references, grammar, node.child(1));
-            left.into_concatenation(right)
+            left.into_concatenation(&right)
         }
         _ => {
             panic!("Unrecognized symbol: {}", node.get_symbol().name)
@@ -563,15 +588,12 @@ fn load_nfa_codepoint(input_index: usize, errors: &mut Vec<Error>, node: AstNode
     // extract the code point value
     let value = node.get_value().unwrap();
     let value = u32::from_str_radix(&value[2..], 16).unwrap();
-    let value = match std::char::from_u32(value) {
-        Some(v) => v,
-        None => {
-            errors.push(Error::InvalidCodePoint(
-                InputReference::from(input_index, &node),
-                value
-            ));
-            return NFA::new_minimal();
-        }
+    let Some(value) = std::char::from_u32(value) else {
+        errors.push(Error::InvalidCodePoint(
+            InputReference::from(input_index, &node),
+            value
+        ));
+        return NFA::new_minimal();
     };
     // build the NFA
     let mut nfa = NFA::new_minimal();
@@ -586,6 +608,7 @@ fn load_nfa_codepoint(input_index: usize, errors: &mut Vec<Error>, node: AstNode
 }
 
 /// Builds a NFA from a character class
+#[allow(clippy::cast_possible_truncation)]
 fn load_nfa_class(input_index: usize, errors: &mut Vec<Error>, node: AstNode) -> NFA {
     // extract the value
     let node_value = node.get_value().unwrap();
@@ -635,14 +658,14 @@ fn load_nfa_class(input_index: usize, errors: &mut Vec<Error>, node: AstNode) ->
     }
     let mut nfa = NFA::new_minimal();
     if positive {
-        for span in spans.into_iter() {
+        for span in spans {
             nfa.add_transition(nfa.entry, span, nfa.exit);
         }
     } else {
         spans.sort();
         // TODO: Check for span intersections and overflow of b (when a span ends on 0xFFFF)
         let mut b = 0;
-        for span in spans.into_iter() {
+        for span in spans {
             if span.begin > b {
                 nfa.add_transition(nfa.entry, CharSpan::new(b, span.begin - 1), nfa.exit);
             }
@@ -672,21 +695,18 @@ fn load_nfa_unicode_category(input_index: usize, errors: &mut Vec<Error>, node: 
     // extract the value
     let node_value = node.get_value().unwrap();
     let value = &node_value[3..(node_value.len() - 1)];
-    match CATEGORIES.get(value) {
-        Some(category) => {
-            let mut nfa = NFA::new_minimal();
-            for span in category.spans.iter() {
-                add_unicode_span_to_nfa(&mut nfa, *span);
-            }
-            nfa
+    if let Some(category) = CATEGORIES.get(value) {
+        let mut nfa = NFA::new_minimal();
+        for span in &category.spans {
+            add_unicode_span_to_nfa(&mut nfa, *span);
         }
-        None => {
-            errors.push(Error::UnknownUnicodeCategory(
-                InputReference::from(input_index, &node),
-                value.to_string()
-            ));
-            NFA::new_minimal()
-        }
+        nfa
+    } else {
+        errors.push(Error::UnknownUnicodeCategory(
+            InputReference::from(input_index, &node),
+            value.to_string()
+        ));
+        NFA::new_minimal()
     }
 }
 
@@ -695,19 +715,16 @@ fn load_nfa_unicode_block(input_index: usize, errors: &mut Vec<Error>, node: Ast
     // extract the value
     let node_value = node.get_value().unwrap();
     let value = &node_value[3..(node_value.len() - 1)];
-    match BLOCKS.get(value) {
-        Some(block) => {
-            let mut nfa = NFA::new_minimal();
-            add_unicode_span_to_nfa(&mut nfa, block.span);
-            nfa
-        }
-        None => {
-            errors.push(Error::UnknownUnicodeBlock(
-                InputReference::from(input_index, &node),
-                value.to_string()
-            ));
-            NFA::new_minimal()
-        }
+    if let Some(block) = BLOCKS.get(value) {
+        let mut nfa = NFA::new_minimal();
+        add_unicode_span_to_nfa(&mut nfa, block.span);
+        nfa
+    } else {
+        errors.push(Error::UnknownUnicodeBlock(
+            InputReference::from(input_index, &node),
+            value.to_string()
+        ));
+        NFA::new_minimal()
     }
 }
 
@@ -752,18 +769,15 @@ fn load_nfa_reference(
     node: AstNode
 ) -> NFA {
     let value = node.get_value().unwrap();
-    match grammar.get_terminal_for_name(value) {
-        Some(terminal) => {
-            references.push((terminal.id, InputReference::from(input_index, &node)));
-            terminal.nfa.clone_no_finals()
-        }
-        None => {
-            errors.push(Error::SymbolNotFound(
-                InputReference::from(input_index, &node),
-                value.to_string()
-            ));
-            NFA::new_minimal()
-        }
+    if let Some(terminal) = grammar.get_terminal_for_name(value) {
+        references.push((terminal.id, InputReference::from(input_index, &node)));
+        terminal.nfa.clone_no_finals()
+    } else {
+        errors.push(Error::SymbolNotFound(
+            InputReference::from(input_index, &node),
+            value.to_string()
+        ));
+        NFA::new_minimal()
     }
 }
 
@@ -857,7 +871,7 @@ fn load_simple_rule(
     let definitions =
         load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(1));
     let variable = grammar.add_variable(name);
-    for body in definitions.bodies.into_iter() {
+    for body in definitions.bodies {
         variable.add_rule(Rule::new(
             variable.id,
             TREE_ACTION_NONE,
@@ -923,7 +937,7 @@ fn load_simple_rule_context(
         load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(1));
     let sub_var = grammar.generate_variable(head_sid);
     let input_ref = InputReference::from(input_index, &node);
-    for body in definitions.bodies.into_iter() {
+    for body in definitions.bodies {
         sub_var.add_rule(Rule::new(
             sub_var.id,
             TREE_ACTION_REPLACE_BY_CHILDREN,
@@ -949,7 +963,7 @@ fn load_simple_rule_sub_rule(
         load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(0));
     let sub_var = grammar.generate_variable(head_sid);
     let input_ref = InputReference::from(input_index, &node);
-    for body in definitions.bodies.into_iter() {
+    for body in definitions.bodies {
         sub_var.add_rule(Rule::new(
             sub_var.id,
             TREE_ACTION_REPLACE_BY_EPSILON,
@@ -993,7 +1007,7 @@ fn load_simple_rule_zero_or_more(
     let input_ref = InputReference::from(input_index, &node);
     // build all rules
     // sub_var -> definition
-    for body in set_inner.bodies.iter() {
+    for body in &set_inner.bodies {
         sub_var.add_rule(Rule::new(
             sub_var.id,
             TREE_ACTION_REPLACE_BY_CHILDREN,
@@ -1009,10 +1023,10 @@ fn load_simple_rule_zero_or_more(
             InputReference::from(input_index, &node)
         )]
     };
-    let set_var = BodySet::product(set_var, set_inner);
+    let set_var = BodySet::product(set_var, &set_inner);
     // build all rules
     // sub_var -> sub_var definition
-    for body in set_var.bodies.into_iter() {
+    for body in set_var.bodies {
         sub_var.add_rule(Rule::new(
             sub_var.id,
             TREE_ACTION_REPLACE_BY_CHILDREN,
@@ -1048,7 +1062,7 @@ fn load_simple_rule_one_or_more(
     let input_ref = InputReference::from(input_index, &node);
     // build all rules
     // sub_var -> definition
-    for body in set_inner.bodies.iter() {
+    for body in &set_inner.bodies {
         sub_var.add_rule(Rule::new(
             sub_var.id,
             TREE_ACTION_REPLACE_BY_CHILDREN,
@@ -1064,10 +1078,10 @@ fn load_simple_rule_one_or_more(
             InputReference::from(input_index, &node)
         )]
     };
-    let set_var = BodySet::product(set_var, set_inner);
+    let set_var = BodySet::product(set_var, &set_inner);
     // build all rules
     // sub_var -> sub_var definition
-    for body in set_var.bodies.into_iter() {
+    for body in set_var.bodies {
         sub_var.add_rule(Rule::new(
             sub_var.id,
             TREE_ACTION_REPLACE_BY_CHILDREN,
@@ -1139,7 +1153,7 @@ fn load_simple_rule_concat(
         load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(0));
     let set_right =
         load_simple_rule_definitions(input_index, errors, grammar, head_sid, node.child(1));
-    BodySet::product(set_left, set_right)
+    BodySet::product(set_left, &set_right)
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
@@ -1219,20 +1233,19 @@ fn load_simple_rule_atomic_simple_ref(
     node: AstNode
 ) -> BodySet<RuleBody> {
     let name = node.child(0).get_value().unwrap();
-    match grammar.get_symbol(name) {
-        Some(symbol_ref) => BodySet {
+    if let Some(symbol_ref) = grammar.get_symbol(name) {
+        BodySet {
             bodies: vec![RuleBody::single(
                 symbol_ref,
                 InputReference::from(input_index, &node)
             )]
-        },
-        None => {
-            errors.push(Error::SymbolNotFound(
-                InputReference::from(input_index, &node.child(0)),
-                name.to_string()
-            ));
-            BodySet { bodies: Vec::new() }
         }
+    } else {
+        errors.push(Error::SymbolNotFound(
+            InputReference::from(input_index, &node.child(0)),
+            name.to_string()
+        ));
+        BodySet { bodies: Vec::new() }
     }
 }
 
@@ -1459,7 +1472,7 @@ fn load_template_rule_zero_or_more(
     sub_template.head_action = TREE_ACTION_REPLACE_BY_CHILDREN;
     // build all rules
     // sub_var -> definition
-    for body in set_inner.bodies.iter() {
+    for body in &set_inner.bodies {
         sub_template.bodies.push(body.clone());
     }
     // Produce single defition [sub_var]
@@ -1475,10 +1488,10 @@ fn load_template_rule_zero_or_more(
             input_ref
         )]
     };
-    let set_var = BodySet::product(set_var, set_inner);
+    let set_var = BodySet::product(set_var, &set_inner);
     // build all rules
     // sub_var -> sub_var definition
-    for body in set_var.bodies.into_iter() {
+    for body in set_var.bodies {
         sub_template.bodies.push(body);
     }
     BodySet {
@@ -1516,7 +1529,7 @@ fn load_template_rule_one_or_more(
     sub_template.head_action = TREE_ACTION_REPLACE_BY_CHILDREN;
     // build all rules
     // sub_var -> definition
-    for body in set_inner.bodies.iter() {
+    for body in &set_inner.bodies {
         sub_template.bodies.push(body.clone());
     }
     // Produce single defition [sub_var]
@@ -1532,10 +1545,10 @@ fn load_template_rule_one_or_more(
             input_ref
         )]
     };
-    let set_var = BodySet::product(set_var, set_inner);
+    let set_var = BodySet::product(set_var, &set_inner);
     // build all rules
     // sub_var -> sub_var definition
-    for body in set_var.bodies.into_iter() {
+    for body in set_var.bodies {
         sub_template.bodies.push(body);
     }
     BodySet {
@@ -1607,7 +1620,7 @@ fn load_template_rule_concat(
         load_template_rule_definitions(input_index, errors, grammar, parameters, node.child(0));
     let set_right =
         load_template_rule_definitions(input_index, errors, grammar, parameters, node.child(1));
-    BodySet::product(set_left, set_right)
+    BodySet::product(set_left, &set_right)
 }
 
 /// Builds the set of rule definitions that are represented by the given AST
@@ -1697,20 +1710,18 @@ fn load_template_rule_atomic_simple_ref(
             )]
         };
     }
-    match grammar.get_symbol(name) {
-        Some(symbol_ref) => BodySet {
-            bodies: vec![TemplateRuleBody::single(
-                TemplateRuleSymbol::Symbol(symbol_ref),
-                InputReference::from(input_index, &node)
-            )]
-        },
-        None => {
-            errors.push(Error::SymbolNotFound(
-                InputReference::from(input_index, &node.child(0)),
-                name.to_string()
-            ));
-            BodySet { bodies: Vec::new() }
-        }
+    let Some(symbol_ref) = grammar.get_symbol(name) else {
+        errors.push(Error::SymbolNotFound(
+            InputReference::from(input_index, &node.child(0)),
+            name.to_string()
+        ));
+        return BodySet { bodies: Vec::new() };
+    };
+    BodySet {
+        bodies: vec![TemplateRuleBody::single(
+            TemplateRuleSymbol::Symbol(symbol_ref),
+            InputReference::from(input_index, &node)
+        )]
     }
 }
 
@@ -1723,19 +1734,16 @@ fn load_template_rule_atomic_template_ref(
     node: AstNode
 ) -> BodySet<TemplateRuleBody> {
     let name = node.child(0).get_value().unwrap();
-    let template_index = match grammar
+    let Some(template_index) = grammar
         .template_rules
         .iter()
         .position(|rule| rule.name == name)
-    {
-        Some(index) => index,
-        None => {
-            errors.push(Error::TemplateRuleNotFound(
-                InputReference::from(input_index, &node.child(0)),
-                String::from("Undefined template rule")
-            ));
-            return BodySet { bodies: Vec::new() };
-        }
+    else {
+        errors.push(Error::TemplateRuleNotFound(
+            InputReference::from(input_index, &node.child(0)),
+            String::from("Undefined template rule")
+        ));
+        return BodySet { bodies: Vec::new() };
     };
     let arguments: Vec<TemplateRuleSymbol> = node
         .child(1)
@@ -1830,8 +1838,7 @@ fn get_char_value(value: &[char], i: usize) -> (char, usize) {
             let mut l = 0;
             while i + 2 + l < value.len() {
                 c = value[i + 2 + l];
-                if ('0'..='9').contains(&c) || ('a'..='f').contains(&c) || ('A'..='F').contains(&c)
-                {
+                if c.is_ascii_digit() || ('a'..='f').contains(&c) || ('A'..='F').contains(&c) {
                     l += 1;
                 } else {
                     break;
@@ -1851,6 +1858,7 @@ fn get_char_value(value: &[char], i: usize) -> (char, usize) {
 }
 
 /// Replaces the escape sequences in the given piece of text by their value
+#[must_use]
 pub fn replace_escapees(value: &str) -> Cow<str> {
     if !value.contains('\\') {
         return Cow::Borrowed(value);

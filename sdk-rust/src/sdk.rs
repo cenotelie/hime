@@ -62,6 +62,7 @@ pub struct InMemoryParser<'s> {
 
 impl<'s> InMemoryParser<'s> {
     /// Parses an input parser
+    #[must_use]
     pub fn parse<'a, 't>(&'a self, input: &'t str) -> ParseResult<'s, 't, 'a> {
         let text = Text::from_str(input);
         let mut result = ParseResult::new(&self.terminals, &self.variables, &self.virtuals, text);

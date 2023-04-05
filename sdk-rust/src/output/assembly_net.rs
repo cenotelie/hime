@@ -85,7 +85,7 @@ fn build_dotnet_project(
     let project_folder = output::temporary_folder();
     fs::create_dir_all(&project_folder)?;
     for (index, grammar) in units.iter() {
-        for source in output::get_sources(task, grammar, *index)?.into_iter() {
+        for source in output::get_sources(task, grammar, *index)? {
             let mut target = project_folder.clone();
             target.push(source.file_name().unwrap());
             fs::copy(source, target)?;

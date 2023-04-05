@@ -8,7 +8,12 @@ use std::collections::HashMap;
 use crate::unicode::Category;
 
 /// Gets all categories
-#[allow(clippy::similar_names)]
+#[allow(
+    clippy::similar_names,
+    clippy::too_many_lines,
+    clippy::module_name_repetitions
+)]
+#[must_use]
 pub fn get_categories() -> HashMap<&'static str, Category> {
     let mut db = HashMap::new();
     let mut cat_cc = Category::new("Cc");
@@ -36,7 +41,7 @@ pub fn get_categories() -> HashMap<&'static str, Category> {
     cat_cf.add_span(0xE0001, 0xE007F);
     let mut cat_co = Category::new("Co");
     cat_co.add_span(0xE000, 0xF8FF);
-    cat_co.add_span(0xF0000, 0x10FFFD);
+    cat_co.add_span(0xF0000, 0x0010_FFFD);
     let cat_cs = Category::new("Cs");
     let mut cat_ll = Category::new("Ll");
     cat_ll.add_span(0x61, 0x7A);

@@ -61,8 +61,7 @@ pub fn write(
     )?;
     writeln!(
         writer,
-        "const PARSER_AUTOMATON: &[u8] = include_bytes!(\"{}\");",
-        bin_name
+        "const PARSER_AUTOMATON: &[u8] = include_bytes!(\"{bin_name}\");"
     )?;
     writeln!(writer)?;
 
@@ -91,7 +90,7 @@ fn write_code_symbols(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
     {
         writeln!(
             writer,
-            "/// The unique identifier for variable {}",
+            "/// The unique identifier for variable `{}`",
             &variable.name
         )?;
         writeln!(
@@ -102,7 +101,7 @@ fn write_code_symbols(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
         )?;
     }
     writeln!(writer)?;
-    for symbol in grammar.virtuals.iter() {
+    for symbol in &grammar.virtuals {
         writeln!(
             writer,
             "/// The unique identifier for virtual {}",
@@ -183,7 +182,7 @@ fn write_code_actions(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
         "/// Represents a set of semantic actions in this parser"
     )?;
     writeln!(writer, "pub trait Actions {{")?;
-    for action in grammar.actions.iter() {
+    for action in &grammar.actions {
         writeln!(writer, "    /// The {} semantic action", &action.name)?;
         writeln!(
             writer,
@@ -197,7 +196,7 @@ fn write_code_actions(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
     writeln!(writer, "pub struct NoActions {{}}")?;
     writeln!(writer)?;
     writeln!(writer, "impl Actions for NoActions {{")?;
-    for action in grammar.actions.iter() {
+    for action in &grammar.actions {
         writeln!(
             writer,
             "    fn {}(&mut self, _head: Symbol, _body: &dyn SemanticBody) {{}}",
@@ -210,6 +209,7 @@ fn write_code_actions(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
 }
 
 /// Generates the code for the constructors
+#[allow(clippy::too_many_lines)]
 fn write_code_constructors(
     writer: &mut dyn Write,
     grammar: &Grammar,
@@ -222,11 +222,12 @@ fn write_code_constructors(
         writeln!(writer, "/// Parses the specified string with this parser")?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
-            writeln!(writer, "#[export_name = \"{}_parse_str\"]", nmespace)?;
+            writeln!(writer, "#[export_name = \"{nmespace}_parse_str\"]")?;
         }
+        writeln!(writer, "#[must_use]")?;
         writeln!(
             writer,
-            "pub fn parse_str<'t>(input: &'t str) -> ParseResult<'static, 't, 'static> {{"
+            "pub fn parse_str(input: &str) -> ParseResult<'static, '_, 'static> {{"
         )?;
         writeln!(writer, "    let text = Text::from_str(input);")?;
         writeln!(writer, "    parse_text(text)")?;
@@ -235,8 +236,9 @@ fn write_code_constructors(
         writeln!(writer, "/// Parses the specified string with this parser")?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
-            writeln!(writer, "#[export_name = \"{}_parse_string\"]", nmespace)?;
+            writeln!(writer, "#[export_name = \"{nmespace}_parse_string\"]")?;
         }
+        writeln!(writer, "#[must_use]")?;
         writeln!(
             writer,
             "pub fn parse_string(input: String) -> ParseResult<'static, 'static, 'static> {{"
@@ -251,11 +253,7 @@ fn write_code_constructors(
         )?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
-            writeln!(
-                writer,
-                "#[export_name = \"{}_parse_utf8_stream\"]",
-                nmespace
-            )?;
+            writeln!(writer, "#[export_name = \"{nmespace}_parse_utf8_stream\"]")?;
         }
         writeln!(
             writer,
@@ -271,7 +269,7 @@ fn write_code_constructors(
         writeln!(writer, "/// Parses the specified text with this parser")?;
         writeln!(
             writer,
-            "fn parse_text<'t>(text: Text<'t>) -> ParseResult<'static, 't, 'static> {{"
+            "fn parse_text(text: Text) -> ParseResult<'static, '_, 'static> {{"
         )?;
         writeln!(
             writer,
@@ -298,11 +296,12 @@ fn write_code_constructors(
         writeln!(writer, "/// Parses the specified string with this parser")?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
-            writeln!(writer, "#[export_name = \"{}_parse_str\"]", nmespace)?;
+            writeln!(writer, "#[export_name = \"{nmespace}_parse_str\"]")?;
         }
+        writeln!(writer, "#[must_use]")?;
         writeln!(
             writer,
-            "pub fn parse_str<'t>(input: &'t str) -> ParseResult<'static, 't, 'static> {{"
+            "pub fn parse_str(input: &str) -> ParseResult<'static, '_, 'static> {{"
         )?;
         writeln!(writer, "    let text = Text::from_str(input);")?;
         writeln!(writer, "    parse_text(text, &mut NoActions {{}})")?;
@@ -311,7 +310,7 @@ fn write_code_constructors(
         writeln!(writer, "/// Parses the specified string with this parser")?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
-            writeln!(writer, "#[export_name = \"{}_parse_str_with\"]", nmespace)?;
+            writeln!(writer, "#[export_name = \"{nmespace}_parse_str_with\"]")?;
         }
         writeln!(
             writer,
@@ -324,8 +323,9 @@ fn write_code_constructors(
         writeln!(writer, "/// Parses the specified string with this parser")?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
-            writeln!(writer, "#[export_name = \"{}_parse_string\"]", nmespace)?;
+            writeln!(writer, "#[export_name = \"{nmespace}_parse_string\"]")?;
         }
+        writeln!(writer, "#[must_use]")?;
         writeln!(
             writer,
             "pub fn parse_string(input: String) -> ParseResult<'static, 'static, 'static> {{"
@@ -337,11 +337,7 @@ fn write_code_constructors(
         writeln!(writer, "/// Parses the specified string with this parser")?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
-            writeln!(
-                writer,
-                "#[export_name = \"{}_parse_string_with\"]",
-                nmespace
-            )?;
+            writeln!(writer, "#[export_name = \"{nmespace}_parse_string_with\"]")?;
         }
         writeln!(
             writer,
@@ -355,17 +351,29 @@ fn write_code_constructors(
             writer,
             "/// Parses the specified stream of UTF-8 with this parser"
         )?;
+        writeln!(
+            writer,
+            "///"
+        )?;
+        writeln!(
+            writer,
+            "/// # Errors"
+        )?;
+        writeln!(
+            writer,
+            "///"
+        )?;
+        writeln!(
+            writer,
+            "/// Return an `std::io::Error` when reading the stream as UTF-8 fails"
+        )?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
-            writeln!(
-                writer,
-                "#[export_name = \"{}_parse_utf8_stream\"]",
-                nmespace
-            )?;
+            writeln!(writer, "#[export_name = \"{nmespace}_parse_utf8_stream\"]")?;
         }
         writeln!(
             writer,
-            "pub fn parse_utf8_stream(input: &mut dyn Read) -> ParseResult<'static, 'static, 'static> {{"
+            "pub fn parse_utf8_stream(input: &mut dyn Read) -> Result<ParseResult<'static, 'static, 'static>, std::io::Error> {{"
         )?;
         writeln!(
             writer,
@@ -378,8 +386,7 @@ fn write_code_constructors(
             writeln!(writer, "#[no_mangle]")?;
             writeln!(
                 writer,
-                "#[export_name = \"{}_parse_utf8_stream_with\"]",
-                nmespace
+                "#[export_name = \"{nmespace}_parse_utf8_stream_with\"]"
             )?;
         }
         writeln!(
@@ -396,7 +403,7 @@ fn write_code_constructors(
         writeln!(writer, "/// Parses the specified text with this parser")?;
         writeln!(
             writer,
-            "fn parse_text<'t>(text: Text<'t>, actions: &mut dyn Actions) -> ParseResult<'static, 't, 'static> {{"
+            "fn parse_text(text: Text, actions: &mut dyn Actions) -> ParseResult<'static, '_, 'static> {{"
         )?;
         writeln!(
             writer,
@@ -434,13 +441,11 @@ fn write_code_constructors(
     writeln!(writer, "        let mut lexer = new_lexer(data.0, data.1);")?;
     writeln!(
         writer,
-        "        let automaton = {}::new(PARSER_AUTOMATON);",
-        automaton_type
+        "        let automaton = {automaton_type}::new(PARSER_AUTOMATON);"
     )?;
     writeln!(
         writer,
-        "        let mut parser = {}::new(&mut lexer, automaton, data.2, &mut my_actions);",
-        parser_type
+        "        let mut parser = {parser_type}::new(&mut lexer, automaton, data.2, &mut my_actions);"
     )?;
     writeln!(writer, "        parser.parse();")?;
     writeln!(writer, "    }}")?;
@@ -458,11 +463,8 @@ fn write_code_visitor(
     writeln!(writer)?;
     writeln!(writer, "/// Visitor interface")?;
     writeln!(writer, "pub trait Visitor {{")?;
-    for terminal_ref in expected.content.iter() {
-        let terminal = match grammar.get_terminal(terminal_ref.sid()) {
-            Some(terminal) => terminal,
-            None => continue
-        };
+    for terminal_ref in &expected.content {
+        let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) else { continue };
         if terminal.name.starts_with(PREFIX_GENERATED_TERMINAL) {
             continue;
         }
@@ -472,7 +474,7 @@ fn write_code_visitor(
             to_snake_case(&terminal.name)
         )?;
     }
-    for variable in grammar.variables.iter() {
+    for variable in &grammar.variables {
         if variable.name.starts_with(PREFIX_GENERATED_VARIABLE) {
             continue;
         }
@@ -482,7 +484,7 @@ fn write_code_visitor(
             to_snake_case(&variable.name)
         )?;
     }
-    for symbol in grammar.virtuals.iter() {
+    for symbol in &grammar.virtuals {
         writeln!(
             writer,
             "    fn on_virtual_{}(&self, _node: &AstNode) {{}}",
@@ -514,11 +516,8 @@ fn write_code_visitor(
     writeln!(writer, "        visit_ast_node(child, visitor);")?;
     writeln!(writer, "    }}")?;
     writeln!(writer, "    match node.get_symbol().id {{")?;
-    for terminal_ref in expected.content.iter() {
-        let terminal = match grammar.get_terminal(terminal_ref.sid()) {
-            Some(terminal) => terminal,
-            None => continue
-        };
+    for terminal_ref in &expected.content {
+        let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) else { continue };
         if terminal.name.starts_with(PREFIX_GENERATED_TERMINAL) {
             continue;
         }
@@ -529,7 +528,7 @@ fn write_code_visitor(
             to_snake_case(&terminal.name)
         )?;
     }
-    for variable in grammar.variables.iter() {
+    for variable in &grammar.variables {
         if variable.name.starts_with(PREFIX_GENERATED_VARIABLE) {
             continue;
         }
@@ -540,7 +539,7 @@ fn write_code_visitor(
             to_snake_case(&variable.name)
         )?;
     }
-    for symbol in grammar.virtuals.iter() {
+    for symbol in &grammar.virtuals {
         writeln!(
             writer,
             "        0x{:04X} => visitor.on_virtual_{}(&node),",

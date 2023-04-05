@@ -8,7 +8,12 @@ use std::collections::HashMap;
 use crate::unicode::Block;
 
 /// Gets all blocks
-#[allow(clippy::similar_names)]
+#[allow(
+    clippy::similar_names,
+    clippy::too_many_lines,
+    clippy::module_name_repetitions
+)]
+#[must_use]
 pub fn get_blocks() -> HashMap<&'static str, Block> {
     let mut db = HashMap::new();
     db.insert("Adlam", Block::new("Adlam", 0x1E900, 0x1E95F));
@@ -703,7 +708,7 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     );
     db.insert(
         "SupplementaryPrivateUseArea-B",
-        Block::new("SupplementaryPrivateUseArea-B", 0x100000, 0x10FFFF)
+        Block::new("SupplementaryPrivateUseArea-B", 0x0010_0000, 0x0010_FFFF)
     );
     db.insert(
         "SuttonSignWriting",

@@ -63,21 +63,25 @@ pub const CHARSPAN_INVALID: CharSpan = CharSpan { begin: 1, end: 0 };
 
 impl CharSpan {
     /// Creates a new span
+    #[must_use]
     pub fn new(begin: u16, end: u16) -> CharSpan {
         CharSpan { begin, end }
     }
 
     /// Gets the range's length in number of characters
+    #[must_use]
     pub fn len(self) -> u16 {
         self.end - self.begin + 1
     }
 
     /// Gets whether the range is empty
+    #[must_use]
     pub fn is_empty(self) -> bool {
         self.end < self.begin
     }
 
     /// Gets the intersection between two spans
+    #[must_use]
     pub fn intersect(self, right: CharSpan) -> CharSpan {
         let result = CharSpan {
             begin: self.begin.max(right.begin),
@@ -91,6 +95,7 @@ impl CharSpan {
     }
 
     /// Splits the span with the given splitter
+    #[must_use]
     pub fn split(self, splitter: CharSpan) -> (CharSpan, CharSpan) {
         if self.begin == splitter.begin {
             if self.end == splitter.end {
@@ -226,6 +231,7 @@ pub enum Input<'a> {
 
 impl<'a> Input<'a> {
     /// Gets the input's name
+    #[must_use]
     pub fn name(&self) -> String {
         match self {
             Input::FileName(file_name) => file_name.clone(),
@@ -234,6 +240,10 @@ impl<'a> Input<'a> {
     }
 
     /// Open a stream for the input
+    ///
+    /// # Errors
+    ///
+    /// Returns an `std::io::Error` if opening the input fails
     pub fn open(&self) -> Result<Box<dyn Read + 'a>, std::io::Error> {
         match self {
             Input::FileName(file_name) => Ok(Box::new(fs::File::open(file_name)?)),
@@ -261,6 +271,7 @@ fn loaded_input_into_static(input: LoadedInput<'_>) -> LoadedInput<'static> {
 
 impl<'t> LoadedInput<'t> {
     /// Transforms into an owned static version of the data
+    #[must_use]
     pub fn into_static(self) -> LoadedInput<'static> {
         loaded_input_into_static(self)
     }
@@ -289,6 +300,7 @@ fn loaded_data_into_static(data: LoadedData<'_>) -> LoadedData<'static> {
 
 impl<'t> LoadedData<'t> {
     /// Transforms into an owned static version of the data
+    #[must_use]
     pub fn into_static(self) -> LoadedData<'static> {
         loaded_data_into_static(self)
     }
@@ -306,6 +318,7 @@ pub struct InputReference {
 }
 
 impl InputReference {
+    #[must_use]
     pub fn get_line_number_width(&self) -> usize {
         if self.position.line < 10 {
             1
@@ -323,6 +336,11 @@ impl InputReference {
     }
 
     /// Build a reference from the specifiec input name and AST node
+    ///
+    /// # Panics
+    ///
+    /// Panic if the specified AST node cannot be used to build a position and span in its associated input.
+    #[must_use]
     pub fn from(input_index: usize, node: &AstNode<'_, '_, '_>) -> InputReference {
         let (position, span) = node.get_total_position_and_span().unwrap();
         InputReference {
@@ -333,6 +351,7 @@ impl InputReference {
     }
 
     /// Checks whether this input reference overlaps with another one
+    #[must_use]
     pub fn overlaps_with(&self, other: &InputReference) -> bool {
         self.input_index == other.input_index
             && self.position.line == other.position.line
@@ -358,18 +377,17 @@ pub enum ParsingMethod {
 
 impl ParsingMethod {
     /// Gets whether conflicts shall be raised for this method
+    #[must_use]
     pub fn raise_conflict(self) -> bool {
         !self.is_rnglr()
     }
 
     /// Gets whether this method uses RNGLR
+    #[must_use]
     pub fn is_rnglr(self) -> bool {
         match self {
-            ParsingMethod::LR0 => false,
-            ParsingMethod::LR1 => false,
-            ParsingMethod::LALR1 => false,
-            ParsingMethod::RNGLR1 => true,
-            ParsingMethod::RNGLALR1 => true
+            ParsingMethod::LR0 | ParsingMethod::LR1 | ParsingMethod::LALR1 => false,
+            ParsingMethod::RNGLR1 | ParsingMethod::RNGLALR1 => true
         }
     }
 }
@@ -387,11 +405,11 @@ pub enum Mode {
 
 impl Mode {
     /// Gets whether a mode requires assembly output
+    #[must_use]
     pub fn output_assembly(self) -> bool {
         match self {
             Mode::Sources => false,
-            Mode::Assembly => true,
-            Mode::SourcesAndAssembly => true
+            Mode::Assembly | Mode::SourcesAndAssembly => true
         }
     }
 }
@@ -443,6 +461,12 @@ pub struct CompilationTask<'a> {
 
 impl<'a> CompilationTask<'a> {
     /// Gets the compiler's output mode for the grammar
+    ///
+    /// Valid values for the mode are: `sources`, `all` and `assembly`.
+    ///
+    /// # Errors
+    ///
+    /// Return an error when the value for the mode is not an expected one
     pub fn get_mode_for(&self, grammar: &Grammar, grammar_index: usize) -> Result<Mode, Error> {
         match self.mode {
             Some(mode) => Ok(mode),
@@ -467,6 +491,12 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Gets the target runtime for the grammar
+    ///
+    /// Valid values for the runtime are: `net`, `java` and `rust`.
+    ///
+    /// # Errors
+    ///
+    /// Return an error when the value for the runtime is not an expected ones
     pub fn get_output_target_for(
         &self,
         grammar: &Grammar,
@@ -495,6 +525,7 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Gets the path for the compiler's output
+    #[must_use]
     pub fn get_output_path_for(&self, grammar: &Grammar) -> Option<String> {
         match self.output_path.as_ref() {
             Some(path) => Some(path.clone()),
@@ -505,6 +536,7 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Gets the namespace for the generated code
+    #[must_use]
     pub fn get_output_namespace(&self, grammar: &Grammar) -> Option<String> {
         match self.output_namespace.as_ref() {
             Some(nmspace) => Some(nmspace.clone()),
@@ -515,6 +547,12 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Gets the access modifier for the generated code
+    ///
+    /// Expected values for the modifiers are `internal` and `public`
+    ///
+    /// # Errors
+    ///
+    /// Return an error when the specified value for the modifier is not an expected ones
     pub fn get_output_modifier_for(
         &self,
         grammar: &Grammar,
@@ -538,6 +576,10 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Executes this task
+    ///
+    /// # Errors
+    ///
+    /// Outputs all the errors produced while loading and compiling, if any
     pub fn execute(&self) -> Result<LoadedData<'a>, Errors<'a>> {
         let mut data = self.load()?;
         // select the grammars to build
@@ -563,20 +605,28 @@ impl<'a> CompilationTask<'a> {
         self.execute_output_assembly(&data.grammars, Runtime::Net, &mut errors);
         self.execute_output_assembly(&data.grammars, Runtime::Java, &mut errors);
         self.execute_output_assembly(&data.grammars, Runtime::Rust, &mut errors);
-        if !errors.is_empty() {
-            Err(Errors::from(data, errors))
-        } else {
+        if errors.is_empty() {
             Ok(data)
+        } else {
+            Err(Errors::from(data, errors))
         }
     }
 
     /// Loads the data for this task
+    ///
+    /// # Errors
+    ///
+    /// Outputs all the errors obtained while loading the inputs, if any
     pub fn load(&self) -> Result<LoadedData<'a>, Errors<'a>> {
         let inputs = loaders::open_all(&self.inputs)?;
         loaders::load(inputs)
     }
 
     /// Generates the in-memory parser for a grammar
+    ///
+    /// # Errors
+    ///
+    /// Outputs all the errors obtained while compiling the specified grammar, if any
     pub fn generate_in_memory<'g>(
         &self,
         grammar: &'g mut Grammar,
@@ -652,6 +702,7 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Gather the grammars for build an assembly for a target
+    #[must_use]
     fn gather_grammars_for_assembly<'g>(
         &self,
         grammars: &'g [Grammar],
@@ -674,8 +725,7 @@ impl<'a> CompilationTask<'a> {
                     }
                 };
                 match self.get_mode_for(grammar, *index) {
-                    Ok(Mode::Assembly) => true,
-                    Ok(Mode::SourcesAndAssembly) => true,
+                    Ok(Mode::Assembly | Mode::SourcesAndAssembly) => true,
                     Ok(Mode::Sources) => false,
                     Err(error) => {
                         errors.push(error);
@@ -692,8 +742,7 @@ impl<'a> CompilationTask<'a> {
         let mut all_files = Vec::new();
         for (index, grammar) in units.iter() {
             let shall_delete = match self.get_mode_for(grammar, *index) {
-                Ok(Mode::Sources) => false,
-                Ok(Mode::SourcesAndAssembly) => false,
+                Ok(Mode::Sources | Mode::SourcesAndAssembly) => false,
                 Ok(Mode::Assembly) => true,
                 Err(error) => {
                     errors.push(error);
@@ -710,7 +759,7 @@ impl<'a> CompilationTask<'a> {
             }
         }
         // cleanup output for source only targets
-        for file in all_files.into_iter() {
+        for file in all_files {
             if let Err(error) = std::fs::remove_file(file) {
                 errors.push(Error::from(error));
             }

@@ -29,6 +29,7 @@ const UNDERSCORE: u8 = 0x5F;
 const TO_LOWER: u8 = LOWER_A - UPPER_A;
 
 /// Converts a name to upper camel case
+#[must_use]
 pub fn to_upper_camel_case(name: &str) -> String {
     let mut result = Vec::<u8>::new();
     let mut new_word = false;
@@ -70,7 +71,7 @@ pub fn to_upper_camel_case(name: &str) -> String {
             }
         }
     }
-    String::from_utf8(result).unwrap()
+    String::from_utf8(result).ok().unwrap_or_default()
 }
 
 #[test]
@@ -84,6 +85,7 @@ fn test_upper_camel_case() {
 }
 
 /// Converts a name to lower camel case
+#[must_use]
 pub fn to_lower_camel_case(name: &str) -> String {
     let mut result = Vec::<u8>::new();
     let mut new_word = false;
@@ -125,7 +127,7 @@ pub fn to_lower_camel_case(name: &str) -> String {
             }
         }
     }
-    String::from_utf8(result).unwrap()
+    String::from_utf8(result).ok().unwrap_or_default()
 }
 
 #[test]
@@ -139,6 +141,7 @@ fn test_lower_camel_case() {
 }
 
 /// Converts a name to upper case
+#[must_use]
 pub fn to_upper_case(name: &str) -> String {
     let mut result = Vec::<u8>::new();
     for (i, c) in name.bytes().enumerate() {
@@ -168,7 +171,7 @@ pub fn to_upper_case(name: &str) -> String {
             result.push(UNDERSCORE);
         }
     }
-    String::from_utf8(result).unwrap()
+    String::from_utf8(result).ok().unwrap_or_default()
 }
 
 #[test]
@@ -182,6 +185,7 @@ fn test_upper_case() {
 }
 
 /// Converts a name to snake case
+#[must_use]
 pub fn to_snake_case(name: &str) -> String {
     let mut result = Vec::<u8>::new();
     for (i, c) in name.bytes().enumerate() {
@@ -209,7 +213,7 @@ pub fn to_snake_case(name: &str) -> String {
             result.push(UNDERSCORE);
         }
     }
-    String::from_utf8(result).unwrap()
+    String::from_utf8(result).ok().unwrap_or_default()
 }
 
 #[test]
@@ -286,18 +290,30 @@ pub fn get_namespace_rust(input: &str) -> String {
 }
 
 /// writes a u16 to a byte stream
+///
+/// # Errors
+///
+/// Return an `std::io::Error` when writer fails
 pub fn write_u8(writer: &mut dyn Write, value: u8) -> Result<(), io::Error> {
     let buffer: [u8; 1] = [value];
     writer.write_all(&buffer)
 }
 
 /// writes a u16 to a byte stream
+///
+/// # Errors
+///
+/// Return an `std::io::Error` when writer fails
 pub fn write_u16(writer: &mut dyn Write, value: u16) -> Result<(), io::Error> {
     let buffer: [u8; 2] = [(value & 0xFF) as u8, (value >> 8) as u8];
     writer.write_all(&buffer)
 }
 
 /// writes a u32 to a byte stream
+///
+/// # Errors
+///
+/// Return an `std::io::Error` when writer fails
 pub fn write_u32(writer: &mut dyn Write, value: u32) -> Result<(), io::Error> {
     let buffer: [u8; 4] = [
         (value & 0xFF) as u8,

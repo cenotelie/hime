@@ -48,6 +48,7 @@ pub fn write_lexer_data_file(
 }
 
 /// Writes the lexer's data
+#[allow(clippy::cast_possible_truncation, clippy::module_name_repetitions)]
 pub fn write_lexer_data(
     writer: &mut dyn Write,
     grammar: &Grammar,
@@ -58,12 +59,12 @@ pub fn write_lexer_data(
     write_u32(writer, dfa.len() as u32)?;
     // write the offsets to all the states
     let mut offset: u32 = 0;
-    for state in dfa.states.iter() {
+    for state in &dfa.states {
         write_u32(writer, offset)?;
         // adds the length required by this state
         offset += 3 + 256; // header + transitions for [0-255] characters
         let mut current_contexts = Vec::new();
-        for item in state.items.iter() {
+        for item in &state.items {
             let context = grammar.get_terminal_context((*item).into());
             if !current_contexts.contains(&context) {
                 current_contexts.push(context);
@@ -79,13 +80,14 @@ pub fn write_lexer_data(
         }
     }
     // write each state
-    for state in dfa.states.iter() {
+    for state in &dfa.states {
         write_lexer_data_state(writer, grammar, expected, state)?;
     }
     Ok(())
 }
 
 /// Writes the lexer's data
+#[allow(clippy::cast_possible_truncation)]
 fn write_lexer_data_state(
     writer: &mut dyn Write,
     grammar: &Grammar,
@@ -95,7 +97,7 @@ fn write_lexer_data_state(
     let mut cache = [DEAD_STATE as u16; 256];
     let mut cached: u16 = 0; // number of cached transitions
     let mut slow = Vec::new();
-    for (span, next) in state.transitions.iter() {
+    for (span, next) in &state.transitions {
         if span.begin <= 255 {
             cached += 1;
             let end = if span.end >= 256 {
@@ -113,7 +115,7 @@ fn write_lexer_data_state(
     }
     let mut contexts = Vec::new();
     let mut matched = Vec::new();
-    for item in state.items.iter() {
+    for item in &state.items {
         let terminal = grammar.get_terminal(item.sid()).unwrap();
         let terminal_ref = TerminalRef::Terminal(terminal.id);
         if !contexts.contains(&terminal.context) {
@@ -126,7 +128,7 @@ fn write_lexer_data_state(
                     .iter()
                     .position(|t| t == &terminal_ref)
                     .unwrap()
-            )
+            );
         }
     }
 
@@ -147,7 +149,7 @@ fn write_lexer_data_state(
     }
     // write the non-cached transitions
     slow.sort_by_key(|(span, _)| span.begin);
-    for (span, next) in slow.into_iter() {
+    for (span, next) in slow {
         write_u16(writer, span.begin)?;
         write_u16(writer, span.end)?;
         write_u16(writer, next as u16)?;

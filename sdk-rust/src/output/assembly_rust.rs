@@ -179,7 +179,7 @@ fn build_cargo_project(
                         .append(true)
                         .open(file_path)?
                 );
-                writeln!(writer, "pub mod {}", part)?;
+                writeln!(writer, "pub mod {part}")?;
                 // create the module file
                 let mut file_path = target.clone();
                 file_path.push("mod.rs");
@@ -197,7 +197,7 @@ fn build_cargo_project(
                 .open(file_path)?
         );
         writeln!(writer, "pub mod {};", parts[parts.len() - 1])?;
-        for source in output::get_sources(task, grammar, *index)?.into_iter() {
+        for source in output::get_sources(task, grammar, *index)? {
             let mut target = current.clone();
             target.push(source.file_name().unwrap());
             fs::copy(source, target)?;

@@ -54,6 +54,7 @@ pub fn write_parser_lrk_data_file(
 }
 
 /// Writes the data for a LR(k) parser
+#[allow(clippy::cast_possible_truncation)]
 pub fn write_parser_lrk_data(
     writer: &mut dyn Write,
     grammar: &Grammar,
@@ -61,7 +62,7 @@ pub fn write_parser_lrk_data(
     graph: &Graph
 ) -> Result<(), Error> {
     let mut rules = Vec::new();
-    for variable in grammar.variables.iter() {
+    for variable in &grammar.variables {
         for i in 0..variable.rules.len() {
             rules.push(RuleRef::new(variable.id, i));
         }
@@ -77,12 +78,12 @@ pub fn write_parser_lrk_data(
     write_parser_opening_contexts(writer, graph)?;
 
     // write the LR table
-    for state in graph.states.iter() {
+    for state in &graph.states {
         write_parser_lrk_data_state(writer, grammar, expected, &rules, state)?;
     }
     // write production rules
-    for variable in grammar.variables.iter() {
-        for rule in variable.rules.iter() {
+    for variable in &grammar.variables {
+        for rule in &variable.rules {
             write_parser_lrk_data_rule(writer, grammar, rule)?;
         }
     }
@@ -90,32 +91,34 @@ pub fn write_parser_lrk_data(
 }
 
 /// Writes the column headers for a parser data
+#[allow(clippy::cast_possible_truncation)]
 fn write_parser_column_headers(
     writer: &mut dyn Write,
     grammar: &Grammar,
     expected: &TerminalSet
 ) -> Result<(), Error> {
     // writes the columns's id
-    for terminal_ref in expected.content.iter() {
+    for terminal_ref in &expected.content {
         write_u16(writer, terminal_ref.sid() as u16)?;
     }
-    for variable in grammar.variables.iter() {
+    for variable in &grammar.variables {
         write_u16(writer, variable.id as u16)?;
     }
     Ok(())
 }
 
 /// Write the opening context informations for each state
+#[allow(clippy::cast_possible_truncation)]
 fn write_parser_opening_contexts(writer: &mut dyn Write, graph: &Graph) -> Result<(), Error> {
     // write context openings for each state
-    for state in graph.states.iter() {
+    for state in &graph.states {
         let count: usize = state
             .opening_contexts
-            .iter()
-            .map(|(_, contexts)| contexts.len())
+            .values()
+            .map(std::vec::Vec::len)
             .sum();
         write_u16(writer, count as u16)?;
-        for (terminal, contexts) in state.opening_contexts.iter() {
+        for (terminal, contexts) in &state.opening_contexts {
             for context in contexts.iter() {
                 write_u16(writer, terminal.sid() as u16)?;
                 write_u16(writer, *context as u16)?;
@@ -126,6 +129,7 @@ fn write_parser_opening_contexts(writer: &mut dyn Write, graph: &Graph) -> Resul
 }
 
 /// Generates the parser's binary data for the provided LR state
+#[allow(clippy::cast_possible_truncation)]
 fn write_parser_lrk_data_state(
     writer: &mut dyn Write,
     grammar: &Grammar,
@@ -168,7 +172,7 @@ fn write_parser_lrk_data_state(
         }
     }
     // write actions for terminals
-    for variable in grammar.variables.iter() {
+    for variable in &grammar.variables {
         if let Some(next) = state.children.get(&SymbolRef::Variable(variable.id)) {
             write_u16(writer, LR_ACTION_CODE_SHIFT)?;
             write_u16(writer, *next as u16)?;
@@ -181,6 +185,7 @@ fn write_parser_lrk_data_state(
 }
 
 /// Generates the parser's binary representation of a rule production
+#[allow(clippy::cast_possible_truncation)]
 fn write_parser_lrk_data_rule(
     writer: &mut dyn Write,
     grammar: &Grammar,
@@ -199,13 +204,12 @@ fn write_parser_lrk_data_rule(
         .elements
         .iter()
         .map(|element| match element.symbol {
-            SymbolRef::Virtual(_) => 2,
-            SymbolRef::Action(_) => 2,
+            SymbolRef::Virtual(_) | SymbolRef::Action(_) => 2,
             _ => 1
         })
         .sum();
     write_u8(writer, length)?;
-    for element in rule.body.elements.iter() {
+    for element in &rule.body.elements {
         match element.symbol {
             SymbolRef::Virtual(id) => {
                 let index = grammar
@@ -252,6 +256,7 @@ pub fn write_parser_rnglr_data_file(
 }
 
 /// Writes the data for a RNGLR parser
+#[allow(clippy::cast_possible_truncation)]
 pub fn write_parser_rnglr_data(
     writer: &mut dyn Write,
     grammar: &Grammar,
@@ -262,7 +267,7 @@ pub fn write_parser_rnglr_data(
     let mut rules = Vec::new();
     // index of the nullable rule for the variable with the same index
     let mut nullables = Vec::new();
-    for variable in grammar.variables.iter() {
+    for variable in &grammar.variables {
         let mut temp = Vec::new();
         for (rule_index, rule) in variable.rules.iter().enumerate() {
             // Add normal rule
@@ -312,7 +317,7 @@ pub fn write_parser_rnglr_data(
     let mut total: u32 = 0;
     let mut offsets: Vec<u32> = Vec::new(); // for each state, the offset in the action table
     let mut counts: Vec<u16> = Vec::new(); // for each state, the number of actions
-    for state in graph.states.iter() {
+    for state in &graph.states {
         total = write_parser_rnglr_data_generate_offset(
             expected,
             grammar,
@@ -350,16 +355,16 @@ pub fn write_parser_rnglr_data(
         write_u32(writer, offset)?;
     }
 
-    for state in graph.states.iter() {
+    for state in &graph.states {
         write_parser_rnglr_data_action_table(writer, expected, grammar, &rules, state)?;
     }
 
-    for (rule_ref, length) in rules.into_iter() {
+    for (rule_ref, length) in rules {
         write_parser_rnglr_data_rule(writer, grammar, rule_ref.get_rule_in(grammar), length)?;
     }
 
     // write the indexes for nullables production
-    for index in nullables.into_iter() {
+    for index in nullables {
         write_u16(writer, index)?;
     }
 
@@ -367,6 +372,7 @@ pub fn write_parser_rnglr_data(
 }
 
 /// Builds the offset table for the RNGLR actions
+#[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
 fn write_parser_rnglr_data_generate_offset(
     expected: &TerminalSet,
     grammar: &Grammar,
@@ -376,18 +382,14 @@ fn write_parser_rnglr_data_generate_offset(
     state: &State
 ) -> u32 {
     let mut reductions_counter: HashMap<TerminalRef, usize> = HashMap::new();
-    for reduction in state.reductions.iter() {
+    for reduction in &state.reductions {
         let counter = reductions_counter
             .entry(reduction.lookahead.terminal)
             .or_default();
         *counter += 1;
     }
-    for terminal in expected.content.iter() {
-        let mut count = if state.children.contains_key(&(*terminal).into()) {
-            1
-        } else {
-            0
-        };
+    for terminal in &expected.content {
+        let mut count = usize::from(state.children.contains_key(&(*terminal).into()));
         if let Some(counter) = reductions_counter.get(terminal) {
             count += *counter;
         }
@@ -395,15 +397,12 @@ fn write_parser_rnglr_data_generate_offset(
         counts.push(count as u16);
         total += count as u32;
     }
-    for variable in grammar.variables.iter() {
-        let count = if state
-            .children
-            .contains_key(&SymbolRef::Variable(variable.id))
-        {
-            1
-        } else {
-            0
-        };
+    for variable in &grammar.variables {
+        let count = i32::from(
+            state
+                .children
+                .contains_key(&SymbolRef::Variable(variable.id))
+        );
         offsets.push(total);
         counts.push(count as u16);
         total += count as u32;
@@ -412,6 +411,7 @@ fn write_parser_rnglr_data_generate_offset(
 }
 
 /// Generates the action table for a state
+#[allow(clippy::cast_possible_truncation)]
 fn write_parser_rnglr_data_action_table(
     writer: &mut dyn Write,
     expected: &TerminalSet,
@@ -444,7 +444,7 @@ fn write_parser_rnglr_data_action_table(
             write_u16(writer, index as u16)?;
         }
     }
-    for variable in grammar.variables.iter() {
+    for variable in &grammar.variables {
         if let Some(next) = state.children.get(&SymbolRef::Variable(variable.id)) {
             write_u16(writer, LR_ACTION_CODE_SHIFT)?;
             write_u16(writer, *next as u16)?;
@@ -454,6 +454,7 @@ fn write_parser_rnglr_data_action_table(
 }
 
 /// Generates the parser's binary representation of a rule production
+#[allow(clippy::cast_possible_truncation)]
 fn write_parser_rnglr_data_rule(
     writer: &mut dyn Write,
     grammar: &Grammar,
@@ -470,12 +471,9 @@ fn write_parser_rnglr_data_rule(
     write_u8(writer, length as u8)?;
     let mut bcl = 0;
     let mut pop = 0;
-    for element in rule.body.elements.iter() {
+    for element in &rule.body.elements {
         match element.symbol {
-            SymbolRef::Virtual(_) => {
-                bcl += 2;
-            }
-            SymbolRef::Action(_) => {
+            SymbolRef::Virtual(_) | SymbolRef::Action(_) => {
                 bcl += 2;
             }
             _ => {
@@ -490,7 +488,7 @@ fn write_parser_rnglr_data_rule(
     }
     write_u8(writer, bcl)?;
     pop = 0;
-    for element in rule.body.elements.iter() {
+    for element in &rule.body.elements {
         match element.symbol {
             SymbolRef::Virtual(id) => {
                 let index = grammar

@@ -55,11 +55,13 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
         let file_name = candidate.file_name();
         if let Some(file_name) = file_name.to_str() {
             if file_name.starts_with("hime-generated-")
-                && file_name.ends_with(".jar")
+                && Path::new(file_name)
+                    .extension()
+                    .map_or(false, |ext| ext.eq_ignore_ascii_case("jar"))
                 && !file_name.contains("javadoc")
                 && !file_name.contains("sources")
             {
-                output_file.push(&file_name);
+                output_file.push(file_name);
                 break;
             }
         }
@@ -116,7 +118,7 @@ fn build_maven_project(
         let target_src = create_namespace_folder(&src_folder, &parts)?;
         let target_resources = create_namespace_folder(&resources_folder, &parts)?;
 
-        for source in output::get_sources(task, grammar, *index)?.into_iter() {
+        for source in output::get_sources(task, grammar, *index)? {
             let mut target = if let Some(extension) = source.extension() {
                 if extension == "bin" {
                     target_resources.clone()
@@ -161,7 +163,7 @@ fn execute_mvn_command(
     let (executable, prefix_args) = get_mvn_command();
     let mut command = Command::new(executable);
     if let Some(mvn_repo) = maven_repository {
-        command.arg(format!("-Dmaven.repo.local={}", mvn_repo));
+        command.arg(format!("-Dmaven.repo.local={mvn_repo}"));
     }
     let output = command
         .current_dir(project_folder)

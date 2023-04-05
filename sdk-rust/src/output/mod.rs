@@ -48,6 +48,11 @@ use crate::sdk::{InMemoryParser, ParserAutomaton};
 use crate::{CompilationTask, ParsingMethod, Runtime};
 
 /// Output artifacts for a grammar
+///
+/// # Errors
+///
+/// Return errors produced while writing the artifacts for the grammar
+#[allow(clippy::too_many_lines, clippy::module_name_repetitions)]
 pub fn output_grammar_artifacts(
     task: &CompilationTask,
     grammar: &Grammar,
@@ -89,41 +94,24 @@ pub fn output_grammar_artifacts(
         return Err(vec![error]);
     }
     if let Err(error) = match data.method {
-        ParsingMethod::LR0 => parser_data::write_parser_lrk_data_file(
-            output_path.as_ref(),
-            get_parser_bin_name(grammar, runtime),
-            grammar,
-            &data.expected,
-            &data.graph
-        ),
-        ParsingMethod::LR1 => parser_data::write_parser_lrk_data_file(
-            output_path.as_ref(),
-            get_parser_bin_name(grammar, runtime),
-            grammar,
-            &data.expected,
-            &data.graph
-        ),
-        ParsingMethod::LALR1 => parser_data::write_parser_lrk_data_file(
-            output_path.as_ref(),
-            get_parser_bin_name(grammar, runtime),
-            grammar,
-            &data.expected,
-            &data.graph
-        ),
-        ParsingMethod::RNGLR1 => parser_data::write_parser_rnglr_data_file(
-            output_path.as_ref(),
-            get_parser_bin_name(grammar, runtime),
-            grammar,
-            &data.expected,
-            &data.graph
-        ),
-        ParsingMethod::RNGLALR1 => parser_data::write_parser_rnglr_data_file(
-            output_path.as_ref(),
-            get_parser_bin_name(grammar, runtime),
-            grammar,
-            &data.expected,
-            &data.graph
-        )
+        ParsingMethod::LR0 | ParsingMethod::LR1 | ParsingMethod::LALR1 => {
+            parser_data::write_parser_lrk_data_file(
+                output_path.as_ref(),
+                get_parser_bin_name(grammar, runtime),
+                grammar,
+                &data.expected,
+                &data.graph
+            )
+        }
+        ParsingMethod::RNGLR1 | ParsingMethod::RNGLALR1 => {
+            parser_data::write_parser_rnglr_data_file(
+                output_path.as_ref(),
+                get_parser_bin_name(grammar, runtime),
+                grammar,
+                &data.expected,
+                &data.graph
+            )
+        }
     } {
         return Err(vec![error]);
     }
@@ -205,6 +193,11 @@ pub fn output_grammar_artifacts(
 }
 
 /// Builds the in-memory parser for a grammar
+///
+/// # Errors
+///
+/// Returns the errors produced by the grammar's compilation
+#[allow(clippy::cast_possible_truncation)]
 pub fn build_in_memory_grammar<'a>(
     grammar: &'a Grammar,
     data: &BuildData
@@ -212,10 +205,10 @@ pub fn build_in_memory_grammar<'a>(
     // get symbols
     let mut terminals: Vec<Symbol<'a>> = Vec::new();
     for terminal_ref in data.expected.content.iter().skip(2) {
-        let terminal = grammar.get_terminal(terminal_ref.sid()).unwrap();
-        if terminal.name.starts_with(PREFIX_GENERATED_TERMINAL) {
-            continue;
-        } else {
+        if let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) {
+            if terminal.name.starts_with(PREFIX_GENERATED_TERMINAL) {
+                continue;
+            }
             terminals.push(Symbol {
                 id: terminal.id as u32,
                 name: &terminal.name
@@ -285,6 +278,10 @@ pub fn build_in_memory_grammar<'a>(
 }
 
 /// Gets the list of sources to produce for a grammar
+///
+/// # Errors
+///
+/// Returns an error when resolving the target (net, java, rust) fails.
 pub fn get_sources(
     task: &CompilationTask,
     grammar: &Grammar,
@@ -339,6 +336,11 @@ fn build_file(path: Option<&String>, file_name: String) -> PathBuf {
 }
 
 /// Builds an assembly for a runtime
+///
+/// # Errors
+///
+/// Returns an error when building the assembly fails,
+/// whith a description of the failure.
 pub fn build_assembly(
     task: &CompilationTask,
     units: &[(usize, &Grammar)],
@@ -400,6 +402,11 @@ fn get_parser_bin_name_rust(grammar: &Grammar) -> String {
 }
 
 /// Creates a temp folder
+///
+/// # Panics
+///
+/// Panic when building the temporary folder name fails.
+#[must_use]
 pub fn temporary_folder() -> PathBuf {
     let mut result = env::temp_dir();
     let name =
