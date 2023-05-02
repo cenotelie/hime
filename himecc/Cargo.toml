@@ -1,6 +1,6 @@
 [package]
 name = "hime_compiler"
-version = "4.2.1"
+version = "4.2.2"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "CLI tool for the generation of LR and GLR parsers for the Hime runtime."
 documentation = "https://cenotelie.fr/projects/hime"

@@ -1,6 +1,6 @@
 [package]
 name = "hime_tests_driver"
-version = "4.2.1"
+version = "4.2.2"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Main driver for the test suits"
 homepage = "https://cenotelie.fr/projects/hime"
