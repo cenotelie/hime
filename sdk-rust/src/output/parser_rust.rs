@@ -331,7 +331,7 @@ fn write_code_constructors(
             "pub fn parse_string(input: String) -> ParseResult<'static, 'static, 'static> {{"
         )?;
         writeln!(writer, "    let text = Text::from_string(input);")?;
-        writeln!(writer, "    parse_text(text, , &mut NoActions {{}})")?;
+        writeln!(writer, "    parse_text(text, &mut NoActions {{}})")?;
         writeln!(writer, "}}")?;
         writeln!(writer)?;
         writeln!(writer, "/// Parses the specified string with this parser")?;
