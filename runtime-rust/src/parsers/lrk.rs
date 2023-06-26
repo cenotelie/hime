@@ -326,9 +326,7 @@ impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
                 self.stack.truncate(stack_size - reduction.length);
             }
         }
-        let result = ::std::mem::replace(&mut self.reduction, None)
-            .unwrap()
-            .into_subtree();
+        let result = self.reduction.take().unwrap().into_subtree();
         self.handle.clear();
         self.stack.push(result);
     }
