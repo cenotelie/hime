@@ -351,18 +351,9 @@ fn write_code_constructors(
             writer,
             "/// Parses the specified stream of UTF-8 with this parser"
         )?;
-        writeln!(
-            writer,
-            "///"
-        )?;
-        writeln!(
-            writer,
-            "/// # Errors"
-        )?;
-        writeln!(
-            writer,
-            "///"
-        )?;
+        writeln!(writer, "///")?;
+        writeln!(writer, "/// # Errors")?;
+        writeln!(writer, "///")?;
         writeln!(
             writer,
             "/// Return an `std::io::Error` when reading the stream as UTF-8 fails"

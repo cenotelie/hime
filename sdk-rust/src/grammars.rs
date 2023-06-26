@@ -1604,10 +1604,10 @@ impl Grammar {
     ) -> Result<SymbolRef, Error> {
         match self.template_rules.iter().position(|r| r.name == name) {
             None => Err(Error::TemplateRuleNotFound(call_ref, name.to_string())),
-            Some(index) => {
-                let rule = &self.template_rules[index];
+            Some(template_index) => {
+                let rule = &self.template_rules[template_index];
                 if rule.parameters.len() == arguments.len() {
-                    Ok(self.instantiate_template_rule_at(index, call_ref, arguments))
+                    Ok(self.instantiate_template_rule_at(template_index, call_ref, arguments))
                 } else {
                     Err(Error::TemplateRuleWrongNumberOfArgs(
                         call_ref,
@@ -1622,16 +1622,23 @@ impl Grammar {
     /// Instantiate a symbol in a template rule
     fn instantiate_template_symbol(
         &mut self,
-        arguments: &[SymbolRef],
+        template_index: usize,
+        instance_index: usize,
         symbol: &TemplateRuleSymbol
     ) -> SymbolRef {
         match symbol {
-            TemplateRuleSymbol::Parameter(index) => arguments[*index],
+            TemplateRuleSymbol::Parameter(index) => {
+                self.template_rules[template_index].instances[instance_index].arguments[*index]
+            }
             TemplateRuleSymbol::Symbol(symbol) => *symbol,
             TemplateRuleSymbol::Template(template_ref) => {
                 let mut new_arguments = Vec::new();
                 for arg in &template_ref.arguments {
-                    new_arguments.push(self.instantiate_template_symbol(arguments, arg));
+                    new_arguments.push(self.instantiate_template_symbol(
+                        template_index,
+                        instance_index,
+                        arg
+                    ));
                 }
                 self.instantiate_template_rule_at(
                     template_ref.template,
@@ -1645,34 +1652,48 @@ impl Grammar {
     /// Instantiate a template rule
     fn instantiate_template_rule_at(
         &mut self,
-        index: usize,
+        template_index: usize,
         call_ref: InputReference,
         arguments: Vec<SymbolRef>
     ) -> SymbolRef {
         let mut new_instance = TemplateRuleInstance { arguments, head: 0 };
-        if let Some(instance) = self.template_rules[index]
+        if let Some(instance) = self.template_rules[template_index]
             .instances
             .iter()
             .find(|instance| *instance == &new_instance)
         {
             SymbolRef::Variable(instance.head)
         } else {
+            // push new instance
             let args_names: Vec<&str> = new_instance
                 .arguments
                 .iter()
                 .map(|arg| self.get_symbol_name(*arg))
                 .collect();
             let args_names = args_names.join(", ");
-            let name = format!("{}<{}>", &self.template_rules[index].name, args_names);
-            let head_action = self.template_rules[index].head_action;
-            let context = self.template_rules[index].context;
+            let name = format!(
+                "{}<{}>",
+                &self.template_rules[template_index].name, args_names
+            );
+            new_instance.head = self.add_variable(&name).id;
+            let instance_index = self.template_rules[template_index].instances.len();
+            self.template_rules[template_index]
+                .instances
+                .push(new_instance);
+
+            // fill-in the body
+            let head_action = self.template_rules[template_index].head_action;
+            let context = self.template_rules[template_index].context;
             let mut bodies = Vec::new();
-            for body in self.template_rules[index].bodies.clone() {
+            for body in self.template_rules[template_index].bodies.clone() {
                 let mut elements = Vec::new();
                 for element in body.elements {
                     elements.push(RuleBodyElement {
-                        symbol: self
-                            .instantiate_template_symbol(&new_instance.arguments, &element.symbol),
+                        symbol: self.instantiate_template_symbol(
+                            template_index,
+                            instance_index,
+                            &element.symbol
+                        ),
                         action: element.action,
                         input_ref: Some(element.input_ref)
                     });
@@ -1692,8 +1713,7 @@ impl Grammar {
                 }
                 variable.id
             };
-            new_instance.head = head;
-            self.template_rules[index].instances.push(new_instance);
+
             SymbolRef::Variable(head)
         }
     }
