@@ -174,7 +174,7 @@ impl Workspace {
             return Err(io::Error::new(
                 ErrorKind::NotFound,
                 String::from("Path cannot be converted to Url")
-            ))
+            ));
         };
         self.resolve_document(uri, path)
     }
