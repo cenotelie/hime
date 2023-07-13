@@ -2121,8 +2121,12 @@ impl Grammar {
         expected: &TerminalSet,
         dfa: &DFA
     ) -> Result<Option<TerminalRef>, Error> {
-        let Some(option) = self.get_option(OPTION_SEPARATOR) else { return Ok(None) };
-        let Some(terminal) = self.get_terminal_for_name(&option.value) else { return Err(Error::SeparatorNotDefined(grammar_index)) };
+        let Some(option) = self.get_option(OPTION_SEPARATOR) else {
+            return Ok(None);
+        };
+        let Some(terminal) = self.get_terminal_for_name(&option.value) else {
+            return Err(Error::SeparatorNotDefined(grammar_index));
+        };
         let terminal_ref = TerminalRef::Terminal(terminal.id);
         // warn if the separator is context-sensitive
         if terminal.context != 0 {

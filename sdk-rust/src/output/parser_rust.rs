@@ -455,7 +455,9 @@ fn write_code_visitor(
     writeln!(writer, "/// Visitor interface")?;
     writeln!(writer, "pub trait Visitor {{")?;
     for terminal_ref in &expected.content {
-        let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) else { continue };
+        let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) else {
+            continue;
+        };
         if terminal.name.starts_with(PREFIX_GENERATED_TERMINAL) {
             continue;
         }
@@ -508,7 +510,9 @@ fn write_code_visitor(
     writeln!(writer, "    }}")?;
     writeln!(writer, "    match node.get_symbol().id {{")?;
     for terminal_ref in &expected.content {
-        let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) else { continue };
+        let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) else {
+            continue;
+        };
         if terminal.name.starts_with(PREFIX_GENERATED_TERMINAL) {
             continue;
         }
