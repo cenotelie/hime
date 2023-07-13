@@ -312,7 +312,7 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
             Error::GrammarNotDefined(input, _name) => Some(self.get_single_label_with_input(input)),
             Error::LrConflict(grammar_index, conflict) => {
                 let grammar = &self.context.grammars[*grammar_index];
-                let mut labels = vec![self.label_for_input(&grammar.input_ref)];
+                let mut labels = Vec::new();
                 for item in &conflict.shift_items {
                     let rule = item.rule.get_rule_in(grammar);
                     let choice = &rule.body.choices[0];
