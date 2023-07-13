@@ -914,6 +914,13 @@ impl PartialEq for Conflict {
 pub struct Conflicts(Vec<Conflict>);
 
 impl Conflicts {
+    /// Find a similar conflict already regsitered
+    fn find_similar(&mut self, kind: ConflictKind, lookahead: &Lookahead) -> Option<&mut Conflict> {
+        self.0
+            .iter_mut()
+            .find(|c| c.kind == kind && &c.lookahead == lookahead)
+    }
+
     /// Raise a shift/reduce conflict
     pub fn raise_shift_reduce(
         &mut self,
@@ -924,12 +931,9 @@ impl Conflicts {
         lookahead: Lookahead
     ) {
         // look for previous conflict
-        for previous in &mut self.0 {
-            if previous.kind == ConflictKind::ShiftReduce && previous.lookahead == lookahead {
-                // Previous conflict
-                previous.reduce_items.push(reducing);
-                return;
-            }
+        if let Some(previous) = self.find_similar(ConflictKind::ShiftReduce, &lookahead) {
+            previous.reduce_items.push(reducing);
+            return;
         }
         // No previous conflict was found
         let next_symbol = Some(lookahead.terminal.into());
@@ -962,12 +966,9 @@ impl Conflicts {
         lookahead: Lookahead
     ) {
         // look for previous conflict
-        for previous in &mut self.0 {
-            if previous.kind == ConflictKind::ReduceReduce && previous.lookahead == lookahead {
-                // Previous conflict
-                previous.reduce_items.push(reducing);
-                return;
-            }
+        if let Some(previous) = self.find_similar(ConflictKind::ReduceReduce, &lookahead) {
+            previous.reduce_items.push(reducing);
+            return;
         }
         // No previous conflict was found
         self.0.push(Conflict {
@@ -981,8 +982,23 @@ impl Conflicts {
     }
 
     /// Aggregate other conflicts into this collection
-    pub fn aggregate(&mut self, mut other: Conflicts) {
-        self.0.append(&mut other.0);
+    pub fn aggregate(&mut self, other: Conflicts) {
+        for conflict in other.0.into_iter() {
+            if let Some(previous) = self.find_similar(conflict.kind, &conflict.lookahead) {
+                for item in conflict.shift_items {
+                    if previous.shift_items.iter().all(|i| i != &item) {
+                        previous.shift_items.push(item);
+                    }
+                }
+                for item in conflict.reduce_items {
+                    if previous.reduce_items.iter().all(|i| i != &item) {
+                        previous.reduce_items.push(item);
+                    }
+                }
+            } else {
+                self.0.push(conflict);
+            }
+        }
     }
 }
 
