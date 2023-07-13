@@ -43,7 +43,7 @@ use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 
 use crate::errors::Error;
-use crate::grammars::{BuildData, Grammar, PREFIX_GENERATED_TERMINAL};
+use crate::grammars::{BuildData, Grammar};
 use crate::sdk::{InMemoryParser, ParserAutomaton};
 use crate::{CompilationTask, ParsingMethod, Runtime};
 
@@ -203,15 +203,21 @@ pub fn build_in_memory_grammar<'a>(
     data: &BuildData
 ) -> Result<InMemoryParser<'a>, Vec<Error>> {
     // get symbols
-    let mut terminals: Vec<Symbol<'a>> = Vec::new();
+    let mut terminals: Vec<Symbol<'a>> = vec![
+        Symbol {
+            id: 0x01,
+            name: "ε"
+        },
+        Symbol {
+            id: 0x02,
+            name: "$"
+        },
+    ];
     for terminal_ref in data.expected.content.iter().skip(2) {
         if let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) {
-            if terminal.name.starts_with(PREFIX_GENERATED_TERMINAL) {
-                continue;
-            }
             terminals.push(Symbol {
                 id: terminal.id as u32,
-                name: &terminal.name
+                name: &terminal.value
             });
         }
     }
