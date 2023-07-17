@@ -14,7 +14,7 @@ include = ["README.md", "Cargo.toml", "src/**/*.rs"]
 edition = "2021"
 
 [dependencies]
-hime_redist = "4.0.0"
+hime_redist = "4.2.2"
 clap = "3"
 
 [badges]

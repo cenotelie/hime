@@ -11,7 +11,7 @@ license = "LGPL-3.0"
 edition = "2021"
 
 [dependencies]
-hime_redist = "4.0.0"
+hime_redist = "4.2.2"
 libloading = "0.7"
 # Used for tests debugging
 # hime_generated = { path = "../tests-results/hime_generated-3.3.1" }
