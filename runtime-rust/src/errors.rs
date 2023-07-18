@@ -298,7 +298,7 @@ impl<'s> std::error::Error for ParseError<'s> {}
 
 /// Represents an entity that can handle lexical and syntactic errors
 #[allow(clippy::module_name_repetitions)]
-#[derive(Default, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct ParseErrors<'s> {
     /// The overall errors
     pub errors: Vec<ParseError<'s>>
