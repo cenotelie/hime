@@ -1,6 +1,6 @@
 [package]
 name = "hime_sdk_debugger"
-version = "4.2.2"
+version = "4.2.3"
 authors = ["Laurent Wouters <lwouters@cenotelie.fr>"]
 description = "Introspection tool for parsers generated with himecc"
 documentation = "https://cenotelie.fr/projects/hime"
@@ -14,7 +14,7 @@ include = ["README.md", "Cargo.toml", "src/**/*.rs"]
 edition = "2021"
 
 [dependencies]
-hime_redist = "4.2.2"
+hime_redist = "4.2.3"
 clap = "3"
 
 [badges]
