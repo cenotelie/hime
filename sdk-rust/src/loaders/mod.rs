@@ -210,7 +210,7 @@ fn parse_input_stream<'a>(
                     position,
                     length: error.get_length()
                 },
-                error.get_message()
+                error.to_string()
             )
         })
         .collect();

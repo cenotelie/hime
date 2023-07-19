@@ -19,6 +19,7 @@
 
 use std::cmp::Ordering;
 use std::collections::HashMap;
+use std::fmt::{Display, Formatter};
 use std::sync::atomic::{AtomicUsize, Ordering as AtomicOrdering};
 
 use hime_redist::parsers::{TreeAction, TREE_ACTION_DROP, TREE_ACTION_NONE, TREE_ACTION_PROMOTE};
@@ -2186,5 +2187,20 @@ impl Grammar {
     /// Returns the errors produced by the grammar's compilation
     pub fn get_in_memory<'a>(&'a self, data: &BuildData) -> Result<InMemoryParser<'a>, Vec<Error>> {
         crate::output::build_in_memory_grammar(self, data)
+    }
+}
+
+impl Display for Grammar {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        for variable in &self.variables {
+            for rule in &variable.rules {
+                write!(f, "{} ->", variable.name)?;
+                for element in &rule.body.choices[0].elements {
+                    write!(f, " {}", self.get_symbol_value(element.symbol))?;
+                }
+                writeln!(f)?;
+            }
+        }
+        Ok(())
     }
 }

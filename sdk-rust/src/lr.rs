@@ -18,6 +18,7 @@
 //! Module for LR automata
 
 use std::collections::HashMap;
+use std::fmt::{Display, Formatter};
 
 use hime_redist::parsers::{LRActionCode, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT};
 
@@ -332,6 +333,53 @@ impl Item {
         }
         result
     }
+
+    /// Formats this item
+    ///
+    /// # Errors
+    ///
+    /// Return an error when formatting fails
+    #[allow(clippy::missing_panics_doc)]
+    pub fn format(&self, f: &mut Formatter, grammar: &Grammar) -> std::fmt::Result {
+        let rule = self.rule.get_rule_in(grammar);
+        write!(
+            f,
+            "{} ->",
+            grammar.get_symbol_name(SymbolRef::Variable(rule.head))
+        )?;
+        for (index, element) in rule.body.choices[0].elements.iter().enumerate() {
+            if index == self.position {
+                write!(f, " •")?;
+            }
+            write!(f, " {}", grammar.get_symbol_value(element.symbol))?;
+        }
+        if self.position == rule.body.choices[0].elements.len() {
+            write!(f, " •")?;
+        }
+        write!(f, "  ❰")?;
+        for (index, lookahead) in self.lookaheads.0.iter().enumerate() {
+            if index > 0 {
+                write!(f, " ")?;
+            }
+            write!(f, "{}", grammar.get_symbol_value(lookahead.terminal.into()))?;
+        }
+        writeln!(f, "❱")?;
+        Ok(())
+    }
+}
+
+/// The graph along with the associated grammar
+pub struct GraphWithGrammar<'a> {
+    /// The grammar
+    pub grammar: &'a Grammar,
+    /// The built LR graph
+    pub graph: &'a Graph
+}
+
+impl<'a> Display for GraphWithGrammar<'a> {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        self.graph.format(f, self.grammar)
+    }
 }
 
 /// Represents the kernel of a LR state
@@ -518,15 +566,13 @@ impl State {
                         item.clone(),
                         lookahead.clone()
                     );
-                } else {
-                    // no conflict
-                    reductions.insert(lookahead.terminal, index);
-                    self.reductions.push(Reduction {
-                        lookahead: lookahead.clone(),
-                        rule: item.rule,
-                        length: item.position
-                    });
                 }
+                reductions.insert(lookahead.terminal, index);
+                self.reductions.push(Reduction {
+                    lookahead: lookahead.clone(),
+                    rule: item.rule,
+                    length: item.position
+                });
             }
         }
         conflicts
@@ -538,6 +584,50 @@ impl State {
         self.reductions
             .iter()
             .find(|reduction| reduction.lookahead.terminal == terminal)
+    }
+
+    /// Formats this state
+    ///
+    /// # Errors
+    ///
+    /// Return an error when formatting fails
+    pub fn format(
+        &self,
+        f: &mut Formatter,
+        state_index: usize,
+        grammar: &Grammar
+    ) -> std::fmt::Result {
+        writeln!(f, "state {state_index} {{")?;
+        writeln!(f, "  transitions {{")?;
+        for (&symbol, target) in &self.children {
+            writeln!(
+                f,
+                "    on {} goto {}",
+                grammar.get_symbol_value(symbol),
+                target
+            )?;
+        }
+        writeln!(f, "  }}")?;
+        writeln!(f, "  reductions {{")?;
+        for reduction in &self.reductions {
+            writeln!(
+                f,
+                "    on {} reduce a {}",
+                grammar.get_symbol_value(reduction.lookahead.terminal.into()),
+                grammar.get_symbol_value(SymbolRef::Variable(
+                    reduction.rule.get_rule_in(grammar).head
+                ))
+            )?;
+        }
+        writeln!(f, "  }}")?;
+        writeln!(f, "  items {{")?;
+        for item in &self.items {
+            write!(f, "    ")?;
+            item.format(f, grammar)?;
+        }
+        writeln!(f, "  }}")?;
+        writeln!(f, "}}")?;
+        Ok(())
     }
 }
 
@@ -666,6 +756,18 @@ impl Graph {
     #[must_use]
     pub fn inverse(&self) -> InverseGraph {
         InverseGraph::from(self)
+    }
+
+    /// Formats this graph
+    ///
+    /// # Errors
+    ///
+    /// Return an error when formatting fails
+    pub fn format(&self, f: &mut Formatter, grammar: &Grammar) -> std::fmt::Result {
+        for (index, state) in self.states.iter().enumerate() {
+            state.format(f, index, grammar)?;
+        }
+        Ok(())
     }
 }
 
@@ -983,7 +1085,7 @@ impl Conflicts {
 
     /// Aggregate other conflicts into this collection
     pub fn aggregate(&mut self, other: Conflicts) {
-        for conflict in other.0.into_iter() {
+        for conflict in other.0 {
             if let Some(previous) = self.find_similar(conflict.kind, &conflict.lookahead) {
                 for item in conflict.shift_items {
                     if previous.shift_items.iter().all(|i| i != &item) {
