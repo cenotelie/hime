@@ -60,7 +60,7 @@ pub fn parse_fixtures(fixtures: &[FixtureDef]) -> Result<Fixtures, Errors> {
                             position,
                             length: error.get_length()
                         },
-                        error.get_message()
+                        error.to_string()
                     )
                 })
             })

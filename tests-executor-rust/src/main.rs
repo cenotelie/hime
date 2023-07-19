@@ -161,7 +161,7 @@ fn execute_test_matches(
     }
     let real_result = get_parsed_input(my_path, library, parser_name);
     for error in &real_result.errors.errors {
-        println!("{}", error.get_message());
+        println!("{error}");
         let context = real_result.text.get_context_at(error.get_position());
         println!("{}", context.content);
         println!("{}", context.pointer);
@@ -201,7 +201,7 @@ fn execute_test_no_matches(
     }
     let real_result = get_parsed_input(my_path, library, parser_name);
     for error in &real_result.errors.errors {
-        println!("{}", error.get_message());
+        println!("{error}");
         let context = real_result.text.get_context_at(error.get_position());
         println!("{}", context.content);
         println!("{}", context.pointer);
@@ -257,7 +257,7 @@ fn execute_test_outputs(
             return RESULT_SUCCESS;
         }
         for error in &real_result.errors.errors {
-            println!("{}", error.get_message());
+            println!("{error}");
             let context = real_result.text.get_context_at(error.get_position());
             println!("{}", context.content);
             println!("{}", context.pointer);
@@ -268,7 +268,7 @@ fn execute_test_outputs(
 
     let mut i = 0;
     for error in &real_result.errors.errors {
-        let message = format!("{error}");
+        let message = format!("@{} {error}", error.get_position());
         let context = real_result.text.get_context_at(error.get_position());
         if i + 2 >= expected_lines.len() {
             println!("Unexpected error:");
