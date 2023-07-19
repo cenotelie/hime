@@ -669,10 +669,11 @@ impl<'s, 't, 'a> LRkParser<'s, 't, 'a> {
             .get_data()
             .repository
             .get_token(kernel.index as usize);
-        let expected_on_head = self.data.automaton.get_expected(
-            self.data.stack[self.data.stack.len() - 1].state,
-            self.builder.lexer.get_data().repository.terminals
-        );
+        let state = self.data.stack[self.data.stack.len() - 1].state;
+        let expected_on_head = self
+            .data
+            .automaton
+            .get_expected(state, self.builder.lexer.get_data().repository.terminals);
         let mut my_expected = Vec::new();
         for x in &expected_on_head.shifts {
             my_expected.push(*x);
@@ -687,6 +688,8 @@ impl<'s, 't, 'a> LRkParser<'s, 't, 'a> {
             token.get_span().unwrap().length,
             token.get_value().unwrap().to_string(),
             token.get_symbol(),
+            #[cfg(feature = "debug")]
+            vec![state],
             my_expected
         )
     }

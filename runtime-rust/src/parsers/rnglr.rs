@@ -1957,15 +1957,19 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
             .get_data()
             .repository
             .get_token(kernel.index as usize);
+        let mut my_states = Vec::new();
         let mut my_expected = Vec::new();
         let generation_data = self.data.gss.get_current_generation();
         for i in 0..generation_data.count {
-            let expected_on_head = self.data.automaton.get_expected(
-                self.data
-                    .gss
-                    .get_represented_state(generation_data.start + i),
-                self.builder.lexer.get_data().repository.terminals
-            );
+            let state = self
+                .data
+                .gss
+                .get_represented_state(generation_data.start + i);
+            my_states.push(state);
+            let expected_on_head = self
+                .data
+                .automaton
+                .get_expected(state, self.builder.lexer.get_data().repository.terminals);
             // register the terminals for shift actions
             for symbol in &expected_on_head.shifts {
                 if !my_expected.contains(symbol) {
@@ -1990,6 +1994,8 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
             token.get_span().unwrap().length,
             token.get_value().unwrap().to_string(),
             token.get_symbol(),
+            #[cfg(feature = "debug")]
+            my_states,
             my_expected
         )
     }
