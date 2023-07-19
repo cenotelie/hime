@@ -17,7 +17,7 @@
 
 //! Module for the definition of lexical and syntactic errors
 
-use std::fmt::{Display, Error, Formatter};
+use std::fmt::{Display, Formatter};
 
 use serde_derive::Serialize;
 
@@ -25,7 +25,7 @@ use crate::symbols::Symbol;
 use crate::text::{TextPosition, Utf16C};
 
 /// Common trait for data about an error
-pub trait ParseErrorDataTrait {
+pub trait ParseErrorDataTrait: Display {
     /// Gets the error's position in the input
     #[must_use]
     fn get_position(&self) -> TextPosition;
@@ -33,10 +33,6 @@ pub trait ParseErrorDataTrait {
     /// Gets the error's length in the input (in number of characters)
     #[must_use]
     fn get_length(&self) -> usize;
-
-    /// Gets the error's message
-    #[must_use]
-    fn get_message(&self) -> String;
 }
 
 /// Represents the unexpected of the input text while more characters were expected
@@ -56,10 +52,11 @@ impl ParseErrorDataTrait for ParseErrorEndOfInput {
     fn get_length(&self) -> usize {
         0
     }
+}
 
-    /// Gets the error's message
-    fn get_message(&self) -> String {
-        String::from("Unexpected end of input")
+impl Display for ParseErrorEndOfInput {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Unexpected end of input")
     }
 }
 
@@ -90,16 +87,15 @@ impl ParseErrorDataTrait for ParseErrorUnexpectedChar {
     fn get_length(&self) -> usize {
         self.unexpected.len_utf8()
     }
+}
 
-    /// Gets the error's message
-    fn get_message(&self) -> String {
-        let mut result = String::new();
-        result.push_str("Unexpected character '");
-        result.push(self.unexpected);
-        result.push_str("' (U+");
-        result.push_str(&format!("{:X}", self.unexpected as u32));
-        result.push(')');
-        result
+impl Display for ParseErrorUnexpectedChar {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Unexpected character '{}' (U+{:X})",
+            self.unexpected, self.unexpected as u32
+        )
     }
 }
 
@@ -137,22 +133,18 @@ impl ParseErrorDataTrait for ParseErrorIncorrectEncodingSequence {
     fn get_length(&self) -> usize {
         1
     }
+}
 
-    /// Gets the error's message
-    fn get_message(&self) -> String {
-        let mut result = String::new();
-        result.push_str("Incorrect encoding sequence: [");
+impl Display for ParseErrorIncorrectEncodingSequence {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Incorrect encoding sequence: [")?;
         if self.missing_high {
-            result.push_str("<missing> ");
-            result.push_str("0x");
-            result.push_str(&format!("{:X}", self.sequence));
+            write!(f, "<missing> 0x{:X}", self.sequence)?;
         } else {
-            result.push_str("0x");
-            result.push_str(&format!("{:X}", self.sequence));
-            result.push_str(" <missing>");
+            write!(f, "0x{:X} <missing>", self.sequence)?;
         }
-        result.push(']');
-        result
+        write!(f, "]")?;
+        Ok(())
     }
 }
 
@@ -183,6 +175,9 @@ pub struct ParseErrorUnexpectedToken<'s> {
     value: String,
     /// The terminal symbol for the unexpected token
     terminal: Symbol<'s>,
+    /// The identifier of the current states
+    #[cfg(feature = "debug")]
+    state_ids: Vec<u32>,
     /// The expected terminals
     expected: Vec<Symbol<'s>>
 }
@@ -197,23 +192,33 @@ impl<'s> ParseErrorDataTrait for ParseErrorUnexpectedToken<'s> {
     fn get_length(&self) -> usize {
         self.length
     }
+}
 
-    /// Gets the error's message
-    fn get_message(&self) -> String {
-        let mut result = String::new();
-        result.push_str("Unexpected token \"");
-        result.push_str(&self.value);
-        result.push('"');
+impl<'s> Display for ParseErrorUnexpectedToken<'s> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Unexpected token \"{}\"", self.value)?;
+        #[cfg(feature = "debug")]
+        {
+            write!(
+                f,
+                " at state(s) {}",
+                self.state_ids
+                    .iter()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>()
+                    .join(",")
+            )?;
+        }
         if !self.expected.is_empty() {
-            result.push_str("; expected: ");
+            write!(f, "; expected: ")?;
             for (i, x) in self.expected.iter().enumerate() {
                 if i != 0 {
-                    result.push_str(", ");
+                    write!(f, ", ")?;
                 }
-                result.push_str(x.name);
+                write!(f, "{}", x.name)?;
             }
         }
-        result
+        Ok(())
     }
 }
 
@@ -225,6 +230,7 @@ impl<'s> ParseErrorUnexpectedToken<'s> {
         length: usize,
         value: String,
         terminal: Symbol<'s>,
+        #[cfg(feature = "debug")] state_ids: Vec<u32>,
         expected: Vec<Symbol<'s>>
     ) -> ParseErrorUnexpectedToken<'s> {
         ParseErrorUnexpectedToken {
@@ -232,6 +238,8 @@ impl<'s> ParseErrorUnexpectedToken<'s> {
             length,
             value,
             terminal,
+            #[cfg(feature = "debug")]
+            state_ids,
             expected
         }
     }
@@ -275,22 +283,18 @@ impl<'s> ParseErrorDataTrait for ParseError<'s> {
             | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_length()
         }
     }
-
-    /// Gets the error's message
-    fn get_message(&self) -> String {
-        match self {
-            ParseError::UnexpectedEndOfInput(x) => x.get_message(),
-            ParseError::UnexpectedChar(x) => x.get_message(),
-            ParseError::UnexpectedToken(x) => x.get_message(),
-            ParseError::IncorrectUTF16NoLowSurrogate(x)
-            | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_message()
-        }
-    }
 }
 
 impl<'s> Display for ParseError<'s> {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "@{} {}", self.get_position(), self.get_message())
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        // write!(f, "@{} ", self.get_position())?;
+        match self {
+            ParseError::UnexpectedEndOfInput(x) => x.fmt(f),
+            ParseError::UnexpectedChar(x) => x.fmt(f),
+            ParseError::UnexpectedToken(x) => x.fmt(f),
+            ParseError::IncorrectUTF16NoLowSurrogate(x)
+            | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.fmt(f)
+        }
     }
 }
 
