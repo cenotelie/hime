@@ -13,7 +13,7 @@
     <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
     <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/../.releng/hime.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
-    <version>4.2.4</version>
+    <version>4.3.0</version>
   </PropertyGroup>
   <PropertyGroup>
     <!-- NuGet properties -->
