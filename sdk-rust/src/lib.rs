@@ -52,6 +52,8 @@ pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const GIT_HASH: &str = env!("GIT_HASH");
 /// The git tag that was used to build the application
 pub const GIT_TAG: &str = env!("GIT_TAG");
+/// The version of unicode which is used for blocks and character categories
+pub const UNICODE_VERSION: &str = "15.1.0";
 
 /// Represents a range of characters
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]

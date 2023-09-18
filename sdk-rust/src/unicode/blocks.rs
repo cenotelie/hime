@@ -52,6 +52,10 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
         Block::new("ArabicExtended-B", 0x870, 0x89F)
     );
     db.insert(
+        "ArabicExtended-C",
+        Block::new("ArabicExtended-C", 0x10EC0, 0x10EFF)
+    );
+    db.insert(
         "ArabicMathematicalAlphabeticSymbols",
         Block::new("ArabicMathematicalAlphabeticSymbols", 0x1EE00, 0x1EEFF)
     );
@@ -156,6 +160,14 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
         "CJKUnifiedIdeographsExtensionG",
         Block::new("CJKUnifiedIdeographsExtensionG", 0x30000, 0x3134F)
     );
+    db.insert(
+        "CJKUnifiedIdeographsExtensionH",
+        Block::new("CJKUnifiedIdeographsExtensionH", 0x31350, 0x323AF)
+    );
+    db.insert(
+        "CJKUnifiedIdeographsExtensionI",
+        Block::new("CJKUnifiedIdeographsExtensionI", 0x2EBF0, 0x2EE5F)
+    );
     db.insert("Carian", Block::new("Carian", 0x102A0, 0x102DF));
     db.insert(
         "CaucasianAlbanian",
@@ -235,6 +247,10 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
         Block::new("CyrillicExtended-C", 0x1C80, 0x1C8F)
     );
     db.insert(
+        "CyrillicExtended-D",
+        Block::new("CyrillicExtended-D", 0x1E030, 0x1E08F)
+    );
+    db.insert(
         "CyrillicSupplement",
         Block::new("CyrillicSupplement", 0x500, 0x52F)
     );
@@ -243,6 +259,10 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert(
         "DevanagariExtended",
         Block::new("DevanagariExtended", 0xA8E0, 0xA8FF)
+    );
+    db.insert(
+        "DevanagariExtended-A",
+        Block::new("DevanagariExtended-A", 0x11B00, 0x11B5F)
     );
     db.insert("Dingbats", Block::new("Dingbats", 0x2700, 0x27BF));
     db.insert("DivesAkuru", Block::new("DivesAkuru", 0x11900, 0x1195F));
@@ -255,7 +275,7 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     );
     db.insert(
         "EgyptianHieroglyphFormatControls",
-        Block::new("EgyptianHieroglyphFormatControls", 0x13430, 0x1343F)
+        Block::new("EgyptianHieroglyphFormatControls", 0x13430, 0x1345F)
     );
     db.insert(
         "EgyptianHieroglyphs",
@@ -387,6 +407,10 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("Javanese", Block::new("Javanese", 0xA980, 0xA9DF));
     db.insert("Kaithi", Block::new("Kaithi", 0x11080, 0x110CF));
     db.insert(
+        "KaktovikNumerals",
+        Block::new("KaktovikNumerals", 0x1D2C0, 0x1D2DF)
+    );
+    db.insert(
         "KanaExtended-A",
         Block::new("KanaExtended-A", 0x1B100, 0x1B12F)
     );
@@ -409,6 +433,7 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
         "KatakanaPhoneticExtensions",
         Block::new("KatakanaPhoneticExtensions", 0x31F0, 0x31FF)
     );
+    db.insert("Kawi", Block::new("Kawi", 0x11F00, 0x11F5F));
     db.insert("KayahLi", Block::new("KayahLi", 0xA900, 0xA92F));
     db.insert("Kharoshthi", Block::new("Kharoshthi", 0x10A00, 0x10A5F));
     db.insert(
@@ -565,6 +590,7 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     );
     db.insert("NKo", Block::new("NKo", 0x7C0, 0x7FF));
     db.insert("Nabataean", Block::new("Nabataean", 0x10880, 0x108AF));
+    db.insert("NagMundari", Block::new("NagMundari", 0x1E4D0, 0x1E4FF));
     db.insert("Nandinagari", Block::new("Nandinagari", 0x119A0, 0x119FF));
     db.insert("NewTaiLue", Block::new("NewTaiLue", 0x1980, 0x19DF));
     db.insert("Newa", Block::new("Newa", 0x11400, 0x1147F));
