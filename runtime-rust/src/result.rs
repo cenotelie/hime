@@ -26,7 +26,6 @@ use crate::text::Text;
 use crate::tokens::{TokenRepository, TokenRepositoryImpl};
 
 /// Represents the output of a parser
-#[allow(clippy::module_name_repetitions)]
 pub struct ParseResult<'s, 't, 'a> {
     /// The table of grammar terminals
     pub terminals: &'a [Symbol<'s>],

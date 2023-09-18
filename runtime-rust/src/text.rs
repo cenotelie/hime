@@ -38,7 +38,6 @@ use serde_derive::{Deserialize, Serialize};
 pub type Utf16C = u16;
 
 /// Represents a span of text in an input as a starting index and length
-#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TextSpan {
     /// The starting index
@@ -71,7 +70,6 @@ impl Display for TextSpan {
 }
 
 /// Represents a position in term of line and column in a text input
-#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TextPosition {
     /// The 1-base line number
@@ -117,7 +115,6 @@ impl Display for TextPosition {
 /// content = "public Struct Context"
 /// pointer = "       ^^^^^^"
 /// ```
-#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct TextContext<'a> {
     /// The text content being represented

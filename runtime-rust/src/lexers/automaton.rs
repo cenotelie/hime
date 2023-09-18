@@ -34,7 +34,6 @@ pub struct MatchedTerminal {
 /// Represents a transition in the automaton of a lexer
 /// A transition is matched by a range of UTF-16 code points
 /// Its target is a state in the automaton
-#[allow(clippy::module_name_repetitions)]
 #[derive(Copy, Clone)]
 pub struct AutomatonTransition {
     /// Start of the range
@@ -68,7 +67,6 @@ impl AutomatonTransition {
 /// u16: start of the range
 /// u16: end of the range
 /// u16: next state's index
-#[allow(clippy::module_name_repetitions)]
 #[derive(Copy, Clone)]
 pub struct AutomatonState<'a> {
     /// The automaton table
@@ -207,7 +205,6 @@ impl Automaton {
     }
 
     /// Gets an iterator over the states
-    #[allow(clippy::cast_possible_truncation)]
     pub fn get_states(&self) -> impl Iterator<Item = AutomatonState<'_>> + '_ {
         (0..self.states_count).map(|i| self.get_state(i as u32))
     }
@@ -223,7 +220,6 @@ pub struct TokenMatch {
 
 /// Runs the lexer's DFA to match a terminal in the input ahead
 #[must_use]
-#[allow(clippy::cast_possible_truncation)]
 pub fn run_dfa(automaton: &Automaton, input: &Text, index: usize) -> Option<TokenMatch> {
     if input.is_end(index) {
         return Some(TokenMatch {

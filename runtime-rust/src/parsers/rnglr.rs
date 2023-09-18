@@ -387,7 +387,6 @@ impl GSS {
     }
 
     /// Creates a new edge in the GSS
-    #[allow(clippy::cast_possible_truncation)]
     pub fn create_edge(&mut self, from: usize, to: usize, label: GSSLabel) {
         self.edges.push(GSSEdge {
             from: from as u32,
@@ -845,7 +844,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     /// Adds the specified GSS label to the current history
     pub fn add_to_history(&mut self, generation: usize, label: usize) {
         let my_history = &mut self.history;
-        for item in my_history.iter_mut() {
+        for item in &mut *my_history {
             if item.generation == generation {
                 item.data.push(label);
                 return;
@@ -936,7 +935,6 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     }
 
     /// Adds the specified GSS label to the reduction cache with the given tree action
-    #[allow(clippy::cast_possible_truncation)]
     fn reduction_add_to_cache_node(
         reduction: &mut SPPFReduction,
         node: &SPPFNodeNormal,
@@ -955,7 +953,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         match &node.versions[0].children {
             None => {}
             Some(children) => {
-                for child in children.iter() {
+                for child in children {
                     reduction.cache.push(*child);
                 }
             }
@@ -976,7 +974,6 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     }
 
     /// During a reduction, inserts a virtual symbol
-    #[allow(clippy::cast_possible_truncation)]
     pub fn reduction_add_virtual(&mut self, index: usize, action: TreeAction) {
         let reduction = self.reduction.as_mut().expect("Not in a reduction");
         let node_id = self
@@ -1013,7 +1010,6 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     }
 
     /// Executes the reduction as a normal reduction
-    #[allow(clippy::cast_possible_truncation)]
     pub fn reduce_normal(&mut self, variable_index: usize, head_action: TreeAction) -> usize {
         let reduction = self.reduction.as_mut().expect("Not in a reduction");
         let mut promoted: Option<(TableElemRef, SPPFNodeRef)> = None;
@@ -1100,7 +1096,6 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     }
 
     /// Finalizes the parse tree
-    #[allow(clippy::cast_possible_truncation)]
     pub fn commit_root(&mut self, root: usize) {
         let sppf = &self.sppf;
         let result = &mut self.result;
@@ -1116,7 +1111,6 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     }
 
     /// Builds thSe final AST for the specified PPF node reference
-    #[allow(clippy::cast_possible_truncation)]
     fn build_final_ast(sppf: &SPPF, reference: SPPFNodeRef, result: &mut Ast) -> AstCell {
         let node = sppf.get_node(reference.node_id as usize).as_normal();
         let version = &node.versions[reference.version as usize];
@@ -1128,7 +1122,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             },
             Some(children) => {
                 let mut buffer = Vec::with_capacity(children.len());
-                for child in children.iter() {
+                for child in children {
                     buffer.push(SPPFBuilder::build_final_ast(sppf, *child, result));
                 }
                 let first = result.store(&buffer, 0, buffer.len());
@@ -1520,7 +1514,6 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
     }
 
     /// Executes a shift operation
-    #[allow(clippy::cast_possible_truncation)]
     fn parse_shift(&mut self, generation: usize, label: GSSLabel, shift: RNGLRShift) {
         let w = self.gss.find_node(generation, shift.to as u32);
         if let Some(w) = w {
@@ -1654,7 +1647,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                     if dep.is_some() {
                         was_unresolved = true;
                         let mut ok = true;
-                        for r in dep.as_ref().unwrap().iter() {
+                        for r in dep.as_ref().unwrap() {
                             ok = ok && dependencies[*r].is_none();
                         }
                         if ok {
@@ -1814,7 +1807,6 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
     }
 
     /// Executes a reduction operation for a given path
-    #[allow(clippy::cast_possible_truncation)]
     fn parse_reduction_path(
         &mut self,
         generation: usize,
@@ -1929,7 +1921,6 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
     }
 
     /// Executes the shift operations for the given token
-    #[allow(clippy::cast_possible_truncation)]
     fn parse_shifts(&mut self, old_token: TokenKernel) -> usize {
         // Create next generation
         let new_gen = self.data.gss.create_generation();

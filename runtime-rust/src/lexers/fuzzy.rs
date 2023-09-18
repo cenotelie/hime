@@ -50,7 +50,6 @@ impl FuzzyMatcherHead {
     }
 
     /// Initializes this erroneous head from a previous one
-    #[allow(clippy::cast_possible_truncation)]
     pub fn new_error(
         previous: &FuzzyMatcherHead,
         state: u32,
@@ -60,7 +59,7 @@ impl FuzzyMatcherHead {
         let mut errors = Vec::with_capacity(distance);
         if previous.errors.is_some() {
             let others = previous.errors.as_ref().unwrap();
-            for x in others.iter() {
+            for x in others {
                 errors.push(*x);
             }
         }
@@ -92,7 +91,6 @@ impl FuzzyMatcherHead {
 /// This matcher uses the Levenshtein distance to match the input ahead against the current DFA automaton.
 /// The matcher favors solutions that are the closest to the original input.
 /// When multiple solutions are at the same Levenshtein distance to the input, the longest one is preferred.
-#[allow(clippy::module_name_repetitions)]
 pub struct FuzzyMatcher<'s, 't, 'a> {
     /// This lexer's automaton
     automaton: &'a Automaton,
@@ -231,7 +229,6 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
     }
 
     /// Constructs the solution when succeeded to fix the error
-    #[allow(clippy::cast_possible_truncation)]
     fn on_success(&mut self, result: &FuzzyMatcherResult) -> TokenMatch {
         let mut last_error_index = result.match_length + 1;
         for i in 0..result.match_head.as_ref().unwrap().get_distance() {

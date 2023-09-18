@@ -101,7 +101,6 @@ struct LRColumnMap {
 
 impl LRColumnMap {
     /// Creates and loads a new column map
-    #[allow(clippy::cast_possible_truncation)]
     pub fn new(data: &[u8], offset: usize, column_count: usize) -> LRColumnMap {
         let mut result = LRColumnMap {
             cache: [0; 512],
@@ -139,7 +138,6 @@ impl LRColumnMap {
     }
 
     /// Gets the symbol's identifier for a column
-    #[allow(clippy::cast_possible_truncation)]
     pub fn get_id_at(&self, column: usize) -> u32 {
         let column = column as u16;
         for (id, c) in self.cache.iter().enumerate() {
@@ -203,7 +201,7 @@ impl LRContexts {
         match self.openings.as_ref() {
             None => false,
             Some(data) => {
-                for x in data.iter() {
+                for x in data {
                     if u32::from(x.identifier) == terminal_id && x.context == context {
                         return true;
                     }

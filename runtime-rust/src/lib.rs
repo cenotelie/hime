@@ -36,6 +36,10 @@
 //! extern crate hime_redist;
 //! ```
 
+#![forbid(unsafe_code)]
+#![warn(clippy::pedantic)]
+#![allow(clippy::cast_possible_truncation, clippy::module_name_repetitions)]
+
 pub mod ast;
 pub mod errors;
 pub mod lexers;

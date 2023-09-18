@@ -92,7 +92,6 @@ impl<'s, 't, 'a> ContextFreeLexer<'s, 't, 'a> {
     }
 
     /// Gets the next token in the input
-    #[allow(clippy::cast_possible_truncation)]
     fn get_next_token(&mut self) -> Option<TokenKernel> {
         if !self.data.has_run {
             // lex all tokens now
@@ -187,7 +186,6 @@ impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
     }
 
     /// Gets the next token in the input
-    #[allow(clippy::cast_possible_truncation)]
     fn get_next_token(&mut self, contexts: &dyn ContextProvider) -> Option<TokenKernel> {
         if self.data.has_run {
             return None;

@@ -74,7 +74,6 @@ impl SubTree {
     }
 
     /// Sets the number of children of the node at the given index
-    #[allow(clippy::cast_possible_truncation)]
     pub fn set_children_count_at(&mut self, index: usize, count: usize) {
         self.nodes[index].count = count as u32;
     }
@@ -140,7 +139,6 @@ impl SubTree {
     /// Commits the children of a sub-tree in this buffer to the final ast
     /// If the index is 0, the root's children are committed, assuming this is a depth-1 sub-tree.
     /// If not, the children of the child at the given index are committed.
-    #[allow(clippy::cast_possible_truncation)]
     pub fn commit_children_of(&mut self, index: usize, ast: &mut Ast) {
         self.nodes[index].first =
             ast.store(&self.nodes, index + 1, self.nodes[index].count as usize) as u32;

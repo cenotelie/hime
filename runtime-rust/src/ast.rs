@@ -82,7 +82,6 @@ impl TableElemRef {
 }
 
 /// Represents a cell in an AST inner structure
-#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct AstCell {
     /// The node's label
@@ -118,7 +117,6 @@ impl AstCell {
 /// Implementation of a simple AST with a tree structure
 /// The nodes are stored in sequential arrays where the children of a node are an inner sequence.
 /// The linkage is represented by each node storing its number of children and the index of its first child.
-#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Default, Clone)]
 pub struct AstImpl {
     /// The nodes' labels
@@ -195,6 +193,12 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     }
 
     /// Gets the root node of this tree
+    ///
+    /// # Panics
+    ///
+    /// Raise a panic when the AST has no root.
+    /// This can happen when a `ParseResult` contains some errors,
+    /// but the AST `get_ast` is called to get an AST but it will have not root.
     #[must_use]
     pub fn get_root(&self) -> AstNode {
         self.data
@@ -308,8 +312,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     /// Traverses the AST from the specified node
     fn traverse<F: FnMut(&AstImpl, usize)>(&self, from: usize, mut action: F) {
         let mut stack = vec![from];
-        while !stack.is_empty() {
-            let current = stack.pop().unwrap();
+        while let Some(current) = stack.pop() {
             let cell = self.data.nodes[current];
             for i in (0..cell.count).rev() {
                 stack.push((cell.first + i) as usize);
@@ -364,7 +367,6 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
 }
 
 /// Represents a node in an Abstract Syntax Tree
-#[allow(clippy::module_name_repetitions)]
 #[derive(Copy, Clone)]
 pub struct AstNode<'s, 't, 'a> {
     /// The original parse tree
@@ -556,7 +558,6 @@ impl<'s, 't, 'a> Serialize for AstNode<'s, 't, 'a> {
 }
 
 /// Represents a family of children for an `ASTNode`
-#[allow(clippy::module_name_repetitions)]
 #[derive(Clone)]
 pub struct AstFamily<'s, 't, 'a> {
     /// The original parse tree
@@ -566,7 +567,6 @@ pub struct AstFamily<'s, 't, 'a> {
 }
 
 /// Represents and iterator for adjacents in this graph
-#[allow(clippy::module_name_repetitions)]
 pub struct AstFamilyIterator<'s, 't, 'a> {
     /// The original parse tree
     tree: &'a Ast<'s, 't, 'a>,

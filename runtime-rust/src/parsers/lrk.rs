@@ -138,7 +138,7 @@ impl LRkAutomaton {
     pub fn get_expected<'s>(&self, state: u32, terminals: &[Symbol<'s>]) -> LRExpected<'s> {
         let mut expected = LRExpected::new();
         let mut offset = self.columns_count * state as usize * 2;
-        for terminal in terminals.iter() {
+        for terminal in terminals {
             let action = self.table[offset];
             if action == LR_ACTION_CODE_SHIFT {
                 expected.shifts.push(*terminal);
@@ -343,7 +343,7 @@ impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
         // promotion data
         let mut promotion = false;
         let mut insertion = 1;
-        for item in handle.iter() {
+        for item in handle {
             let item = *item;
             if reduction.cache.get_action_at(item) == TREE_ACTION_PROMOTE {
                 if promotion {
