@@ -17,7 +17,7 @@
 
 //! Module for utility APIs
 
-use std::ops::{Deref, DerefMut};
+use core::ops::{Deref, DerefMut};
 
 pub mod biglist;
 pub mod bin;

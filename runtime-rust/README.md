@@ -13,10 +13,23 @@ used by adding `hime_redist` to your dependencies in your project's `Cargo.toml`
 
 ```toml
 [dependencies]
-hime_redist = "4.0.0"
+hime_redist = "4.3"
 ```
 
 Generated lexer and parser codes will import this crate and provide a simple API to parse input text.
+
+## Support for `no_std`
+
+As of version `4.3.0`, this crate support `no_std` contexts.
+This crate has an `std` feature which is activated by default for retro-compatibility but can deactivated as follow:
+
+```toml
+[dependencies]
+hime_redist = { version = "4.3", default-features = false }
+```
+
+The only dependency of this crate (`serde`) also does not require `std` support, and will only use its `std` feature when the `std` feature of this crate is activated (which it is by default).
+De-activating `std` for this crate also de-activates `std` for serde.
 
 ## How can I contribute? ##
 

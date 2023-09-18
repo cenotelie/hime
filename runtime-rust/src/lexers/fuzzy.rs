@@ -17,7 +17,8 @@
 
 //! Module for the lexers' fuzzy DFA matcher
 
-use std::mem::take;
+use alloc::vec::Vec;
+use core::mem::take;
 
 use super::automaton::{Automaton, AutomatonState, TokenMatch, DEAD_STATE};
 use crate::errors::{ParseErrorEndOfInput, ParseErrorUnexpectedChar, ParseErrors};

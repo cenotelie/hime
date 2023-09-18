@@ -17,6 +17,8 @@
 
 //! Module for binary manipulation APIs
 
+use alloc::vec::Vec;
+
 /// reads a u16 from an array of bytes
 #[must_use]
 pub fn read_u16(buffer: &[u8], index: usize) -> u16 {

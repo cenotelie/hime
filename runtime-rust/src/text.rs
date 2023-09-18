@@ -17,14 +17,15 @@
 
 //! Module for text-handling APIs
 
-use std::borrow::Cow;
-use std::cmp::{Ord, Ordering};
-use std::fmt::{Display, Error, Formatter};
-use std::io::Read;
-use std::result::Result;
-use std::str::Chars;
+use alloc::borrow::Cow;
+use alloc::fmt::{Display, Error, Formatter};
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::cmp::{Ord, Ordering};
+// use alloc::io::Read;
+use core::str::Chars;
 
-use serde_derive::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 
 /// `Utf16C` represents a single UTF-16 code unit.
 /// A UTF-16 code unit is always represented as a 16 bits unsigned integer.
@@ -170,7 +171,10 @@ impl<'a> Text<'a> {
     /// # Errors
     ///
     /// Return an error when reading the input fails.
-    pub fn from_utf8_stream(input: &mut dyn Read) -> Result<Text<'static>, std::io::Error> {
+    #[cfg(feature = "std")]
+    pub fn from_utf8_stream(
+        input: &mut dyn std::io::Read
+    ) -> Result<Text<'static>, std::io::Error> {
         let mut content = String::new();
         input.read_to_string(&mut content)?;
         let lines = find_lines_in(content.char_indices());

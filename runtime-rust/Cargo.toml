@@ -14,12 +14,12 @@ include = ["README.md", "Cargo.toml", "build.rs", "src/**/*.rs"]
 edition = "2021"
 
 [features]
-default = []
+default = ["std"]
 debug = []
+std = ["serde/std"]
 
 [dependencies]
-serde = "1"
-serde_derive = "1"
+serde = { version = "1", default-features = false, features = ["derive", "alloc"] }
 
 [badges]
 maintenance = { status = "actively-developed" }

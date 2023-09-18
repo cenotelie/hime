@@ -17,9 +17,11 @@
 
 //! Module for the definition of lexical and syntactic errors
 
-use std::fmt::{Display, Formatter};
+use alloc::fmt::{Display, Formatter};
+use alloc::string::String;
+use alloc::vec::Vec;
 
-use serde_derive::Serialize;
+use serde::Serialize;
 
 use crate::symbols::Symbol;
 use crate::text::{TextPosition, Utf16C};
@@ -55,7 +57,7 @@ impl ParseErrorDataTrait for ParseErrorEndOfInput {
 }
 
 impl Display for ParseErrorEndOfInput {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> alloc::fmt::Result {
         write!(f, "Unexpected end of input")
     }
 }
@@ -90,7 +92,7 @@ impl ParseErrorDataTrait for ParseErrorUnexpectedChar {
 }
 
 impl Display for ParseErrorUnexpectedChar {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> alloc::fmt::Result {
         write!(
             f,
             "Unexpected character '{}' (U+{:X})",
@@ -136,7 +138,7 @@ impl ParseErrorDataTrait for ParseErrorIncorrectEncodingSequence {
 }
 
 impl Display for ParseErrorIncorrectEncodingSequence {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> alloc::fmt::Result {
         write!(f, "Incorrect encoding sequence: [")?;
         if self.missing_high {
             write!(f, "<missing> 0x{:X}", self.sequence)?;
@@ -195,7 +197,7 @@ impl<'s> ParseErrorDataTrait for ParseErrorUnexpectedToken<'s> {
 }
 
 impl<'s> Display for ParseErrorUnexpectedToken<'s> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> alloc::fmt::Result {
         write!(f, "Unexpected token \"{}\"", self.value)?;
         #[cfg(feature = "debug")]
         {
@@ -204,7 +206,7 @@ impl<'s> Display for ParseErrorUnexpectedToken<'s> {
                 " at state(s) {}",
                 self.state_ids
                     .iter()
-                    .map(ToString::to_string)
+                    .map(alloc::string::ToString::to_string)
                     .collect::<Vec<_>>()
                     .join(",")
             )?;
@@ -286,7 +288,7 @@ impl<'s> ParseErrorDataTrait for ParseError<'s> {
 }
 
 impl<'s> Display for ParseError<'s> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> alloc::fmt::Result {
         // write!(f, "@{} ", self.get_position())?;
         match self {
             ParseError::UnexpectedEndOfInput(x) => x.fmt(f),
@@ -298,6 +300,7 @@ impl<'s> Display for ParseError<'s> {
     }
 }
 
+#[cfg(feature = "std")]
 impl<'s> std::error::Error for ParseError<'s> {}
 
 /// Represents an entity that can handle lexical and syntactic errors

@@ -17,6 +17,8 @@
 
 //! Module for AST subtree in parsers
 
+use alloc::vec::Vec;
+
 use super::{TreeAction, TREE_ACTION_REPLACE_BY_CHILDREN};
 use crate::ast::{Ast, AstCell, TableElemRef};
 

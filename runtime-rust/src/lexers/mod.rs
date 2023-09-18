@@ -21,8 +21,6 @@ pub mod automaton;
 pub mod fuzzy;
 pub mod impls;
 
-use std::usize;
-
 use crate::errors::ParseErrors;
 use crate::lexers::automaton::Automaton;
 use crate::tokens::TokenRepository;

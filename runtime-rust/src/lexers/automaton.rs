@@ -17,6 +17,8 @@
 
 //! Module for lexers' automata
 
+use alloc::vec::Vec;
+
 use crate::text::{Text, Utf16C};
 use crate::utils::bin::{read_table_u16, read_table_u32, read_u32};
 

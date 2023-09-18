@@ -36,9 +36,14 @@
 //! extern crate hime_redist;
 //! ```
 
+#![no_std]
 #![forbid(unsafe_code)]
 #![warn(clippy::pedantic)]
 #![allow(clippy::cast_possible_truncation, clippy::module_name_repetitions)]
+
+extern crate alloc;
+#[cfg(feature = "std")]
+extern crate std;
 
 pub mod ast;
 pub mod errors;

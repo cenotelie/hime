@@ -17,8 +17,8 @@
 
 //! Module for Abstract-Syntax Trees
 
-use std::fmt::{Display, Error, Formatter};
-use std::iter::FusedIterator;
+use alloc::fmt::{Display, Error, Formatter};
+use core::iter::FusedIterator;
 
 use serde::ser::{Serialize, SerializeSeq, SerializeStruct, Serializer};
 
@@ -274,8 +274,8 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     pub fn get_total_position_and_span(&self, node: usize) -> Option<(TextPosition, TextSpan)> {
         let mut total_span: Option<TextSpan> = None;
         let mut position = TextPosition {
-            line: std::usize::MAX,
-            column: std::usize::MAX
+            line: usize::MAX,
+            column: usize::MAX
         };
         self.traverse(node, |data, current| {
             if let Some(p) = self.get_position_at(data, current) {
@@ -311,7 +311,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
 
     /// Traverses the AST from the specified node
     fn traverse<F: FnMut(&AstImpl, usize)>(&self, from: usize, mut action: F) {
-        let mut stack = vec![from];
+        let mut stack = alloc::vec![from];
         while let Some(current) = stack.pop() {
             let cell = self.data.nodes[current];
             for i in (0..cell.count).rev() {

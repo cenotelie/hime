@@ -17,7 +17,8 @@
 
 //! Module for LR(k) parsers
 
-use std::usize;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 
 use super::subtree::SubTree;
 use super::{
@@ -644,7 +645,7 @@ impl<'s, 't, 'a> LRkParser<'s, 't, 'a> {
         LRkParser {
             data: LRkParserData {
                 automaton,
-                stack: vec![LRkHead {
+                stack: alloc::vec![LRkHead {
                     state: 0,
                     identifier: 0
                 }],
@@ -689,7 +690,7 @@ impl<'s, 't, 'a> LRkParser<'s, 't, 'a> {
             token.get_value().unwrap().to_string(),
             token.get_symbol(),
             #[cfg(feature = "debug")]
-            vec![state],
+            alloc::vec![state],
             my_expected
         )
     }

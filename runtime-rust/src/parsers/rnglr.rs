@@ -17,8 +17,9 @@
 
 //! Module for RNGLR parsers
 
-use std::collections::VecDeque;
-use std::usize;
+use alloc::collections::VecDeque;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 
 use super::{
     get_op_code_base, get_op_code_tree_action, read_table_u16, read_u16, read_u32, ContextProvider,
@@ -570,7 +571,7 @@ impl SPPFNodeNormal {
     pub fn new(label: TableElemRef) -> SPPFNodeNormal {
         SPPFNodeNormal {
             original: label,
-            versions: vec![SPPFNodeVersion::new(label)]
+            versions: alloc::vec![SPPFNodeVersion::new(label)]
         }
     }
 
@@ -583,7 +584,7 @@ impl SPPFNodeNormal {
     ) -> SPPFNodeNormal {
         SPPFNodeNormal {
             original,
-            versions: vec![SPPFNodeVersion::from(label, buffer, count)]
+            versions: alloc::vec![SPPFNodeVersion::from(label, buffer, count)]
         }
     }
 
@@ -852,7 +853,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         }
         my_history.push(HistoryPart {
             generation,
-            data: vec![label]
+            data: alloc::vec![label]
         });
     }
 
@@ -1311,7 +1312,7 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
             if count > 0 {
                 // enqueue the info, top GSS stack node and target GLR state
                 queue_gss_heads.push(shift.from);
-                queue_vstack.push(vec![shift.to as u32]);
+                queue_vstack.push(alloc::vec![shift.to as u32]);
             }
         }
         // now, close the queue
@@ -1365,7 +1366,7 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
                         );
                         // enqueue the info, top GSS stack node and target GLR state
                         queue_gss_heads.push(path.last_node);
-                        queue_vstack.push(vec![next.unwrap()]);
+                        queue_vstack.push(alloc::vec![next.unwrap()]);
                     }
                 }
             }
@@ -1431,7 +1432,7 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
                     );
                     // enqueue the info, top GSS stack node and target GLR state
                     queue_gss_heads.push(path.last_node);
-                    queue_vstack.push(vec![next.unwrap()]);
+                    queue_vstack.push(alloc::vec![next.unwrap()]);
                 }
             }
         }
@@ -1491,7 +1492,7 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
                         );
                         // enqueue the info, top GSS stack node and target GLR state
                         queue_gss_heads.push(path.last_node);
-                        queue_vstack.push(vec![next.unwrap()]);
+                        queue_vstack.push(alloc::vec![next.unwrap()]);
                     }
                 }
             }

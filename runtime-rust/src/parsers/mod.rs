@@ -21,6 +21,8 @@ pub mod lrk;
 pub mod rnglr;
 pub mod subtree;
 
+use alloc::vec::Vec;
+
 use crate::lexers::ContextProvider;
 use crate::symbols::Symbol;
 use crate::utils::bin::{read_table_u16, read_u16, read_u32};
@@ -181,7 +183,7 @@ impl LRContexts {
     pub fn add(&mut self, identifier: u16, context: u16) {
         match self.openings.as_mut() {
             None => {
-                self.openings = Some(vec![LRContextOpening {
+                self.openings = Some(alloc::vec![LRContextOpening {
                     identifier,
                     context
                 }]);

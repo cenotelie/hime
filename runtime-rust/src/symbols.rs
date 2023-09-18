@@ -17,9 +17,9 @@
 
 //! Module for the definition of grammar symbols
 
-use std::fmt::{Display, Error, Formatter};
+use alloc::fmt::{Display, Error, Formatter};
 
-use serde_derive::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 
 use crate::text::{TextContext, TextPosition, TextSpan};
 use crate::tokens::Token;
