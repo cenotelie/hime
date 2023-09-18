@@ -159,7 +159,7 @@ fn build_cargo_project(
     src_folder.push("src");
     fs::create_dir(&src_folder)?;
     write_lib_rs(&src_folder)?;
-    for (index, grammar) in units.iter() {
+    for (index, grammar) in units {
         let module_name = get_module_name(task, grammar);
         let parts: Vec<&str> = module_name.split("::").collect();
         let mut current = src_folder.clone();

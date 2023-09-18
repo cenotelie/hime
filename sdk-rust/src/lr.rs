@@ -865,7 +865,7 @@ impl InverseGraph {
         while !queue.is_empty() {
             let current = queue.remove(0);
             if let Some(transitions) = self.0.get(&elements[current].state) {
-                for (symbol, antecedents) in transitions.iter() {
+                for (symbol, antecedents) in transitions {
                     for previous in antecedents {
                         let visited_with = visited.entry(*previous).or_insert_with(Vec::new);
                         if visited_with.contains(symbol) {
@@ -1269,7 +1269,7 @@ fn build_graph_lalr1_propagate(kernels: &mut [StateKernel], table: &[Propagation
     let mut modifications = 1;
     while modifications != 0 {
         modifications = 0;
-        for propagation in table.iter() {
+        for propagation in table {
             let before = kernels[propagation.to_state].items[propagation.to_item]
                 .lookaheads
                 .0

@@ -54,7 +54,6 @@ pub fn write_parser_lrk_data_file(
 }
 
 /// Writes the data for a LR(k) parser
-#[allow(clippy::cast_possible_truncation)]
 pub fn write_parser_lrk_data(
     writer: &mut dyn Write,
     grammar: &Grammar,
@@ -91,7 +90,6 @@ pub fn write_parser_lrk_data(
 }
 
 /// Writes the column headers for a parser data
-#[allow(clippy::cast_possible_truncation)]
 fn write_parser_column_headers(
     writer: &mut dyn Write,
     grammar: &Grammar,
@@ -108,7 +106,6 @@ fn write_parser_column_headers(
 }
 
 /// Write the opening context informations for each state
-#[allow(clippy::cast_possible_truncation)]
 fn write_parser_opening_contexts(writer: &mut dyn Write, graph: &Graph) -> Result<(), Error> {
     // write context openings for each state
     for state in &graph.states {
@@ -119,7 +116,7 @@ fn write_parser_opening_contexts(writer: &mut dyn Write, graph: &Graph) -> Resul
             .sum();
         write_u16(writer, count as u16)?;
         for (terminal, contexts) in &state.opening_contexts {
-            for context in contexts.iter() {
+            for context in contexts {
                 write_u16(writer, terminal.sid() as u16)?;
                 write_u16(writer, *context as u16)?;
             }
@@ -129,7 +126,6 @@ fn write_parser_opening_contexts(writer: &mut dyn Write, graph: &Graph) -> Resul
 }
 
 /// Generates the parser's binary data for the provided LR state
-#[allow(clippy::cast_possible_truncation)]
 fn write_parser_lrk_data_state(
     writer: &mut dyn Write,
     grammar: &Grammar,
@@ -185,7 +181,6 @@ fn write_parser_lrk_data_state(
 }
 
 /// Generates the parser's binary representation of a rule production
-#[allow(clippy::cast_possible_truncation)]
 fn write_parser_lrk_data_rule(
     writer: &mut dyn Write,
     grammar: &Grammar,
@@ -256,7 +251,6 @@ pub fn write_parser_rnglr_data_file(
 }
 
 /// Writes the data for a RNGLR parser
-#[allow(clippy::cast_possible_truncation)]
 pub fn write_parser_rnglr_data(
     writer: &mut dyn Write,
     grammar: &Grammar,
@@ -372,7 +366,7 @@ pub fn write_parser_rnglr_data(
 }
 
 /// Builds the offset table for the RNGLR actions
-#[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+#[allow(clippy::cast_sign_loss)]
 fn write_parser_rnglr_data_generate_offset(
     expected: &TerminalSet,
     grammar: &Grammar,
@@ -411,7 +405,6 @@ fn write_parser_rnglr_data_generate_offset(
 }
 
 /// Generates the action table for a state
-#[allow(clippy::cast_possible_truncation)]
 fn write_parser_rnglr_data_action_table(
     writer: &mut dyn Write,
     expected: &TerminalSet,
@@ -454,7 +447,6 @@ fn write_parser_rnglr_data_action_table(
 }
 
 /// Generates the parser's binary representation of a rule production
-#[allow(clippy::cast_possible_truncation)]
 fn write_parser_rnglr_data_rule(
     writer: &mut dyn Write,
     grammar: &Grammar,

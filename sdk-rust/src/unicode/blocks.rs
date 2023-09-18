@@ -8,11 +8,7 @@ use std::collections::HashMap;
 use crate::unicode::Block;
 
 /// Gets all blocks
-#[allow(
-    clippy::similar_names,
-    clippy::too_many_lines,
-    clippy::module_name_repetitions
-)]
+#[allow(clippy::similar_names, clippy::too_many_lines)]
 #[must_use]
 pub fn get_blocks() -> HashMap<&'static str, Block> {
     let mut db = HashMap::new();

@@ -17,6 +17,10 @@
 
 //! Rust SDK for the Hime parser generator
 
+#![forbid(unsafe_code)]
+#![warn(clippy::pedantic)]
+#![allow(clippy::cast_possible_truncation, clippy::module_name_repetitions)]
+
 pub mod errors;
 pub mod finite;
 pub mod grammars;
@@ -740,7 +744,7 @@ impl<'a> CompilationTask<'a> {
     fn delete_sources(&self, units: &[(usize, &Grammar)], errors: &mut Vec<Error>) {
         // gather all source files
         let mut all_files = Vec::new();
-        for (index, grammar) in units.iter() {
+        for (index, grammar) in units {
             let shall_delete = match self.get_mode_for(grammar, *index) {
                 Ok(Mode::Sources | Mode::SourcesAndAssembly) => false,
                 Ok(Mode::Assembly) => true,

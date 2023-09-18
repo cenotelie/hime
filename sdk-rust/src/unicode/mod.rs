@@ -66,7 +66,6 @@ impl CodePoint {
     }
 
     /// Gets the UTF-16 encoding of this code point
-    #[allow(clippy::cast_possible_truncation)]
     #[must_use]
     pub fn get_utf16(self) -> [u16; 2] {
         if self.0 <= 0xFFFF {

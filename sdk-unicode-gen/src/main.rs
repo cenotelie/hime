@@ -120,6 +120,11 @@ fn generate_blocks_db(blocks: &[Block]) -> Result<(), Box<dyn Error>> {
     writeln!(writer, "/// Gets all blocks")?;
     writeln!(
         writer,
+        "#[allow(clippy::similar_names, clippy::too_many_lines)]"
+    )?;
+    writeln!(writer, "#[must_use]")?;
+    writeln!(
+        writer,
         "pub fn get_blocks() -> HashMap<&'static str, Block> {{"
     )?;
     writeln!(writer, "    let mut db = HashMap::new();")?;
@@ -192,6 +197,11 @@ fn generate_categories_db(categories: &[Category]) -> Result<(), Box<dyn Error>>
     writeln!(writer, "use std::collections::HashMap;")?;
     writeln!(writer)?;
     writeln!(writer, "/// Gets all categories")?;
+    writeln!(
+        writer,
+        "#[allow(clippy::similar_names, clippy::too_many_lines)]"
+    )?;
+    writeln!(writer, "#[must_use]")?;
     writeln!(
         writer,
         "pub fn get_categories() -> HashMap<&'static str, Category> {{"

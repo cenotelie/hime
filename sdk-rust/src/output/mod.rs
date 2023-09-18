@@ -52,7 +52,7 @@ use crate::{CompilationTask, ParsingMethod, Runtime};
 /// # Errors
 ///
 /// Return errors produced while writing the artifacts for the grammar
-#[allow(clippy::too_many_lines, clippy::module_name_repetitions)]
+#[allow(clippy::too_many_lines)]
 pub fn output_grammar_artifacts(
     task: &CompilationTask,
     grammar: &Grammar,
@@ -197,7 +197,6 @@ pub fn output_grammar_artifacts(
 /// # Errors
 ///
 /// Returns the errors produced by the grammar's compilation
-#[allow(clippy::cast_possible_truncation)]
 pub fn build_in_memory_grammar<'a>(
     grammar: &'a Grammar,
     data: &BuildData

@@ -112,7 +112,7 @@ fn build_maven_project(
     resources_folder.push("resources");
     fs::create_dir_all(&resources_folder)?;
 
-    for (index, grammar) in units.iter() {
+    for (index, grammar) in units {
         let nmspace = get_namespace(task, grammar);
         let parts: Vec<&str> = nmspace.split('.').collect();
         let target_src = create_namespace_folder(&src_folder, &parts)?;
@@ -138,7 +138,7 @@ fn build_maven_project(
 /// Creates folders for a namespace
 fn create_namespace_folder(root: &Path, parts: &[&str]) -> Result<PathBuf, Error> {
     let mut target = root.to_path_buf();
-    for part in parts.iter() {
+    for part in parts {
         target.push(part);
     }
     fs::create_dir_all(&target)?;

@@ -48,7 +48,6 @@ pub fn write_lexer_data_file(
 }
 
 /// Writes the lexer's data
-#[allow(clippy::cast_possible_truncation, clippy::module_name_repetitions)]
 pub fn write_lexer_data(
     writer: &mut dyn Write,
     grammar: &Grammar,
@@ -87,7 +86,6 @@ pub fn write_lexer_data(
 }
 
 /// Writes the lexer's data
-#[allow(clippy::cast_possible_truncation)]
 fn write_lexer_data_state(
     writer: &mut dyn Write,
     grammar: &Grammar,
@@ -144,7 +142,7 @@ fn write_lexer_data_state(
         write_u16(writer, index as u16)?;
     }
     // write the cached transitions
-    for value in cache.iter() {
+    for value in &cache {
         write_u16(writer, *value)?;
     }
     // write the non-cached transitions

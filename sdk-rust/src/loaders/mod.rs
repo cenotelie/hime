@@ -52,7 +52,7 @@ pub struct LoadInput<'a>(String, Box<dyn Read + 'a>);
 pub fn open_all<'t>(inputs: &[Input<'t>]) -> Result<Vec<LoadInput<'t>>, Errors<'t>> {
     let mut errors = Vec::new();
     let mut result = Vec::new();
-    for input in inputs.iter() {
+    for input in inputs {
         match input.open() {
             Ok(stream) => result.push(LoadInput(input.name(), stream)),
             Err(error) => errors.push(Error::Io(error))
@@ -74,7 +74,7 @@ fn build_loaded_data<'t>(
     LoadedData {
         inputs: names
             .into_iter()
-            .zip(parse_results.into_iter())
+            .zip(parse_results)
             .map(|(name, result)| LoadedInput {
                 name,
                 content: result.text
@@ -141,7 +141,7 @@ fn do_load_grammars(roots: &[(usize, AstNode)]) -> (Vec<Grammar>, Vec<Error>) {
     let mut errors = Vec::new();
     let mut completed = Vec::new();
     let mut to_resolve = Vec::new();
-    for &(input_index, grammar_root) in roots.iter() {
+    for &(input_index, grammar_root) in roots {
         let loader = Loader::new(input_index, grammar_root, &mut errors);
         if loader.is_solved() {
             completed.push(loader);
@@ -178,7 +178,7 @@ fn resolve_inheritance<'s, 't, 'a>(
             return;
         }
         if !modified {
-            for loader in to_resolve.iter() {
+            for loader in &*to_resolve {
                 loader.collect_errors(to_resolve, errors);
             }
             return;
@@ -573,7 +573,7 @@ fn load_nfa_simple_text(node: &AstNode) -> NFA {
             nfa.add_transition(nfa.exit, CharSpan::new(encoded2, encoded2), temp);
             nfa.exit = temp;
         } else {
-            for encoded in c.encode_utf16(&mut buffer).iter() {
+            for encoded in &*c.encode_utf16(&mut buffer) {
                 let temp = nfa.add_state().id;
                 nfa.add_transition(nfa.exit, CharSpan::new(*encoded, *encoded), temp);
                 nfa.exit = temp;
@@ -599,7 +599,7 @@ fn load_nfa_codepoint(input_index: usize, errors: &mut Vec<Error>, node: AstNode
     let mut nfa = NFA::new_minimal();
     let mut buffer = [0; 2];
     nfa.exit = nfa.entry;
-    for encoded in value.encode_utf16(&mut buffer).iter() {
+    for encoded in &*value.encode_utf16(&mut buffer) {
         let temp = nfa.add_state().id;
         nfa.add_transition(nfa.exit, CharSpan::new(*encoded, *encoded), temp);
         nfa.exit = temp;
@@ -608,7 +608,6 @@ fn load_nfa_codepoint(input_index: usize, errors: &mut Vec<Error>, node: AstNode
 }
 
 /// Builds a NFA from a character class
-#[allow(clippy::cast_possible_truncation)]
 fn load_nfa_class(input_index: usize, errors: &mut Vec<Error>, node: AstNode) -> NFA {
     // extract the value
     let node_value = node.get_value().unwrap();

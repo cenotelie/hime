@@ -147,7 +147,7 @@ impl DFAState {
 
     /// Adds new items making this state a final state
     pub fn add_items(&mut self, items: &[FinalItem]) {
-        for item in items.iter() {
+        for item in items {
             self.do_add_item(*item);
         }
         self.items.sort();
@@ -465,7 +465,7 @@ impl DFAInverse {
     /// Closes the specified list of states through inverse transitions
     fn close_by_antecedents(&self, states: &[usize]) -> Vec<usize> {
         let mut result = Vec::new();
-        for state in states.iter() {
+        for state in states {
             result.push(*state);
         }
         // transitive closure of the final states by their antecedents
@@ -475,7 +475,7 @@ impl DFAInverse {
         while i < len {
             let state = result[i];
             if let Some(antecedents) = self.inverses.get(&state) {
-                for antecedent in antecedents.iter() {
+                for antecedent in antecedents {
                     if !result.contains(antecedent) && self.reachable.contains(antecedent) {
                         // this antecedent is reachable and not yet in the closure
                         // => add it to the closure
@@ -700,7 +700,7 @@ impl NFAState {
 
     /// Adds new items making this state a final state
     pub fn add_items(&mut self, items: &[FinalItem]) {
-        for item in items.iter() {
+        for item in items {
             self.add_item(*item);
         }
     }
