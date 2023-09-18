@@ -19,19 +19,34 @@
 
 use alloc::vec::Vec;
 
-/// reads a u16 from an array of bytes
+/// Reads a `u16` from an array of bytes
+///
+/// # Panics
+///
+/// Raise a panic when the given buffer is not long enough
+/// from the specified index to accomodate the size of a `u16` value
 #[must_use]
 pub fn read_u16(buffer: &[u8], index: usize) -> u16 {
-    u16::from(buffer[index + 1]) << 8 | u16::from(buffer[index])
+    const SIZE: usize = std::mem::size_of::<u16>();
+    let bytes: &[u8; SIZE] = buffer[index..(index + SIZE)]
+        .try_into()
+        .expect("given buffer cannot contain u16 value");
+    u16::from_le_bytes(*bytes)
 }
 
-/// reads a u32 from an array of bytes
+/// Reads a `u32` from an array of bytes
+///
+/// # Panics
+///
+/// Raise a panic when the given buffer is not long enough
+/// from the specified index to accomodate the size of a `u32` value
 #[must_use]
 pub fn read_u32(buffer: &[u8], index: usize) -> u32 {
-    u32::from(buffer[index + 3]) << 24
-        | u32::from(buffer[index + 2]) << 16
-        | u32::from(buffer[index + 1]) << 8
-        | u32::from(buffer[index])
+    const SIZE: usize = std::mem::size_of::<u32>();
+    let bytes: &[u8; SIZE] = buffer[index..(index + SIZE)]
+        .try_into()
+        .expect("given buffer cannot contain u32 value");
+    u32::from_le_bytes(*bytes)
 }
 
 /// Reads a table of u16 from a byte buffer
