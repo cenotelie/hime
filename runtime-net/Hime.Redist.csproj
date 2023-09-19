@@ -21,12 +21,12 @@
     <Authors>cenotelie</Authors>
     <Description>Redistributable runtime library for parsers generated with Hime (LR, RNGLR).</Description>
     <Copyright>Copyright © Association Cénotélie 2020</Copyright>
-    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://cenotelie.fr/projects/hime</PackageProjectUrl>
     <PackageIcon>Logo.png</PackageIcon>
     <PackageTags>parser generator lr glr rnglr</PackageTags>
     <RepositoryUrl>https://github.com/cenotelie/hime</RepositoryUrl>
-    <RepositoryType>hg</RepositoryType>
+    <RepositoryType>git</RepositoryType>
     <IncludeSymbols>true</IncludeSymbols>
     <IncludeSource>true</IncludeSource>
     <IncludeBuildOutput>true</IncludeBuildOutput>

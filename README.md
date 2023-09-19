@@ -1,39 +1,41 @@
 # README #
 
-[![Build Status](https://dev.azure.com/lwouters/cenotelie/_apis/build/status/cenotelie.hime?branchName=master)](https://dev.azure.com/lwouters/cenotelie/_build/latest?definitionId=6&branchName=master)
+[![Build Status](https://dev.azure.com/cenotelie/cenotelie/_apis/build/status%2Fcenotelie.hime?branchName=master)](https://dev.azure.com/cenotelie/cenotelie/_build/latest?definitionId=6&branchName=master)
+[![Crates.io](https://img.shields.io/crates/v/hime_redist.svg)](https://crates.io/crates/hime_redist)
 
-The Hime parser generator is a parser generator that targets the .Net platform, Java and Rust. It primarily supports the LR family of parsing methods, including GLR (Generalized-LR). Key distinguishing features are:
+Hime is a parser generator that targets .Net, Java and Rust.
+Hime relies on the [LR](https://en.wikipedia.org/wiki/LR_parser)
+family of parsing techniques, including the state of the art
+[RNGLR algorithm]((http://portal.acm.org/citation.cfm?id=1146809.1146810&coll=DL&dl=GUIDE&CFID=9339017&CFTOKEN=49072692)) for generalized LR parsing used for
+ambiguous grammars. Hime provides a powerful, expressive,
+and feature-rich grammar language with support for
+[template syntactic rules](http://cenotelie.fr/projects/hime/referenceLangTemplates),
+[context-sensitive lexing](http://cenotelie.fr/projects/hime/referenceLangContextSensitive)
+(useful for contextal keywords),
+[tree actions](http://cenotelie.fr//projects/hime/referenceLangTreeActions)
+(useful for clean syntax trees), and more!
+Hime strongly emphasizes the separation of data and code. Hime forbids the inclusion of inline code in its grammar definitions in order to have very readable grammars that can be easily understood, debugged, improved. It is still possible to have custom code invoked during parsing with semantic actions.
 
-* Fast LR and GLR parsing.
-* Modern implementation of GLR with the [RNGLR algorithm](http://portal.acm.org/citation.cfm?id=1146809.1146810&coll=DL&dl=GUIDE&CFID=9339017&CFTOKEN=49072692).
-* Robust runtime implementations in .Net, Java and Rust published in public repositories (Nuget, Maven Central, crates.io).
-* Strong emphasis on the separation of data and code. Hime forbids the inclusion of inline code in its grammar definitions in order to have very readable grammars that can be easily understood, debugged, improved. It is still possible to have custom code invoked during parsing with semantic actions.
+The generated parsers require a runtime, available for the following platforms:
 
-The generated parsers can be embedded in software that target:
+* [.Net framework](https://www.nuget.org/packages/Hime.Redist/)
+* [JVM](https://central.sonatype.com/artifact/fr.cenotelie.hime/hime-redist)
+* [Rust](https://crates.io/crates/hime_redist)
 
-* Native platforms (Windows, Linux, MacOS) with Rust.
-* The .Net platform:
-	* Any implementation of [.Net Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) 1.0, including the [.Net Framework](https://www.microsoft.com/net/download/framework) 4.5 and up (installed by default on Windows 8 and up), [.Net Core](https://www.microsoft.com/net/core) 1.0 and up, [Mono](http://www.mono-project.com/) 4.6 and up, etc.
-	* [.Net Framework](https://www.microsoft.com/net/download/framework) 2.0 and up (installed by default on Windows Vista and up); or compatible implementations such as [Mono](http://www.mono-project.com/).
-* The JVM, with a JRE 7 or later installed.
+## Parser generator
 
-**The parser generator (himecc) has native builds for Windows, MacOS and Linux.**
+The parser generator (himecc) has native builds for Windows, MacOS and Linux.
+* [Windows](https://cenotelie.s3.fr-par.scw.cloud/hime/stable/windows/himecc.exe)
+* [Linux](https://cenotelie.s3.fr-par.scw.cloud/hime/stable/linux-musl/himecc)
+* [MacOS](https://cenotelie.s3.fr-par.scw.cloud/hime/stable/macos/himecc)
 
-> **Note**: For the production of compiled parser assemblies in .Net, the .Net framework is required.
+Alternatively, himecc can be built and installed from sources with cargo :
 
-> **Note**: For the production of compiled parser assemblies in Java, Maven is required.
+```bash
+cargo install hime_compiler
+```
 
-> **Note**: For the production of compiled native assemblies with Rust, Cargo and the Rust toolchain is required.
-
-
-## Products ##
-
-* [.Net Runtime on NuGet](https://www.nuget.org/packages/Hime.Redist/)
-* [Java Runtime on Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22fr.cenotelie.hime%22)
-* [Rust Runtime on crates.io](https://crates.io/crates/hime_redist)
-* [Rust SDK on crates.io](https://crates.io/crates/hime_sdk)
-* [Hime compiler on crates.io](https://crates.io/crates/hime_compiler)
-* [Hime compiler builds for Windows, MacOS, Linux](https://github.com/cenotelie/hime/downloads/).
+See all download options in [the download page of the doc](https://cenotelie.fr/projects/hime/download).
 
 ## How do I use this software? ##
 
@@ -41,15 +43,25 @@ The generated parsers can be embedded in software that target:
 * [Grammar library](https://github.com/cenotelie/hime-grams)
 
 
+## License
+
+All software is available under the terms of the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
 ## Repository structure ##
 
-* Software components
+* Runtime implementations
 	* `runtime-net`: .Net implementation of the runtime.
 	* `runtime-java`: Java implementation of the runtime.
 	* `runtime-rust`: Rust implementation of the runtime.
+* SDK
 	* `sdk-rust`: Rust implementation of the SDK for parser generation.
+	* `sdk-debugger`: CLI tool to inspect and debug generated binary automata.
+	* `sdk-unicode-gen`: CLI tool to generate the code to be put in `sdk-rust` related to unicode blocks and categories.
+* Final tools
 	* `himecc`: Rust implementation of the parser generator CLI.
 	* `parseit`: Rust implementation of the tool for parsing bits of texts using a previously generated parser assembly.
+	* `langserv`: Language server for the Hime grammar language.
+* Tests
 	* `tests-driver`: Sources of the tests driver for all runtime tests.
 	* `tests-executor-net`: Sources of the test executor for the .Net runtime implementation.
 	* `tests-executor-java`: Sources of the test executor for the Java runtime implementation.
@@ -67,15 +79,7 @@ To build the code and execute all tests, run
 $ sh build.sh
 ```
 
-This requires:
-
-* A local installation of [Mono](http://www.mono-project.com/) 4.4, or up (preferably 5.2)
-* A local installation of [.Net Core SDK](https://www.microsoft.com/net/download/core) 2.0, or up
-* Java 7 and Maven 3.3, or up
-* Rustc 1.22.1 and Cargo 0.23.0, or up
-
-During the build, a common set of tests are executed on all runtime implementations.
-The results are output in the JUnit format in `TestResults.xml` at the repository's root.
+Note that the development environment is fully dockerized and executing this command requires docker and will pull the required docker image if not locally available.
 
 
 ## How can I contribute? ##

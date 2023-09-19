@@ -7,7 +7,7 @@ homepage = "https://cenotelie.fr/projects/hime"
 repository = "https://github.com/cenotelie/hime"
 keywords = ["hime", "parser", "generator", "lr", "glr", "rnglr"]
 categories = ["algorithms", "parsing", "parser-implementations", "text-processing"]
-license = "LGPL-3.0"
+license = "Apache-2.0"
 edition = "2021"
 
 [dependencies]

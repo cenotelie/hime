@@ -33,5 +33,4 @@ The [isse tracker](https://github.com/cenotelie/hime/issues) contains tickets th
 
 ## License ##
 
-This software is licenced under the Lesser General Public License (LGPL) v3.
-Refers to the `LICENSE.txt` file at the root of the repository for the full text, or to [the online version](http://www.gnu.org/licenses/lgpl-3.0.html).
+This software is available under the terms of the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).

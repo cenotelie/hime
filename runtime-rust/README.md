@@ -20,7 +20,7 @@ Generated lexer and parser codes will import this crate and provide a simple API
 
 ## Support for `no_std`
 
-As of version `4.3.0`, this crate support `no_std` contexts.
+As of version `4.3.0`, this crate supports `no_std` contexts.
 This crate has an `std` feature which is activated by default for retro-compatibility but can deactivated as follow:
 
 ```toml
@@ -45,5 +45,4 @@ The [isse tracker](https://github.com/cenotelie/hime/issues) contains tickets th
 
 ## License ##
 
-This software is licenced under the Lesser General Public License (LGPL) v3.
-Refers to the `LICENSE.txt` file at the root of the repository for the full text, or to [the online version](http://www.gnu.org/licenses/lgpl-3.0.html).
+This software is available under the terms of the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
