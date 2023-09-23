@@ -68,7 +68,7 @@ pub fn write(
     writeln!(writer)?;
 
     if !std {
-        writeln!(writer, "use alloc::String;")?;
+        writeln!(writer, "use alloc::string::String;")?;
     }
 
     writeln!(writer, "use hime_redist::ast::AstNode;")?;
