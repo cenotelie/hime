@@ -101,7 +101,7 @@ pub fn write(
     )?;
     writeln!(
         writer,
-        "const LEXER_AUTOMATON: &[u8] = include_bytes!(\"{}\");",
+        "static LEXER_AUTOMATON: &[u8] = include_bytes!(\"{}\");",
         &bin_name
     )?;
     writeln!(writer)?;

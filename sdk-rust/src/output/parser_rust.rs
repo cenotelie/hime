@@ -62,7 +62,7 @@ pub fn write(
     )?;
     writeln!(
         writer,
-        "const PARSER_AUTOMATON: &[u8] = include_bytes!(\"{bin_name}\");"
+        "static PARSER_AUTOMATON: &[u8] = include_bytes!(\"{bin_name}\");"
     )?;
     writeln!(writer)?;
 
