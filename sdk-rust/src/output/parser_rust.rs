@@ -76,7 +76,8 @@ pub fn write(
         output_assembly,
         nmespace,
         automaton_type,
-        parser_type
+        parser_type,
+        std
     )?;
     write_code_visitor(&mut writer, grammar, expected)?;
     Ok(())
@@ -217,7 +218,8 @@ fn write_code_constructors(
     output_assembly: bool,
     nmespace: &str,
     automaton_type: &str,
-    parser_type: &str
+    parser_type: &str,
+    std: bool
 ) -> Result<(), Error> {
     if grammar.actions.is_empty() {
         writeln!(writer, "/// Parses the specified string with this parser")?;
