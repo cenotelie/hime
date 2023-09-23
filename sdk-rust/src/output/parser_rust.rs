@@ -250,25 +250,28 @@ fn write_code_constructors(
         writeln!(writer, "    parse_text(text)")?;
         writeln!(writer, "}}")?;
         writeln!(writer)?;
-        writeln!(
-            writer,
-            "/// Parses the specified stream of UTF-8 with this parser"
-        )?;
-        if output_assembly {
-            writeln!(writer, "#[no_mangle]")?;
-            writeln!(writer, "#[export_name = \"{nmespace}_parse_utf8_stream\"]")?;
+
+        if std {
+            writeln!(
+                writer,
+                "/// Parses the specified stream of UTF-8 with this parser"
+            )?;
+            if output_assembly {
+                writeln!(writer, "#[no_mangle]")?;
+                writeln!(writer, "#[export_name = \"{nmespace}_parse_utf8_stream\"]")?;
+            }
+            writeln!(
+                writer,
+                "pub fn parse_utf8_stream(input: &mut dyn std::io::Read) -> ParseResult<'static, 'static, 'static> {{"
+            )?;
+            writeln!(
+                writer,
+                "    let text = Text::from_utf8_stream(input).unwrap();"
+            )?;
+            writeln!(writer, "    parse_text(text)")?;
+            writeln!(writer, "}}")?;
+            writeln!(writer)?;
         }
-        writeln!(
-            writer,
-            "pub fn parse_utf8_stream(input: &mut dyn std::io::Read) -> ParseResult<'static, 'static, 'static> {{"
-        )?;
-        writeln!(
-            writer,
-            "    let text = Text::from_utf8_stream(input).unwrap();"
-        )?;
-        writeln!(writer, "    parse_text(text)")?;
-        writeln!(writer, "}}")?;
-        writeln!(writer)?;
         writeln!(writer, "/// Parses the specified text with this parser")?;
         writeln!(
             writer,
