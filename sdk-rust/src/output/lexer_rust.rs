@@ -179,7 +179,7 @@ pub fn write(
     writeln!(writer, ") -> Lexer<'a, 'b, 'c> {{")?;
     writeln!(
         writer,
-        "    let automaton = Automaton::new(LEXER_AUTOMATON);"
+        "    let automaton = Automaton::new(LEXER_AUTOMATON.as_ref());"
     )?;
     writeln!(
         writer,

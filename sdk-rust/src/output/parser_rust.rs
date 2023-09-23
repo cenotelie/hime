@@ -442,7 +442,7 @@ fn write_code_constructors(
     writeln!(writer, "        let mut lexer = new_lexer(data.0, data.1);")?;
     writeln!(
         writer,
-        "        let automaton = {automaton_type}::new(PARSER_AUTOMATON);"
+        "        let automaton = {automaton_type}::new(PARSER_AUTOMATON.as_ref());"
     )?;
     writeln!(
         writer,
