@@ -462,7 +462,9 @@ pub struct CompilationTask<'a> {
     /// The parsing method use
     pub method: Option<ParsingMethod>,
     /// Java-only, the path to the local maven repository to use
-    pub java_maven_repository: Option<String>
+    pub java_maven_repository: Option<String>,
+    /// Rust-only, indicates whether standard library exclusive feautres are enabled
+    pub std: Option<bool>
 }
 
 impl<'a> CompilationTask<'a> {

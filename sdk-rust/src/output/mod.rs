@@ -183,7 +183,8 @@ pub fn output_grammar_artifacts(
                 &data.expected,
                 data.method,
                 &nmspace,
-                mode.output_assembly()
+                mode.output_assembly(),
+                task.std.unwrap_or(true)
             ) {
                 return Err(vec![error]);
             }

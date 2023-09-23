@@ -35,7 +35,8 @@ pub fn write(
     expected: &TerminalSet,
     method: ParsingMethod,
     nmespace: &str,
-    output_assembly: bool
+    output_assembly: bool,
+    std: bool
 ) -> Result<(), Error> {
     let mut final_path = PathBuf::new();
     if let Some(path) = path {
@@ -257,7 +258,7 @@ fn write_code_constructors(
         }
         writeln!(
             writer,
-            "pub fn parse_utf8_stream(input: &mut dyn Read) -> ParseResult<'static, 'static, 'static> {{"
+            "pub fn parse_utf8_stream(input: &mut dyn std::io::Read) -> ParseResult<'static, 'static, 'static> {{"
         )?;
         writeln!(
             writer,
@@ -347,50 +348,54 @@ fn write_code_constructors(
         writeln!(writer, "    parse_text(text, actions)")?;
         writeln!(writer, "}}")?;
         writeln!(writer)?;
-        writeln!(
-            writer,
-            "/// Parses the specified stream of UTF-8 with this parser"
-        )?;
-        writeln!(writer, "///")?;
-        writeln!(writer, "/// # Errors")?;
-        writeln!(writer, "///")?;
-        writeln!(
-            writer,
-            "/// Return an `std::io::Error` when reading the stream as UTF-8 fails"
-        )?;
-        if output_assembly {
-            writeln!(writer, "#[no_mangle]")?;
-            writeln!(writer, "#[export_name = \"{nmespace}_parse_utf8_stream\"]")?;
-        }
-        writeln!(
-            writer,
-            "pub fn parse_utf8_stream(input: &mut dyn Read) -> Result<ParseResult<'static, 'static, 'static>, std::io::Error> {{"
-        )?;
-        writeln!(
-            writer,
-            "    let text = Text::from_utf8_stream(input).unwrap();"
-        )?;
-        writeln!(writer, "    parse_text(text, &mut NoActions {{}})")?;
-        writeln!(writer, "}}")?;
-        writeln!(writer)?;
-        if output_assembly {
-            writeln!(writer, "#[no_mangle]")?;
+
+        if std {
             writeln!(
                 writer,
-                "#[export_name = \"{nmespace}_parse_utf8_stream_with\"]"
+                "/// Parses the specified stream of UTF-8 with this parser"
             )?;
+            writeln!(writer, "///")?;
+            writeln!(writer, "/// # Errors")?;
+            writeln!(writer, "///")?;
+            writeln!(
+                writer,
+                "/// Return an `std::io::Error` when reading the stream as UTF-8 fails"
+            )?;
+            if output_assembly {
+                writeln!(writer, "#[no_mangle]")?;
+                writeln!(writer, "#[export_name = \"{nmespace}_parse_utf8_stream\"]")?;
+            }
+            writeln!(
+                writer,
+                "pub fn parse_utf8_stream(input: &mut dyn std::io::Read) -> Result<ParseResult<'static, 'static, 'static>, std::io::Error> {{"
+            )?;
+            writeln!(
+                writer,
+                "    let text = Text::from_utf8_stream(input).unwrap();"
+            )?;
+            writeln!(writer, "    parse_text(text, &mut NoActions {{}})")?;
+            writeln!(writer, "}}")?;
+            writeln!(writer)?;
+            if output_assembly {
+                writeln!(writer, "#[no_mangle]")?;
+                writeln!(
+                    writer,
+                    "#[export_name = \"{nmespace}_parse_utf8_stream_with\"]"
+                )?;
+            }
+            writeln!(
+                writer,
+                "pub fn parse_utf8_stream_with(input: &mut dyn std::io::Read, actions: &mut dyn Actions) -> ParseResult<'static, 'static, 'static> {{"
+            )?;
+            writeln!(
+                writer,
+                "    let text = Text::from_utf8_stream(input).unwrap();"
+            )?;
+            writeln!(writer, "    parse_text(text, actions)")?;
+            writeln!(writer, "}}")?;
+            writeln!(writer)?;
         }
-        writeln!(
-            writer,
-            "pub fn parse_utf8_stream_with(input: &mut dyn Read, actions: &mut dyn Actions) -> ParseResult<'static, 'static, 'static> {{"
-        )?;
-        writeln!(
-            writer,
-            "    let text = Text::from_utf8_stream(input).unwrap();"
-        )?;
-        writeln!(writer, "    parse_text(text, actions)")?;
-        writeln!(writer, "}}")?;
-        writeln!(writer)?;
+
         writeln!(writer, "/// Parses the specified text with this parser")?;
         writeln!(
             writer,
