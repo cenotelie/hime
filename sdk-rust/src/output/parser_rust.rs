@@ -404,7 +404,7 @@ fn write_code_constructors(
         writeln!(writer, "/// Parses the specified text with this parser")?;
         writeln!(
             writer,
-            "fn parse_text(text: Text, actions: &mut dyn Actions) -> ParseResult<'static, '_, 'static> {{"
+            "fn parse_text<'t>(text: Text<'t>, actions: &mut dyn Actions) -> ParseResult<'static, 't, 'static> {{"
         )?;
         writeln!(
             writer,
