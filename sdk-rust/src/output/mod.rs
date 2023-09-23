@@ -166,13 +166,15 @@ pub fn output_grammar_artifacts(
             }
         }
         Runtime::Rust => {
+            let std = task.std.unwrap_or(true);
             if let Err(error) = lexer_rust::write(
                 output_path.as_ref(),
                 format!("{}.rs", helper::to_snake_case(&grammar.name)),
                 grammar,
                 &data.expected,
                 data.separator,
-                data.method.is_rnglr()
+                data.method.is_rnglr(),
+                std
             ) {
                 return Err(vec![error]);
             }
@@ -184,7 +186,7 @@ pub fn output_grammar_artifacts(
                 data.method,
                 &nmspace,
                 mode.output_assembly(),
-                task.std.unwrap_or(true)
+                std
             ) {
                 return Err(vec![error]);
             }
