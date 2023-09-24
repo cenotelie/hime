@@ -64,7 +64,7 @@ pub fn write(
     if compress {
         writeln!(
             writer,
-            "include_flate::flate!(static PARSER_AUTOMATON: [u8] from \"{bin_name}\");"
+            "include_flate::flate!(static PARSER_AUTOMATON: [u8] from \"{bin_name}\" on "OUT_DIR");"
         )?;
     } else {
         writeln!(

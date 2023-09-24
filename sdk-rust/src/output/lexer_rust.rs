@@ -103,7 +103,7 @@ pub fn write(
     if compress {
         writeln!(
             writer,
-            "include_flate::flate!(static LEXER_AUTOMATON: [u8] from \"{}\");",
+            "include_flate::flate!(static LEXER_AUTOMATON: [u8] from \"{}\" on "OUT_DIR");",
             &bin_name
         )?;
     } else {
