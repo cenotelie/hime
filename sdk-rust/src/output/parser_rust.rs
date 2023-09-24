@@ -36,7 +36,8 @@ pub fn write(
     method: ParsingMethod,
     nmespace: &str,
     output_assembly: bool,
-    std: bool
+    std: bool,
+    compress: bool
 ) -> Result<(), Error> {
     let mut final_path = PathBuf::new();
     if let Some(path) = path {
@@ -60,10 +61,17 @@ pub fn write(
         writer,
         "/// Static resource for the serialized parser automaton"
     )?;
-    writeln!(
-        writer,
-        "static PARSER_AUTOMATON: &[u8] = include_bytes!(\"{bin_name}\");"
-    )?;
+    if compress {
+        writeln!(
+            writer,
+            "include_flate::flate!(static PARSER_AUTOMATON: [u8] from \"{bin_name}\");"
+        )?;
+    } else {
+        writeln!(
+            writer,
+            "static PARSER_AUTOMATON: &[u8] = include_bytes!(\"{bin_name}\");"
+        )?;
+    }
     writeln!(writer)?;
 
     write_code_symbols(&mut writer, grammar)?;

@@ -37,7 +37,8 @@ pub fn write(
     separator: Option<TerminalRef>,
     is_rnglr: bool,
     std: bool,
-    embed: bool
+    embed: bool,
+    compress: bool
 ) -> Result<(), Error> {
     let mut final_path = PathBuf::new();
     if let Some(path) = path {
@@ -99,11 +100,19 @@ pub fn write(
         writer,
         "/// Static resource for the serialized lexer automaton"
     )?;
-    writeln!(
-        writer,
-        "static LEXER_AUTOMATON: &[u8] = include_bytes!(\"{}\");",
-        &bin_name
-    )?;
+    if compress {
+        writeln!(
+            writer,
+            "include_flate::flate!(static LEXER_AUTOMATON: [u8] from \"{}\");",
+            &bin_name
+        )?;
+    } else {
+        writeln!(
+            writer,
+            "static LEXER_AUTOMATON: &[u8] = include_bytes!(\"{}\");",
+            &bin_name
+        )?;
+    }
     writeln!(writer)?;
 
     for terminal_ref in expected.content.iter().skip(2) {

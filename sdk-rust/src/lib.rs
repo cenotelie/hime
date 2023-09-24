@@ -466,7 +466,9 @@ pub struct CompilationTask<'a> {
     /// Rust-only, indicates whether standard library exclusive feautres are enabled
     pub std: Option<bool>,
     /// Rust-only, indicates if the file is embeddable (blocked by https://github.com/rust-lang/rust/issues/66920)
-    pub embed: Option<bool>
+    pub embed: Option<bool>,
+    /// Rust-only, add transparent compression for state automaton file
+    pub compress: Option<bool>
 }
 
 impl<'a> CompilationTask<'a> {
