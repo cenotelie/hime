@@ -270,13 +270,10 @@ fn write_code_constructors(
             }
             writeln!(
                 writer,
-                "pub fn parse_utf8_stream(input: &mut dyn std::io::Read) -> ParseResult<'static, 'static, 'static> {{"
+                "pub fn parse_utf8_stream(input: &mut dyn std::io::Read) -> Result<ParseResult<'static, 'static, 'static>, std::io:Error> {{"
             )?;
-            writeln!(
-                writer,
-                "    let text = Text::from_utf8_stream(input).unwrap();"
-            )?;
-            writeln!(writer, "    parse_text(text)")?;
+            writeln!(writer, "    let text = Text::from_utf8_stream(input)?;")?;
+            writeln!(writer, "    Ok(parse_text(text))")?;
             writeln!(writer, "}}")?;
             writeln!(writer)?;
         }
@@ -382,11 +379,8 @@ fn write_code_constructors(
                 writer,
                 "pub fn parse_utf8_stream(input: &mut dyn std::io::Read) -> Result<ParseResult<'static, 'static, 'static>, std::io::Error> {{"
             )?;
-            writeln!(
-                writer,
-                "    let text = Text::from_utf8_stream(input).unwrap();"
-            )?;
-            writeln!(writer, "    parse_text(text, &mut NoActions {{}})")?;
+            writeln!(writer, "    let text = Text::from_utf8_stream(input)?;")?;
+            writeln!(writer, "    Ok(parse_text(text, &mut NoActions {{}}))")?;
             writeln!(writer, "}}")?;
             writeln!(writer)?;
             if output_assembly {
