@@ -166,9 +166,9 @@ pub fn output_grammar_artifacts(
             }
         }
         Runtime::Rust => {
-            let std = task.std.unwrap_or(true);
-            let embed = task.embed.unwrap_or(false);
-            let compress = task.compress.unwrap_or(std);
+            let with_std = task.rust_std.unwrap_or(true);
+            let embed = task.rust_embed.unwrap_or(false);
+            let compress_automata = task.rust_compress_automata.unwrap_or(with_std);
             if let Err(error) = lexer_rust::write(
                 output_path.as_ref(),
                 format!("{}.rs", helper::to_snake_case(&grammar.name)),
@@ -176,9 +176,9 @@ pub fn output_grammar_artifacts(
                 &data.expected,
                 data.separator,
                 data.method.is_rnglr(),
-                std,
+                with_std,
                 embed,
-                compress
+                compress_automata
             ) {
                 return Err(vec![error]);
             }
@@ -190,8 +190,8 @@ pub fn output_grammar_artifacts(
                 data.method,
                 &nmspace,
                 mode.output_assembly(),
-                std,
-                compress
+                with_std,
+                compress_automata
             ) {
                 return Err(vec![error]);
             }

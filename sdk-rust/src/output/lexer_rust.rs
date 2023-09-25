@@ -36,9 +36,9 @@ pub fn write(
     expected: &TerminalSet,
     separator: Option<TerminalRef>,
     is_rnglr: bool,
-    std: bool,
+    with_std: bool,
     embed: bool,
-    compress: bool
+    compress_automata: bool
 ) -> Result<(), Error> {
     let mut final_path = PathBuf::new();
     if let Some(path) = path {
@@ -71,7 +71,7 @@ pub fn write(
         writeln!(writer)?;
     }
 
-    if !std {
+    if !with_std {
         writeln!(writer, "use alloc::string::String;")?;
     }
 
@@ -100,7 +100,7 @@ pub fn write(
         writer,
         "/// Static resource for the serialized lexer automaton"
     )?;
-    if compress {
+    if compress_automata {
         writeln!(
             writer,
             r#"include_flate::flate!(static LEXER_AUTOMATON: [u8] from "{}" on "OUT_DIR");"#,

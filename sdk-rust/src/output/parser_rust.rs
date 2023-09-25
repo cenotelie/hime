@@ -36,8 +36,8 @@ pub fn write(
     method: ParsingMethod,
     nmespace: &str,
     output_assembly: bool,
-    std: bool,
-    compress: bool
+    with_std: bool,
+    compress_automata: bool
 ) -> Result<(), Error> {
     let mut final_path = PathBuf::new();
     if let Some(path) = path {
@@ -61,7 +61,7 @@ pub fn write(
         writer,
         "/// Static resource for the serialized parser automaton"
     )?;
-    if compress {
+    if compress_automata {
         writeln!(
             writer,
             r#"include_flate::flate!(static PARSER_AUTOMATON: [u8] from "{bin_name}" on "OUT_DIR");"#
@@ -85,7 +85,7 @@ pub fn write(
         nmespace,
         automaton_type,
         parser_type,
-        std
+        with_std
     )?;
     write_code_visitor(&mut writer, grammar, expected)?;
     Ok(())
@@ -227,7 +227,7 @@ fn write_code_constructors(
     nmespace: &str,
     automaton_type: &str,
     parser_type: &str,
-    std: bool
+    with_std: bool
 ) -> Result<(), Error> {
     if grammar.actions.is_empty() {
         writeln!(writer, "/// Parses the specified string with this parser")?;
@@ -259,7 +259,7 @@ fn write_code_constructors(
         writeln!(writer, "}}")?;
         writeln!(writer)?;
 
-        if std {
+        if with_std {
             writeln!(
                 writer,
                 "/// Parses the specified stream of UTF-8 with this parser"
@@ -362,7 +362,7 @@ fn write_code_constructors(
         writeln!(writer, "}}")?;
         writeln!(writer)?;
 
-        if std {
+        if with_std {
             writeln!(
                 writer,
                 "/// Parses the specified stream of UTF-8 with this parser"

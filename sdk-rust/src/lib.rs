@@ -463,12 +463,12 @@ pub struct CompilationTask<'a> {
     pub method: Option<ParsingMethod>,
     /// Java-only, the path to the local maven repository to use
     pub java_maven_repository: Option<String>,
-    /// Rust-only, indicates whether standard library exclusive feautres are enabled
-    pub std: Option<bool>,
+    /// Rust-only, indicates whether standard library exclusive features are enabled
+    pub rust_std: Option<bool>,
     /// Rust-only, indicates if the file is embeddable (blocked by https://github.com/rust-lang/rust/issues/66920)
-    pub embed: Option<bool>,
+    pub rust_embed: Option<bool>,
     /// Rust-only, add transparent compression for state automaton file
-    pub compress: Option<bool>
+    pub rust_compress_automata: Option<bool>
 }
 
 impl<'a> CompilationTask<'a> {

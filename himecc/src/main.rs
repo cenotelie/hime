@@ -126,6 +126,27 @@ pub fn main() -> miette::Result<()> {
                 ])
         )
         .arg(
+            Arg::new("rust_no_std")
+                .long("--no-std")
+                .help("Rust-only, activates the support for no-std in the generated code")
+                .takes_value(false)
+                .required(false)
+        )
+        .arg(
+            Arg::new("rust_embed")
+                .long("--embed")
+                .help("Rust-only, indicates if the generated code is embeddable (blocked by https://github.com/rust-lang/rust/issues/66920)")
+                .takes_value(false)
+                .required(false)
+        )
+        .arg(
+            Arg::new("rust_compress_automata")
+                .long("--compress")
+                .help("Rust-only, add transparent compression for automata file")
+                .takes_value(false)
+                .required(false)
+        )
+        .arg(
             Arg::new("grammar_name")
                 .value_name("GRAMMAR")
                 .short('g')
@@ -184,6 +205,15 @@ pub fn main() -> miette::Result<()> {
         Some("rnglr1") => task.method = Some(ParsingMethod::RNGLR1),
         Some("rnglalr1") => task.method = Some(ParsingMethod::RNGLALR1),
         _ => {}
+    }
+    if matches.is_present("rust_no_std") {
+        task.rust_std = Some(false);
+    }
+    if matches.is_present("rust_embed") {
+        task.rust_embed = Some(true);
+    }
+    if matches.is_present("rust_compress_automata") {
+        task.rust_compress_automata = Some(true);
     }
     task.grammar_name = matches
         .value_of("grammar_name")
