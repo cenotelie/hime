@@ -27,7 +27,7 @@ use alloc::vec::Vec;
 /// from the specified index to accomodate the size of a `u16` value
 #[must_use]
 pub fn read_u16(buffer: &[u8], index: usize) -> u16 {
-    const SIZE: usize = std::mem::size_of::<u16>();
+    const SIZE: usize = core::mem::size_of::<u16>();
     let bytes: &[u8; SIZE] = buffer[index..(index + SIZE)]
         .try_into()
         .expect("given buffer cannot contain u16 value");
@@ -42,7 +42,7 @@ pub fn read_u16(buffer: &[u8], index: usize) -> u16 {
 /// from the specified index to accomodate the size of a `u32` value
 #[must_use]
 pub fn read_u32(buffer: &[u8], index: usize) -> u32 {
-    const SIZE: usize = std::mem::size_of::<u32>();
+    const SIZE: usize = core::mem::size_of::<u32>();
     let bytes: &[u8; SIZE] = buffer[index..(index + SIZE)]
         .try_into()
         .expect("given buffer cannot contain u32 value");
