@@ -26,7 +26,6 @@ use crate::symbols::{SemanticElementTrait, Symbol};
 use crate::text::{TextContext, TextPosition, TextSpan};
 use crate::tokens::{Token, TokenRepository};
 use crate::utils::biglist::BigList;
-use crate::utils::EitherMut;
 
 /// Represents a type of symbol table
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -53,7 +52,7 @@ impl From<usize> for TableType {
 }
 
 /// Represents a compact reference to an element in a table
-#[derive(Debug, Default, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Hash)]
 pub struct TableElemRef {
     /// The backend data
     data: usize
@@ -131,6 +130,25 @@ impl AstImpl {
     pub fn has_root(&self) -> bool {
         self.root.is_some()
     }
+
+    /// Stores the root of this tree
+    pub fn store_root(&mut self, node: AstCell) {
+        self.root = Some(self.nodes.push(node));
+    }
+
+    /// Stores some children nodes in this AST
+    #[must_use]
+    pub fn store(&mut self, nodes: &[AstCell], index: usize, count: usize) -> usize {
+        if count == 0 {
+            0
+        } else {
+            let result = self.nodes.push(nodes[index]);
+            for i in 1..count {
+                self.nodes.push(nodes[index + i]);
+            }
+            result
+        }
+    }
 }
 
 /// Represents a simple AST with a tree structure
@@ -138,13 +156,13 @@ impl AstImpl {
 /// The linkage is represented by each node storing its number of children and the index of its first child.
 pub struct Ast<'s, 't, 'a> {
     /// The table of tokens
-    tokens: Option<TokenRepository<'s, 't, 'a>>,
+    tokens: TokenRepository<'s, 't, 'a>,
     /// The table of variables
-    pub variables: &'a [Symbol<'s>],
+    variables: &'a [Symbol<'s>],
     /// The table of virtuals
-    pub virtuals: &'a [Symbol<'s>],
+    virtuals: &'a [Symbol<'s>],
     /// The data of the implementation
-    data: EitherMut<'a, AstImpl>
+    data: &'a AstImpl
 }
 
 impl<'s, 't, 'a> Ast<'s, 't, 'a> {
@@ -157,33 +175,16 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
         data: &'a AstImpl
     ) -> Ast<'s, 't, 'a> {
         Ast {
-            tokens: Some(tokens),
+            tokens,
             variables,
             virtuals,
-            data: EitherMut::Immutable(data)
-        }
-    }
-
-    /// Creates a new AST proxy structure
-    pub fn new_mut(
-        variables: &'a [Symbol<'s>],
-        virtuals: &'a [Symbol<'s>],
-        data: &'a mut AstImpl
-    ) -> Ast<'s, 't, 'a> {
-        Ast {
-            tokens: None,
-            variables,
-            virtuals,
-            data: EitherMut::Mutable(data)
+            data
         }
     }
 
     /// Gets the i-th token in the associated repository
     fn get_token(&'a self, index: usize) -> Token<'s, 't, 'a> {
-        self.tokens
-            .as_ref()
-            .expect("Missing token repository")
-            .get_token(index)
+        self.tokens.get_token(index)
     }
 
     /// Gets whether a root has been defined for this AST
@@ -237,7 +238,6 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     #[must_use]
     pub fn find_node_at_index(&self, index: usize) -> Option<AstNode> {
         self.tokens
-            .as_ref()?
             .find_token_at(index)
             .and_then(|token| self.find_node_for(&token))
     }
@@ -246,9 +246,8 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     /// a token label that contains the specified index in the input text
     #[must_use]
     pub fn find_node_at_position(&self, position: TextPosition) -> Option<AstNode> {
-        let tokens = self.tokens.as_ref()?;
-        let index = tokens.text.get_line_index(position.line) + position.column - 1;
-        tokens
+        let index = self.tokens.text.get_line_index(position.line) + position.column - 1;
+        self.tokens
             .find_token_at(index)
             .and_then(|token| self.find_node_for(&token))
     }
@@ -317,7 +316,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
             for i in (0..cell.count).rev() {
                 stack.push((cell.first + i) as usize);
             }
-            action(&self.data, current);
+            action(self.data, current);
         }
     }
 
@@ -345,24 +344,6 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
             }
             _ => None
         }
-    }
-
-    /// Stores some children nodes in this AST
-    pub fn store(&mut self, nodes: &[AstCell], index: usize, count: usize) -> usize {
-        if count == 0 {
-            0
-        } else {
-            let result = self.data.nodes.push(nodes[index]);
-            for i in 1..count {
-                self.data.nodes.push(nodes[index + i]);
-            }
-            result
-        }
-    }
-
-    /// Stores the root of this tree
-    pub fn store_root(&mut self, node: AstCell) {
-        self.data.root = Some(self.data.nodes.push(node));
     }
 }
 
@@ -439,12 +420,12 @@ impl<'s, 't, 'a> AstNode<'s, 't, 'a> {
 impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for AstNode<'s, 't, 'a> {
     /// Gets the position in the input text of this element
     fn get_position(&self) -> Option<TextPosition> {
-        self.tree.get_position_at(&self.tree.data, self.index)
+        self.tree.get_position_at(self.tree.data, self.index)
     }
 
     /// Gets the span in the input text of this element
     fn get_span(&self) -> Option<TextSpan> {
-        self.tree.get_span_at(&self.tree.data, self.index)
+        self.tree.get_span_at(self.tree.data, self.index)
     }
 
     /// Gets the context of this element in the input
@@ -470,10 +451,8 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for AstNode<'s, 't, 'a> {
             TableType::Variable => self.tree.variables[cell.label.index()],
             TableType::Virtual => self.tree.virtuals[cell.label.index()],
             TableType::None => {
-                match &self.tree.tokens {
-                    None => panic!("Missing token repository"),
-                    Some(repository) => repository.terminals[0] // terminal epsilon
-                }
+                // terminal epsilon
+                self.tree.tokens.terminals[0]
             }
         }
     }
@@ -531,12 +510,9 @@ impl<'s, 't, 'a> Display for AstNode<'s, 't, 'a> {
                 let symbol = self.tree.virtuals[cell.label.index()];
                 write!(f, "{}", symbol.name)
             }
-            TableType::None => match &self.tree.tokens {
-                None => panic!("Missing token repository"),
-                Some(repository) => {
-                    let symbol = repository.terminals[0];
-                    write!(f, "{}", symbol.name)
-                }
+            TableType::None => {
+                let symbol = self.tree.tokens.terminals[0];
+                write!(f, "{}", symbol.name)
             }
         }
     }
@@ -572,7 +548,7 @@ pub struct AstFamilyIterator<'s, 't, 'a> {
     tree: &'a Ast<'s, 't, 'a>,
     /// The index of the current child in the parse tree
     current: usize,
-    /// the index of the last child (excluded) in the parse tree
+    /// The index of the last child (excluded) in the parse tree
     end: usize
 }
 

@@ -698,12 +698,19 @@ fn parse_text_with<'s, 't, 'a>(
     virtuals: &'a [Symbol<'s>]
 ) -> ParseResult<'s, 't, 'a> {
     let mut my_actions = |_index: usize, _head: Symbol, _body: &dyn SemanticBody| ();
-    let mut result = ParseResult::new(terminals, variables, virtuals, text);
+    let mut result = ParseResult::new_with_ast(terminals, variables, virtuals, text);
     {
-        let data = result.get_parsing_data();
+        let data = result.get_parsing_data_ast();
         let mut lexer = new_lexer(data.0, data.1);
         let automaton = LRkAutomaton::new(PARSER_AUTOMATON);
-        let mut parser = LRkParser::new(&mut lexer, automaton, data.2, &mut my_actions);
+        let mut parser = LRkParser::new(
+            &mut lexer,
+            variables,
+            virtuals,
+            automaton,
+            data.2,
+            &mut my_actions
+        );
         parser.parse();
     }
     result

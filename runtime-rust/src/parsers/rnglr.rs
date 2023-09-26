@@ -29,11 +29,13 @@ use super::{
     LR_OP_CODE_BASE_SEMANTIC_ACTION, TREE_ACTION_DROP, TREE_ACTION_PROMOTE,
     TREE_ACTION_REPLACE_BY_CHILDREN, TREE_ACTION_REPLACE_BY_EPSILON
 };
-use crate::ast::{Ast, AstCell, TableElemRef, TableType};
+use crate::ast::{AstCell, AstImpl, TableElemRef, TableType};
 use crate::errors::ParseErrorUnexpectedToken;
 use crate::lexers::{Lexer, TokenKernel, DEFAULT_CONTEXT};
+use crate::sppf::{SppfImpl, SppfImplNode, SppfImplNodeNormal, SppfImplNodeRef, SppfImplNodeTrait};
 use crate::symbols::{SemanticBody, SemanticElement, SemanticElementTrait, SID_EPSILON};
 use crate::utils::biglist::BigList;
+use crate::utils::OwnOrMut;
 
 /// Represents a cell in a RNGLR parse table
 #[derive(Copy, Clone)]
@@ -489,274 +491,11 @@ impl GSS {
     }
 }
 
-/// Represents a reference to a Shared-Packed Parse Forest node in a specific version
-#[derive(Copy, Clone)]
-struct SPPFNodeRef {
-    /// The identifier of the node
-    node_id: u32,
-    /// The version to refer to
-    version: u32
-}
-
-/// Represents a version of a node in a Shared-Packed Parse Forest
-#[derive(Clone)]
-struct SPPFNodeVersion {
-    /// The label of the node for this version
-    label: TableElemRef,
-    /// The children of the node for this version
-    children: Option<Vec<SPPFNodeRef>>
-}
-
-impl SPPFNodeVersion {
-    /// Initializes this node version without children
-    pub fn new(label: TableElemRef) -> SPPFNodeVersion {
-        SPPFNodeVersion {
-            label,
-            children: None
-        }
-    }
-
-    /// Initializes this node version
-    pub fn from(label: TableElemRef, buffer: &[SPPFNodeRef], count: usize) -> SPPFNodeVersion {
-        if count == 0 {
-            SPPFNodeVersion {
-                label,
-                children: None
-            }
-        } else {
-            let mut children = Vec::with_capacity(count);
-            for x in buffer.iter().take(count) {
-                children.push(*x);
-            }
-            SPPFNodeVersion {
-                label,
-                children: Some(children)
-            }
-        }
-    }
-
-    /// Gets the number of children
-    pub fn len(&self) -> usize {
-        match &self.children {
-            None => 0,
-            Some(children) => children.len()
-        }
-    }
-}
-
-/// Represents the interface for a node in a Shared-Packed Parse Forest
-trait SPPFNodeTrait {
-    /// Gets the original symbol for this node
-    fn get_original_symbol(&self) -> TableElemRef;
-}
-
-/// Represents a node in a Shared-Packed Parse Forest
-/// A node can have multiple versions
-#[derive(Clone)]
-struct SPPFNodeNormal {
-    /// The original label of this node
-    original: TableElemRef,
-    /// The different versions of this node
-    versions: Vec<SPPFNodeVersion>
-}
-
-impl SPPFNodeTrait for SPPFNodeNormal {
-    fn get_original_symbol(&self) -> TableElemRef {
-        self.original
-    }
-}
-
-impl SPPFNodeNormal {
-    /// Initializes this node
-    pub fn new(label: TableElemRef) -> SPPFNodeNormal {
-        SPPFNodeNormal {
-            original: label,
-            versions: alloc::vec![SPPFNodeVersion::new(label)]
-        }
-    }
-
-    /// Initializes this node
-    pub fn new_with_children(
-        original: TableElemRef,
-        label: TableElemRef,
-        buffer: &[SPPFNodeRef],
-        count: usize
-    ) -> SPPFNodeNormal {
-        SPPFNodeNormal {
-            original,
-            versions: alloc::vec![SPPFNodeVersion::from(label, buffer, count)]
-        }
-    }
-
-    /// Adds a new version to this node
-    pub fn new_version(
-        &mut self,
-        label: TableElemRef,
-        buffer: &[SPPFNodeRef],
-        count: usize
-    ) -> usize {
-        let result = self.versions.len();
-        self.versions
-            .push(SPPFNodeVersion::from(label, buffer, count));
-        result
-    }
-}
-
-/// Represents a node in a Shared-Packed Parse Forest that can be replaced by its children
-#[derive(Clone)]
-struct SPPFNodeReplaceable {
-    /// The original label of this node
-    original: TableElemRef,
-    /// The children of this node
-    children: Option<Vec<SPPFNodeRef>>,
-    /// The tree actions on the children of this node
-    actions: Option<Vec<TreeAction>>
-}
-
-impl SPPFNodeTrait for SPPFNodeReplaceable {
-    fn get_original_symbol(&self) -> TableElemRef {
-        self.original
-    }
-}
-
-impl SPPFNodeReplaceable {
-    /// Initializes this node
-    pub fn new(
-        label: TableElemRef,
-        children_buffer: &[SPPFNodeRef],
-        actions_buffer: &[TreeAction],
-        count: usize
-    ) -> SPPFNodeReplaceable {
-        if count == 0 {
-            SPPFNodeReplaceable {
-                original: label,
-                children: None,
-                actions: None
-            }
-        } else {
-            let mut children = Vec::with_capacity(count);
-            let mut actions = Vec::with_capacity(count);
-            for i in 0..count {
-                children.push(children_buffer[i]);
-                actions.push(actions_buffer[i]);
-            }
-            SPPFNodeReplaceable {
-                original: label,
-                children: Some(children),
-                actions: Some(actions)
-            }
-        }
-    }
-}
-
-/// Represents a node in a Shared-Packed Parse Forest
-#[derive(Clone)]
-enum SPPFNode {
-    /// A normal node
-    Normal(SPPFNodeNormal),
-    /// A replaceable node
-    Replaceable(SPPFNodeReplaceable)
-}
-
-impl SPPFNodeTrait for SPPFNode {
-    fn get_original_symbol(&self) -> TableElemRef {
-        match self {
-            SPPFNode::Normal(node) => node.original,
-            SPPFNode::Replaceable(node) => node.original
-        }
-    }
-}
-
-impl SPPFNode {
-    /// Gets this node as a normal node
-    pub fn as_normal(&self) -> &SPPFNodeNormal {
-        match self {
-            SPPFNode::Normal(node) => node,
-            SPPFNode::Replaceable(_node) => panic!("Expected a normal node")
-        }
-    }
-
-    /// Gets this node as a normal node
-    pub fn as_normal_mut(&mut self) -> &mut SPPFNodeNormal {
-        match self {
-            SPPFNode::Normal(node) => node,
-            SPPFNode::Replaceable(_node) => panic!("Expected a normal node")
-        }
-    }
-}
-
 /// Represents the epsilon node
 const EPSILON: GSSLabel = GSSLabel {
     sppf_node: 0xFFFF_FFFF,
     symbol_id: SID_EPSILON
 };
-
-/// Represents a Shared-Packed Parse Forest
-#[allow(clippy::upper_case_acronyms)]
-struct SPPF {
-    /// The nodes in the SPPF
-    nodes: Vec<SPPFNode>
-}
-
-impl SPPF {
-    /// Initializes this SPPF
-    pub fn new() -> SPPF {
-        SPPF { nodes: Vec::new() }
-    }
-
-    /// Gets the SPPF node for the specified identifier
-    pub fn get_node(&self, identifier: usize) -> &SPPFNode {
-        &self.nodes[identifier]
-    }
-
-    /// Gets the SPPF node for the specified identifier
-    pub fn get_node_mut(&mut self, identifier: usize) -> &mut SPPFNode {
-        &mut self.nodes[identifier]
-    }
-
-    /// Creates a new single node in the SPPF
-    pub fn new_normal_node(&mut self, label: TableElemRef) -> usize {
-        let identifier = self.nodes.len();
-        self.nodes
-            .push(SPPFNode::Normal(SPPFNodeNormal::new(label)));
-        identifier
-    }
-
-    /// Creates a new single node in the SPPF
-    pub fn new_normal_node_with_children(
-        &mut self,
-        original: TableElemRef,
-        label: TableElemRef,
-        buffer: &[SPPFNodeRef],
-        count: usize
-    ) -> usize {
-        let identifier = self.nodes.len();
-        self.nodes
-            .push(SPPFNode::Normal(SPPFNodeNormal::new_with_children(
-                original, label, buffer, count
-            )));
-        identifier
-    }
-
-    /// Creates a new replaceable node in the SPPF
-    pub fn new_replaceable_node(
-        &mut self,
-        label: TableElemRef,
-        children_buffer: &[SPPFNodeRef],
-        actions_buffer: &[TreeAction],
-        count: usize
-    ) -> usize {
-        let identifier = self.nodes.len();
-        self.nodes
-            .push(SPPFNode::Replaceable(SPPFNodeReplaceable::new(
-                label,
-                children_buffer,
-                actions_buffer,
-                count
-            )));
-        identifier
-    }
-}
 
 /// Represents a generation of GSS edges in the current history
 /// The history is used to quickly find pre-existing matching GSS edges
@@ -770,7 +509,7 @@ struct HistoryPart {
 /// The data about a reduction for a SPPF
 struct SPPFReduction {
     /// The adjacency cache for the reduction
-    cache: Vec<SPPFNodeRef>,
+    cache: Vec<SppfImplNodeRef>,
     /// The reduction handle represented as the indices of the sub-trees in the cache
     handle_indices: Vec<usize>,
     /// The actions for the reduction
@@ -788,14 +527,18 @@ struct SPPFReduction {
 struct SPPFBuilder<'s, 't, 'a, 'l> {
     /// Lexer associated to this parser
     lexer: &'l mut Lexer<'s, 't, 'a>,
+    /// The table of variables
+    variables: &'a [Symbol<'s>],
+    /// The table of virtuals
+    virtuals: &'a [Symbol<'s>],
     /// The history
     history: Vec<HistoryPart>,
-    /// The SPPF being built
-    sppf: SPPF,
+    /// The SPPF front to build the SPPF
+    sppf: OwnOrMut<'a, SppfImpl>,
     /// The data of the current reduction
     reduction: Option<SPPFReduction>,
-    /// The AST being built
-    result: Ast<'s, 't, 'a>
+    /// The AST being built, if any
+    ast: Option<&'a mut AstImpl>
 }
 
 impl<'s, 't, 'a, 'l> SemanticBody for SPPFBuilder<'s, 't, 'a, 'l> {
@@ -808,8 +551,8 @@ impl<'s, 't, 'a, 'l> SemanticBody for SPPFBuilder<'s, 't, 'a, 'l> {
             TableType::Token => {
                 SemanticElement::Token(self.lexer.get_data().repository.get_token(label.index()))
             }
-            TableType::Variable => SemanticElement::Variable(self.result.variables[label.index()]),
-            TableType::Virtual => SemanticElement::Virtual(self.result.virtuals[label.index()]),
+            TableType::Variable => SemanticElement::Variable(self.variables[label.index()]),
+            TableType::Virtual => SemanticElement::Virtual(self.virtuals[label.index()]),
             TableType::None => {
                 SemanticElement::Terminal(self.lexer.get_data().repository.terminals[0])
             }
@@ -823,17 +566,39 @@ impl<'s, 't, 'a, 'l> SemanticBody for SPPFBuilder<'s, 't, 'a, 'l> {
 }
 
 impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
-    /// Initializes the builder with the given stack size
-    pub fn new(
+    /// Initializes the builder targeting an AST
+    pub fn new_ast(
         lexer: &'l mut Lexer<'s, 't, 'a>,
-        result: Ast<'s, 't, 'a>
+        variables: &'a [Symbol<'s>],
+        virtuals: &'a [Symbol<'s>],
+        ast: &'a mut AstImpl
     ) -> SPPFBuilder<'s, 't, 'a, 'l> {
         SPPFBuilder {
             lexer,
+            variables,
+            virtuals,
             history: Vec::new(),
-            sppf: SPPF::new(),
+            sppf: OwnOrMut::Owned(SppfImpl::default()),
             reduction: None,
-            result
+            ast: Some(ast)
+        }
+    }
+
+    /// Initializes the builder targeting an SPPF
+    pub fn new_sppf(
+        lexer: &'l mut Lexer<'s, 't, 'a>,
+        variables: &'a [Symbol<'s>],
+        virtuals: &'a [Symbol<'s>],
+        sppf: &'a mut SppfImpl
+    ) -> SPPFBuilder<'s, 't, 'a, 'l> {
+        SPPFBuilder {
+            lexer,
+            variables,
+            virtuals,
+            history: Vec::new(),
+            sppf: OwnOrMut::MutRef(sppf),
+            reduction: None,
+            ast: None
         }
     }
 
@@ -902,7 +667,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     /// Adds the specified GSS label to the reduction cache with the given tree action
     fn reduction_add_to_cache(
         reduction: &mut SPPFReduction,
-        sppf: &SPPF,
+        sppf: &SppfImpl,
         sppf_node: usize,
         action: TreeAction
     ) {
@@ -911,11 +676,11 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         }
         let node = sppf.get_node(sppf_node);
         match node {
-            SPPFNode::Normal(normal) => {
+            SppfImplNode::Normal(normal) => {
                 // this is a simple reference to an existing SPPF node
                 SPPFBuilder::reduction_add_to_cache_node(reduction, normal, sppf_node, action);
             }
-            SPPFNode::Replaceable(replaceable) => {
+            SppfImplNode::Replaceable(replaceable) => {
                 // this is replaceable sub-tree
                 match &replaceable.children {
                     None => {}
@@ -938,12 +703,12 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     /// Adds the specified GSS label to the reduction cache with the given tree action
     fn reduction_add_to_cache_node(
         reduction: &mut SPPFReduction,
-        node: &SPPFNodeNormal,
+        node: &SppfImplNodeNormal,
         node_id: usize,
         action: TreeAction
     ) {
         // add the node in the cache
-        reduction.cache.push(SPPFNodeRef {
+        reduction.cache.push(SppfImplNodeRef {
             node_id: node_id as u32,
             version: 0
         });
@@ -951,13 +716,8 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         reduction.handle_indices.push(reduction.cache.len() - 1);
         reduction.handle_actions.push(action);
         // copy the children
-        match &node.versions[0].children {
-            None => {}
-            Some(children) => {
-                for child in children {
-                    reduction.cache.push(*child);
-                }
-            }
+        for child in &node.versions[0].children {
+            reduction.cache.push(child);
         }
     }
 
@@ -980,7 +740,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         let node_id = self
             .sppf
             .new_normal_node(TableElemRef::new(TableType::Virtual, index));
-        reduction.cache.push(SPPFNodeRef {
+        reduction.cache.push(SppfImplNodeRef {
             node_id: node_id as u32,
             version: 0
         });
@@ -1013,7 +773,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     /// Executes the reduction as a normal reduction
     pub fn reduce_normal(&mut self, variable_index: usize, head_action: TreeAction) -> usize {
         let reduction = self.reduction.as_mut().expect("Not in a reduction");
-        let mut promoted: Option<(TableElemRef, SPPFNodeRef)> = None;
+        let mut promoted: Option<(TableElemRef, SppfImplNodeRef)> = None;
         let mut insertion = 0;
 
         for i in 0..reduction.handle_indices.len() {
@@ -1024,7 +784,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
                         // not the first promotion
                         // create a new version for the promoted node
                         let old_promoted_node = self.sppf.get_node_mut(node_ref.node_id as usize);
-                        let old_promoted_ref = SPPFNodeRef {
+                        let old_promoted_ref = SppfImplNodeRef {
                             node_id: node_ref.node_id,
                             version: old_promoted_node.as_normal_mut().new_version(
                                 symbol,
@@ -1098,40 +858,45 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
 
     /// Finalizes the parse tree
     pub fn commit_root(&mut self, root: usize) {
-        let sppf = &self.sppf;
-        let result = &mut self.result;
-        let cell_root = SPPFBuilder::build_final_ast(
-            sppf,
-            SPPFNodeRef {
-                node_id: root as u32,
-                version: 0
-            },
-            result
-        );
-        result.store_root(cell_root);
+        self.sppf.store_root(root);
+        if let Some(ast) = self.ast.as_mut() {
+            let sppf = &self.sppf;
+            let cell_root = SPPFBuilder::build_final_ast(
+                sppf,
+                SppfImplNodeRef {
+                    node_id: root as u32,
+                    version: 0
+                },
+                ast
+            );
+            ast.store_root(cell_root);
+        }
     }
 
     /// Builds thSe final AST for the specified PPF node reference
-    fn build_final_ast(sppf: &SPPF, reference: SPPFNodeRef, result: &mut Ast) -> AstCell {
+    fn build_final_ast(
+        sppf: &SppfImpl,
+        reference: SppfImplNodeRef,
+        result: &mut AstImpl
+    ) -> AstCell {
         let node = sppf.get_node(reference.node_id as usize).as_normal();
         let version = &node.versions[reference.version as usize];
-        match &version.children {
-            None => AstCell {
+        if version.children.is_empty() {
+            AstCell {
                 label: version.label,
                 first: 0,
                 count: 0
-            },
-            Some(children) => {
-                let mut buffer = Vec::with_capacity(children.len());
-                for child in children {
-                    buffer.push(SPPFBuilder::build_final_ast(sppf, *child, result));
-                }
-                let first = result.store(&buffer, 0, buffer.len());
-                AstCell {
-                    label: version.label,
-                    first: first as u32,
-                    count: children.len() as u32
-                }
+            }
+        } else {
+            let mut buffer = Vec::with_capacity(version.children.len());
+            for child in &version.children {
+                buffer.push(SPPFBuilder::build_final_ast(sppf, child, result));
+            }
+            let first = result.store(&buffer, 0, buffer.len());
+            AstCell {
+                label: version.label,
+                first: first as u32,
+                count: version.children.len() as u32
             }
         }
     }
@@ -1592,10 +1357,12 @@ pub struct RNGLRParser<'s, 't, 'a, 'l> {
 
 impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
     /// Initializes a new instance of the parser
-    pub fn new(
+    pub fn new_with_ast(
         lexer: &'l mut Lexer<'s, 't, 'a>,
+        variables: &'a [Symbol<'s>],
+        virtuals: &'a [Symbol<'s>],
         automaton: RNGLRAutomaton,
-        ast: Ast<'s, 't, 'a>,
+        ast: &'a mut AstImpl,
         actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
     ) -> RNGLRParser<'s, 't, 'a, 'l> {
         let mut parser = RNGLRParser {
@@ -1605,10 +1372,42 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                 next_token: None,
                 reductions: VecDeque::new(),
                 shifts: VecDeque::new(),
-                variables: ast.variables,
+                variables,
                 actions
             },
-            builder: SPPFBuilder::new(lexer, ast),
+            builder: SPPFBuilder::new_ast(lexer, variables, virtuals, ast),
+            nullables: Vec::new()
+        };
+        RNGLRParser::build_nullables(
+            &mut parser.builder,
+            &mut parser.data.actions,
+            &mut parser.nullables,
+            &parser.data.automaton,
+            parser.data.variables
+        );
+        parser
+    }
+
+    /// Initializes a new instance of the parser
+    pub fn new_with_sppf(
+        lexer: &'l mut Lexer<'s, 't, 'a>,
+        variables: &'a [Symbol<'s>],
+        virtuals: &'a [Symbol<'s>],
+        automaton: RNGLRAutomaton,
+        sppf: &'a mut SppfImpl,
+        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+    ) -> RNGLRParser<'s, 't, 'a, 'l> {
+        let mut parser = RNGLRParser {
+            data: RNGLRParserData {
+                automaton,
+                gss: GSS::new(),
+                next_token: None,
+                reductions: VecDeque::new(),
+                shifts: VecDeque::new(),
+                variables,
+                actions
+            },
+            builder: SPPFBuilder::new_sppf(lexer, variables, virtuals, sppf),
             nullables: Vec::new()
         };
         RNGLRParser::build_nullables(
@@ -1740,7 +1539,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
         first: GSSLabel,
         path: &GSSPath
     ) -> usize {
-        let variable = builder.result.variables[production.head];
+        let variable = builder.variables[production.head];
         builder.reduction_prepare(first, path, production.reduction_length);
         let mut i = 0;
         while i < production.bytecode.len() {

@@ -20,7 +20,7 @@
 use alloc::vec::Vec;
 
 use super::{TreeAction, TREE_ACTION_REPLACE_BY_CHILDREN};
-use crate::ast::{Ast, AstCell, TableElemRef};
+use crate::ast::{AstCell, AstImpl, TableElemRef};
 
 /// Represents a sub-tree in an AST
 /// A sub-tree is composed of a root with its children.
@@ -141,13 +141,13 @@ impl SubTree {
     /// Commits the children of a sub-tree in this buffer to the final ast
     /// If the index is 0, the root's children are committed, assuming this is a depth-1 sub-tree.
     /// If not, the children of the child at the given index are committed.
-    pub fn commit_children_of(&mut self, index: usize, ast: &mut Ast) {
+    pub fn commit_children_of(&mut self, index: usize, ast: &mut AstImpl) {
         self.nodes[index].first =
             ast.store(&self.nodes, index + 1, self.nodes[index].count as usize) as u32;
     }
 
     /// Commits this buffer to the final ast
-    pub fn commit(&mut self, ast: &mut Ast) {
+    pub fn commit(&mut self, ast: &mut AstImpl) {
         self.commit_children_of(0, ast);
         ast.store_root(self.nodes[0]);
     }

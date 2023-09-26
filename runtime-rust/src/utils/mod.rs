@@ -49,3 +49,32 @@ impl<'a, T: 'a> DerefMut for EitherMut<'a, T> {
         }
     }
 }
+
+/// Represents a resource that is either owned,
+/// or exclusively held with a a mutable reference
+pub enum OwnOrMut<'a, T> {
+    /// The resource is directly owned
+    Owned(T),
+    /// The resource is held through a mutable reference
+    MutRef(&'a mut T)
+}
+
+impl<'a, T> Deref for OwnOrMut<'a, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        match self {
+            OwnOrMut::Owned(data) => data,
+            OwnOrMut::MutRef(data) => data
+        }
+    }
+}
+
+impl<'a, T> DerefMut for OwnOrMut<'a, T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        match self {
+            OwnOrMut::Owned(data) => data,
+            OwnOrMut::MutRef(data) => data
+        }
+    }
+}

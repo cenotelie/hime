@@ -50,6 +50,7 @@ pub mod errors;
 pub mod lexers;
 pub mod parsers;
 pub mod result;
+pub mod sppf;
 pub mod symbols;
 pub mod text;
 pub mod tokens;

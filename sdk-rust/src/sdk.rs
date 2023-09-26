@@ -17,7 +17,7 @@
 
 //! Module for SDK utilities
 
-use hime_redist::ast::Ast;
+use hime_redist::ast::AstImpl;
 use hime_redist::errors::ParseErrors;
 use hime_redist::lexers::automaton::Automaton;
 use hime_redist::lexers::impls::{ContextFreeLexer, ContextSensitiveLexer};
@@ -65,10 +65,11 @@ impl<'s> InMemoryParser<'s> {
     #[must_use]
     pub fn parse<'a, 't>(&'a self, input: &'t str) -> ParseResult<'s, 't, 'a> {
         let text = Text::from_str(input);
-        let mut result = ParseResult::new(&self.terminals, &self.variables, &self.virtuals, text);
+        let mut result =
+            ParseResult::new_with_ast(&self.terminals, &self.variables, &self.virtuals, text);
         let mut my_actions = |_index: usize, _head: Symbol, _body: &dyn SemanticBody| ();
         {
-            let data = result.get_parsing_data();
+            let data = result.get_parsing_data_ast();
             let mut lexer = self.new_lexer(data.0, data.1);
             self.do_parse(&mut lexer, data.2, &mut my_actions);
         }
@@ -79,16 +80,26 @@ impl<'s> InMemoryParser<'s> {
     fn do_parse<'a, 't>(
         &'a self,
         lexer: &'a mut Lexer<'s, 't, 'a>,
-        ast: Ast<'s, 't, 'a>,
+        ast: &'a mut AstImpl,
         actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
     ) {
         let mut parser: Box<dyn Parser> = match &self.parser_automaton {
-            ParserAutomaton::Lrk(automaton) => {
-                Box::new(LRkParser::new(lexer, automaton.clone(), ast, actions))
-            }
-            ParserAutomaton::Rnglr(automaton) => {
-                Box::new(RNGLRParser::new(lexer, automaton.clone(), ast, actions))
-            }
+            ParserAutomaton::Lrk(automaton) => Box::new(LRkParser::new(
+                lexer,
+                &self.variables,
+                &self.virtuals,
+                automaton.clone(),
+                ast,
+                actions
+            )),
+            ParserAutomaton::Rnglr(automaton) => Box::new(RNGLRParser::new_with_ast(
+                lexer,
+                &self.variables,
+                &self.virtuals,
+                automaton.clone(),
+                ast,
+                actions
+            ))
         };
         parser.parse();
     }

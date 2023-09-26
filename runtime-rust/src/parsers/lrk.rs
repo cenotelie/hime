@@ -29,7 +29,7 @@ use super::{
     TREE_ACTION_NONE, TREE_ACTION_PROMOTE, TREE_ACTION_REPLACE_BY_CHILDREN,
     TREE_ACTION_REPLACE_BY_EPSILON
 };
-use crate::ast::{Ast, TableElemRef, TableType};
+use crate::ast::{AstImpl, TableElemRef, TableType};
 use crate::errors::ParseErrorUnexpectedToken;
 use crate::lexers::{Lexer, TokenKernel, DEFAULT_CONTEXT};
 use crate::symbols::{SemanticBody, SemanticElement, SemanticElementTrait};
@@ -175,10 +175,14 @@ impl LRkAstReduction {
 struct LRkAstBuilder<'s, 't, 'a> {
     /// Lexer associated to this parser
     lexer: &'a mut Lexer<'s, 't, 'a>,
+    /// The table of variables
+    variables: &'a [Symbol<'s>],
+    /// The table of virtuals
+    virtuals: &'a [Symbol<'s>],
     /// The stack of semantic objects
     stack: Vec<SubTree>,
     /// The AST being built
-    result: Ast<'s, 't, 'a>,
+    result: &'a mut AstImpl,
     /// The reduction handle represented as the indices of the sub-trees in the cache
     handle: Vec<usize>,
     /// The data of the current reduction
@@ -195,12 +199,8 @@ impl<'s, 't, 'a> SemanticBody for LRkAstBuilder<'s, 't, 'a> {
                     TableType::Token => SemanticElement::Token(
                         self.lexer.get_data().repository.get_token(label.index())
                     ),
-                    TableType::Variable => {
-                        SemanticElement::Variable(self.result.variables[label.index()])
-                    }
-                    TableType::Virtual => {
-                        SemanticElement::Virtual(self.result.virtuals[label.index()])
-                    }
+                    TableType::Variable => SemanticElement::Variable(self.variables[label.index()]),
+                    TableType::Virtual => SemanticElement::Virtual(self.virtuals[label.index()]),
                     TableType::None => {
                         SemanticElement::Terminal(self.lexer.get_data().repository.terminals[0])
                     }
@@ -218,10 +218,14 @@ impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
     /// Initializes the builder with the given stack size
     pub fn new(
         lexer: &'a mut Lexer<'s, 't, 'a>,
-        result: Ast<'s, 't, 'a>
+        variables: &'a [Symbol<'s>],
+        virtuals: &'a [Symbol<'s>],
+        result: &'a mut AstImpl
     ) -> LRkAstBuilder<'s, 't, 'a> {
         LRkAstBuilder {
             lexer,
+            variables,
+            virtuals,
             stack: Vec::new(),
             result,
             handle: Vec::new(),
@@ -321,7 +325,7 @@ impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
                 if reduction.cache.get_action_at(0) == TREE_ACTION_REPLACE_BY_CHILDREN {
                     reduction.cache.set_children_count_at(0, self.handle.len());
                 } else {
-                    LRkAstBuilder::reduce_tree(reduction, &self.handle, &mut self.result);
+                    LRkAstBuilder::reduce_tree(reduction, &self.handle, self.result);
                 }
                 // Put it on the stack
                 self.stack.truncate(stack_size - reduction.length);
@@ -333,7 +337,7 @@ impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
     }
 
     /// Applies the promotion tree actions to the cache and commits to the final AST
-    pub fn reduce_tree(reduction: &mut LRkAstReduction, handle: &[usize], result: &mut Ast) {
+    pub fn reduce_tree(reduction: &mut LRkAstReduction, handle: &[usize], result: &mut AstImpl) {
         // apply the epsilon replace, if any
         if reduction.cache.get_action_at(0) == TREE_ACTION_REPLACE_BY_EPSILON {
             reduction
@@ -382,7 +386,7 @@ impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
         let length = self.stack.len();
         if length > 1 {
             let head = &mut self.stack[length - 2];
-            head.commit(&mut self.result);
+            head.commit(self.result);
         }
     }
 }
@@ -580,7 +584,7 @@ impl<'s, 't, 'a> LRkParserData<'s, 'a> {
             stack.truncate(length - production.reduction_length);
             let action = self.automaton.get_action(
                 stack[stack.len() - 1].state,
-                builder.result.variables[production.head].id
+                builder.variables[production.head].id
             );
             stack.push(LRkHead {
                 state: u32::from(action.get_data()),
@@ -595,7 +599,7 @@ impl<'s, 't, 'a> LRkParserData<'s, 'a> {
         builder: &mut LRkAstBuilder<'s, 't, 'a>,
         actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
     ) -> Symbol<'s> {
-        let variable = builder.result.variables[production.head];
+        let variable = builder.variables[production.head];
         builder.reduction_prepare(
             production.head,
             production.reduction_length,
@@ -638,8 +642,10 @@ impl<'s, 't, 'a> LRkParser<'s, 't, 'a> {
     /// Initializes a new instance of the parser
     pub fn new(
         lexer: &'a mut Lexer<'s, 't, 'a>,
+        variables: &'a [Symbol<'s>],
+        virtuals: &'a [Symbol<'s>],
         automaton: LRkAutomaton,
-        ast: Ast<'s, 't, 'a>,
+        ast: &'a mut AstImpl,
         actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
     ) -> LRkParser<'s, 't, 'a> {
         LRkParser {
@@ -649,10 +655,10 @@ impl<'s, 't, 'a> LRkParser<'s, 't, 'a> {
                     state: 0,
                     identifier: 0
                 }],
-                variables: ast.variables,
+                variables,
                 actions
             },
-            builder: LRkAstBuilder::<'s, 't, 'a>::new(lexer, ast)
+            builder: LRkAstBuilder::<'s, 't, 'a>::new(lexer, variables, virtuals, ast)
         }
     }
 
