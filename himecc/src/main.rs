@@ -128,21 +128,21 @@ pub fn main() -> miette::Result<()> {
         .arg(
             Arg::new("rust_no_std")
                 .long("--no-std")
-                .help("Rust-only, activates the support for no-std in the generated code")
+                .help("Rust-only, activates the support for no-std in the generated code (default to no support for no-std)")
                 .takes_value(false)
                 .required(false)
         )
         .arg(
-            Arg::new("rust_embed")
+            Arg::new("rust_suppress_module_doc")
                 .long("--embed")
-                .help("Rust-only, indicates if the generated code is embeddable (blocked by https://github.com/rust-lang/rust/issues/66920)")
+                .help("Rust-only,  indicates whether to suppress module documentation so that the generated code can be embedded (blocked by https://github.com/rust-lang/rust/issues/66920) (default to false)")
                 .takes_value(false)
                 .required(false)
         )
         .arg(
             Arg::new("rust_compress_automata")
                 .long("--compress")
-                .help("Rust-only, add transparent compression for automata file")
+                .help("Rust-only, indicates whether to compress automata binary files (default to false)")
                 .takes_value(false)
                 .required(false)
         )
@@ -207,10 +207,10 @@ pub fn main() -> miette::Result<()> {
         _ => {}
     }
     if matches.is_present("rust_no_std") {
-        task.rust_std = Some(false);
+        task.rust_use_std = Some(false);
     }
-    if matches.is_present("rust_embed") {
-        task.rust_embed = Some(true);
+    if matches.is_present("rust_suppress_module_doc") {
+        task.rust_suppress_module_doc = Some(true);
     }
     if matches.is_present("rust_compress_automata") {
         task.rust_compress_automata = Some(true);

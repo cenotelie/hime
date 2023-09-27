@@ -57,16 +57,16 @@ pub fn write(
     };
     let bin_name = get_parser_bin_name_rust(grammar);
 
-    writeln!(
-        writer,
-        "/// Static resource for the serialized parser automaton"
-    )?;
     if compress_automata {
         writeln!(
             writer,
-            r#"include_flate::flate!(static PARSER_AUTOMATON: [u8] from "{bin_name}" on "OUT_DIR");"#
+            r#"include_flate::flate!(static PARSER_AUTOMATON: [u8] from "{bin_name}");"#
         )?;
     } else {
+        writeln!(
+            writer,
+            "/// Static resource for the serialized parser automaton"
+        )?;
         writeln!(
             writer,
             "static PARSER_AUTOMATON: &[u8] = include_bytes!(\"{bin_name}\");"
@@ -85,7 +85,8 @@ pub fn write(
         nmespace,
         automaton_type,
         parser_type,
-        with_std
+        with_std,
+        compress_automata
     )?;
     write_code_visitor(&mut writer, grammar, expected)?;
     Ok(())
@@ -227,7 +228,8 @@ fn write_code_constructors(
     nmespace: &str,
     automaton_type: &str,
     parser_type: &str,
-    with_std: bool
+    with_std: bool,
+    compress_automata: bool
 ) -> Result<(), Error> {
     if grammar.actions.is_empty() {
         writeln!(writer, "/// Parses the specified string with this parser")?;
@@ -444,7 +446,8 @@ fn write_code_constructors(
     writeln!(writer, "        let mut lexer = new_lexer(data.0, data.1);")?;
     writeln!(
         writer,
-        "        let automaton = {automaton_type}::new(PARSER_AUTOMATON.as_ref());"
+        "        let automaton = {automaton_type}::new(PARSER_AUTOMATON{});",
+        if compress_automata { ".as_ref()" } else { "" }
     )?;
     writeln!(
         writer,

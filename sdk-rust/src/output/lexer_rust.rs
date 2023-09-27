@@ -37,7 +37,7 @@ pub fn write(
     separator: Option<TerminalRef>,
     is_rnglr: bool,
     with_std: bool,
-    embed: bool,
+    suppress_module_doc: bool,
     compress_automata: bool
 ) -> Result<(), Error> {
     let mut final_path = PathBuf::new();
@@ -60,7 +60,7 @@ pub fn write(
         Some(terminal_ref) => terminal_ref.sid()
     };
 
-    if !embed {
+    if !suppress_module_doc {
         writeln!(
             writer,
             "//! Module for the lexer and parser for `{}`",
@@ -96,21 +96,19 @@ pub fn write(
     writeln!(writer, "use hime_redist::tokens::TokenRepository;")?;
     writeln!(writer)?;
 
-    writeln!(
-        writer,
-        "/// Static resource for the serialized lexer automaton"
-    )?;
     if compress_automata {
         writeln!(
             writer,
-            r#"include_flate::flate!(static LEXER_AUTOMATON: [u8] from "{}" on "OUT_DIR");"#,
-            &bin_name
+            r#"include_flate::flate!(static LEXER_AUTOMATON: [u8] from "{bin_name}");"#
         )?;
     } else {
         writeln!(
             writer,
-            "static LEXER_AUTOMATON: &[u8] = include_bytes!(\"{}\");",
-            &bin_name
+            "/// Static resource for the serialized lexer automaton"
+        )?;
+        writeln!(
+            writer,
+            "static LEXER_AUTOMATON: &[u8] = include_bytes!(\"{bin_name}\");"
         )?;
     }
     writeln!(writer)?;
@@ -188,7 +186,8 @@ pub fn write(
     writeln!(writer, ") -> Lexer<'a, 'b, 'c> {{")?;
     writeln!(
         writer,
-        "    let automaton = Automaton::new(LEXER_AUTOMATON.as_ref());"
+        "    let automaton = Automaton::new(LEXER_AUTOMATON{});",
+        if compress_automata { ".as_ref()" } else { "" }
     )?;
     writeln!(
         writer,

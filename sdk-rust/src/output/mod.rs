@@ -166,9 +166,9 @@ pub fn output_grammar_artifacts(
             }
         }
         Runtime::Rust => {
-            let with_std = task.rust_std.unwrap_or(true);
-            let embed = task.rust_embed.unwrap_or(false);
-            let compress_automata = task.rust_compress_automata.unwrap_or(with_std);
+            let with_std = task.get_rust_use_std();
+            let suppress_module_doc = task.get_rust_suppress_module_doc();
+            let compress_automata = task.get_rust_compress_automata();
             if let Err(error) = lexer_rust::write(
                 output_path.as_ref(),
                 format!("{}.rs", helper::to_snake_case(&grammar.name)),
@@ -177,7 +177,7 @@ pub fn output_grammar_artifacts(
                 data.separator,
                 data.method.is_rnglr(),
                 with_std,
-                embed,
+                suppress_module_doc,
                 compress_automata
             ) {
                 return Err(vec![error]);
