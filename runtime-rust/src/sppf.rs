@@ -298,7 +298,7 @@ impl SppfImplNodeVersions {
     }
 
     /// Gets whether there is no version
-    /// Always return `false
+    /// Always return `false`
     #[must_use]
     pub fn is_empty(&self) -> bool {
         false
@@ -736,7 +736,7 @@ impl<'s, 't, 'a> SppfNodeVersions<'s, 't, 'a> {
     }
 
     /// Gets whether there is no version
-    /// Always return `false
+    /// Always return `false`
     #[must_use]
     pub fn is_empty(&self) -> bool {
         false
@@ -757,7 +757,6 @@ impl<'s, 't, 'a> IntoIterator for SppfNodeVersions<'s, 't, 'a> {
     }
 }
 
-#[derive(Copy, Clone)]
 pub struct SppfNodeVersionsIterator<'s, 't, 'a> {
     /// The parent SPPF
     sppf: &'a Sppf<'s, 't, 'a>,

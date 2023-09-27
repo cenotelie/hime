@@ -465,7 +465,8 @@ pub struct CompilationTask<'a> {
     pub java_maven_repository: Option<String>,
     /// Rust-only, indicates whether standard library exclusive features are enabled
     pub rust_use_std: Option<bool>,
-    /// Rust-only, indicates whether to suppress module documentation so that the generated code can be embedded (blocked by https://github.com/rust-lang/rust/issues/66920)
+    /// Rust-only, indicates whether to suppress module documentation so that the generated code can be embedded
+    /// blocked by [https://github.com/rust-lang/rust/issues/66920](https://github.com/rust-lang/rust/issues/66920)
     pub rust_suppress_module_doc: Option<bool>,
     /// Rust-only, indicates whether to compress automata binary files
     pub rust_compress_automata: Option<bool>
@@ -588,16 +589,20 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Rust-only, gets whether standard library exclusive features are enabled
+    #[must_use]
     pub fn get_rust_use_std(&self) -> bool {
         self.rust_use_std.unwrap_or(true)
     }
 
-    /// Rust-only, gets whether to suppress module documentation so that the generated code can be embedded (blocked by https://github.com/rust-lang/rust/issues/66920)
+    /// Rust-only, gets whether to suppress module documentation so that the generated code can be embedded
+    /// (blocked by [https://github.com/rust-lang/rust/issues/66920](https://github.com/rust-lang/rust/issues/66920))
+    #[must_use]
     pub fn get_rust_suppress_module_doc(&self) -> bool {
         self.rust_suppress_module_doc.unwrap_or(false)
     }
 
     /// Rust-only, gets whether to compress automata binary files
+    #[must_use]
     pub fn get_rust_compress_automata(&self) -> bool {
         self.rust_compress_automata.unwrap_or(false)
     }

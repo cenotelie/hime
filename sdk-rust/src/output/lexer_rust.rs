@@ -28,7 +28,11 @@ use crate::output::helper::{to_upper_camel_case, to_upper_case};
 use crate::CRATE_VERSION;
 
 /// Generates code for the specified file
-#[allow(clippy::too_many_lines)]
+#[allow(
+    clippy::too_many_lines,
+    clippy::too_many_arguments,
+    clippy::fn_params_excessive_bools
+)]
 pub fn write(
     path: Option<&String>,
     file_name: String,

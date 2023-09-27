@@ -28,6 +28,7 @@ use crate::output::helper::{to_snake_case, to_upper_case};
 use crate::ParsingMethod;
 
 /// Generates code for the specified file
+#[allow(clippy::too_many_arguments)]
 pub fn write(
     path: Option<&String>,
     file_name: String,
@@ -220,7 +221,7 @@ fn write_code_actions(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
 }
 
 /// Generates the code for the constructors
-#[allow(clippy::too_many_lines)]
+#[allow(clippy::too_many_lines, clippy::too_many_arguments)]
 fn write_code_constructors(
     writer: &mut dyn Write,
     grammar: &Grammar,
