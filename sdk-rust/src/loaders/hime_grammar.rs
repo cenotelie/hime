@@ -4,14 +4,14 @@
 
 use std::io::Read;
 
-use hime_redist::ast::AstNode;
+use hime_redist::ast::{AstImpl, AstNode};
 use hime_redist::errors::ParseErrors;
 use hime_redist::lexers::automaton::Automaton;
 use hime_redist::lexers::impls::ContextFreeLexer;
 use hime_redist::lexers::Lexer;
 use hime_redist::parsers::lrk::{LRkAutomaton, LRkParser};
 use hime_redist::parsers::Parser;
-use hime_redist::result::ParseResult;
+use hime_redist::result::{ParseResult, ParseResultAst};
 use hime_redist::symbols::{SemanticBody, SemanticElementTrait, Symbol};
 use hime_redist::text::Text;
 use hime_redist::tokens::TokenRepository;
@@ -547,14 +547,14 @@ pub const VIRTUALS: &[Symbol] = &[
 
 /// Parses the specified string with this parser
 #[must_use]
-pub fn parse_str(input: &str) -> ParseResult<'static, '_, 'static> {
+pub fn parse_str(input: &str) -> ParseResult<'static, '_, 'static, AstImpl> {
     let text = Text::from_str(input);
     parse_text(text)
 }
 
 /// Parses the specified string with this parser
 #[must_use]
-pub fn parse_string(input: String) -> ParseResult<'static, 'static, 'static> {
+pub fn parse_string(input: String) -> ParseResultAst {
     let text = Text::from_string(input);
     parse_text(text)
 }
@@ -564,15 +564,13 @@ pub fn parse_string(input: String) -> ParseResult<'static, 'static, 'static> {
 /// # Errors
 ///
 /// Return an `std::io::Error` when reading the stream as UTF-8 fails
-pub fn parse_utf8_stream(
-    input: &mut dyn Read
-) -> Result<ParseResult<'static, 'static, 'static>, std::io::Error> {
+pub fn parse_utf8_stream(input: &mut dyn Read) -> Result<ParseResultAst, std::io::Error> {
     let text = Text::from_utf8_stream(input)?;
     Ok(parse_text(text))
 }
 
 /// Parses the specified text with this parser
-fn parse_text(text: Text) -> ParseResult<'static, '_, 'static> {
+fn parse_text(text: Text) -> ParseResult<'static, '_, 'static, AstImpl> {
     parse_text_with(text, TERMINALS, VARIABLES, VIRTUALS)
 }
 
@@ -582,11 +580,11 @@ fn parse_text_with<'s, 't, 'a>(
     terminals: &'a [Symbol<'s>],
     variables: &'a [Symbol<'s>],
     virtuals: &'a [Symbol<'s>]
-) -> ParseResult<'s, 't, 'a> {
+) -> ParseResult<'s, 't, 'a, AstImpl> {
     let mut my_actions = |_index: usize, _head: Symbol, _body: &dyn SemanticBody| ();
-    let mut result = ParseResult::new_with_ast(terminals, variables, virtuals, text);
+    let mut result = ParseResult::<AstImpl>::new(terminals, variables, virtuals, text);
     {
-        let data = result.get_parsing_data_ast();
+        let data = result.get_parsing_data();
         let mut lexer = new_lexer(data.0, data.1);
         let automaton = LRkAutomaton::new(PARSER_AUTOMATON);
         let mut parser = LRkParser::new(
@@ -668,7 +666,7 @@ pub trait Visitor {
 }
 
 /// Walk the AST of a result using a visitor
-pub fn visit(result: &ParseResult, visitor: &dyn Visitor) {
+pub fn visit(result: &ParseResult<AstImpl>, visitor: &dyn Visitor) {
     let ast = result.get_ast();
     let root = ast.get_root();
     visit_ast_node(root, visitor);

@@ -22,14 +22,14 @@ pub mod hime_grammar;
 use std::borrow::Cow;
 use std::io::{self, Read};
 
-use hime_redist::ast::{Ast, AstNode};
+use hime_redist::ast::{Ast, AstImpl, AstNode};
 use hime_redist::errors::ParseErrorDataTrait;
 use hime_redist::lexers::DEFAULT_CONTEXT;
 use hime_redist::parsers::{
     TREE_ACTION_DROP, TREE_ACTION_NONE, TREE_ACTION_PROMOTE, TREE_ACTION_REPLACE_BY_CHILDREN,
     TREE_ACTION_REPLACE_BY_EPSILON
 };
-use hime_redist::result::ParseResult;
+use hime_redist::result::{ParseResult, ParseResultAst};
 use hime_redist::symbols::SemanticElementTrait;
 
 use crate::errors::{Error, Errors};
@@ -68,7 +68,7 @@ pub fn open_all<'t>(inputs: &[Input<'t>]) -> Result<Vec<LoadInput<'t>>, Errors<'
 /// Build the loaded data structure
 fn build_loaded_data<'t>(
     names: Vec<String>,
-    parse_results: Vec<ParseResult<'_, 't, '_>>,
+    parse_results: Vec<ParseResult<'_, 't, '_, AstImpl>>,
     grammars: Vec<Grammar>
 ) -> LoadedData<'t> {
     LoadedData {
@@ -104,7 +104,7 @@ pub fn load(inputs: Vec<LoadInput>) -> Result<LoadedData, Errors> {
     // extract grammar roots
     let asts: Vec<Ast> = results
         .iter()
-        .map(hime_redist::result::ParseResult::get_ast)
+        .map(hime_redist::result::ParseResult::<AstImpl>::get_ast)
         .collect();
     let doc_roots: Vec<AstNode> = asts.iter().map(hime_redist::ast::Ast::get_root).collect();
     let roots: Vec<(usize, AstNode)> = doc_roots
@@ -191,10 +191,7 @@ fn resolve_inheritance<'s, 't, 'a>(
 fn parse_input_stream<'a>(
     content: Box<dyn Read + 'a>,
     input_index: usize
-) -> Result<
-    ParseResult<'static, 'a, 'static>,
-    (Option<ParseResult<'static, 'a, 'static>>, Vec<Error>)
-> {
+) -> Result<ParseResultAst, (Option<ParseResultAst>, Vec<Error>)> {
     let mut reader = io::BufReader::new(content);
     let result =
         hime_grammar::parse_utf8_stream(&mut reader).map_err(|e| (None, vec![Error::Io(e)]))?;
@@ -222,7 +219,7 @@ fn parse_input_stream<'a>(
 }
 
 /// Parses all inputs
-fn parse_inputs(inputs: Vec<LoadInput>) -> Result<(Vec<String>, Vec<ParseResult>), Errors> {
+fn parse_inputs(inputs: Vec<LoadInput>) -> Result<(Vec<String>, Vec<ParseResultAst>), Errors> {
     let mut names = Vec::new();
     let mut results = Vec::new();
     let mut has_errors = false;

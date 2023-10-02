@@ -25,7 +25,7 @@ use std::{env, fs, io, path, process};
 
 use hime_redist::ast::AstNode;
 use hime_redist::errors::ParseErrorDataTrait;
-use hime_redist::result::ParseResult;
+use hime_redist::result::ParseResultAst;
 use hime_redist::symbols::SemanticElementTrait;
 
 /// The name of this program
@@ -95,7 +95,7 @@ fn get_parser_library_name(my_path: &path::Path) -> path::PathBuf {
 }
 
 /// Gets the serialized expected AST
-fn get_expected_ast(my_path: &path::Path) -> ParseResult<'static, 'static, 'static> {
+fn get_expected_ast(my_path: &path::Path) -> ParseResultAst {
     let file = my_path.join("expected.txt");
     let file_input = fs::File::open(file).unwrap();
     let mut input_reader = io::BufReader::new(file_input);
@@ -117,7 +117,7 @@ fn get_parsed_input(
     my_path: &path::Path,
     library: &libloading::Library,
     parser_name: &str
-) -> ParseResult<'static, 'static, 'static> {
+) -> ParseResultAst {
     let mut function_name = String::new();
     function_name.push_str(parser_name);
     function_name.push_str("_parse_utf8_stream");
@@ -125,9 +125,8 @@ fn get_parsed_input(
     let file_input = fs::File::open(file).unwrap();
     let mut input_reader = io::BufReader::new(file_input);
     unsafe {
-        let parser: libloading::Symbol<
-            fn(&mut dyn io::Read) -> ParseResult<'static, 'static, 'static>
-        > = library.get(function_name.as_bytes()).unwrap();
+        let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResultAst> =
+            library.get(function_name.as_bytes()).unwrap();
         parser(&mut input_reader)
     }
 }

@@ -20,7 +20,7 @@
 use std::{env, io};
 
 use clap::{Arg, Command};
-use hime_redist::result::ParseResult;
+use hime_redist::result::ParseResultAst;
 
 /// The name of this program
 pub const CRATE_NAME: &str = env!("CARGO_PKG_NAME");
@@ -66,7 +66,7 @@ fn do_parse(input: &mut dyn io::Read, lib_name: &str, parser_module: &str) {
     function_name.push_str("_parse_utf8");
     unsafe {
         let library = libloading::Library::new(lib_name).unwrap();
-        let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResult> =
+        let parser: libloading::Symbol<fn(&mut dyn io::Read) -> ParseResultAst> =
             library.get(function_name.as_bytes()).unwrap();
         let result = parser(input);
         serde_json::to_writer(std::io::stdout(), &result).unwrap();

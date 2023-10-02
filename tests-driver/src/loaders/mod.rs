@@ -26,8 +26,9 @@ pub use fixture::{
     ID_VARIABLE_TEST_FAILS, ID_VARIABLE_TEST_MATCHES, ID_VARIABLE_TEST_NO_MATCH,
     ID_VARIABLE_TEST_OUTPUT
 };
+use hime_redist::ast::AstImpl;
 use hime_redist::errors::ParseErrorDataTrait;
-use hime_redist::result::ParseResult;
+use hime_redist::result::{ParseResult, ParseResultAst};
 use hime_sdk::errors::{Error, Errors};
 use hime_sdk::{InputReference, LoadedData, LoadedInput};
 
@@ -35,14 +36,14 @@ use crate::model::{Fixture, FixtureDef, Fixtures};
 
 /// Parses all fixtures
 pub fn parse_fixtures(fixtures: &[FixtureDef]) -> Result<Fixtures, Errors> {
-    let results: Vec<ParseResult> = fixtures
+    let results: Vec<ParseResultAst> = fixtures
         .iter()
         .map(|FixtureDef(_, content)| {
             let mut reader = BufReader::new(*content);
             fixture::parse_utf8_stream(&mut reader)
         })
         .collect();
-    let is_ok = results.iter().all(ParseResult::is_success);
+    let is_ok = results.iter().all(ParseResult::<AstImpl>::is_success);
     if is_ok {
         Ok(Fixtures(
             results.into_iter().map(Fixture::from_content).collect()

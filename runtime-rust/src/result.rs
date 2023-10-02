@@ -26,59 +26,8 @@ use crate::symbols::Symbol;
 use crate::text::Text;
 use crate::tokens::{TokenRepository, TokenRepositoryImpl};
 
-/// The data for the parse tree
-enum ParseTreeData {
-    /// An AST is expected by the user
-    Ast(AstImpl),
-    /// An SPPF is expected by the user at the end
-    Sppf(SppfImpl)
-}
-
-impl ParseTreeData {
-    /// Gets whether a root has been defined for this AST
-    #[must_use]
-    fn has_root(&self) -> bool {
-        match self {
-            ParseTreeData::Ast(data) => data.has_root(),
-            ParseTreeData::Sppf(data) => data.has_root()
-        }
-    }
-
-    /// Gets the AST data
-    fn as_ast(&self) -> &AstImpl {
-        match self {
-            ParseTreeData::Ast(data) => data,
-            ParseTreeData::Sppf(_) => panic!("Expected AST data, found SPPF")
-        }
-    }
-
-    /// Gets the AST data
-    fn as_ast_mut(&mut self) -> &mut AstImpl {
-        match self {
-            ParseTreeData::Ast(data) => data,
-            ParseTreeData::Sppf(_) => panic!("Expected AST data, found SPPF")
-        }
-    }
-
-    /// Gets the SPPF data
-    fn as_sppf(&self) -> &SppfImpl {
-        match self {
-            ParseTreeData::Sppf(data) => data,
-            ParseTreeData::Ast(_) => panic!("Expected SPPF data, found AST")
-        }
-    }
-
-    /// Gets the SPPF data
-    fn as_sppf_mut(&mut self) -> &mut SppfImpl {
-        match self {
-            ParseTreeData::Sppf(data) => data,
-            ParseTreeData::Ast(_) => panic!("Expected SPPF data, found AST")
-        }
-    }
-}
-
 /// Represents the output of a parser
-pub struct ParseResult<'s, 't, 'a> {
+pub struct ParseResult<'s, 't, 'a, T> {
     /// The table of grammar terminals
     pub terminals: &'a [Symbol<'s>],
     /// The table of grammar variables
@@ -92,18 +41,18 @@ pub struct ParseResult<'s, 't, 'a> {
     /// The table of matched tokens
     pub tokens: TokenRepositoryImpl,
     /// The produced AST
-    parse_tree: ParseTreeData
+    parse_tree: T
 }
 
-impl<'s, 't, 'a> ParseResult<'s, 't, 'a> {
+impl<'s, 't, 'a, T: Default> ParseResult<'s, 't, 'a, T> {
     /// Initialize a new parse result
     #[must_use]
-    pub fn new_with_ast(
+    pub fn new(
         terminals: &'a [Symbol<'s>],
         variables: &'a [Symbol<'s>],
         virtuals: &'a [Symbol<'s>],
         text: Text<'t>
-    ) -> ParseResult<'s, 't, 'a> {
+    ) -> ParseResult<'s, 't, 'a, T> {
         ParseResult {
             terminals,
             variables,
@@ -111,39 +60,22 @@ impl<'s, 't, 'a> ParseResult<'s, 't, 'a> {
             text,
             errors: ParseErrors::default(),
             tokens: TokenRepositoryImpl::default(),
-            parse_tree: ParseTreeData::Ast(AstImpl::default())
+            parse_tree: T::default()
         }
-    }
-
-    /// Initialize a new parse result
-    #[must_use]
-    pub fn new_with_sppf(
-        terminals: &'a [Symbol<'s>],
-        variables: &'a [Symbol<'s>],
-        virtuals: &'a [Symbol<'s>],
-        text: Text<'t>
-    ) -> ParseResult<'s, 't, 'a> {
-        ParseResult {
-            terminals,
-            variables,
-            virtuals,
-            text,
-            errors: ParseErrors::default(),
-            tokens: TokenRepositoryImpl::default(),
-            parse_tree: ParseTreeData::Sppf(SppfImpl::default())
-        }
-    }
-
-    /// Gets whether this result denotes a successful parsing
-    #[must_use]
-    pub fn is_success(&self) -> bool {
-        self.parse_tree.has_root()
     }
 
     /// Gets the token repository associated with this result
     #[must_use]
     pub fn get_tokens(&self) -> TokenRepository {
         TokenRepository::new(self.terminals, &self.text, &self.tokens)
+    }
+}
+
+impl<'s, 't, 'a> ParseResult<'s, 't, 'a, AstImpl> {
+    /// Gets whether this result denotes a successful parsing
+    #[must_use]
+    pub fn is_success(&self) -> bool {
+        self.parse_tree.has_root()
     }
 
     /// Gets the resulting AST
@@ -153,24 +85,13 @@ impl<'s, 't, 'a> ParseResult<'s, 't, 'a> {
             TokenRepository::new(self.terminals, &self.text, &self.tokens),
             self.variables,
             self.virtuals,
-            self.parse_tree.as_ast()
-        )
-    }
-
-    /// Gets the resulting AST
-    #[must_use]
-    pub fn get_sppf<'x>(&'x self) -> Sppf<'s, 't, 'x> {
-        Sppf::new(
-            TokenRepository::new(self.terminals, &self.text, &self.tokens),
-            self.variables,
-            self.virtuals,
-            self.parse_tree.as_sppf()
+            &self.parse_tree
         )
     }
 
     /// Gets the mutable data required for parsing
     #[must_use]
-    pub fn get_parsing_data_ast<'x>(
+    pub fn get_parsing_data<'x>(
         &'x mut self
     ) -> (
         TokenRepository<'s, 't, 'x>,
@@ -180,13 +101,32 @@ impl<'s, 't, 'a> ParseResult<'s, 't, 'a> {
         (
             TokenRepository::new_mut(self.terminals, &self.text, &mut self.tokens),
             &mut self.errors,
-            self.parse_tree.as_ast_mut()
+            &mut self.parse_tree
+        )
+    }
+}
+
+impl<'s, 't, 'a> ParseResult<'s, 't, 'a, SppfImpl> {
+    /// Gets whether this result denotes a successful parsing
+    #[must_use]
+    pub fn is_success(&self) -> bool {
+        self.parse_tree.has_root()
+    }
+
+    /// Gets the resulting AST
+    #[must_use]
+    pub fn get_ast<'x>(&'x self) -> Sppf<'s, 't, 'x> {
+        Sppf::new(
+            TokenRepository::new(self.terminals, &self.text, &self.tokens),
+            self.variables,
+            self.virtuals,
+            &self.parse_tree
         )
     }
 
     /// Gets the mutable data required for parsing
     #[must_use]
-    pub fn get_parsing_data_sppf<'x>(
+    pub fn get_parsing_data<'x>(
         &'x mut self
     ) -> (
         TokenRepository<'s, 't, 'x>,
@@ -196,12 +136,12 @@ impl<'s, 't, 'a> ParseResult<'s, 't, 'a> {
         (
             TokenRepository::new_mut(self.terminals, &self.text, &mut self.tokens),
             &mut self.errors,
-            self.parse_tree.as_sppf_mut()
+            &mut self.parse_tree
         )
     }
 }
 
-impl<'s, 't, 'a> Serialize for ParseResult<'s, 't, 'a> {
+impl<'s, 't, 'a> Serialize for ParseResult<'s, 't, 'a, AstImpl> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer
@@ -218,3 +158,9 @@ impl<'s, 't, 'a> Serialize for ParseResult<'s, 't, 'a> {
         state.end()
     }
 }
+
+/// A parse result with an AST
+pub type ParseResultAst = ParseResult<'static, 'static, 'static, AstImpl>;
+
+/// A parse result with a SPPF
+pub type ParseResultSppf = ParseResult<'static, 'static, 'static, SppfImpl>;

@@ -26,7 +26,7 @@ use std::process::Command;
 use std::time::Instant;
 
 use hime_redist::ast::AstNode;
-use hime_redist::result::ParseResult;
+use hime_redist::result::ParseResultAst;
 use hime_redist::symbols::SemanticElementTrait;
 use hime_sdk::errors::{Error, Errors};
 use hime_sdk::grammars::{BuildData, Grammar, OPTION_METHOD};
@@ -272,14 +272,14 @@ pub struct Fixture {
     /// The fixture's name
     pub name: String,
     /// The inner content for this ficture
-    content: ParseResult<'static, 'static, 'static>,
+    content: ParseResultAst,
     /// The tests in the fixture
     pub tests: Vec<Test>
 }
 
 impl Fixture {
     /// Build a fixture from parsed content
-    pub fn from_content(content: ParseResult<'static, 'static, 'static>) -> Fixture {
+    pub fn from_content(content: ParseResultAst) -> Fixture {
         let ast = content.get_ast();
         let root = ast.get_root();
         let name = root.get_value().unwrap();

@@ -79,7 +79,7 @@ pub fn write(
         writeln!(writer, "use alloc::string::String;")?;
     }
 
-    writeln!(writer, "use hime_redist::ast::AstNode;")?;
+    writeln!(writer, "use hime_redist::ast::{{AstImpl, AstNode}};")?;
     writeln!(writer, "use hime_redist::errors::ParseErrors;")?;
     writeln!(writer, "use hime_redist::lexers::automaton::Automaton;")?;
     writeln!(writer, "use hime_redist::lexers::impls::{base_lexer}Lexer;")?;
@@ -92,7 +92,14 @@ pub fn write(
         writeln!(writer, "use hime_redist::parsers::lrk::LRkParser;")?;
     }
     writeln!(writer, "use hime_redist::parsers::Parser;")?;
-    writeln!(writer, "use hime_redist::result::ParseResult;")?;
+    writeln!(
+        writer,
+        "use hime_redist::result::{{ParseResult, ParseResultAst{}}};",
+        if is_rnglr { ", ParseResultSppf" } else { "" }
+    )?;
+    if is_rnglr {
+        writeln!(writer, "use hime_redist::sppf::SppfImpl;")?;
+    }
     writeln!(writer, "use hime_redist::symbols::SemanticBody;")?;
     writeln!(writer, "use hime_redist::symbols::SemanticElementTrait;")?;
     writeln!(writer, "use hime_redist::symbols::Symbol;")?;

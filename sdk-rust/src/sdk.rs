@@ -63,13 +63,13 @@ pub struct InMemoryParser<'s> {
 impl<'s> InMemoryParser<'s> {
     /// Parses an input parser
     #[must_use]
-    pub fn parse<'a, 't>(&'a self, input: &'t str) -> ParseResult<'s, 't, 'a> {
+    pub fn parse<'a, 't>(&'a self, input: &'t str) -> ParseResult<'s, 't, 'a, AstImpl> {
         let text = Text::from_str(input);
         let mut result =
-            ParseResult::new_with_ast(&self.terminals, &self.variables, &self.virtuals, text);
+            ParseResult::<AstImpl>::new(&self.terminals, &self.variables, &self.virtuals, text);
         let mut my_actions = |_index: usize, _head: Symbol, _body: &dyn SemanticBody| ();
         {
-            let data = result.get_parsing_data_ast();
+            let data = result.get_parsing_data();
             let mut lexer = self.new_lexer(data.0, data.1);
             self.do_parse(&mut lexer, data.2, &mut my_actions);
         }

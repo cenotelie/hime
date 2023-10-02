@@ -197,31 +197,22 @@ impl SppfImplNodeVersion {
         } else if count == 1 {
             SppfImplNodeVersion {
                 label,
-                children: SppfImplNodeChildren::Single(buffer[count])
+                children: SppfImplNodeChildren::Single(buffer[0])
             }
         } else if count == 2 {
             SppfImplNodeVersion {
                 label,
-                children: SppfImplNodeChildren::Two([buffer[count], buffer[count + 1]])
+                children: SppfImplNodeChildren::Two([buffer[0], buffer[1]])
             }
         } else if count == 3 {
             SppfImplNodeVersion {
                 label,
-                children: SppfImplNodeChildren::Three([
-                    buffer[count],
-                    buffer[count + 1],
-                    buffer[count + 2]
-                ])
+                children: SppfImplNodeChildren::Three([buffer[0], buffer[1], buffer[2]])
             }
         } else if count == 4 {
             SppfImplNodeVersion {
                 label,
-                children: SppfImplNodeChildren::Four([
-                    buffer[count],
-                    buffer[count + 1],
-                    buffer[count + 2],
-                    buffer[count + 3]
-                ])
+                children: SppfImplNodeChildren::Four([buffer[0], buffer[1], buffer[2], buffer[3]])
             }
         } else {
             let mut children = Vec::with_capacity(count);
