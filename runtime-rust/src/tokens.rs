@@ -157,7 +157,7 @@ impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
 
     /// Gets the token (if any) that contains the specified index in the input text
     #[must_use]
-    pub fn find_token_at(&self, index: usize) -> Option<Token> {
+    pub fn find_token_at(&'a self, index: usize) -> Option<Token<'s, 't, 'a>> {
         let count = self.data.cells.len();
         if count == 0 {
             return None;

@@ -18,8 +18,12 @@
 //! Module for Shared-Packed Parse Forest
 
 use alloc::vec::Vec;
+use core::fmt::{Display, Error, Formatter};
 use core::iter::FusedIterator;
 use core::ops::Index;
+
+use serde::ser::{SerializeSeq, SerializeStruct};
+use serde::{Serialize, Serializer};
 
 use crate::ast::{TableElemRef, TableType};
 use crate::parsers::TreeAction;
@@ -34,6 +38,23 @@ pub struct SppfImplNodeRef {
     pub node_id: u32,
     /// The version to refer to
     pub version: u32
+}
+
+impl SppfImplNodeRef {
+    /// Creates a new reference to a node version
+    #[must_use]
+    pub fn new(node_id: u32, version: u32) -> Self {
+        Self { node_id, version }
+    }
+
+    /// Creates a new reference to a node version
+    #[must_use]
+    pub fn new_usize(node_id: usize, version: usize) -> Self {
+        Self {
+            node_id: node_id as u32,
+            version: version as u32
+        }
+    }
 }
 
 /// The children for a SPPF node
@@ -544,8 +565,16 @@ impl SppfImpl {
     }
 
     /// Gets the SPPF node for the specified identifier
+    #[must_use]
     pub fn get_node_mut(&mut self, identifier: usize) -> &mut SppfImplNode {
         &mut self.nodes[identifier]
+    }
+
+    /// Gets the node version for the specified reference
+    #[must_use]
+    pub fn get_node_version(&self, node_ref: SppfImplNodeRef) -> &SppfImplNodeVersion {
+        let node = self.get_node(node_ref.node_id as usize);
+        &node.as_normal().versions[node_ref.version as usize]
     }
 
     /// Creates a new single node in the SPPF
@@ -637,34 +666,44 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
     /// This can happen when a `ParseResult` contains some errors,
     /// but the SPPF `get_sppf` is called to get an SPPF but it will have not root.
     #[must_use]
-    pub fn get_root(&self) -> SppfNode {
-        let node = self.data.nodes[self.data.root.expect("No root defined!")].as_normal();
-        SppfNode { sppf: self, node }
+    pub fn get_root(&'a self) -> SppfNode<'s, 't, 'a> {
+        let root = self.data.root.expect("No root defined!");
+        let node = self.data.nodes[root].as_normal();
+        SppfNode {
+            sppf: self,
+            node_id: root,
+            node
+        }
     }
 
     /// Gets the SPPF node (if any) that has the specified token as label
     #[must_use]
-    pub fn find_node_for(&self, token: &Token) -> Option<SppfNodeVersion> {
-        self.data
-            .nodes
-            .iter()
-            .find_map(|node| {
-                let normal = node.as_normal();
-                normal.versions.into_iter().find(|version| {
-                    version.label.table_type() == TableType::Token
+    pub fn find_node_for(&'a self, token: &Token) -> Option<SppfNodeVersion<'s, 't, 'a>> {
+        let root = self.get_root();
+        for version in root.versions() {
+            if let Some(result) = self.traverse(
+                version.version,
+                version.get_ref(),
+                |version, version_ref| {
+                    if version.label.table_type() == TableType::Token
                         && version.label.index() == token.index
-                })
-            })
-            .map(|version| SppfNodeVersion {
-                sppf: self,
-                version
-            })
+                    {
+                        Some(version_ref)
+                    } else {
+                        None
+                    }
+                }
+            ) {
+                return Some(SppfNodeVersion::new(self, result));
+            }
+        }
+        None
     }
 
     /// Gets the AST node (if any) that has
     /// a token label that contains the specified index in the input text
     #[must_use]
-    pub fn find_node_at_index(&self, index: usize) -> Option<SppfNodeVersion> {
+    pub fn find_node_at_index(&'a self, index: usize) -> Option<SppfNodeVersion<'s, 't, 'a>> {
         self.tokens
             .find_token_at(index)
             .and_then(|token| self.find_node_for(&token))
@@ -673,11 +712,132 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
     /// Gets the AST node (if any) that has
     /// a token label that contains the specified index in the input text
     #[must_use]
-    pub fn find_node_at_position(&self, position: TextPosition) -> Option<SppfNodeVersion> {
+    pub fn find_node_at_position(
+        &'a self,
+        position: TextPosition
+    ) -> Option<SppfNodeVersion<'s, 't, 'a>> {
         let index = self.tokens.text.get_line_index(position.line) + position.column - 1;
         self.tokens
             .find_token_at(index)
             .and_then(|token| self.find_node_for(&token))
+    }
+
+    /// Gets the parent of the specified node, if any
+    #[must_use]
+    pub fn find_parent_of(
+        &'a self,
+        node_ref: SppfImplNodeRef
+    ) -> Option<SppfNodeVersion<'s, 't, 'a>> {
+        let root = self.get_root();
+        for version in root.versions() {
+            if let Some(result) = self.traverse(
+                version.version,
+                version.get_ref(),
+                |version, version_ref| {
+                    if version.children.into_iter().any(|child| child == node_ref) {
+                        Some(version_ref)
+                    } else {
+                        None
+                    }
+                }
+            ) {
+                return Some(SppfNodeVersion::new(self, result));
+            }
+        }
+        None
+    }
+
+    /// Gets the total span of sub-tree given its root and its position
+    #[must_use]
+    pub fn get_total_position_and_span(
+        &self,
+        version: &SppfImplNodeVersion
+    ) -> Option<(TextPosition, TextSpan)> {
+        let mut total_span: Option<TextSpan> = None;
+        let mut position = TextPosition {
+            line: usize::MAX,
+            column: usize::MAX
+        };
+        self.traverse(version, SppfImplNodeRef::default(), |current, _| {
+            if let Some(p) = self.get_position_at(current) {
+                if p < position {
+                    position = p;
+                }
+            }
+            if let Some(total_span) = total_span.as_mut() {
+                if let Some(span) = self.get_span_at(current) {
+                    if span.index + span.length > total_span.index + total_span.length {
+                        let margin =
+                            (span.index + span.length) - (total_span.index + total_span.length);
+                        total_span.length += margin;
+                    }
+                    if span.index < total_span.index {
+                        let margin = total_span.index - span.index;
+                        total_span.length += margin;
+                        total_span.index -= margin;
+                    }
+                }
+            } else {
+                total_span = self.get_span_at(current);
+            }
+            Option::<()>::None
+        });
+        total_span.map(|span| (position, span))
+    }
+
+    /// Gets the total span of sub-tree given its root
+    #[must_use]
+    pub fn get_total_span(&self, version: &SppfImplNodeVersion) -> Option<TextSpan> {
+        self.get_total_position_and_span(version)
+            .map(|(_, span)| span)
+    }
+
+    /// Traverses the AST from the specified node
+    fn traverse<R, F>(
+        &self,
+        from: &'a SppfImplNodeVersion,
+        from_ref: SppfImplNodeRef,
+        mut action: F
+    ) -> Option<R>
+    where
+        F: FnMut(&'a SppfImplNodeVersion, SppfImplNodeRef) -> Option<R>
+    {
+        let mut stack = alloc::vec![(from, from_ref)];
+        while let Some((current, current_ref)) = stack.pop() {
+            for child_ref in current.children.into_iter().rev() {
+                stack.push((self.data.get_node_version(child_ref), child_ref));
+            }
+            if let Some(r) = action(current, current_ref) {
+                return Some(r);
+            }
+        }
+        None
+    }
+
+    /// Get the span of the symbol on a node's version
+    #[must_use]
+    fn get_span_at(&self, version: &SppfImplNodeVersion) -> Option<TextSpan> {
+        let label = version.label;
+        match label.table_type() {
+            TableType::Token => {
+                let token = self.tokens.get_token(label.index());
+                token.get_span()
+            }
+            _ => None
+        }
+    }
+
+    /// Get the position of the symbol on a node's version
+    #[must_use]
+    fn get_position_at(&self, version: &SppfImplNodeVersion) -> Option<TextPosition> {
+        let label = version.label;
+        match label.table_type() {
+            TableType::Token => {
+                let token = self.tokens.get_token(label.index());
+                token.get_position()
+            }
+            _ => None
+        }
     }
 }
 
@@ -686,18 +846,38 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
 pub struct SppfNode<'s, 't, 'a> {
     /// The parent SPPF
     sppf: &'a Sppf<'s, 't, 'a>,
+    /// The node's identifier
+    node_id: usize,
     /// The underlying node in the SPPF implementation
     node: &'a SppfImplNodeNormal
 }
 
 impl<'s, 't, 'a> SppfNode<'s, 't, 'a> {
+    /// Creates a new node
+    #[must_use]
+    fn new(sppf: &'a Sppf<'s, 't, 'a>, node_id: usize) -> SppfNode<'s, 't, 'a> {
+        let node = sppf.data.get_node(node_id).as_normal();
+        SppfNode {
+            sppf,
+            node_id,
+            node
+        }
+    }
+
     /// Gets the first version of this node
     #[must_use]
     pub fn first_version(&self) -> SppfNodeVersion<'s, 't, 'a> {
-        let version = &self.node.versions[0];
+        self.version(0)
+    }
+
+    /// Gets i-th version of this node
+    #[must_use]
+    pub fn version(&self, index: usize) -> SppfNodeVersion<'s, 't, 'a> {
+        let version = &self.node.versions[index];
         SppfNodeVersion {
             sppf: self.sppf,
-            version
+            version,
+            node_ref: SppfImplNodeRef::new_usize(self.node_id, index)
         }
     }
 
@@ -706,8 +886,31 @@ impl<'s, 't, 'a> SppfNode<'s, 't, 'a> {
     pub fn versions(&self) -> SppfNodeVersions<'s, 't, 'a> {
         SppfNodeVersions {
             sppf: self.sppf,
+            node_id: self.node_id,
             node: self.node
         }
+    }
+
+    /// Gets the number of versions for this node
+    #[must_use]
+    pub fn versions_count(&self) -> usize {
+        self.node.versions.len()
+    }
+}
+
+impl<'s, 't, 'a> Serialize for SppfNode<'s, 't, 'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer
+    {
+        let version = self.first_version();
+        let mut state = serializer.serialize_struct("SppfNode", 5)?;
+        state.serialize_field("symbol", &version.get_symbol())?;
+        state.serialize_field("position", &version.get_position())?;
+        state.serialize_field("span", &version.get_span())?;
+        state.serialize_field("value", &version.get_value())?;
+        state.serialize_field("children", &version.children())?;
+        state.end()
     }
 }
 
@@ -715,6 +918,8 @@ impl<'s, 't, 'a> SppfNode<'s, 't, 'a> {
 pub struct SppfNodeVersions<'s, 't, 'a> {
     /// The parent SPPF
     sppf: &'a Sppf<'s, 't, 'a>,
+    /// The node's identifier
+    node_id: usize,
     /// The underlying node in the SPPF implementation
     node: &'a SppfImplNodeNormal
 }
@@ -741,6 +946,7 @@ impl<'s, 't, 'a> IntoIterator for SppfNodeVersions<'s, 't, 'a> {
     fn into_iter(self) -> Self::IntoIter {
         SppfNodeVersionsIterator {
             sppf: self.sppf,
+            node_id: self.node_id,
             node: self.node,
             current: 0,
             end: self.node.versions.len()
@@ -751,6 +957,8 @@ impl<'s, 't, 'a> IntoIterator for SppfNodeVersions<'s, 't, 'a> {
 pub struct SppfNodeVersionsIterator<'s, 't, 'a> {
     /// The parent SPPF
     sppf: &'a Sppf<'s, 't, 'a>,
+    /// The node's identifier
+    node_id: usize,
     /// The underlying node in the SPPF implementation
     node: &'a SppfImplNodeNormal,
     /// The current (next) index
@@ -767,7 +975,8 @@ impl<'s, 't, 'a> Iterator for SppfNodeVersionsIterator<'s, 't, 'a> {
             self.current += 1;
             Some(SppfNodeVersion {
                 sppf: self.sppf,
-                version: &self.node.versions[index]
+                version: &self.node.versions[index],
+                node_ref: SppfImplNodeRef::new_usize(self.node_id, index)
             })
         } else {
             None
@@ -787,7 +996,8 @@ impl<'s, 't, 'a> DoubleEndedIterator for SppfNodeVersionsIterator<'s, 't, 'a> {
         } else {
             let result = SppfNodeVersion {
                 sppf: self.sppf,
-                version: &self.node.versions[self.end - 1]
+                version: &self.node.versions[self.end - 1],
+                node_ref: SppfImplNodeRef::new_usize(self.node_id, self.end - 1)
             };
             self.end -= 1;
             Some(result)
@@ -803,10 +1013,52 @@ pub struct SppfNodeVersion<'s, 't, 'a> {
     /// The parent SPPF
     sppf: &'a Sppf<'s, 't, 'a>,
     /// The underlying version in the SPPF implementation
-    version: &'a SppfImplNodeVersion
+    version: &'a SppfImplNodeVersion,
+    /// The reference to this specific version
+    node_ref: SppfImplNodeRef
 }
 
 impl<'s, 't, 'a> SppfNodeVersion<'s, 't, 'a> {
+    /// Creates a new version
+    #[must_use]
+    fn new(sppf: &'a Sppf<'s, 't, 'a>, node_ref: SppfImplNodeRef) -> SppfNodeVersion<'s, 't, 'a> {
+        let node = sppf.data.get_node(node_ref.node_id as usize).as_normal();
+        let version = &node.versions[node_ref.version as usize];
+        SppfNodeVersion {
+            sppf,
+            version,
+            node_ref
+        }
+    }
+
+    /// Gets a reference to this node version
+    #[must_use]
+    pub fn get_ref(&self) -> SppfImplNodeRef {
+        self.node_ref
+    }
+
+    /// Gets the index of the token born by this version, if any
+    #[must_use]
+    pub fn get_token_index(&self) -> Option<usize> {
+        let label = self.version.label;
+        match label.table_type() {
+            TableType::Token => Some(label.index()),
+            _ => None
+        }
+    }
+
+    /// Gets the parent node of which this is a version
+    #[must_use]
+    pub fn node(&self) -> SppfNode<'s, 't, 'a> {
+        SppfNode::new(self.sppf, self.node_ref.node_id as usize)
+    }
+
+    /// Gets the parent of this node, if any
+    #[must_use]
+    pub fn parent(&self) -> Option<SppfNodeVersion<'s, 't, 'a>> {
+        self.sppf.find_parent_of(self.node_ref)
+    }
+
     /// Gets the children for this version of the node
     #[must_use]
     pub fn children(&self) -> SppfNodeChildren<'s, 't, 'a> {
@@ -815,31 +1067,42 @@ impl<'s, 't, 'a> SppfNodeVersion<'s, 't, 'a> {
             version: self.version
         }
     }
+
+    /// Gets the i-th child
+    #[must_use]
+    pub fn child(&self, index: usize) -> SppfNode<'s, 't, 'a> {
+        let child_id = self.version.children[index].node_id as usize;
+        SppfNode::new(self.sppf, child_id)
+    }
+
+    /// Gets the number of children
+    #[must_use]
+    pub fn children_count(&self) -> usize {
+        self.version.children.len()
+    }
+
+    /// Gets the total span for the sub-tree at this node
+    #[must_use]
+    pub fn get_total_span(&self) -> Option<TextSpan> {
+        self.sppf.get_total_span(self.version)
+    }
+
+    /// Gets the total position and span for the sub-tree at this node
+    #[must_use]
+    pub fn get_total_position_and_span(&self) -> Option<(TextPosition, TextSpan)> {
+        self.sppf.get_total_position_and_span(self.version)
+    }
 }
 
 impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for SppfNodeVersion<'s, 't, 'a> {
     /// Gets the position in the input text of this element
     fn get_position(&self) -> Option<TextPosition> {
-        let label = self.version.label;
-        match label.table_type() {
-            TableType::Token => {
-                let token = self.sppf.tokens.get_token(label.index());
-                token.get_position()
-            }
-            _ => None
-        }
+        self.sppf.get_position_at(self.version)
     }
 
     /// Gets the span in the input text of this element
     fn get_span(&self) -> Option<TextSpan> {
-        let label = self.version.label;
-        match label.table_type() {
-            TableType::Token => {
-                let token = self.sppf.tokens.get_token(label.index());
-                token.get_span()
-            }
-            _ => None
-        }
+        self.sppf.get_span_at(self.version)
     }
 
     /// Gets the context of this element in the input
@@ -884,6 +1147,47 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for SppfNodeVersion<'s, 't, 'a> {
     }
 }
 
+impl<'s, 't, 'a> Display for SppfNodeVersion<'s, 't, 'a> {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        let label = self.version.label;
+        match label.table_type() {
+            TableType::Token => {
+                let token = self.sppf.tokens.get_token(label.index());
+                let symbol = token.get_symbol();
+                let value = token.get_value();
+                write!(f, "{} = {}", symbol.name, value.unwrap())
+            }
+            TableType::Variable => {
+                let symbol = self.sppf.variables[label.index()];
+                write!(f, "{}", symbol.name)
+            }
+            TableType::Virtual => {
+                let symbol = self.sppf.virtuals[label.index()];
+                write!(f, "{}", symbol.name)
+            }
+            TableType::None => {
+                let symbol = self.sppf.tokens.terminals[0];
+                write!(f, "{}", symbol.name)
+            }
+        }
+    }
+}
+
+impl<'s, 't, 'a> Serialize for SppfNodeVersion<'s, 't, 'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer
+    {
+        let mut state = serializer.serialize_struct("SppfNodeVersion", 5)?;
+        state.serialize_field("symbol", &self.get_symbol())?;
+        state.serialize_field("position", &self.get_position())?;
+        state.serialize_field("span", &self.get_span())?;
+        state.serialize_field("value", &self.get_value())?;
+        state.serialize_field("children", &self.children())?;
+        state.end()
+    }
+}
+
 #[derive(Copy, Clone)]
 pub struct SppfNodeChildren<'s, 't, 'a> {
     /// The parent SPPF
@@ -904,10 +1208,17 @@ impl<'s, 't, 'a> SppfNodeChildren<'s, 't, 'a> {
     pub fn is_empty(&self) -> bool {
         self.version.is_empty()
     }
+
+    /// Gets the i-th child
+    #[must_use]
+    pub fn at(&self, index: usize) -> SppfNode<'s, 't, 'a> {
+        let child_id = self.version.children[index].node_id as usize;
+        SppfNode::new(self.sppf, child_id)
+    }
 }
 
 impl<'s, 't, 'a> IntoIterator for SppfNodeChildren<'s, 't, 'a> {
-    type Item = SppfNode<'s, 't, 'a>;
+    type Item = SppfNodeVersion<'s, 't, 'a>;
     type IntoIter = SppfNodeChildrenIterator<'s, 't, 'a>;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -917,6 +1228,19 @@ impl<'s, 't, 'a> IntoIterator for SppfNodeChildren<'s, 't, 'a> {
             index: 0,
             end: self.version.len()
         }
+    }
+}
+
+impl<'s, 't, 'a> Serialize for SppfNodeChildren<'s, 't, 'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer
+    {
+        let mut seq = serializer.serialize_seq(Some(self.len()))?;
+        for version in self.into_iter() {
+            seq.serialize_element(&version)?;
+        }
+        seq.end()
     }
 }
 
@@ -933,21 +1257,13 @@ pub struct SppfNodeChildrenIterator<'s, 't, 'a> {
 }
 
 impl<'s, 't, 'a> Iterator for SppfNodeChildrenIterator<'s, 't, 'a> {
-    type Item = SppfNode<'s, 't, 'a>;
+    type Item = SppfNodeVersion<'s, 't, 'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.end {
-            let node = self
-                .sppf
-                .data
-                .get_node(self.version.children[self.index].node_id as usize)
-                .as_normal();
-            let result = Some(SppfNode {
-                sppf: self.sppf,
-                node
-            });
+            let node_ref = self.version.children[self.index];
             self.index += 1;
-            result
+            Some(SppfNodeVersion::new(self.sppf, node_ref))
         } else {
             None
         }
@@ -964,17 +1280,9 @@ impl<'s, 't, 'a> DoubleEndedIterator for SppfNodeChildrenIterator<'s, 't, 'a> {
         if self.index >= self.end {
             None
         } else {
-            let node = self
-                .sppf
-                .data
-                .get_node(self.version.children[self.end - 1].node_id as usize)
-                .as_normal();
-            let result = Some(SppfNode {
-                sppf: self.sppf,
-                node
-            });
+            let node_ref = self.version.children[self.end - 1];
             self.end -= 1;
-            result
+            Some(SppfNodeVersion::new(self.sppf, node_ref))
         }
     }
 }

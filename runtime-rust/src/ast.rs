@@ -201,7 +201,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     /// This can happen when a `ParseResult` contains some errors,
     /// but the AST `get_ast` is called to get an AST but it will have not root.
     #[must_use]
-    pub fn get_root(&self) -> AstNode {
+    pub fn get_root(&'a self) -> AstNode<'s, 't, 'a> {
         self.data
             .root
             .map(|x| AstNode {
@@ -213,7 +213,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
 
     /// Gets a specific node in this tree
     #[must_use]
-    pub fn get_node(&self, id: usize) -> AstNode {
+    pub fn get_node(&'a self, id: usize) -> AstNode<'s, 't, 'a> {
         AstNode {
             tree: self,
             index: id
@@ -222,7 +222,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
 
     /// Gets the AST node (if any) that has the specified token as label
     #[must_use]
-    pub fn find_node_for(&self, token: &Token) -> Option<AstNode> {
+    pub fn find_node_for(&'a self, token: &Token<'s, 't, 'a>) -> Option<AstNode<'s, 't, 'a>> {
         self.data
             .nodes
             .iter()
@@ -236,7 +236,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     /// Gets the AST node (if any) that has
     /// a token label that contains the specified index in the input text
     #[must_use]
-    pub fn find_node_at_index(&self, index: usize) -> Option<AstNode> {
+    pub fn find_node_at_index(&'a self, index: usize) -> Option<AstNode<'s, 't, 'a>> {
         self.tokens
             .find_token_at(index)
             .and_then(|token| self.find_node_for(&token))
@@ -245,7 +245,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     /// Gets the AST node (if any) that has
     /// a token label that contains the specified index in the input text
     #[must_use]
-    pub fn find_node_at_position(&self, position: TextPosition) -> Option<AstNode> {
+    pub fn find_node_at_position(&'a self, position: TextPosition) -> Option<AstNode<'s, 't, 'a>> {
         let index = self.tokens.text.get_line_index(position.line) + position.column - 1;
         self.tokens
             .find_token_at(index)
@@ -255,7 +255,6 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     /// Gets the parent of the specified node, if any
     #[must_use]
     pub fn find_parent_of(&'a self, node: usize) -> Option<AstNode<'s, 't, 'a>> {
-        // self.data.root?;
         self.data
             .nodes
             .iter()
@@ -276,14 +275,14 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
             line: usize::MAX,
             column: usize::MAX
         };
-        self.traverse(node, |data, current| {
-            if let Some(p) = self.get_position_at(data, current) {
+        self.traverse(node, |current| {
+            if let Some(p) = self.get_position_at(current) {
                 if p < position {
                     position = p;
                 }
             }
             if let Some(total_span) = total_span.as_mut() {
-                if let Some(span) = self.get_span_at(data, current) {
+                if let Some(span) = self.get_span_at(current) {
                     if span.index + span.length > total_span.index + total_span.length {
                         let margin =
                             (span.index + span.length) - (total_span.index + total_span.length);
@@ -296,7 +295,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
                     }
                 }
             } else {
-                total_span = self.get_span_at(data, current);
+                total_span = self.get_span_at(current);
             }
         });
         total_span.map(|span| (position, span))
@@ -309,21 +308,21 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     }
 
     /// Traverses the AST from the specified node
-    fn traverse<F: FnMut(&AstImpl, usize)>(&self, from: usize, mut action: F) {
+    fn traverse<F: FnMut(usize)>(&self, from: usize, mut action: F) {
         let mut stack = alloc::vec![from];
         while let Some(current) = stack.pop() {
             let cell = self.data.nodes[current];
             for i in (0..cell.count).rev() {
                 stack.push((cell.first + i) as usize);
             }
-            action(self.data, current);
+            action(current);
         }
     }
 
     /// Get the span of the symbol on a node
     #[must_use]
-    fn get_span_at(&self, data: &AstImpl, node: usize) -> Option<TextSpan> {
-        let cell = data.nodes[node];
+    fn get_span_at(&self, node: usize) -> Option<TextSpan> {
+        let cell = self.data.nodes[node];
         match cell.label.table_type() {
             TableType::Token => {
                 let token = self.get_token(cell.label.index());
@@ -335,8 +334,8 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
 
     /// Get the position of the symbol on a node
     #[must_use]
-    fn get_position_at(&self, data: &AstImpl, node: usize) -> Option<TextPosition> {
-        let cell = data.nodes[node];
+    fn get_position_at(&self, node: usize) -> Option<TextPosition> {
+        let cell = self.data.nodes[node];
         match cell.label.table_type() {
             TableType::Token => {
                 let token = self.get_token(cell.label.index());
@@ -420,12 +419,12 @@ impl<'s, 't, 'a> AstNode<'s, 't, 'a> {
 impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for AstNode<'s, 't, 'a> {
     /// Gets the position in the input text of this element
     fn get_position(&self) -> Option<TextPosition> {
-        self.tree.get_position_at(self.tree.data, self.index)
+        self.tree.get_position_at(self.index)
     }
 
     /// Gets the span in the input text of this element
     fn get_span(&self) -> Option<TextSpan> {
-        self.tree.get_span_at(self.tree.data, self.index)
+        self.tree.get_span_at(self.index)
     }
 
     /// Gets the context of this element in the input
