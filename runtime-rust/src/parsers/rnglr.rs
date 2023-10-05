@@ -32,7 +32,7 @@ use super::{
 use crate::ast::{AstCell, AstImpl, TableElemRef, TableType};
 use crate::errors::ParseErrorUnexpectedToken;
 use crate::lexers::{Lexer, TokenKernel, DEFAULT_CONTEXT};
-use crate::sppf::{SppfImpl, SppfImplNode, SppfImplNodeNormal, SppfImplNodeRef, SppfImplNodeTrait};
+use crate::sppf::{SppfImpl, SppfImplNode, SppfImplNodeNormal, SppfImplNodeRef};
 use crate::symbols::{SemanticBody, SemanticElement, SemanticElementTrait, SID_EPSILON};
 use crate::utils::biglist::BigList;
 use crate::utils::OwnOrMut;
@@ -247,7 +247,7 @@ impl RNGLRAutomaton {
 /// Represents a label for a GSS edge
 #[derive(Debug, Default, Copy, Clone)]
 struct GSSLabel {
-    /// The identifier of the SPPF node
+    /// The identifier of the SPPF node in this edge
     sppf_node: u32,
     /// The symbol identifier of the original symbol on the SPPF node
     symbol_id: u32
@@ -527,15 +527,6 @@ const EPSILON: GSSLabel = GSSLabel {
     symbol_id: SID_EPSILON
 };
 
-/// Represents a generation of GSS edges in the current history
-/// The history is used to quickly find pre-existing matching GSS edges
-struct HistoryPart {
-    /// The GSS labels in this part
-    data: Vec<usize>,
-    /// The index of the represented GSS generation
-    generation: usize
-}
-
 /// The data about a reduction for a SPPF
 struct SPPFReduction {
     /// The adjacency cache for the reduction
@@ -559,8 +550,6 @@ struct SPPFBuilder<'s, 't, 'a, 'l> {
     variables: &'a [Symbol<'s>],
     /// The table of virtuals
     virtuals: &'a [Symbol<'s>],
-    /// The history
-    history: Vec<HistoryPart>,
     /// The SPPF front to build the SPPF
     sppf: OwnOrMut<'a, SppfImpl>,
     /// The data of the current reduction
@@ -605,7 +594,6 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             lexer,
             variables,
             virtuals,
-            history: Vec::new(),
             sppf: OwnOrMut::Owned(SppfImpl::default()),
             reduction: None,
             ast: Some(ast)
@@ -623,48 +611,10 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             lexer,
             variables,
             virtuals,
-            history: Vec::new(),
             sppf: OwnOrMut::MutRef(sppf),
             reduction: None,
             ast: None
         }
-    }
-
-    /// Clears the current history
-    pub fn clear_history(&mut self) {
-        self.history.clear();
-    }
-
-    /// Adds the specified GSS label to the current history
-    pub fn add_to_history(&mut self, generation: usize, label: usize) {
-        if let Some(part) = self
-            .history
-            .iter_mut()
-            .find(|hp| hp.generation == generation)
-        {
-            part.data.push(label);
-        } else {
-            self.history.push(HistoryPart {
-                generation,
-                data: alloc::vec![label]
-            });
-        }
-    }
-
-    /// Gets the GSS label already in history for the given GSS generation and symbol
-    pub fn _get_label_for(&self, generation: usize, reference: TableElemRef) -> Option<usize> {
-        self.history
-            .iter()
-            .find_map(|part| {
-                if part.generation == generation {
-                    part.data
-                        .iter()
-                        .find(|&&id| self.sppf.get_node(id).get_original_symbol() == reference)
-                } else {
-                    None
-                }
-            })
-            .copied()
     }
 
     /// Creates a single node in the result SPPF an returns it
@@ -762,10 +712,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         let node_id = self
             .sppf
             .new_normal_node(TableElemRef::new(TableType::Virtual, index));
-        reduction.cache.push(SppfImplNodeRef {
-            node_id: node_id as u32,
-            version: 0
-        });
+        reduction.cache.push(SppfImplNodeRef::new_usize(node_id, 0));
         reduction.handle_indices.push(reduction.cache.len() - 1);
         reduction.handle_actions.push(action);
     }
@@ -779,18 +726,15 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     /// Finalizes the reduction operation
     pub fn reduce(
         &mut self,
-        generation: usize,
         variable_index: usize,
         head_action: TreeAction,
         target: Option<usize>
     ) -> usize {
-        let label = if head_action == TREE_ACTION_REPLACE_BY_CHILDREN {
+        if head_action == TREE_ACTION_REPLACE_BY_CHILDREN {
             self.reduce_replaceable(variable_index)
         } else {
             self.reduce_normal(variable_index, head_action, target)
-        };
-        self.add_to_history(generation, label);
-        label
+        }
     }
 
     /// Executes the reduction as a normal reduction
@@ -814,11 +758,10 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
                         let old_promoted_node = self.sppf.get_node_mut(node_ref.node_id as usize);
                         let old_promoted_ref = SppfImplNodeRef {
                             node_id: node_ref.node_id,
-                            version: old_promoted_node.as_normal_mut().new_version(
-                                symbol,
-                                &reduction.cache,
-                                insertion
-                            ) as u32
+                            version: old_promoted_node
+                                .as_normal_mut()
+                                .new_version(symbol, &reduction.cache[..insertion])
+                                as u32
                         };
                         // register the previously promoted reference into the cache
                         reduction.cache[0] = old_promoted_ref;
@@ -860,18 +803,16 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             Some((symbol, _node_ref)) => symbol
         };
         if let Some(target) = target {
-            self.sppf.get_node_mut(target).as_normal_mut().new_version(
-                original_label,
-                &reduction.cache,
-                insertion
-            );
+            self.sppf
+                .get_node_mut(target)
+                .as_normal_mut()
+                .new_version(original_label, &reduction.cache[..insertion]);
             target
         } else {
             self.sppf.new_normal_node_with_children(
                 original_label,
                 current_label,
-                &reduction.cache,
-                insertion
+                &reduction.cache[..insertion]
             )
         }
     }
@@ -1486,7 +1427,6 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                         builder,
                         actions,
                         nullables,
-                        0,
                         production.unwrap(),
                         EPSILON,
                         &path,
@@ -1548,12 +1488,10 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
     }
 
     /// Builds the SPPF
-    #[allow(clippy::too_many_arguments)]
     fn build_sppf(
         builder: &mut SPPFBuilder<'s, 't, 'a, 'l>,
         actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
         nullables: &[usize],
-        generation: usize,
         production: &LRProduction,
         first: GSSLabel,
         path: &GSSPath,
@@ -1587,7 +1525,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                 }
             }
         }
-        builder.reduce(generation, production.head, production.head_action, target)
+        builder.reduce(production.head, production.head_action, target)
     }
 
     /// Gets the next token in the kernel
@@ -1601,7 +1539,6 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
 
     /// Executes the reduction operations from the given GSS generation
     fn parse_reductions(&mut self, generation: usize) {
-        self.builder.clear_history();
         while !self.data.reductions.is_empty() {
             let reduction = self.data.reductions.pop_front().unwrap();
             self.parse_reduction(generation, reduction);
@@ -1627,7 +1564,6 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
     }
 
     /// Executes a reduction operation for a given path
-    #[allow(clippy::too_many_lines)]
     fn parse_reduction_path(
         &mut self,
         generation: usize,
@@ -1651,12 +1587,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                 .get_edge(generation, w, path.last_node)
                 .map(|edge| edge.label)
         });
-        // Resolve the sub-root
-        // let maybe_sppf = self.builder.get_label_for(
-        //     path.generation,
-        //     TableElemRef::new(TableType::Variable, production.head)
-        // );
-        let node_id =
+        let sppf_node =
             if self.data.automaton.nullables[production.head] as usize == reduction.production {
                 // nullable production, use the nullable node
                 self.nullables[production.head]
@@ -1665,7 +1596,6 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                     &mut self.builder,
                     &mut self.data.actions,
                     &self.nullables,
-                    generation,
                     production,
                     reduction.first,
                     path,
@@ -1675,7 +1605,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                 )
             };
         let label = previous_edge_label.unwrap_or(GSSLabel {
-            sppf_node: node_id as u32,
+            sppf_node: sppf_node as u32,
             symbol_id: head.id
         });
 

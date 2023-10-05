@@ -43,7 +43,7 @@ pub struct SppfImplNodeRef {
 impl SppfImplNodeRef {
     /// Creates a new reference to a node version
     #[must_use]
-    pub fn new(node_id: u32, version: u32) -> Self {
+    pub const fn new(node_id: u32, version: u32) -> Self {
         Self { node_id, version }
     }
 
@@ -211,11 +211,8 @@ impl SppfImplNodeVersion {
 
     /// Initializes this node version
     #[must_use]
-    pub fn from(
-        label: TableElemRef,
-        buffer: &[SppfImplNodeRef],
-        count: usize
-    ) -> SppfImplNodeVersion {
+    pub fn from(label: TableElemRef, buffer: &[SppfImplNodeRef]) -> SppfImplNodeVersion {
+        let count = buffer.len();
         if count == 0 {
             SppfImplNodeVersion {
                 label,
@@ -265,6 +262,18 @@ impl SppfImplNodeVersion {
         self.children.is_empty()
     }
 
+    /// Determines whether this version is the same as the given info
+    #[must_use]
+    pub fn is_same_as(&self, label: TableElemRef, children: &[SppfImplNodeRef]) -> bool {
+        self.label == label
+            && self.len() == children.len()
+            && self
+                .children
+                .into_iter()
+                .zip(children)
+                .all(|(left, &right)| left == right)
+    }
+
     /// Format this node
     ///
     /// # Errors
@@ -308,21 +317,34 @@ impl SppfImplNodeVersions {
     pub fn with_new_version(
         self,
         label: TableElemRef,
-        buffer: &[SppfImplNodeRef],
-        count: usize
+        buffer: &[SppfImplNodeRef]
     ) -> (Self, usize) {
         match self {
-            SppfImplNodeVersions::Single(first) => (
-                SppfImplNodeVersions::Multiple(alloc::vec![
-                    first,
-                    SppfImplNodeVersion::from(label, buffer, count)
-                ]),
-                0
-            ),
+            SppfImplNodeVersions::Single(first) => {
+                if first.is_same_as(label, buffer) {
+                    (SppfImplNodeVersions::Single(first), 0)
+                } else {
+                    (
+                        SppfImplNodeVersions::Multiple(alloc::vec![
+                            first,
+                            SppfImplNodeVersion::from(label, buffer)
+                        ]),
+                        0
+                    )
+                }
+            }
             SppfImplNodeVersions::Multiple(mut versions) => {
-                let current = versions.len();
-                versions.push(SppfImplNodeVersion::from(label, buffer, count));
-                (SppfImplNodeVersions::Multiple(versions), current)
+                if let Some((version, _)) = versions
+                    .iter()
+                    .enumerate()
+                    .find(|(_, version)| version.is_same_as(label, buffer))
+                {
+                    (SppfImplNodeVersions::Multiple(versions), version)
+                } else {
+                    let current = versions.len();
+                    versions.push(SppfImplNodeVersion::from(label, buffer));
+                    (SppfImplNodeVersions::Multiple(versions), current)
+                }
             }
         }
     }
@@ -448,25 +470,19 @@ impl SppfImplNodeNormal {
     pub fn new_with_children(
         original: TableElemRef,
         label: TableElemRef,
-        buffer: &[SppfImplNodeRef],
-        count: usize
+        buffer: &[SppfImplNodeRef]
     ) -> SppfImplNodeNormal {
         SppfImplNodeNormal {
             original,
-            versions: SppfImplNodeVersions::Single(SppfImplNodeVersion::from(label, buffer, count))
+            versions: SppfImplNodeVersions::Single(SppfImplNodeVersion::from(label, buffer))
         }
     }
 
     /// Adds a new version to this node
-    pub fn new_version(
-        &mut self,
-        label: TableElemRef,
-        buffer: &[SppfImplNodeRef],
-        count: usize
-    ) -> usize {
+    pub fn new_version(&mut self, label: TableElemRef, buffer: &[SppfImplNodeRef]) -> usize {
         let result;
         (self.versions, result) =
-            std::mem::take(&mut self.versions).with_new_version(label, buffer, count);
+            std::mem::take(&mut self.versions).with_new_version(label, buffer);
         result
     }
 
@@ -682,13 +698,12 @@ impl SppfImpl {
         &mut self,
         original: TableElemRef,
         label: TableElemRef,
-        buffer: &[SppfImplNodeRef],
-        count: usize
+        buffer: &[SppfImplNodeRef]
     ) -> usize {
         let identifier = self.nodes.len();
         self.nodes
             .push(SppfImplNode::Normal(SppfImplNodeNormal::new_with_children(
-                original, label, buffer, count
+                original, label, buffer
             )));
         identifier
     }
