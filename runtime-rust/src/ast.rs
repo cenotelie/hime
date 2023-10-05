@@ -78,6 +78,27 @@ impl TableElemRef {
     pub fn index(self) -> usize {
         self.data & 0x3FFF_FFFF
     }
+
+    /// Formats this table reference
+    ///
+    /// # Errors
+    ///
+    /// Propagates the error from `write!`
+    pub fn fmt(
+        &self,
+        f: &mut Formatter<'_>,
+        variables: &[Symbol],
+        virtuals: &[Symbol]
+    ) -> Result<(), Error> {
+        match self.table_type() {
+            TableType::None => write!(f, "none[{}]", self.index())?,
+            TableType::Token => write!(f, "token[{}]", self.index())?,
+            TableType::Variable => write!(f, "{}", variables[self.index()].name)?,
+            TableType::Virtual => write!(f, "{}", virtuals[self.index()].name)?
+        }
+
+        Ok(())
+    }
 }
 
 /// Represents a cell in an AST inner structure

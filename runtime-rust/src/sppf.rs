@@ -57,6 +57,12 @@ impl SppfImplNodeRef {
     }
 }
 
+impl Display for SppfImplNodeRef {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        write!(f, "[{}+{}]", self.node_id, self.version)
+    }
+}
+
 /// The children for a SPPF node
 #[derive(Debug, Default, Clone)]
 pub enum SppfImplNodeChildren {
@@ -258,6 +264,27 @@ impl SppfImplNodeVersion {
     pub fn is_empty(&self) -> bool {
         self.children.is_empty()
     }
+
+    /// Format this node
+    ///
+    /// # Errors
+    ///
+    /// Propagates the error from `write!`
+    pub fn fmt(
+        &self,
+        f: &mut Formatter,
+        variables: &[Symbol],
+        virtuals: &[Symbol]
+    ) -> Result<(), Error> {
+        self.label.fmt(f, variables, virtuals)?;
+        if !self.is_empty() {
+            write!(f, " ->")?;
+            for child in &self.children {
+                write!(f, " {child}")?;
+            }
+        }
+        Ok(())
+    }
 }
 
 /// The different versions of a node in a Shared-Packed Parse Forest
@@ -442,6 +469,33 @@ impl SppfImplNodeNormal {
             std::mem::take(&mut self.versions).with_new_version(label, buffer, count);
         result
     }
+
+    /// Format this node
+    ///
+    /// # Errors
+    ///
+    /// Propagates the error from `write!`
+    pub fn fmt(
+        &self,
+        f: &mut Formatter,
+        variables: &[Symbol],
+        virtuals: &[Symbol]
+    ) -> Result<(), Error> {
+        match &self.versions {
+            SppfImplNodeVersions::Single(version) => {
+                version.fmt(f, variables, virtuals)?;
+            }
+            SppfImplNodeVersions::Multiple(versions) => {
+                for (index, version) in versions.iter().enumerate() {
+                    if index > 0 {
+                        write!(f, " | ")?;
+                        version.fmt(f, variables, virtuals)?;
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
 }
 
 /// Represents a node in a Shared-Packed Parse Forest that can be replaced by its children
@@ -450,9 +504,9 @@ pub struct SppfImplNodeReplaceable {
     /// The original label of this node
     pub original: TableElemRef,
     /// The children of this node
-    pub children: Option<Vec<SppfImplNodeRef>>,
+    pub children: Vec<SppfImplNodeRef>,
     /// The tree actions on the children of this node
-    pub actions: Option<Vec<TreeAction>>
+    pub actions: Vec<TreeAction>
 }
 
 impl SppfImplNodeTrait for SppfImplNodeReplaceable {
@@ -473,8 +527,8 @@ impl SppfImplNodeReplaceable {
         if count == 0 {
             SppfImplNodeReplaceable {
                 original: label,
-                children: None,
-                actions: None
+                children: Vec::new(),
+                actions: Vec::new()
             }
         } else {
             let mut children = Vec::with_capacity(count);
@@ -485,10 +539,31 @@ impl SppfImplNodeReplaceable {
             }
             SppfImplNodeReplaceable {
                 original: label,
-                children: Some(children),
-                actions: Some(actions)
+                children,
+                actions
             }
         }
+    }
+
+    /// Format this node
+    ///
+    /// # Errors
+    ///
+    /// Propagates the error from `write!`
+    pub fn fmt(
+        &self,
+        f: &mut Formatter,
+        variables: &[Symbol],
+        virtuals: &[Symbol]
+    ) -> Result<(), Error> {
+        self.original.fmt(f, variables, virtuals)?;
+        if !self.children.is_empty() {
+            write!(f, " ->")?;
+            for child in &self.children {
+                write!(f, " {child}")?;
+            }
+        }
+        Ok(())
     }
 }
 
@@ -533,6 +608,23 @@ impl SppfImplNode {
         match self {
             SppfImplNode::Normal(node) => node,
             SppfImplNode::Replaceable(_node) => panic!("Expected a normal node")
+        }
+    }
+
+    /// Format this node
+    ///
+    /// # Errors
+    ///
+    /// Propagates the error from `write!`
+    pub fn fmt(
+        &self,
+        f: &mut Formatter,
+        variables: &[Symbol],
+        virtuals: &[Symbol]
+    ) -> Result<(), Error> {
+        match self {
+            SppfImplNode::Normal(node) => node.fmt(f, variables, virtuals),
+            SppfImplNode::Replaceable(node) => node.fmt(f, variables, virtuals)
         }
     }
 }
@@ -618,6 +710,28 @@ impl SppfImpl {
                 count
             )));
         identifier
+    }
+}
+
+/// Structure to display an SPPF node
+pub struct SppfImplNodeDisplay<'a, 's> {
+    /// The SPPF
+    pub sppf: &'a SppfImpl,
+    /// The node of interest
+    pub node_id: usize,
+    /// The table of variables
+    pub variables: &'a [Symbol<'s>],
+    /// The table of virtuals
+    pub virtuals: &'a [Symbol<'s>]
+}
+
+impl<'a, 's> Display for SppfImplNodeDisplay<'a, 's> {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        let root = self.sppf.get_node(self.node_id);
+        write!(f, "{}: ", self.node_id)?;
+        root.fmt(f, self.variables, self.virtuals)?;
+        writeln!(f)?;
+        Ok(())
     }
 }
 
@@ -862,6 +976,12 @@ impl<'s, 't, 'a> SppfNode<'s, 't, 'a> {
             node_id,
             node
         }
+    }
+
+    /// Gets the identifier of this node
+    #[must_use]
+    pub fn id(&self) -> usize {
+        self.node_id
     }
 
     /// Gets the first version of this node

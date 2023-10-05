@@ -126,6 +126,13 @@ pub fn main() -> miette::Result<()> {
                 ])
         )
         .arg(
+            Arg::new("debug")
+                .long("debug")
+                .help("Print debug data when building a grammar.")
+                .takes_value(false)
+                .required(false)
+        )
+        .arg(
             Arg::new("rust_no_std")
                 .long("--no-std")
                 .help("Rust-only, activates the support for no-std in the generated code (default to no support for no-std)")
@@ -205,6 +212,9 @@ pub fn main() -> miette::Result<()> {
         Some("rnglr1") => task.method = Some(ParsingMethod::RNGLR1),
         Some("rnglalr1") => task.method = Some(ParsingMethod::RNGLALR1),
         _ => {}
+    }
+    if matches.is_present("debug") {
+        task.print_debug_data = Some(true);
     }
     if matches.is_present("rust_no_std") {
         task.rust_use_std = Some(false);

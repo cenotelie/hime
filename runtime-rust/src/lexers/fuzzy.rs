@@ -30,7 +30,7 @@ struct FuzzyMatcherHead {
     /// The associated DFA state
     state: u32,
     /// The data representing this head
-    errors: Option<Vec<u32>>
+    errors: Vec<u32>
 }
 
 impl FuzzyMatcherHead {
@@ -38,7 +38,7 @@ impl FuzzyMatcherHead {
     pub fn new(state: u32) -> FuzzyMatcherHead {
         FuzzyMatcherHead {
             state,
-            errors: None
+            errors: Vec::new()
         }
     }
 
@@ -58,33 +58,23 @@ impl FuzzyMatcherHead {
         distance: usize
     ) -> FuzzyMatcherHead {
         let mut errors = Vec::with_capacity(distance);
-        if previous.errors.is_some() {
-            let others = previous.errors.as_ref().unwrap();
-            for x in others {
-                errors.push(*x);
-            }
+        for &error in &previous.errors {
+            errors.push(error);
         }
         while errors.len() < distance {
             errors.push(offset as u32);
         }
-        FuzzyMatcherHead {
-            state,
-            errors: Some(errors)
-        }
+        FuzzyMatcherHead { state, errors }
     }
 
     /// Gets the Levenshtein distance of this head from the input
     pub fn get_distance(&self) -> usize {
-        if self.errors.is_none() {
-            0
-        } else {
-            self.errors.as_ref().unwrap().len()
-        }
+        self.errors.len()
     }
 
     /// Gets the offset in the input of the i-th lexical error on this head
     pub fn get_error(&self, i: usize) -> u32 {
-        self.errors.as_ref().unwrap()[i]
+        self.errors[i]
     }
 }
 

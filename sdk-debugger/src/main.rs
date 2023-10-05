@@ -25,11 +25,13 @@ use std::io::{BufReader, Read};
 use clap::{Arg, ArgMatches, Command};
 use hime_redist::lexers::automaton::{Automaton, DEAD_STATE};
 use hime_redist::parsers::lrk::LRkAutomaton;
+use hime_redist::parsers::rnglr::RNGLRAutomaton;
 use hime_redist::parsers::{
     get_op_code_base, get_op_code_tree_action, LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_NONE,
-    LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT, LR_OP_CODE_BASE_ADD_VIRTUAL,
-    LR_OP_CODE_BASE_POP_STACK, LR_OP_CODE_BASE_SEMANTIC_ACTION, TREE_ACTION_DROP,
-    TREE_ACTION_PROMOTE, TREE_ACTION_REPLACE_BY_CHILDREN, TREE_ACTION_REPLACE_BY_EPSILON
+    LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT, LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE,
+    LR_OP_CODE_BASE_ADD_VIRTUAL, LR_OP_CODE_BASE_POP_STACK, LR_OP_CODE_BASE_SEMANTIC_ACTION,
+    TREE_ACTION_DROP, TREE_ACTION_PROMOTE, TREE_ACTION_REPLACE_BY_CHILDREN,
+    TREE_ACTION_REPLACE_BY_EPSILON
 };
 
 /// The name of this program
@@ -310,8 +312,105 @@ fn print_parser_lrk(file_name: &str, show_bytecode: bool) -> Result<(), Box<dyn 
 }
 
 /// Prints a parser's automaton
-fn print_parser_glr(_file_name: &str, _show_bytecode: bool) -> Result<(), Box<dyn Error>> {
-    panic!("not implemented");
+fn print_parser_glr(file_name: &str, show_bytecode: bool) -> Result<(), Box<dyn Error>> {
+    let automaton = load_automaton_glr(file_name)?;
+    let states = automaton.get_states_count() as u32;
+    let columns = automaton.get_columns_count();
+    for state in 0..states {
+        let contexts = automaton.get_contexts(state);
+        println!("state {state}");
+
+        for c in 0..columns {
+            let actions_count = automaton.get_actions_count_at(state, c);
+            for i in 0..actions_count {
+                let action = automaton.get_action_at(state, c, i);
+                match action.get_code() {
+                    LR_ACTION_CODE_SHIFT => {
+                        print!("    on 0x{:X}, shift to {}", c, action.get_data());
+                        if let Some(context) =
+                            contexts.get_context_opened_by(automaton.get_sid_for_column(c))
+                        {
+                            print!(", open context {context}");
+                        }
+                        println!();
+                    }
+                    LR_ACTION_CODE_REDUCE => {
+                        let reduction = automaton.get_production(action.get_data() as usize);
+                        print!(
+                            "    on 0x{:X}, reduce 0x{:X} by {}",
+                            c, reduction.head, reduction.reduction_length
+                        );
+                        match reduction.head_action {
+                            TREE_ACTION_DROP => print!(" and drop"),
+                            TREE_ACTION_PROMOTE => print!(" and promote"),
+                            TREE_ACTION_REPLACE_BY_CHILDREN => print!(" and replace by children"),
+                            TREE_ACTION_REPLACE_BY_EPSILON => print!(" and replace by epsilon"),
+                            _ => {}
+                        }
+                        if let Some(context) =
+                            contexts.get_context_opened_by(automaton.get_sid_for_column(c))
+                        {
+                            print!(", open context {context}");
+                        }
+                        println!();
+                        if show_bytecode {
+                            print!("    +-> ");
+                            let mut i = 0;
+                            while i < reduction.bytecode.len() {
+                                if i > 0 {
+                                    print!(" ");
+                                }
+                                let op_code = reduction.bytecode[i];
+                                i += 1;
+                                match get_op_code_base(op_code) {
+                                    LR_OP_CODE_BASE_POP_STACK => {
+                                        print!("pop");
+                                        match get_op_code_tree_action(op_code) {
+                                            TREE_ACTION_DROP => print!("!"),
+                                            TREE_ACTION_PROMOTE => print!("^"),
+                                            _ => {}
+                                        }
+                                    }
+                                    LR_OP_CODE_BASE_SEMANTIC_ACTION => {
+                                        let index = reduction.bytecode[i];
+                                        i += 1;
+                                        print!("action {index}");
+                                    }
+                                    LR_OP_CODE_BASE_ADD_VIRTUAL => {
+                                        let index = reduction.bytecode[i];
+                                        i += 1;
+                                        print!("virtual {index}");
+                                        match get_op_code_tree_action(op_code) {
+                                            TREE_ACTION_DROP => print!("!"),
+                                            TREE_ACTION_PROMOTE => print!("^"),
+                                            _ => {}
+                                        }
+                                    }
+                                    LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE => {
+                                        let index = reduction.bytecode[i];
+                                        i += 1;
+                                        print!("nullable {index}");
+                                        match get_op_code_tree_action(op_code) {
+                                            TREE_ACTION_DROP => print!("!"),
+                                            TREE_ACTION_PROMOTE => print!("^"),
+                                            _ => {}
+                                        }
+                                    }
+                                    _ => {}
+                                }
+                            }
+                            println!();
+                        }
+                    }
+                    LR_ACTION_CODE_ACCEPT => {
+                        println!("    on 0x{c:X}, accept");
+                    }
+                    _ => {}
+                }
+            }
+        }
+    }
+    Ok(())
 }
 
 /// Computes the diff between two lexer automaton
@@ -563,4 +662,12 @@ fn load_automaton_lrk(file_name: &str) -> Result<LRkAutomaton, Box<dyn Error>> {
     let mut buffer = Vec::new();
     file.read_to_end(&mut buffer)?;
     Ok(LRkAutomaton::new(&buffer))
+}
+
+/// Loads an LR(k) automaton from a file
+fn load_automaton_glr(file_name: &str) -> Result<RNGLRAutomaton, Box<dyn Error>> {
+    let mut file = BufReader::new(File::open(file_name)?);
+    let mut buffer = Vec::new();
+    file.read_to_end(&mut buffer)?;
+    Ok(RNGLRAutomaton::new(&buffer))
 }

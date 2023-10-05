@@ -169,60 +169,40 @@ struct LRContextOpening {
 #[derive(Default, Clone)]
 pub struct LRContexts {
     /// The contexts, if any
-    openings: Option<Vec<LRContextOpening>>
+    openings: Vec<LRContextOpening>
 }
 
 impl LRContexts {
     /// Initializes empty contexts
     #[must_use]
     pub fn new() -> LRContexts {
-        LRContexts { openings: None }
+        LRContexts {
+            openings: Vec::new()
+        }
     }
 
     /// Registers a new context
     pub fn add(&mut self, identifier: u16, context: u16) {
-        match self.openings.as_mut() {
-            None => {
-                self.openings = Some(alloc::vec![LRContextOpening {
-                    identifier,
-                    context
-                }]);
-            }
-            Some(data) => {
-                data.push(LRContextOpening {
-                    identifier,
-                    context
-                });
-            }
-        }
+        self.openings.push(LRContextOpening {
+            identifier,
+            context
+        });
     }
 
     /// Gets whether the specified context opens by a transition using the specified terminal ID
     #[must_use]
     pub fn opens(&self, terminal_id: u32, context: u16) -> bool {
-        match self.openings.as_ref() {
-            None => false,
-            Some(data) => {
-                for x in data {
-                    if u32::from(x.identifier) == terminal_id && x.context == context {
-                        return true;
-                    }
-                }
-                false
-            }
-        }
+        self.openings.iter().any(|opening| {
+            u32::from(opening.identifier) == terminal_id && opening.context == context
+        })
     }
 
     /// Gets the context opened by a symbol, if any
     #[must_use]
     pub fn get_context_opened_by(&self, terminal_id: u32) -> Option<u16> {
         self.openings
-            .as_ref()
-            .and_then(|openings| {
-                openings
-                    .iter()
-                    .find(|op| u32::from(op.identifier) == terminal_id)
-            })
+            .iter()
+            .find(|op| u32::from(op.identifier) == terminal_id)
             .map(|op| op.context)
     }
 }

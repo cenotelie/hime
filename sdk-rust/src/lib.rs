@@ -461,6 +461,8 @@ pub struct CompilationTask<'a> {
     pub output_modifier: Option<Modifier>,
     /// The parsing method use
     pub method: Option<ParsingMethod>,
+    /// Whether to print debug data when building a grammar
+    pub print_debug_data: Option<bool>,
     /// Java-only, the path to the local maven repository to use
     pub java_maven_repository: Option<String>,
     /// Rust-only, indicates whether standard library exclusive features are enabled
@@ -629,6 +631,18 @@ impl<'a> CompilationTask<'a> {
             Ok(d) => d,
             Err(errors) => return Err(Errors::from(data, errors))
         };
+        if self.print_debug_data.unwrap_or_default() {
+            for (grammar, data) in data.grammars.iter().zip(all_data.iter()) {
+                println!("================ {}", &grammar.name);
+                println!("{grammar}");
+                println!("================ {}, graph", &grammar.name);
+                let graph = lr::GraphWithGrammar {
+                    grammar,
+                    graph: &data.graph
+                };
+                println!("{graph}");
+            }
+        }
         if let Err(errors) = self.execute_grammar_artifacts(&data.grammars, &all_data) {
             return Err(Errors::from(data, errors));
         }

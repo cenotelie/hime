@@ -142,6 +142,18 @@ impl RNGLRAutomaton {
         self.states_count
     }
 
+    /// Gets the number of columns in the LR table
+    #[must_use]
+    pub fn get_columns_count(&self) -> usize {
+        self.columns_count
+    }
+
+    /// Gets the symbol's identifier for a column
+    #[must_use]
+    pub fn get_sid_for_column(&self, column: usize) -> u32 {
+        self.columns_map.get_id_at(column)
+    }
+
     /// Gets the contexts opened by the specified state
     #[must_use]
     pub fn get_contexts(&self, state: u32) -> &LRContexts {
@@ -152,6 +164,12 @@ impl RNGLRAutomaton {
     #[must_use]
     pub fn get_actions_count(&self, state: u32, identifier: u32) -> usize {
         let column = self.columns_map.get(identifier) as usize;
+        self.get_actions_count_at(state, column)
+    }
+
+    /// Gets the number of GLR actions for the given state and column
+    #[must_use]
+    pub fn get_actions_count_at(&self, state: u32, column: usize) -> usize {
         self.cells[state as usize * self.columns_count + column].count as usize
     }
 
@@ -159,11 +177,23 @@ impl RNGLRAutomaton {
     #[must_use]
     pub fn get_action(&self, state: u32, identifier: u32, index: usize) -> LRAction {
         let column = self.columns_map.get(identifier) as usize;
+        self.get_action_at(state, column, index)
+    }
+
+    /// Gets the i-th GLR action for the given state and column
+    #[must_use]
+    pub fn get_action_at(&self, state: u32, column: usize, index: usize) -> LRAction {
         let cell = self.cells[state as usize * self.columns_count + column];
         LRAction {
             table: &self.table,
             offset: (cell.index as usize + index) * 2
         }
+    }
+
+    /// Gets the number of productions
+    #[must_use]
+    pub fn get_productions_count(&self) -> usize {
+        self.productions.len()
     }
 
     /// Gets the i-th production
@@ -246,14 +276,14 @@ struct GSSGeneration {
 }
 
 /// Represents a path in a GSS
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 struct GSSPath {
     /// The final target of this path
     last_node: usize,
     /// The generation containing the final target of this path
     generation: usize,
     /// The labels on this GSS path
-    labels: Option<Vec<GSSLabel>>
+    labels: Vec<GSSLabel>
 }
 
 impl GSSPath {
@@ -263,9 +293,9 @@ impl GSSPath {
             last_node,
             generation,
             labels: if length == 0 {
-                None
+                Vec::new()
             } else {
-                Some(Vec::with_capacity(length))
+                Vec::with_capacity(length)
             }
         }
     }
@@ -275,7 +305,7 @@ impl GSSPath {
         GSSPath {
             last_node,
             generation,
-            labels: None
+            labels: Vec::new()
         }
     }
 
@@ -291,7 +321,7 @@ impl GSSPath {
             generation,
             labels: previous.labels.clone()
         };
-        result.labels.as_mut().unwrap().push(label);
+        result.labels.push(label);
         result
     }
 
@@ -299,7 +329,7 @@ impl GSSPath {
     pub fn push(&mut self, last_node: usize, generation: usize, label: GSSLabel) {
         self.last_node = last_node;
         self.generation = generation;
-        self.labels.as_mut().unwrap().push(label);
+        self.labels.push(label);
     }
 }
 
@@ -351,16 +381,16 @@ impl GSS {
         (data.start..(data.start + data.count)).find(|&i| self.node_labels[i] == state)
     }
 
-    /// Determines whether this instance has the required edge
-    pub fn has_edge(&self, generation: usize, from: usize, to: usize) -> bool {
+    /// Gets the corresponding edge, if any
+    pub fn get_edge(&self, generation: usize, from: usize, to: usize) -> Option<GSSEdge> {
         let data = self.edges_generations[generation];
         for i in data.start..(data.start + data.count) {
             let edge = self.edges[i];
             if edge.from as usize == from && edge.to as usize == to {
-                return true;
+                return Some(edge);
             }
         }
-        false
+        None
     }
 
     /// Opens a new generation in this GSS
@@ -522,8 +552,6 @@ struct SPPFReduction {
 
 /// Represents a structure that helps build a Shared Packed Parse Forest (SPPF)
 /// A SPPF is a compact representation of multiple variants of an AST at once.
-/// GLR algorithms originally builds the complete SPPF.
-/// However we only need to build one of the variant, i.e. an AST for the user.
 struct SPPFBuilder<'s, 't, 'a, 'l> {
     /// Lexer associated to this parser
     lexer: &'l mut Lexer<'s, 't, 'a>,
@@ -609,33 +637,34 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
 
     /// Adds the specified GSS label to the current history
     pub fn add_to_history(&mut self, generation: usize, label: usize) {
-        let my_history = &mut self.history;
-        for item in &mut *my_history {
-            if item.generation == generation {
-                item.data.push(label);
-                return;
-            }
+        if let Some(part) = self
+            .history
+            .iter_mut()
+            .find(|hp| hp.generation == generation)
+        {
+            part.data.push(label);
+        } else {
+            self.history.push(HistoryPart {
+                generation,
+                data: alloc::vec![label]
+            });
         }
-        my_history.push(HistoryPart {
-            generation,
-            data: alloc::vec![label]
-        });
     }
 
     /// Gets the GSS label already in history for the given GSS generation and symbol
-    pub fn get_label_for(&self, generation: usize, reference: TableElemRef) -> Option<usize> {
-        for i in 0..self.history.len() {
-            let hp = &self.history[i];
-            if hp.generation == generation {
-                for id in &hp.data {
-                    let node_symbol = self.sppf.get_node(*id).get_original_symbol();
-                    if node_symbol == reference {
-                        return Some(*id);
-                    }
+    pub fn _get_label_for(&self, generation: usize, reference: TableElemRef) -> Option<usize> {
+        self.history
+            .iter()
+            .find_map(|part| {
+                if part.generation == generation {
+                    part.data
+                        .iter()
+                        .find(|&&id| self.sppf.get_node(id).get_original_symbol() == reference)
+                } else {
+                    None
                 }
-            }
-        }
-        None
+            })
+            .copied()
     }
 
     /// Creates a single node in the result SPPF an returns it
@@ -648,9 +677,8 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         let mut stack = Vec::new();
         if length > 0 {
             if length > 1 {
-                let path_labels = path.labels.as_ref().unwrap();
                 for i in 0..(length - 1) {
-                    stack.push(path_labels[length - 2 - i]);
+                    stack.push(path.labels[length - 2 - i]);
                 }
             }
             stack.push(first);
@@ -682,19 +710,13 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             }
             SppfImplNode::Replaceable(replaceable) => {
                 // this is replaceable sub-tree
-                match &replaceable.children {
-                    None => {}
-                    Some(children) => {
-                        let actions = replaceable.actions.as_ref().unwrap();
-                        for i in 0..children.len() {
-                            SPPFBuilder::reduction_add_to_cache(
-                                reduction,
-                                sppf,
-                                children[i].node_id as usize,
-                                actions[i]
-                            );
-                        }
-                    }
+                for (node_ref, &action) in replaceable.children.iter().zip(&replaceable.actions) {
+                    SPPFBuilder::reduction_add_to_cache(
+                        reduction,
+                        sppf,
+                        node_ref.node_id as usize,
+                        action
+                    );
                 }
             }
         }
@@ -759,19 +781,25 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         &mut self,
         generation: usize,
         variable_index: usize,
-        head_action: TreeAction
+        head_action: TreeAction,
+        target: Option<usize>
     ) -> usize {
         let label = if head_action == TREE_ACTION_REPLACE_BY_CHILDREN {
             self.reduce_replaceable(variable_index)
         } else {
-            self.reduce_normal(variable_index, head_action)
+            self.reduce_normal(variable_index, head_action, target)
         };
         self.add_to_history(generation, label);
         label
     }
 
     /// Executes the reduction as a normal reduction
-    pub fn reduce_normal(&mut self, variable_index: usize, head_action: TreeAction) -> usize {
+    pub fn reduce_normal(
+        &mut self,
+        variable_index: usize,
+        head_action: TreeAction,
+        target: Option<usize>
+    ) -> usize {
         let reduction = self.reduction.as_mut().expect("Not in a reduction");
         let mut promoted: Option<(TableElemRef, SppfImplNodeRef)> = None;
         let mut insertion = 0;
@@ -831,12 +859,21 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             }
             Some((symbol, _node_ref)) => symbol
         };
-        self.sppf.new_normal_node_with_children(
-            original_label,
-            current_label,
-            &reduction.cache,
-            insertion
-        )
+        if let Some(target) = target {
+            self.sppf.get_node_mut(target).as_normal_mut().new_version(
+                original_label,
+                &reduction.cache,
+                insertion
+            );
+            target
+        } else {
+            self.sppf.new_normal_node_with_children(
+                original_label,
+                current_label,
+                &reduction.cache,
+                insertion
+            )
+        }
     }
 
     /// Executes the reduction as the reduction of a replaceable variable
@@ -873,7 +910,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         }
     }
 
-    /// Builds thSe final AST for the specified PPF node reference
+    /// Builds thSe final AST for the specified SPPF node reference
     fn build_final_ast(
         sppf: &SppfImpl,
         reference: SppfImplNodeRef,
@@ -907,7 +944,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
 /// the first label then is epsilon
 /// For others, the node is the SECOND GSS node on the path, not the head.
 /// The first label is then the label on the transition from the head.
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 struct RNGLRReduction {
     /// The GSS node to reduce from
     node: usize,
@@ -1043,7 +1080,7 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
             let paths = self.gss.get_paths(from, 1);
             for path in &paths {
                 let last_node = path.last_node;
-                let symbol_id = path.labels.as_ref().unwrap()[0].symbol_id;
+                let symbol_id = path.labels[0].symbol_id;
                 let contexts = self
                     .automaton
                     .get_contexts(self.gss.get_represented_state(last_node));
@@ -1376,7 +1413,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                 actions
             },
             builder: SPPFBuilder::new_ast(lexer, variables, virtuals, ast),
-            nullables: Vec::new()
+            nullables: alloc::vec![0xFFFF_FFFF ; variables.len()]
         };
         RNGLRParser::build_nullables(
             &mut parser.builder,
@@ -1408,7 +1445,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                 actions
             },
             builder: SPPFBuilder::new_sppf(lexer, variables, virtuals, sppf),
-            nullables: Vec::new()
+            nullables: alloc::vec![0xFFFF_FFFF ; variables.len()]
         };
         RNGLRParser::build_nullables(
             &mut parser.builder,
@@ -1424,14 +1461,10 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
     fn build_nullables(
         builder: &mut SPPFBuilder<'s, 't, 'a, 'l>,
         actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
-        nullables: &mut Vec<usize>,
+        nullables: &mut [usize],
         automaton: &RNGLRAutomaton,
         variables: &[Symbol]
     ) {
-        for _i in 0..variables.len() {
-            nullables.push(0xFFFF_FFFF);
-        }
-
         // Get the dependency table
         let mut dependencies = RNGLRParser::build_nullables_dependencies(automaton, variables);
         // Solve and build
@@ -1440,39 +1473,29 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
             remaining = 0;
             let mut resolved = 0;
             for i in 0..variables.len() {
-                let mut was_unresolved = false;
-                let mut is_resolved = false;
-                {
-                    let dep = &dependencies[i];
-                    if dep.is_some() {
-                        was_unresolved = true;
-                        let mut ok = true;
-                        for r in dep.as_ref().unwrap() {
-                            ok = ok && dependencies[*r].is_none();
-                        }
-                        if ok {
-                            let production = automaton.get_nullable_production(i);
-                            let path = GSSPath::new(0, 0, 0);
-                            nullables[i] = RNGLRParser::build_sppf(
-                                builder,
-                                actions,
-                                nullables,
-                                0,
-                                production.unwrap(),
-                                EPSILON,
-                                &path
-                            );
-                            is_resolved = true;
-                        }
-                    }
+                let production = automaton.get_nullable_production(i);
+                if production.is_none() || nullables[i] != 0xFFFF_FFFF {
+                    // not nullable, or already resolved
+                    continue;
                 }
-                if was_unresolved {
-                    if is_resolved {
-                        dependencies[i] = None;
-                        resolved += 1;
-                    } else {
-                        remaining += 1;
-                    }
+                let can_resolve = dependencies[i].is_empty()
+                    || dependencies[i].iter().all(|&d| nullables[d] != 0xFFFF_FFFF);
+                if can_resolve {
+                    let path = GSSPath::new(0, 0, 0);
+                    nullables[i] = RNGLRParser::build_sppf(
+                        builder,
+                        actions,
+                        nullables,
+                        0,
+                        production.unwrap(),
+                        EPSILON,
+                        &path,
+                        None
+                    );
+                    dependencies[i].clear();
+                    resolved += 1;
+                } else {
+                    remaining += 1;
                 }
             }
             // There is dependency cycle ...
@@ -1488,22 +1511,17 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
     fn build_nullables_dependencies(
         automaton: &RNGLRAutomaton,
         variables: &[Symbol]
-    ) -> Vec<Option<Vec<usize>>> {
-        let mut result = Vec::<Option<Vec<usize>>>::with_capacity(variables.len());
-        for i in 0..variables.len() {
-            let production = automaton.get_nullable_production(i);
-            match production {
-                None => {
-                    result.push(None);
-                }
-                Some(nullable_production) => {
-                    result.push(Some(RNGLRParser::build_nullable_dependencies_for(
-                        nullable_production
-                    )));
-                }
-            }
-        }
-        result
+    ) -> Vec<Vec<usize>> {
+        variables
+            .iter()
+            .enumerate()
+            .map(|(i, _variable)| {
+                automaton
+                    .get_nullable_production(i)
+                    .map(RNGLRParser::build_nullable_dependencies_for)
+                    .unwrap_or_default()
+            })
+            .collect()
     }
 
     /// Gets the dependencies on nullable variables
@@ -1530,6 +1548,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
     }
 
     /// Builds the SPPF
+    #[allow(clippy::too_many_arguments)]
     fn build_sppf(
         builder: &mut SPPFBuilder<'s, 't, 'a, 'l>,
         actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
@@ -1537,7 +1556,8 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
         generation: usize,
         production: &LRProduction,
         first: GSSLabel,
-        path: &GSSPath
+        path: &GSSPath,
+        target: Option<usize>
     ) -> usize {
         let variable = builder.variables[production.head];
         builder.reduction_prepare(first, path, production.reduction_length);
@@ -1567,7 +1587,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                 }
             }
         }
-        builder.reduce(generation, production.head, production.head_action)
+        builder.reduce(generation, production.head, production.head_action, target)
     }
 
     /// Gets the next token in the kernel
@@ -1607,6 +1627,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
     }
 
     /// Executes a reduction operation for a given path
+    #[allow(clippy::too_many_lines)]
     fn parse_reduction_path(
         &mut self,
         generation: usize,
@@ -1616,14 +1637,29 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
         let production = self.data.automaton.get_production(reduction.production);
         // Get the rule's head
         let head = self.data.variables[production.head];
+        // Get the target state by transition on the rule's head
+        let to = self
+            .data
+            .get_next_by_var(self.data.gss.get_represented_state(path.last_node), head.id)
+            .unwrap();
+        // Find a node for the target state in the GSS
+        let w = self.data.gss.find_node(generation, to);
+        // Do we have to create a GSS edge?
+        let previous_edge_label = w.and_then(|w| {
+            self.data
+                .gss
+                .get_edge(generation, w, path.last_node)
+                .map(|edge| edge.label)
+        });
         // Resolve the sub-root
-        let maybe_sppf = self.builder.get_label_for(
-            path.generation,
-            TableElemRef::new(TableType::Variable, production.head)
-        );
-        let label = GSSLabel {
-            sppf_node: if let Some(sppf) = maybe_sppf {
-                sppf as u32
+        // let maybe_sppf = self.builder.get_label_for(
+        //     path.generation,
+        //     TableElemRef::new(TableType::Variable, production.head)
+        // );
+        let node_id =
+            if self.data.automaton.nullables[production.head] as usize == reduction.production {
+                // nullable production, use the nullable node
+                self.nullables[production.head]
             } else {
                 RNGLRParser::build_sppf(
                     &mut self.builder,
@@ -1632,22 +1668,20 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                     generation,
                     production,
                     reduction.first,
-                    path
-                ) as u32
-            },
+                    path,
+                    previous_edge_label
+                        .as_ref()
+                        .map(|previous| previous.sppf_node as usize)
+                )
+            };
+        let label = previous_edge_label.unwrap_or(GSSLabel {
+            sppf_node: node_id as u32,
             symbol_id: head.id
-        };
+        });
 
-        // Get the target state by transition on the rule's head
-        let to = self
-            .data
-            .get_next_by_var(self.data.gss.get_represented_state(path.last_node), head.id)
-            .unwrap();
-        // Find a node for the target state in the GSS
-        let w = self.data.gss.find_node(generation, to);
         if let Some(w) = w {
             // A node for the target state is already in the GSS
-            if !self.data.gss.has_edge(generation, w, path.last_node) {
+            if previous_edge_label.is_none() {
                 // But the new edge does not exist
                 self.data.gss.create_edge(w, path.last_node, label);
                 // Look for the new reductions at this state
@@ -1855,7 +1889,7 @@ impl<'s, 't, 'a, 'l> Parser for RNGLRParser<'s, 't, 'a, 'l> {
             if self.data.automaton.is_accepting_state(state) {
                 // Has reduction _Axiom_ -> axiom $ . on ε
                 let paths = self.data.gss.get_paths(i, 2);
-                let root = paths[0].labels.as_ref().unwrap()[1];
+                let root = paths[0].labels[1];
                 self.builder.commit_root(root.sppf_node as usize);
             }
         }
