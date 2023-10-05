@@ -32,7 +32,7 @@ use super::{
 use crate::ast::{AstCell, AstImpl, TableElemRef, TableType};
 use crate::errors::ParseErrorUnexpectedToken;
 use crate::lexers::{Lexer, TokenKernel, DEFAULT_CONTEXT};
-use crate::sppf::{SppfImpl, SppfImplNode, SppfImplNodeNormal, SppfImplNodeRef};
+use crate::sppf::{SppfImpl, SppfImplNode, SppfImplNodeRef};
 use crate::symbols::{SemanticBody, SemanticElement, SemanticElementTrait, SID_EPSILON};
 use crate::utils::biglist::BigList;
 use crate::utils::OwnOrMut;
@@ -248,7 +248,7 @@ impl RNGLRAutomaton {
 #[derive(Debug, Default, Copy, Clone)]
 struct GSSLabel {
     /// The identifier of the SPPF node in this edge
-    sppf_node: u32,
+    sppf_node: SppfImplNodeRef,
     /// The symbol identifier of the original symbol on the SPPF node
     symbol_id: u32
 }
@@ -523,7 +523,7 @@ impl GSS {
 
 /// Represents the epsilon node
 const EPSILON: GSSLabel = GSSLabel {
-    sppf_node: 0xFFFF_FFFF,
+    sppf_node: SppfImplNodeRef::new(0xFFFF_FFFF),
     symbol_id: SID_EPSILON
 };
 
@@ -531,10 +531,8 @@ const EPSILON: GSSLabel = GSSLabel {
 struct SPPFReduction {
     /// The adjacency cache for the reduction
     cache: Vec<SppfImplNodeRef>,
-    /// The reduction handle represented as the indices of the sub-trees in the cache
-    handle_indices: Vec<usize>,
     /// The actions for the reduction
-    handle_actions: Vec<TreeAction>,
+    actions: Vec<TreeAction>,
     /// The stack of semantic objects for the reduction
     stack: Vec<GSSLabel>,
     /// The number of items popped from the stack
@@ -552,7 +550,7 @@ struct SPPFBuilder<'s, 't, 'a, 'l> {
     virtuals: &'a [Symbol<'s>],
     /// The SPPF front to build the SPPF
     sppf: OwnOrMut<'a, SppfImpl>,
-    /// The data of the current reduction
+    /// The data of the current reductions
     reduction: Option<SPPFReduction>,
     /// The AST being built, if any
     ast: Option<&'a mut AstImpl>
@@ -561,9 +559,9 @@ struct SPPFBuilder<'s, 't, 'a, 'l> {
 impl<'s, 't, 'a, 'l> SemanticBody for SPPFBuilder<'s, 't, 'a, 'l> {
     fn get_element_at(&self, index: usize) -> SemanticElement {
         let reduction = self.reduction.as_ref().expect("Not in a reduction");
-        let reference = reduction.cache[reduction.handle_indices[index]];
-        let node = self.sppf.get_node(reference.node_id as usize).as_normal();
-        let label = node.versions[reference.version as usize].label;
+        let reference = reduction.cache[index];
+        let node = self.sppf.get_node(reference).as_normal();
+        let label = node.versions[0].label;
         match label.table_type() {
             TableType::Token => {
                 SemanticElement::Token(self.lexer.get_data().repository.get_token(label.index()))
@@ -577,8 +575,11 @@ impl<'s, 't, 'a, 'l> SemanticBody for SPPFBuilder<'s, 't, 'a, 'l> {
     }
 
     fn length(&self) -> usize {
-        let reduction = self.reduction.as_ref().expect("Not in a reduction");
-        reduction.handle_indices.len()
+        self.reduction
+            .as_ref()
+            .expect("Not in a reduction")
+            .cache
+            .len()
     }
 }
 
@@ -618,7 +619,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     }
 
     /// Creates a single node in the result SPPF an returns it
-    pub fn get_single_node(&mut self, symbol: TableElemRef) -> usize {
+    pub fn get_single_node(&mut self, symbol: TableElemRef) -> SppfImplNodeRef {
         self.sppf.new_normal_node(symbol)
     }
 
@@ -635,8 +636,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         }
         self.reduction = Some(SPPFReduction {
             cache: Vec::with_capacity(length),
-            handle_indices: Vec::with_capacity(length),
-            handle_actions: Vec::with_capacity(length),
+            actions: Vec::with_capacity(length),
             stack,
             pop_count: 0
         });
@@ -646,27 +646,22 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     fn reduction_add_to_cache(
         reduction: &mut SPPFReduction,
         sppf: &SppfImpl,
-        sppf_node: usize,
+        sppf_node_ref: SppfImplNodeRef,
         action: TreeAction
     ) {
         if action == TREE_ACTION_DROP {
             return;
         }
-        let node = sppf.get_node(sppf_node);
+        let node = sppf.get_node(sppf_node_ref);
         match node {
-            SppfImplNode::Normal(normal) => {
+            SppfImplNode::Normal(_) => {
                 // this is a simple reference to an existing SPPF node
-                SPPFBuilder::reduction_add_to_cache_node(reduction, normal, sppf_node, action);
+                SPPFBuilder::reduction_add_to_cache_node(reduction, sppf_node_ref, action);
             }
             SppfImplNode::Replaceable(replaceable) => {
                 // this is replaceable sub-tree
-                for (node_ref, &action) in replaceable.children.iter().zip(&replaceable.actions) {
-                    SPPFBuilder::reduction_add_to_cache(
-                        reduction,
-                        sppf,
-                        node_ref.node_id as usize,
-                        action
-                    );
+                for (&node_ref, &action) in replaceable.children.iter().zip(&replaceable.actions) {
+                    SPPFBuilder::reduction_add_to_cache(reduction, sppf, node_ref, action);
                 }
             }
         }
@@ -675,22 +670,12 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     /// Adds the specified GSS label to the reduction cache with the given tree action
     fn reduction_add_to_cache_node(
         reduction: &mut SPPFReduction,
-        node: &SppfImplNodeNormal,
-        node_id: usize,
+        sppf_node_ref: SppfImplNodeRef,
         action: TreeAction
     ) {
         // add the node in the cache
-        reduction.cache.push(SppfImplNodeRef {
-            node_id: node_id as u32,
-            version: 0
-        });
-        // setup the handle to point to the root
-        reduction.handle_indices.push(reduction.cache.len() - 1);
-        reduction.handle_actions.push(action);
-        // copy the children
-        for child in &node.versions[0].children {
-            reduction.cache.push(child);
-        }
+        reduction.cache.push(sppf_node_ref);
+        reduction.actions.push(action);
     }
 
     /// During a reduction, pops the top symbol from the stack and gives it a tree action
@@ -698,12 +683,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         let reduction = self.reduction.as_mut().expect("Not in a reduction");
         let label = reduction.stack[reduction.pop_count];
         reduction.pop_count += 1;
-        SPPFBuilder::reduction_add_to_cache(
-            reduction,
-            &self.sppf,
-            label.sppf_node as usize,
-            action
-        );
+        SPPFBuilder::reduction_add_to_cache(reduction, &self.sppf, label.sppf_node, action);
     }
 
     /// During a reduction, inserts a virtual symbol
@@ -712,13 +692,12 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         let node_id = self
             .sppf
             .new_normal_node(TableElemRef::new(TableType::Virtual, index));
-        reduction.cache.push(SppfImplNodeRef::new_usize(node_id, 0));
-        reduction.handle_indices.push(reduction.cache.len() - 1);
-        reduction.handle_actions.push(action);
+        reduction.cache.push(node_id);
+        reduction.actions.push(action);
     }
 
     /// During a reduction, inserts the sub-tree of a nullable variable
-    pub fn reduction_add_nullable(&mut self, nullable: usize, action: TreeAction) {
+    pub fn reduction_add_nullable(&mut self, nullable: SppfImplNodeRef, action: TreeAction) {
         let reduction = self.reduction.as_mut().expect("Not in a reduction");
         SPPFBuilder::reduction_add_to_cache(reduction, &self.sppf, nullable, action);
     }
@@ -728,8 +707,8 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         &mut self,
         variable_index: usize,
         head_action: TreeAction,
-        target: Option<usize>
-    ) -> usize {
+        target: Option<SppfImplNodeRef>
+    ) -> SppfImplNodeRef {
         if head_action == TREE_ACTION_REPLACE_BY_CHILDREN {
             self.reduce_replaceable(variable_index)
         } else {
@@ -742,111 +721,72 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         &mut self,
         variable_index: usize,
         head_action: TreeAction,
-        target: Option<usize>
-    ) -> usize {
-        let reduction = self.reduction.as_mut().expect("Not in a reduction");
-        let mut promoted: Option<(TableElemRef, SppfImplNodeRef)> = None;
-        let mut insertion = 0;
+        target: Option<SppfImplNodeRef>
+    ) -> SppfImplNodeRef {
+        let reduction: &mut SPPFReduction = self.reduction.as_mut().expect("Not in a reduction");
+        let mut promoted: Option<SppfImplNodeRef> = None;
 
-        for i in 0..reduction.handle_indices.len() {
-            if reduction.handle_actions[i] == TREE_ACTION_PROMOTE {
-                match promoted {
-                    None => {}
-                    Some((symbol, node_ref)) => {
-                        // not the first promotion
-                        // create a new version for the promoted node
-                        let old_promoted_node = self.sppf.get_node_mut(node_ref.node_id as usize);
-                        let old_promoted_ref = SppfImplNodeRef {
-                            node_id: node_ref.node_id,
-                            version: old_promoted_node
-                                .as_normal_mut()
-                                .new_version(symbol, &reduction.cache[..insertion])
-                                as u32
-                        };
-                        // register the previously promoted reference into the cache
-                        reduction.cache[0] = old_promoted_ref;
-                        insertion = 1;
-                    }
+        let mut b = 0;
+        let mut e = 0;
+        while e < reduction.cache.len() {
+            if reduction.actions[e] == TREE_ACTION_PROMOTE {
+                let current = self.sppf.get_node_mut(reduction.cache[e]).as_normal_mut();
+                if promoted.is_some() {
+                    // not the first promotion, insert the old promoted and the remaining head
+                    current.insert_head(&reduction.cache[(b - 1)..e]);
+                } else {
+                    assert_eq!(b, 0);
+                    // capture the current head
+                    current.insert_head(&reduction.cache[..e]);
                 }
-                // save the new promoted node
-                let promoted_reference = reduction.cache[reduction.handle_indices[i]];
-                let promoted_node = self
-                    .sppf
-                    .get_node(promoted_reference.node_id as usize)
-                    .as_normal();
-                let promoted_version = &promoted_node.versions[promoted_reference.version as usize];
-                promoted = Some((promoted_version.label, promoted_reference));
-                // repack the children on the left if any
-                for c in 0..promoted_version.len() {
-                    reduction.cache[insertion] =
-                        reduction.cache[reduction.handle_indices[i] + 1 + c];
-                    insertion += 1;
-                }
-            } else {
-                // Repack the sub-root on the left
-                if insertion != reduction.handle_indices[i] {
-                    reduction.cache[insertion] = reduction.cache[reduction.handle_indices[i]];
-                }
-                insertion += 1;
+
+                // promote
+                promoted = Some(reduction.cache[e]);
+                // advance
+                b = e + 1;
             }
+            e += 1;
         }
 
-        let original_label = TableElemRef::new(TableType::Variable, variable_index);
-        let current_label = match promoted {
-            None => {
-                if head_action == TREE_ACTION_REPLACE_BY_EPSILON {
-                    TableElemRef::new(TableType::None, 0)
-                } else {
-                    original_label
-                }
-            }
-            Some((symbol, _node_ref)) => symbol
-        };
-        if let Some(target) = target {
-            self.sppf
-                .get_node_mut(target)
-                .as_normal_mut()
-                .new_version(original_label, &reduction.cache[..insertion]);
-            target
+        if let Some(promoted) = promoted {
+            // capture the tail
+            let current = self.sppf.get_node_mut(promoted).as_normal_mut();
+            current.add_tail(&reduction.cache[b..]);
+            promoted
         } else {
-            self.sppf.new_normal_node_with_children(
-                original_label,
-                current_label,
-                &reduction.cache[..insertion]
-            )
+            assert_eq!(b, 0);
+            let original_label = if head_action == TREE_ACTION_REPLACE_BY_EPSILON {
+                TableElemRef::new(TableType::None, 0)
+            } else {
+                TableElemRef::new(TableType::Variable, variable_index)
+            };
+            if let Some(target) = target {
+                self.sppf
+                    .get_node_mut(target)
+                    .as_normal_mut()
+                    .new_version(original_label, &reduction.cache);
+                target
+            } else {
+                self.sppf
+                    .new_normal_node_with_children(original_label, &reduction.cache)
+            }
         }
     }
 
     /// Executes the reduction as the reduction of a replaceable variable
-    pub fn reduce_replaceable(&mut self, variable_index: usize) -> usize {
+    pub fn reduce_replaceable(&mut self, variable_index: usize) -> SppfImplNodeRef {
         let reduction = self.reduction.as_mut().expect("Not in a reduction");
-        for i in 0..reduction.handle_indices.len() {
-            if i != reduction.handle_indices[i] {
-                reduction.cache[i] = reduction.cache[reduction.handle_indices[i]];
-            }
-        }
         let label = TableElemRef::new(TableType::Variable, variable_index);
-        self.sppf.new_replaceable_node(
-            label,
-            &reduction.cache,
-            &reduction.handle_actions,
-            reduction.handle_indices.len()
-        )
+        self.sppf
+            .new_replaceable_node(label, &reduction.cache, &reduction.actions)
     }
 
     /// Finalizes the parse tree
-    pub fn commit_root(&mut self, root: usize) {
+    pub fn commit_root(&mut self, root: SppfImplNodeRef) {
         self.sppf.store_root(root);
         if let Some(ast) = self.ast.as_mut() {
             let sppf = &self.sppf;
-            let cell_root = SPPFBuilder::build_final_ast(
-                sppf,
-                SppfImplNodeRef {
-                    node_id: root as u32,
-                    version: 0
-                },
-                ast
-            );
+            let cell_root = SPPFBuilder::build_final_ast(sppf, root, ast);
             ast.store_root(cell_root);
         }
     }
@@ -854,11 +794,11 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     /// Builds thSe final AST for the specified SPPF node reference
     fn build_final_ast(
         sppf: &SppfImpl,
-        reference: SppfImplNodeRef,
+        sppf_node_ref: SppfImplNodeRef,
         result: &mut AstImpl
     ) -> AstCell {
-        let node = sppf.get_node(reference.node_id as usize).as_normal();
-        let version = &node.versions[reference.version as usize];
+        let node = sppf.get_node(sppf_node_ref).as_normal();
+        let version = &node.versions[0];
         if version.children.is_empty() {
             AstCell {
                 label: version.label,
@@ -1431,7 +1371,8 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                         EPSILON,
                         &path,
                         None
-                    );
+                    )
+                    .node_id();
                     dependencies[i].clear();
                     resolved += 1;
                 } else {
@@ -1495,8 +1436,8 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
         production: &LRProduction,
         first: GSSLabel,
         path: &GSSPath,
-        target: Option<usize>
-    ) -> usize {
+        target: Option<SppfImplNodeRef>
+    ) -> SppfImplNodeRef {
         let variable = builder.variables[production.head];
         builder.reduction_prepare(first, path, production.reduction_length);
         let mut i = 0;
@@ -1517,8 +1458,10 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                 LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE => {
                     let index = production.bytecode[i] as usize;
                     i += 1;
-                    builder
-                        .reduction_add_nullable(nullables[index], get_op_code_tree_action(op_code));
+                    builder.reduction_add_nullable(
+                        SppfImplNodeRef::new_usize(nullables[index]),
+                        get_op_code_tree_action(op_code)
+                    );
                 }
                 _ => {
                     builder.reduction_pop(get_op_code_tree_action(op_code));
@@ -1590,7 +1533,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
         let sppf_node =
             if self.data.automaton.nullables[production.head] as usize == reduction.production {
                 // nullable production, use the nullable node
-                self.nullables[production.head]
+                SppfImplNodeRef::new_usize(self.nullables[production.head])
             } else {
                 RNGLRParser::build_sppf(
                     &mut self.builder,
@@ -1601,11 +1544,11 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                     path,
                     previous_edge_label
                         .as_ref()
-                        .map(|previous| previous.sppf_node as usize)
+                        .map(|previous| previous.sppf_node)
                 )
             };
         let label = previous_edge_label.unwrap_or(GSSLabel {
-            sppf_node: sppf_node as u32,
+            sppf_node,
             symbol_id: head.id
         });
 
@@ -1692,7 +1635,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
         let symbol = TableElemRef::new(TableType::Token, old_token.index as usize);
         let sppf_node = self.builder.get_single_node(symbol);
         let label = GSSLabel {
-            sppf_node: sppf_node as u32,
+            sppf_node,
             symbol_id: old_token.terminal_id
         };
         // Execute all shifts in the queue at this point
@@ -1820,7 +1763,7 @@ impl<'s, 't, 'a, 'l> Parser for RNGLRParser<'s, 't, 'a, 'l> {
                 // Has reduction _Axiom_ -> axiom $ . on ε
                 let paths = self.data.gss.get_paths(i, 2);
                 let root = paths[0].labels[1];
-                self.builder.commit_root(root.sppf_node as usize);
+                self.builder.commit_root(root.sppf_node);
             }
         }
         // At end of input but was still waiting for tokens
