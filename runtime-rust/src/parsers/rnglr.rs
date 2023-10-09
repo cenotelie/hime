@@ -730,13 +730,17 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         let mut e = 0;
         while e < reduction.cache.len() {
             if reduction.actions[e] == TREE_ACTION_PROMOTE {
-                let current = self.sppf.get_node_mut(reduction.cache[e]).as_normal_mut();
-                if promoted.is_some() {
-                    // not the first promotion, insert the old promoted and the remaining head
-                    current.insert_head(&reduction.cache[(b - 1)..e]);
+                if let Some(promoted_ref) = promoted {
+                    // not the first promotion, add the tail to the old promoted
+                    let promoted = self.sppf.get_node_mut(promoted_ref).as_normal_mut();
+                    promoted.add_tail(&reduction.cache[b..e]);
+                    // insert the old promoted as the head for the newly promoted
+                    let current = self.sppf.get_node_mut(reduction.cache[e]).as_normal_mut();
+                    current.insert_head(&[promoted_ref]);
                 } else {
                     assert_eq!(b, 0);
                     // capture the current head
+                    let current = self.sppf.get_node_mut(reduction.cache[e]).as_normal_mut();
                     current.insert_head(&reduction.cache[..e]);
                 }
 
