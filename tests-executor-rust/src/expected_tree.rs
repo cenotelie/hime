@@ -77,210 +77,210 @@ pub const CONTEXT_TREE: u16 = 0x0001;
 pub const TERMINALS: &[Symbol] = &[
     Symbol {
         id: 0x0001,
-        name: "ε"
+        name: "ε",
     },
     Symbol {
         id: 0x0002,
-        name: "$"
+        name: "$",
     },
     Symbol {
         id: 0x0007,
-        name: "SEPARATOR"
+        name: "SEPARATOR",
     },
     Symbol {
         id: 0x0009,
-        name: "NAME"
+        name: "NAME",
     },
     Symbol {
         id: 0x000A,
-        name: "INTEGER"
+        name: "INTEGER",
     },
     Symbol {
         id: 0x000C,
-        name: "LITERAL_STRING"
+        name: "LITERAL_STRING",
     },
     Symbol {
         id: 0x000D,
-        name: "LITERAL_ANY"
+        name: "LITERAL_ANY",
     },
     Symbol {
         id: 0x000E,
-        name: "LITERAL_TEXT"
+        name: "LITERAL_TEXT",
     },
     Symbol {
         id: 0x000F,
-        name: "LITERAL_CLASS"
+        name: "LITERAL_CLASS",
     },
     Symbol {
         id: 0x0010,
-        name: "UNICODE_BLOCK"
+        name: "UNICODE_BLOCK",
     },
     Symbol {
         id: 0x0011,
-        name: "UNICODE_CATEGORY"
+        name: "UNICODE_CATEGORY",
     },
     Symbol {
         id: 0x0012,
-        name: "UNICODE_CODEPOINT"
+        name: "UNICODE_CODEPOINT",
     },
     Symbol {
         id: 0x0013,
-        name: "UNICODE_SPAN_MARKER"
+        name: "UNICODE_SPAN_MARKER",
     },
     Symbol {
         id: 0x0014,
-        name: "OPERATOR_OPTIONAL"
+        name: "OPERATOR_OPTIONAL",
     },
     Symbol {
         id: 0x0015,
-        name: "OPERATOR_ZEROMORE"
+        name: "OPERATOR_ZEROMORE",
     },
     Symbol {
         id: 0x0016,
-        name: "OPERATOR_ONEMORE"
+        name: "OPERATOR_ONEMORE",
     },
     Symbol {
         id: 0x0017,
-        name: "OPERATOR_UNION"
+        name: "OPERATOR_UNION",
     },
     Symbol {
         id: 0x0018,
-        name: "OPERATOR_DIFFERENCE"
+        name: "OPERATOR_DIFFERENCE",
     },
     Symbol {
         id: 0x0019,
-        name: "TREE_ACTION_PROMOTE"
+        name: "TREE_ACTION_PROMOTE",
     },
     Symbol {
         id: 0x001A,
-        name: "TREE_ACTION_DROP"
+        name: "TREE_ACTION_DROP",
     },
     Symbol {
         id: 0x001B,
-        name: "BLOCK_OPTIONS"
+        name: "BLOCK_OPTIONS",
     },
     Symbol {
         id: 0x001C,
-        name: "BLOCK_TERMINALS"
+        name: "BLOCK_TERMINALS",
     },
     Symbol {
         id: 0x001D,
-        name: "BLOCK_RULES"
+        name: "BLOCK_RULES",
     },
     Symbol {
         id: 0x001E,
-        name: "BLOCK_CONTEXT"
+        name: "BLOCK_CONTEXT",
     },
     Symbol {
         id: 0x0043,
-        name: "="
+        name: "=",
     },
     Symbol {
         id: 0x0044,
-        name: ";"
+        name: ";",
     },
     Symbol {
         id: 0x0045,
-        name: "("
+        name: "(",
     },
     Symbol {
         id: 0x0046,
-        name: ")"
+        name: ")",
     },
     Symbol {
         id: 0x0048,
-        name: "{"
+        name: "{",
     },
     Symbol {
         id: 0x0049,
-        name: ","
+        name: ",",
     },
     Symbol {
         id: 0x004A,
-        name: "}"
+        name: "}",
     },
     Symbol {
         id: 0x004F,
-        name: "->"
+        name: "->",
     },
     Symbol {
         id: 0x0050,
-        name: "fragment"
+        name: "fragment",
     },
     Symbol {
         id: 0x0052,
-        name: "@"
+        name: "@",
     },
     Symbol {
         id: 0x0053,
-        name: "<"
+        name: "<",
     },
     Symbol {
         id: 0x0055,
-        name: ">"
+        name: ">",
     },
     Symbol {
         id: 0x0056,
-        name: "#"
+        name: "#",
     },
     Symbol {
         id: 0x005E,
-        name: ":"
+        name: ":",
     },
     Symbol {
         id: 0x0060,
-        name: "grammar"
+        name: "grammar",
     },
     Symbol {
         id: 0x0062,
-        name: "NODE_NAME"
+        name: "NODE_NAME",
     },
     Symbol {
         id: 0x006E,
-        name: "fixture"
+        name: "fixture",
     },
     Symbol {
         id: 0x006F,
-        name: "test"
+        name: "test",
     },
     Symbol {
         id: 0x0070,
-        name: "parser"
+        name: "parser",
     },
     Symbol {
         id: 0x0071,
-        name: "on"
+        name: "on",
     },
     Symbol {
         id: 0x0072,
-        name: "yields"
+        name: "yields",
     },
     Symbol {
         id: 0x0073,
-        name: "differs"
+        name: "differs",
     },
     Symbol {
         id: 0x0074,
-        name: "fails"
+        name: "fails",
     },
     Symbol {
         id: 0x0075,
-        name: "outputs"
+        name: "outputs",
     },
     Symbol {
         id: 0x0078,
-        name: "!="
-    }
+        name: "!=",
+    },
 ];
 
 /// Creates a new lexer
 fn new_lexer<'a: 'b, 'b, 'c>(
     repository: TokenRepository<'a, 'b, 'c>,
-    errors: &'c mut ParseErrors<'a>
+    errors: &'c mut ParseErrors<'a>,
 ) -> Lexer<'a, 'b, 'c> {
     let automaton = Automaton::new(LEXER_AUTOMATON);
     Lexer::ContextSensitive(ContextSensitiveLexer::new(
-        repository, errors, automaton, 0x0007
+        repository, errors, automaton, 0x0007,
     ))
 }
 
@@ -393,260 +393,260 @@ pub const ID_VIRTUAL_EMPTYPART: u32 = 0x0058;
 pub const VARIABLES: &[Symbol] = &[
     Symbol {
         id: 0x001F,
-        name: "option"
+        name: "option",
     },
     Symbol {
         id: 0x0020,
-        name: "terminal_def_atom"
+        name: "terminal_def_atom",
     },
     Symbol {
         id: 0x0021,
-        name: "terminal_def_element"
+        name: "terminal_def_element",
     },
     Symbol {
         id: 0x0022,
-        name: "terminal_def_cardinalilty"
+        name: "terminal_def_cardinalilty",
     },
     Symbol {
         id: 0x0023,
-        name: "terminal_def_repetition"
+        name: "terminal_def_repetition",
     },
     Symbol {
         id: 0x0024,
-        name: "terminal_def_fragment"
+        name: "terminal_def_fragment",
     },
     Symbol {
         id: 0x0025,
-        name: "terminal_def_restrict"
+        name: "terminal_def_restrict",
     },
     Symbol {
         id: 0x0026,
-        name: "terminal_definition"
+        name: "terminal_definition",
     },
     Symbol {
         id: 0x0027,
-        name: "terminal_rule"
+        name: "terminal_rule",
     },
     Symbol {
         id: 0x0028,
-        name: "terminal_fragment"
+        name: "terminal_fragment",
     },
     Symbol {
         id: 0x0029,
-        name: "terminal_context"
+        name: "terminal_context",
     },
     Symbol {
         id: 0x002A,
-        name: "terminal_item"
+        name: "terminal_item",
     },
     Symbol {
         id: 0x002B,
-        name: "rule_sym_action"
+        name: "rule_sym_action",
     },
     Symbol {
         id: 0x002C,
-        name: "rule_sym_virtual"
+        name: "rule_sym_virtual",
     },
     Symbol {
         id: 0x002D,
-        name: "rule_sym_ref_params"
+        name: "rule_sym_ref_params",
     },
     Symbol {
         id: 0x002E,
-        name: "rule_sym_ref_template"
+        name: "rule_sym_ref_template",
     },
     Symbol {
         id: 0x002F,
-        name: "rule_sym_ref_simple"
+        name: "rule_sym_ref_simple",
     },
     Symbol {
         id: 0x0030,
-        name: "rule_def_atom"
+        name: "rule_def_atom",
     },
     Symbol {
         id: 0x0031,
-        name: "rule_def_context"
+        name: "rule_def_context",
     },
     Symbol {
         id: 0x0032,
-        name: "rule_def_sub"
+        name: "rule_def_sub",
     },
     Symbol {
         id: 0x0033,
-        name: "rule_def_element"
+        name: "rule_def_element",
     },
     Symbol {
         id: 0x0034,
-        name: "rule_def_tree_action"
+        name: "rule_def_tree_action",
     },
     Symbol {
         id: 0x0035,
-        name: "rule_def_repetition"
+        name: "rule_def_repetition",
     },
     Symbol {
         id: 0x0036,
-        name: "rule_def_fragment"
+        name: "rule_def_fragment",
     },
     Symbol {
         id: 0x0037,
-        name: "rule_def_choice"
+        name: "rule_def_choice",
     },
     Symbol {
         id: 0x0038,
-        name: "rule_definition"
+        name: "rule_definition",
     },
     Symbol {
         id: 0x0039,
-        name: "rule_template_params"
+        name: "rule_template_params",
     },
     Symbol {
         id: 0x003A,
-        name: "cf_rule_template"
+        name: "cf_rule_template",
     },
     Symbol {
         id: 0x003B,
-        name: "cf_rule_simple"
+        name: "cf_rule_simple",
     },
     Symbol {
         id: 0x003C,
-        name: "cf_rule"
+        name: "cf_rule",
     },
     Symbol {
         id: 0x003D,
-        name: "grammar_options"
+        name: "grammar_options",
     },
     Symbol {
         id: 0x003E,
-        name: "grammar_terminals"
+        name: "grammar_terminals",
     },
     Symbol {
         id: 0x003F,
-        name: "grammar_cf_rules"
+        name: "grammar_cf_rules",
     },
     Symbol {
         id: 0x0040,
-        name: "grammar_parency"
+        name: "grammar_parency",
     },
     Symbol {
         id: 0x0041,
-        name: "cf_grammar"
+        name: "cf_grammar",
     },
     Symbol {
         id: 0x0042,
-        name: "file"
+        name: "file",
     },
     Symbol {
         id: 0x004C,
-        name: "__V76"
+        name: "__V76",
     },
     Symbol {
         id: 0x004D,
-        name: "__V77"
+        name: "__V77",
     },
     Symbol {
         id: 0x004E,
-        name: "__V78"
+        name: "__V78",
     },
     Symbol {
         id: 0x0051,
-        name: "__V81"
+        name: "__V81",
     },
     Symbol {
         id: 0x0054,
-        name: "__V84"
+        name: "__V84",
     },
     Symbol {
         id: 0x0057,
-        name: "__V87"
+        name: "__V87",
     },
     Symbol {
         id: 0x0059,
-        name: "__V89"
+        name: "__V89",
     },
     Symbol {
         id: 0x005A,
-        name: "__V90"
+        name: "__V90",
     },
     Symbol {
         id: 0x005B,
-        name: "__V91"
+        name: "__V91",
     },
     Symbol {
         id: 0x005C,
-        name: "__V92"
+        name: "__V92",
     },
     Symbol {
         id: 0x005D,
-        name: "__V93"
+        name: "__V93",
     },
     Symbol {
         id: 0x005F,
-        name: "__V95"
+        name: "__V95",
     },
     Symbol {
         id: 0x0061,
-        name: "__V97"
+        name: "__V97",
     },
     Symbol {
         id: 0x0063,
-        name: "fixture"
+        name: "fixture",
     },
     Symbol {
         id: 0x0064,
-        name: "header"
+        name: "header",
     },
     Symbol {
         id: 0x0065,
-        name: "test"
+        name: "test",
     },
     Symbol {
         id: 0x0066,
-        name: "test_matches"
+        name: "test_matches",
     },
     Symbol {
         id: 0x0067,
-        name: "test_no_match"
+        name: "test_no_match",
     },
     Symbol {
         id: 0x0068,
-        name: "test_fails"
+        name: "test_fails",
     },
     Symbol {
         id: 0x0069,
-        name: "test_output"
+        name: "test_output",
     },
     Symbol {
         id: 0x006A,
-        name: "tree"
+        name: "tree",
     },
     Symbol {
         id: 0x006B,
-        name: "check"
+        name: "check",
     },
     Symbol {
         id: 0x006C,
-        name: "children"
+        name: "children",
     },
     Symbol {
         id: 0x006D,
-        name: "__V109"
+        name: "__V109",
     },
     Symbol {
         id: 0x0076,
-        name: "__V118"
+        name: "__V118",
     },
     Symbol {
         id: 0x0077,
-        name: "__V119"
+        name: "__V119",
     },
     Symbol {
         id: 0x0079,
-        name: "__V121"
+        name: "__V121",
     },
     Symbol {
         id: 0x007A,
-        name: "__VAxiom"
-    }
+        name: "__VAxiom",
+    },
 ];
 
 /// The collection of virtuals matched by this parser
@@ -655,16 +655,16 @@ pub const VARIABLES: &[Symbol] = &[
 pub const VIRTUALS: &[Symbol] = &[
     Symbol {
         id: 0x0047,
-        name: "range"
+        name: "range",
     },
     Symbol {
         id: 0x004B,
-        name: "concat"
+        name: "concat",
     },
     Symbol {
         id: 0x0058,
-        name: "emptypart"
-    }
+        name: "emptypart",
+    },
 ];
 
 /// Parses the specified string with this parser
@@ -695,7 +695,7 @@ fn parse_text_with<'s, 't, 'a>(
     text: Text<'t>,
     terminals: &'a [Symbol<'s>],
     variables: &'a [Symbol<'s>],
-    virtuals: &'a [Symbol<'s>]
+    virtuals: &'a [Symbol<'s>],
 ) -> ParseResult<'s, 't, 'a, AstImpl> {
     let mut my_actions = |_index: usize, _head: Symbol, _body: &dyn SemanticBody| ();
     let mut result = ParseResult::<AstImpl>::new(terminals, variables, virtuals, text);
@@ -709,7 +709,7 @@ fn parse_text_with<'s, 't, 'a>(
             virtuals,
             automaton,
             data.2,
-            &mut my_actions
+            &mut my_actions,
         );
         parser.parse();
     }
@@ -878,6 +878,6 @@ pub fn visit_ast_node(node: AstNode, visitor: &dyn Visitor) {
         0x0047 => visitor.on_virtual_range(&node),
         0x004B => visitor.on_virtual_concat(&node),
         0x0058 => visitor.on_virtual_emptypart(&node),
-        _ => ()
+        _ => (),
     };
 }

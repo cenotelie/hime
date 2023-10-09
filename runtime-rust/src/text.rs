@@ -44,7 +44,7 @@ pub struct TextSpan {
     /// The starting index
     pub index: usize,
     /// The length
-    pub length: usize
+    pub length: usize,
 }
 
 impl PartialOrd for TextSpan {
@@ -52,7 +52,7 @@ impl PartialOrd for TextSpan {
         match self.index.cmp(&other.index) {
             Ordering::Greater => Some(Ordering::Greater),
             Ordering::Less => Some(Ordering::Less),
-            Ordering::Equal => Some(self.length.cmp(&other.length))
+            Ordering::Equal => Some(self.length.cmp(&other.length)),
         }
     }
 }
@@ -76,7 +76,7 @@ pub struct TextPosition {
     /// The 1-base line number
     pub line: usize,
     /// The 1-base column number
-    pub column: usize
+    pub column: usize,
 }
 
 impl PartialOrd for TextPosition {
@@ -84,7 +84,7 @@ impl PartialOrd for TextPosition {
         match self.line.cmp(&other.line) {
             Ordering::Greater => Some(Ordering::Greater),
             Ordering::Less => Some(Ordering::Less),
-            Ordering::Equal => Some(self.column.cmp(&other.column))
+            Ordering::Equal => Some(self.column.cmp(&other.column)),
         }
     }
 }
@@ -121,7 +121,7 @@ pub struct TextContext<'a> {
     /// The text content being represented
     pub content: &'a str,
     /// The pointer textual representation
-    pub pointer: String
+    pub pointer: String,
 }
 
 /// Represents the input of parser with some metadata for line endings
@@ -132,7 +132,7 @@ pub struct Text<'a> {
     /// The full content of the input
     content: Cow<'a, str>,
     /// Cache of the starting indices of each line within the text
-    lines: Vec<usize>
+    lines: Vec<usize>,
 }
 
 impl<'a> Text<'a> {
@@ -141,7 +141,7 @@ impl<'a> Text<'a> {
     pub fn into_static(self) -> Text<'static> {
         Text {
             content: Cow::Owned(self.content.to_string()),
-            lines: self.lines
+            lines: self.lines,
         }
     }
 
@@ -152,7 +152,7 @@ impl<'a> Text<'a> {
         let lines = find_lines_in(content.char_indices());
         Text {
             content: Cow::Borrowed(content),
-            lines
+            lines,
         }
     }
 
@@ -162,7 +162,7 @@ impl<'a> Text<'a> {
         let lines = find_lines_in(content.char_indices());
         Text {
             content: Cow::Owned(content),
-            lines
+            lines,
         }
     }
 
@@ -173,14 +173,14 @@ impl<'a> Text<'a> {
     /// Return an error when reading the input fails.
     #[cfg(feature = "std")]
     pub fn from_utf8_stream(
-        input: &mut dyn std::io::Read
+        input: &mut dyn std::io::Read,
     ) -> Result<Text<'static>, std::io::Error> {
         let mut content = String::new();
         input.read_to_string(&mut content)?;
         let lines = find_lines_in(content.char_indices());
         Ok(Text {
             content: Cow::Owned(content),
-            lines
+            lines,
         })
     }
 
@@ -279,7 +279,7 @@ impl<'a> Text<'a> {
         let nb_chars = self.content[self.lines[line]..index].chars().count();
         TextPosition {
             line: line + 1,
-            column: nb_chars + 1
+            column: nb_chars + 1,
         }
     }
 
@@ -341,7 +341,7 @@ impl<'a> Text<'a> {
         // return the output
         TextContext {
             content: line_content,
-            pointer
+            pointer,
         }
     }
 
@@ -357,7 +357,7 @@ impl<'a> Text<'a> {
     pub fn iter_utf16_from(&self, from: usize) -> Utf16Iter {
         Utf16Iter {
             inner: self.content[from..].chars(),
-            next_cp: None
+            next_cp: None,
         }
     }
 }
@@ -370,7 +370,7 @@ pub struct Utf16Iter<'a> {
     /// The inner iterator over chars
     inner: Chars<'a>,
     /// The next codepoint, if any
-    next_cp: Option<(Utf16C, usize)>
+    next_cp: Option<(Utf16C, usize)>,
 }
 
 impl<'a> Iterator for Utf16Iter<'a> {
@@ -393,7 +393,7 @@ impl<'a> Iterator for Utf16Iter<'a> {
                         Some((encoded[0], 0))
                     }
                 }
-            }
+            },
         }
     }
 }

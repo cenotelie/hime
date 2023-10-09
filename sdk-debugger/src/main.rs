@@ -31,7 +31,7 @@ use hime_redist::parsers::{
     LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT, LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE,
     LR_OP_CODE_BASE_ADD_VIRTUAL, LR_OP_CODE_BASE_POP_STACK, LR_OP_CODE_BASE_SEMANTIC_ACTION,
     TREE_ACTION_DROP, TREE_ACTION_PROMOTE, TREE_ACTION_REPLACE_BY_CHILDREN,
-    TREE_ACTION_REPLACE_BY_EPSILON
+    TREE_ACTION_REPLACE_BY_EPSILON,
 };
 
 /// The name of this program
@@ -60,8 +60,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                                 .value_name("FILE")
                                 .help("Path to the lexer's automaton")
                                 .takes_value(true)
-                                .required(true)
-                        )
+                                .required(true),
+                        ),
                 )
                 .subcommand(
                     Command::new("parser")
@@ -71,7 +71,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                                 .long("glr")
                                 .help("Whether this is a GLR automaton")
                                 .takes_value(false)
-                                .required(false)
+                                .required(false),
                         )
                         .arg(
                             Arg::new("show_bytecode")
@@ -79,16 +79,16 @@ fn main() -> Result<(), Box<dyn Error>> {
                                 .long("bytecode")
                                 .help("Activate to show the bytecode of reductions")
                                 .takes_value(false)
-                                .required(false)
+                                .required(false),
                         )
                         .arg(
                             Arg::new("parser_file")
                                 .value_name("FILE")
                                 .help("Path to the parser's automaton")
                                 .takes_value(true)
-                                .required(true)
-                        )
-                )
+                                .required(true),
+                        ),
+                ),
         )
         .subcommand(
             Command::new("diff")
@@ -101,15 +101,15 @@ fn main() -> Result<(), Box<dyn Error>> {
                                 .value_name("FROM")
                                 .help("Path to a lexer's automaton")
                                 .takes_value(true)
-                                .required(true)
+                                .required(true),
                         )
                         .arg(
                             Arg::new("file_right")
                                 .value_name("TO")
                                 .help("Path to a lexer's automaton")
                                 .takes_value(true)
-                                .required(true)
-                        )
+                                .required(true),
+                        ),
                 )
                 .subcommand(
                     Command::new("parser")
@@ -119,23 +119,23 @@ fn main() -> Result<(), Box<dyn Error>> {
                                 .long("glr")
                                 .help("Whether this is a GLR automaton")
                                 .takes_value(false)
-                                .required(false)
+                                .required(false),
                         )
                         .arg(
                             Arg::new("file_left")
                                 .value_name("FROM")
                                 .help("Path to a lexer's automaton")
                                 .takes_value(true)
-                                .required(true)
+                                .required(true),
                         )
                         .arg(
                             Arg::new("file_right")
                                 .value_name("TO")
                                 .help("Path to a lexer's automaton")
                                 .takes_value(true)
-                                .required(true)
-                        )
-                )
+                                .required(true),
+                        ),
+                ),
         )
         .get_matches();
     execute(&matches)
@@ -155,7 +155,7 @@ fn execute(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
                 let show_bytecode = matches.is_present("show_bytecode");
                 print_parser(file_name, is_glr, show_bytecode)?;
             }
-            _ => panic!("invalid command")
+            _ => panic!("invalid command"),
         },
         Some(("diff", matches)) => match matches.subcommand() {
             Some(("lexer", matches)) => {
@@ -169,9 +169,9 @@ fn execute(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
                 let file_right = matches.value_of("file_right").unwrap();
                 diff_parser(file_left, file_right, is_glr)?;
             }
-            _ => panic!("invalid command")
+            _ => panic!("invalid command"),
         },
-        _ => panic!("invalid command")
+        _ => panic!("invalid command"),
     }
     Ok(())
 }
@@ -526,7 +526,7 @@ fn diff_parser_lrk(file_left: &str, file_right: &str) -> Result<(), Box<dyn Erro
                     map_right_left[target_right] = target_left;
                     match (
                         contexts_left.get_context_opened_by(automaton_left.get_sid_for_column(c)),
-                        contexts_right.get_context_opened_by(automaton_right.get_sid_for_column(c))
+                        contexts_right.get_context_opened_by(automaton_right.get_sid_for_column(c)),
                     ) {
                         (None, None) => {}
                         (Some(from), Some(to)) => {
@@ -639,7 +639,7 @@ fn action_name(code: u16) -> &'static str {
         LR_ACTION_CODE_SHIFT => "shift",
         LR_ACTION_CODE_REDUCE => "reduce",
         LR_ACTION_CODE_ACCEPT => "accept",
-        _ => ""
+        _ => "",
     }
 }
 

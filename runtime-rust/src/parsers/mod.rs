@@ -88,7 +88,7 @@ struct LRColumnMapCell {
     /// The symbol identifier
     identifier: u16,
     /// The column in the LR table
-    column: u16
+    column: u16,
 }
 
 /// Represent a map from symbols' IDs to the index of their corresponding column in an LR table.
@@ -98,7 +98,7 @@ struct LRColumnMap {
     /// The cache for Ids from 0x0000 to 0x01FF
     cache: [u16; 512],
     /// Mapping for the other symbols
-    others: Vec<LRColumnMapCell>
+    others: Vec<LRColumnMapCell>,
 }
 
 impl LRColumnMap {
@@ -106,7 +106,7 @@ impl LRColumnMap {
     pub fn new(data: &[u8], offset: usize, column_count: usize) -> LRColumnMap {
         let mut result = LRColumnMap {
             cache: [0; 512],
-            others: Vec::new()
+            others: Vec::new(),
         };
         for i in 0..column_count {
             let index = offset + i * 2;
@@ -162,14 +162,14 @@ struct LRContextOpening {
     /// The identifier of the symbol on the transition
     identifier: u16,
     /// The context being opened
-    context: u16
+    context: u16,
 }
 
 /// Represents the contexts opening by transitions from a state
 #[derive(Default, Clone)]
 pub struct LRContexts {
     /// The contexts, if any
-    openings: Vec<LRContextOpening>
+    openings: Vec<LRContextOpening>,
 }
 
 impl LRContexts {
@@ -177,7 +177,7 @@ impl LRContexts {
     #[must_use]
     pub fn new() -> LRContexts {
         LRContexts {
-            openings: Vec::new()
+            openings: Vec::new(),
         }
     }
 
@@ -185,7 +185,7 @@ impl LRContexts {
     pub fn add(&mut self, identifier: u16, context: u16) {
         self.openings.push(LRContextOpening {
             identifier,
-            context
+            context,
         });
     }
 
@@ -213,7 +213,7 @@ pub struct LRAction<'a> {
     /// The automaton table
     table: &'a [u16],
     /// The offset of this state within the table
-    offset: usize
+    offset: usize,
 }
 
 impl<'a> LRAction<'a> {
@@ -250,7 +250,7 @@ pub struct LRProduction {
     /// Size of the rule's body by only counting terminals and variables
     pub reduction_length: usize,
     /// Bytecode for the rule's production
-    pub bytecode: Vec<LROpCode>
+    pub bytecode: Vec<LROpCode>,
 }
 
 impl LRProduction {
@@ -273,7 +273,7 @@ impl LRProduction {
             head,
             head_action,
             reduction_length,
-            bytecode
+            bytecode,
         }
     }
 }
@@ -284,7 +284,7 @@ pub struct LRExpected<'s> {
     /// The terminals expected for shift actions
     pub shifts: Vec<Symbol<'s>>,
     /// The terminals expected for reduction actions
-    pub reductions: Vec<Symbol<'s>>
+    pub reductions: Vec<Symbol<'s>>,
 }
 
 impl<'s> LRExpected<'s> {
@@ -293,7 +293,7 @@ impl<'s> LRExpected<'s> {
     pub fn new() -> LRExpected<'s> {
         LRExpected {
             shifts: Vec::new(),
-            reductions: Vec::new()
+            reductions: Vec::new(),
         }
     }
 

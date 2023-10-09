@@ -24,7 +24,7 @@ mod fixture;
 
 pub use fixture::{
     ID_VARIABLE_TEST_FAILS, ID_VARIABLE_TEST_MATCHES, ID_VARIABLE_TEST_NO_MATCH,
-    ID_VARIABLE_TEST_OUTPUT
+    ID_VARIABLE_TEST_OUTPUT,
 };
 use hime_redist::ast::AstImpl;
 use hime_redist::errors::ParseErrorDataTrait;
@@ -46,7 +46,7 @@ pub fn parse_fixtures(fixtures: &[FixtureDef]) -> Result<Fixtures, Errors> {
     let is_ok = results.iter().all(ParseResult::<AstImpl>::is_success);
     if is_ok {
         Ok(Fixtures(
-            results.into_iter().map(Fixture::from_content).collect()
+            results.into_iter().map(Fixture::from_content).collect(),
         ))
     } else {
         let errors: Vec<Error> = results
@@ -59,9 +59,9 @@ pub fn parse_fixtures(fixtures: &[FixtureDef]) -> Result<Fixtures, Errors> {
                         InputReference {
                             input_index: index,
                             position,
-                            length: error.get_length()
+                            length: error.get_length(),
                         },
-                        error.to_string()
+                        error.to_string(),
                     )
                 })
             })
@@ -73,12 +73,12 @@ pub fn parse_fixtures(fixtures: &[FixtureDef]) -> Result<Fixtures, Errors> {
                     .zip(fixtures.iter())
                     .map(|(r, FixtureDef(name, _))| LoadedInput {
                         name: (*name).to_string(),
-                        content: r.text
+                        content: r.text,
                     })
                     .collect(),
-                grammars: Vec::new()
+                grammars: Vec::new(),
             },
-            errors
+            errors,
         })
     }
 }

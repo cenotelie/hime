@@ -15,61 +15,61 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("Adlam", Block::new("Adlam", 0x1E900, 0x1E95F));
     db.insert(
         "AegeanNumbers",
-        Block::new("AegeanNumbers", 0x10100, 0x1013F)
+        Block::new("AegeanNumbers", 0x10100, 0x1013F),
     );
     db.insert("Ahom", Block::new("Ahom", 0x11700, 0x1174F));
     db.insert(
         "AlchemicalSymbols",
-        Block::new("AlchemicalSymbols", 0x1F700, 0x1F77F)
+        Block::new("AlchemicalSymbols", 0x1F700, 0x1F77F),
     );
     db.insert(
         "AlphabeticPresentationForms",
-        Block::new("AlphabeticPresentationForms", 0xFB00, 0xFB4F)
+        Block::new("AlphabeticPresentationForms", 0xFB00, 0xFB4F),
     );
     db.insert(
         "AnatolianHieroglyphs",
-        Block::new("AnatolianHieroglyphs", 0x14400, 0x1467F)
+        Block::new("AnatolianHieroglyphs", 0x14400, 0x1467F),
     );
     db.insert(
         "AncientGreekMusicalNotation",
-        Block::new("AncientGreekMusicalNotation", 0x1D200, 0x1D24F)
+        Block::new("AncientGreekMusicalNotation", 0x1D200, 0x1D24F),
     );
     db.insert(
         "AncientGreekNumbers",
-        Block::new("AncientGreekNumbers", 0x10140, 0x1018F)
+        Block::new("AncientGreekNumbers", 0x10140, 0x1018F),
     );
     db.insert(
         "AncientSymbols",
-        Block::new("AncientSymbols", 0x10190, 0x101CF)
+        Block::new("AncientSymbols", 0x10190, 0x101CF),
     );
     db.insert("Arabic", Block::new("Arabic", 0x600, 0x6FF));
     db.insert(
         "ArabicExtended-A",
-        Block::new("ArabicExtended-A", 0x8A0, 0x8FF)
+        Block::new("ArabicExtended-A", 0x8A0, 0x8FF),
     );
     db.insert(
         "ArabicExtended-B",
-        Block::new("ArabicExtended-B", 0x870, 0x89F)
+        Block::new("ArabicExtended-B", 0x870, 0x89F),
     );
     db.insert(
         "ArabicExtended-C",
-        Block::new("ArabicExtended-C", 0x10EC0, 0x10EFF)
+        Block::new("ArabicExtended-C", 0x10EC0, 0x10EFF),
     );
     db.insert(
         "ArabicMathematicalAlphabeticSymbols",
-        Block::new("ArabicMathematicalAlphabeticSymbols", 0x1EE00, 0x1EEFF)
+        Block::new("ArabicMathematicalAlphabeticSymbols", 0x1EE00, 0x1EEFF),
     );
     db.insert(
         "ArabicPresentationForms-A",
-        Block::new("ArabicPresentationForms-A", 0xFB50, 0xFDFF)
+        Block::new("ArabicPresentationForms-A", 0xFB50, 0xFDFF),
     );
     db.insert(
         "ArabicPresentationForms-B",
-        Block::new("ArabicPresentationForms-B", 0xFE70, 0xFEFF)
+        Block::new("ArabicPresentationForms-B", 0xFE70, 0xFEFF),
     );
     db.insert(
         "ArabicSupplement",
-        Block::new("ArabicSupplement", 0x750, 0x77F)
+        Block::new("ArabicSupplement", 0x750, 0x77F),
     );
     db.insert("Armenian", Block::new("Armenian", 0x530, 0x58F));
     db.insert("Arrows", Block::new("Arrows", 0x2190, 0x21FF));
@@ -78,7 +78,7 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("Bamum", Block::new("Bamum", 0xA6A0, 0xA6FF));
     db.insert(
         "BamumSupplement",
-        Block::new("BamumSupplement", 0x16800, 0x16A3F)
+        Block::new("BamumSupplement", 0x16800, 0x16A3F),
     );
     db.insert("BasicLatin", Block::new("BasicLatin", 0x0, 0x7F));
     db.insert("BassaVah", Block::new("BassaVah", 0x16AD0, 0x16AFF));
@@ -89,180 +89,180 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("Bopomofo", Block::new("Bopomofo", 0x3100, 0x312F));
     db.insert(
         "BopomofoExtended",
-        Block::new("BopomofoExtended", 0x31A0, 0x31BF)
+        Block::new("BopomofoExtended", 0x31A0, 0x31BF),
     );
     db.insert("BoxDrawing", Block::new("BoxDrawing", 0x2500, 0x257F));
     db.insert("Brahmi", Block::new("Brahmi", 0x11000, 0x1107F));
     db.insert(
         "BraillePatterns",
-        Block::new("BraillePatterns", 0x2800, 0x28FF)
+        Block::new("BraillePatterns", 0x2800, 0x28FF),
     );
     db.insert("Buginese", Block::new("Buginese", 0x1A00, 0x1A1F));
     db.insert("Buhid", Block::new("Buhid", 0x1740, 0x175F));
     db.insert(
         "ByzantineMusicalSymbols",
-        Block::new("ByzantineMusicalSymbols", 0x1D000, 0x1D0FF)
+        Block::new("ByzantineMusicalSymbols", 0x1D000, 0x1D0FF),
     );
     db.insert(
         "CJKCompatibility",
-        Block::new("CJKCompatibility", 0x3300, 0x33FF)
+        Block::new("CJKCompatibility", 0x3300, 0x33FF),
     );
     db.insert(
         "CJKCompatibilityForms",
-        Block::new("CJKCompatibilityForms", 0xFE30, 0xFE4F)
+        Block::new("CJKCompatibilityForms", 0xFE30, 0xFE4F),
     );
     db.insert(
         "CJKCompatibilityIdeographs",
-        Block::new("CJKCompatibilityIdeographs", 0xF900, 0xFAFF)
+        Block::new("CJKCompatibilityIdeographs", 0xF900, 0xFAFF),
     );
     db.insert(
         "CJKCompatibilityIdeographsSupplement",
-        Block::new("CJKCompatibilityIdeographsSupplement", 0x2F800, 0x2FA1F)
+        Block::new("CJKCompatibilityIdeographsSupplement", 0x2F800, 0x2FA1F),
     );
     db.insert(
         "CJKRadicalsSupplement",
-        Block::new("CJKRadicalsSupplement", 0x2E80, 0x2EFF)
+        Block::new("CJKRadicalsSupplement", 0x2E80, 0x2EFF),
     );
     db.insert("CJKStrokes", Block::new("CJKStrokes", 0x31C0, 0x31EF));
     db.insert(
         "CJKSymbolsandPunctuation",
-        Block::new("CJKSymbolsandPunctuation", 0x3000, 0x303F)
+        Block::new("CJKSymbolsandPunctuation", 0x3000, 0x303F),
     );
     db.insert(
         "CJKUnifiedIdeographs",
-        Block::new("CJKUnifiedIdeographs", 0x4E00, 0x9FFF)
+        Block::new("CJKUnifiedIdeographs", 0x4E00, 0x9FFF),
     );
     db.insert(
         "CJKUnifiedIdeographsExtensionA",
-        Block::new("CJKUnifiedIdeographsExtensionA", 0x3400, 0x4DBF)
+        Block::new("CJKUnifiedIdeographsExtensionA", 0x3400, 0x4DBF),
     );
     db.insert(
         "CJKUnifiedIdeographsExtensionB",
-        Block::new("CJKUnifiedIdeographsExtensionB", 0x20000, 0x2A6DF)
+        Block::new("CJKUnifiedIdeographsExtensionB", 0x20000, 0x2A6DF),
     );
     db.insert(
         "CJKUnifiedIdeographsExtensionC",
-        Block::new("CJKUnifiedIdeographsExtensionC", 0x2A700, 0x2B73F)
+        Block::new("CJKUnifiedIdeographsExtensionC", 0x2A700, 0x2B73F),
     );
     db.insert(
         "CJKUnifiedIdeographsExtensionD",
-        Block::new("CJKUnifiedIdeographsExtensionD", 0x2B740, 0x2B81F)
+        Block::new("CJKUnifiedIdeographsExtensionD", 0x2B740, 0x2B81F),
     );
     db.insert(
         "CJKUnifiedIdeographsExtensionE",
-        Block::new("CJKUnifiedIdeographsExtensionE", 0x2B820, 0x2CEAF)
+        Block::new("CJKUnifiedIdeographsExtensionE", 0x2B820, 0x2CEAF),
     );
     db.insert(
         "CJKUnifiedIdeographsExtensionF",
-        Block::new("CJKUnifiedIdeographsExtensionF", 0x2CEB0, 0x2EBEF)
+        Block::new("CJKUnifiedIdeographsExtensionF", 0x2CEB0, 0x2EBEF),
     );
     db.insert(
         "CJKUnifiedIdeographsExtensionG",
-        Block::new("CJKUnifiedIdeographsExtensionG", 0x30000, 0x3134F)
+        Block::new("CJKUnifiedIdeographsExtensionG", 0x30000, 0x3134F),
     );
     db.insert(
         "CJKUnifiedIdeographsExtensionH",
-        Block::new("CJKUnifiedIdeographsExtensionH", 0x31350, 0x323AF)
+        Block::new("CJKUnifiedIdeographsExtensionH", 0x31350, 0x323AF),
     );
     db.insert(
         "CJKUnifiedIdeographsExtensionI",
-        Block::new("CJKUnifiedIdeographsExtensionI", 0x2EBF0, 0x2EE5F)
+        Block::new("CJKUnifiedIdeographsExtensionI", 0x2EBF0, 0x2EE5F),
     );
     db.insert("Carian", Block::new("Carian", 0x102A0, 0x102DF));
     db.insert(
         "CaucasianAlbanian",
-        Block::new("CaucasianAlbanian", 0x10530, 0x1056F)
+        Block::new("CaucasianAlbanian", 0x10530, 0x1056F),
     );
     db.insert("Chakma", Block::new("Chakma", 0x11100, 0x1114F));
     db.insert("Cham", Block::new("Cham", 0xAA00, 0xAA5F));
     db.insert("Cherokee", Block::new("Cherokee", 0x13A0, 0x13FF));
     db.insert(
         "CherokeeSupplement",
-        Block::new("CherokeeSupplement", 0xAB70, 0xABBF)
+        Block::new("CherokeeSupplement", 0xAB70, 0xABBF),
     );
     db.insert("ChessSymbols", Block::new("ChessSymbols", 0x1FA00, 0x1FA6F));
     db.insert("Chorasmian", Block::new("Chorasmian", 0x10FB0, 0x10FDF));
     db.insert(
         "CombiningDiacriticalMarks",
-        Block::new("CombiningDiacriticalMarks", 0x300, 0x36F)
+        Block::new("CombiningDiacriticalMarks", 0x300, 0x36F),
     );
     db.insert(
         "CombiningDiacriticalMarksExtended",
-        Block::new("CombiningDiacriticalMarksExtended", 0x1AB0, 0x1AFF)
+        Block::new("CombiningDiacriticalMarksExtended", 0x1AB0, 0x1AFF),
     );
     db.insert(
         "CombiningDiacriticalMarksSupplement",
-        Block::new("CombiningDiacriticalMarksSupplement", 0x1DC0, 0x1DFF)
+        Block::new("CombiningDiacriticalMarksSupplement", 0x1DC0, 0x1DFF),
     );
     db.insert(
         "CombiningDiacriticalMarksforSymbols",
-        Block::new("CombiningDiacriticalMarksforSymbols", 0x20D0, 0x20FF)
+        Block::new("CombiningDiacriticalMarksforSymbols", 0x20D0, 0x20FF),
     );
     db.insert(
         "CombiningHalfMarks",
-        Block::new("CombiningHalfMarks", 0xFE20, 0xFE2F)
+        Block::new("CombiningHalfMarks", 0xFE20, 0xFE2F),
     );
     db.insert(
         "CommonIndicNumberForms",
-        Block::new("CommonIndicNumberForms", 0xA830, 0xA83F)
+        Block::new("CommonIndicNumberForms", 0xA830, 0xA83F),
     );
     db.insert(
         "ControlPictures",
-        Block::new("ControlPictures", 0x2400, 0x243F)
+        Block::new("ControlPictures", 0x2400, 0x243F),
     );
     db.insert("Coptic", Block::new("Coptic", 0x2C80, 0x2CFF));
     db.insert(
         "CopticEpactNumbers",
-        Block::new("CopticEpactNumbers", 0x102E0, 0x102FF)
+        Block::new("CopticEpactNumbers", 0x102E0, 0x102FF),
     );
     db.insert(
         "CountingRodNumerals",
-        Block::new("CountingRodNumerals", 0x1D360, 0x1D37F)
+        Block::new("CountingRodNumerals", 0x1D360, 0x1D37F),
     );
     db.insert("Cuneiform", Block::new("Cuneiform", 0x12000, 0x123FF));
     db.insert(
         "CuneiformNumbersandPunctuation",
-        Block::new("CuneiformNumbersandPunctuation", 0x12400, 0x1247F)
+        Block::new("CuneiformNumbersandPunctuation", 0x12400, 0x1247F),
     );
     db.insert(
         "CurrencySymbols",
-        Block::new("CurrencySymbols", 0x20A0, 0x20CF)
+        Block::new("CurrencySymbols", 0x20A0, 0x20CF),
     );
     db.insert(
         "CypriotSyllabary",
-        Block::new("CypriotSyllabary", 0x10800, 0x1083F)
+        Block::new("CypriotSyllabary", 0x10800, 0x1083F),
     );
     db.insert("Cypro-Minoan", Block::new("Cypro-Minoan", 0x12F90, 0x12FFF));
     db.insert("Cyrillic", Block::new("Cyrillic", 0x400, 0x4FF));
     db.insert(
         "CyrillicExtended-A",
-        Block::new("CyrillicExtended-A", 0x2DE0, 0x2DFF)
+        Block::new("CyrillicExtended-A", 0x2DE0, 0x2DFF),
     );
     db.insert(
         "CyrillicExtended-B",
-        Block::new("CyrillicExtended-B", 0xA640, 0xA69F)
+        Block::new("CyrillicExtended-B", 0xA640, 0xA69F),
     );
     db.insert(
         "CyrillicExtended-C",
-        Block::new("CyrillicExtended-C", 0x1C80, 0x1C8F)
+        Block::new("CyrillicExtended-C", 0x1C80, 0x1C8F),
     );
     db.insert(
         "CyrillicExtended-D",
-        Block::new("CyrillicExtended-D", 0x1E030, 0x1E08F)
+        Block::new("CyrillicExtended-D", 0x1E030, 0x1E08F),
     );
     db.insert(
         "CyrillicSupplement",
-        Block::new("CyrillicSupplement", 0x500, 0x52F)
+        Block::new("CyrillicSupplement", 0x500, 0x52F),
     );
     db.insert("Deseret", Block::new("Deseret", 0x10400, 0x1044F));
     db.insert("Devanagari", Block::new("Devanagari", 0x900, 0x97F));
     db.insert(
         "DevanagariExtended",
-        Block::new("DevanagariExtended", 0xA8E0, 0xA8FF)
+        Block::new("DevanagariExtended", 0xA8E0, 0xA8FF),
     );
     db.insert(
         "DevanagariExtended-A",
-        Block::new("DevanagariExtended-A", 0x11B00, 0x11B5F)
+        Block::new("DevanagariExtended-A", 0x11B00, 0x11B5F),
     );
     db.insert("Dingbats", Block::new("Dingbats", 0x2700, 0x27BF));
     db.insert("DivesAkuru", Block::new("DivesAkuru", 0x11900, 0x1195F));
@@ -271,77 +271,77 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("Duployan", Block::new("Duployan", 0x1BC00, 0x1BC9F));
     db.insert(
         "EarlyDynasticCuneiform",
-        Block::new("EarlyDynasticCuneiform", 0x12480, 0x1254F)
+        Block::new("EarlyDynasticCuneiform", 0x12480, 0x1254F),
     );
     db.insert(
         "EgyptianHieroglyphFormatControls",
-        Block::new("EgyptianHieroglyphFormatControls", 0x13430, 0x1345F)
+        Block::new("EgyptianHieroglyphFormatControls", 0x13430, 0x1345F),
     );
     db.insert(
         "EgyptianHieroglyphs",
-        Block::new("EgyptianHieroglyphs", 0x13000, 0x1342F)
+        Block::new("EgyptianHieroglyphs", 0x13000, 0x1342F),
     );
     db.insert("Elbasan", Block::new("Elbasan", 0x10500, 0x1052F));
     db.insert("Elymaic", Block::new("Elymaic", 0x10FE0, 0x10FFF));
     db.insert("Emoticons", Block::new("Emoticons", 0x1F600, 0x1F64F));
     db.insert(
         "EnclosedAlphanumericSupplement",
-        Block::new("EnclosedAlphanumericSupplement", 0x1F100, 0x1F1FF)
+        Block::new("EnclosedAlphanumericSupplement", 0x1F100, 0x1F1FF),
     );
     db.insert(
         "EnclosedAlphanumerics",
-        Block::new("EnclosedAlphanumerics", 0x2460, 0x24FF)
+        Block::new("EnclosedAlphanumerics", 0x2460, 0x24FF),
     );
     db.insert(
         "EnclosedCJKLettersandMonths",
-        Block::new("EnclosedCJKLettersandMonths", 0x3200, 0x32FF)
+        Block::new("EnclosedCJKLettersandMonths", 0x3200, 0x32FF),
     );
     db.insert(
         "EnclosedIdeographicSupplement",
-        Block::new("EnclosedIdeographicSupplement", 0x1F200, 0x1F2FF)
+        Block::new("EnclosedIdeographicSupplement", 0x1F200, 0x1F2FF),
     );
     db.insert("Ethiopic", Block::new("Ethiopic", 0x1200, 0x137F));
     db.insert(
         "EthiopicExtended",
-        Block::new("EthiopicExtended", 0x2D80, 0x2DDF)
+        Block::new("EthiopicExtended", 0x2D80, 0x2DDF),
     );
     db.insert(
         "EthiopicExtended-A",
-        Block::new("EthiopicExtended-A", 0xAB00, 0xAB2F)
+        Block::new("EthiopicExtended-A", 0xAB00, 0xAB2F),
     );
     db.insert(
         "EthiopicExtended-B",
-        Block::new("EthiopicExtended-B", 0x1E7E0, 0x1E7FF)
+        Block::new("EthiopicExtended-B", 0x1E7E0, 0x1E7FF),
     );
     db.insert(
         "EthiopicSupplement",
-        Block::new("EthiopicSupplement", 0x1380, 0x139F)
+        Block::new("EthiopicSupplement", 0x1380, 0x139F),
     );
     db.insert(
         "GeneralPunctuation",
-        Block::new("GeneralPunctuation", 0x2000, 0x206F)
+        Block::new("GeneralPunctuation", 0x2000, 0x206F),
     );
     db.insert(
         "GeometricShapes",
-        Block::new("GeometricShapes", 0x25A0, 0x25FF)
+        Block::new("GeometricShapes", 0x25A0, 0x25FF),
     );
     db.insert(
         "GeometricShapesExtended",
-        Block::new("GeometricShapesExtended", 0x1F780, 0x1F7FF)
+        Block::new("GeometricShapesExtended", 0x1F780, 0x1F7FF),
     );
     db.insert("Georgian", Block::new("Georgian", 0x10A0, 0x10FF));
     db.insert(
         "GeorgianExtended",
-        Block::new("GeorgianExtended", 0x1C90, 0x1CBF)
+        Block::new("GeorgianExtended", 0x1C90, 0x1CBF),
     );
     db.insert(
         "GeorgianSupplement",
-        Block::new("GeorgianSupplement", 0x2D00, 0x2D2F)
+        Block::new("GeorgianSupplement", 0x2D00, 0x2D2F),
     );
     db.insert("Glagolitic", Block::new("Glagolitic", 0x2C00, 0x2C5F));
     db.insert(
         "GlagoliticSupplement",
-        Block::new("GlagoliticSupplement", 0x1E000, 0x1E02F)
+        Block::new("GlagoliticSupplement", 0x1E000, 0x1E02F),
     );
     db.insert("Gothic", Block::new("Gothic", 0x10330, 0x1034F));
     db.insert("Grantha", Block::new("Grantha", 0x11300, 0x1137F));
@@ -352,28 +352,28 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("Gurmukhi", Block::new("Gurmukhi", 0xA00, 0xA7F));
     db.insert(
         "HalfwidthandFullwidthForms",
-        Block::new("HalfwidthandFullwidthForms", 0xFF00, 0xFFEF)
+        Block::new("HalfwidthandFullwidthForms", 0xFF00, 0xFFEF),
     );
     db.insert(
         "HangulCompatibilityJamo",
-        Block::new("HangulCompatibilityJamo", 0x3130, 0x318F)
+        Block::new("HangulCompatibilityJamo", 0x3130, 0x318F),
     );
     db.insert("HangulJamo", Block::new("HangulJamo", 0x1100, 0x11FF));
     db.insert(
         "HangulJamoExtended-A",
-        Block::new("HangulJamoExtended-A", 0xA960, 0xA97F)
+        Block::new("HangulJamoExtended-A", 0xA960, 0xA97F),
     );
     db.insert(
         "HangulJamoExtended-B",
-        Block::new("HangulJamoExtended-B", 0xD7B0, 0xD7FF)
+        Block::new("HangulJamoExtended-B", 0xD7B0, 0xD7FF),
     );
     db.insert(
         "HangulSyllables",
-        Block::new("HangulSyllables", 0xAC00, 0xD7AF)
+        Block::new("HangulSyllables", 0xAC00, 0xD7AF),
     );
     db.insert(
         "HanifiRohingya",
-        Block::new("HanifiRohingya", 0x10D00, 0x10D3F)
+        Block::new("HanifiRohingya", 0x10D00, 0x10D3F),
     );
     db.insert("Hanunoo", Block::new("Hanunoo", 0x1720, 0x173F));
     db.insert("Hatran", Block::new("Hatran", 0x108E0, 0x108FF));
@@ -382,63 +382,63 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("IPAExtensions", Block::new("IPAExtensions", 0x250, 0x2AF));
     db.insert(
         "IdeographicDescriptionCharacters",
-        Block::new("IdeographicDescriptionCharacters", 0x2FF0, 0x2FFF)
+        Block::new("IdeographicDescriptionCharacters", 0x2FF0, 0x2FFF),
     );
     db.insert(
         "IdeographicSymbolsandPunctuation",
-        Block::new("IdeographicSymbolsandPunctuation", 0x16FE0, 0x16FFF)
+        Block::new("IdeographicSymbolsandPunctuation", 0x16FE0, 0x16FFF),
     );
     db.insert(
         "ImperialAramaic",
-        Block::new("ImperialAramaic", 0x10840, 0x1085F)
+        Block::new("ImperialAramaic", 0x10840, 0x1085F),
     );
     db.insert(
         "IndicSiyaqNumbers",
-        Block::new("IndicSiyaqNumbers", 0x1EC70, 0x1ECBF)
+        Block::new("IndicSiyaqNumbers", 0x1EC70, 0x1ECBF),
     );
     db.insert(
         "InscriptionalPahlavi",
-        Block::new("InscriptionalPahlavi", 0x10B60, 0x10B7F)
+        Block::new("InscriptionalPahlavi", 0x10B60, 0x10B7F),
     );
     db.insert(
         "InscriptionalParthian",
-        Block::new("InscriptionalParthian", 0x10B40, 0x10B5F)
+        Block::new("InscriptionalParthian", 0x10B40, 0x10B5F),
     );
     db.insert("Javanese", Block::new("Javanese", 0xA980, 0xA9DF));
     db.insert("Kaithi", Block::new("Kaithi", 0x11080, 0x110CF));
     db.insert(
         "KaktovikNumerals",
-        Block::new("KaktovikNumerals", 0x1D2C0, 0x1D2DF)
+        Block::new("KaktovikNumerals", 0x1D2C0, 0x1D2DF),
     );
     db.insert(
         "KanaExtended-A",
-        Block::new("KanaExtended-A", 0x1B100, 0x1B12F)
+        Block::new("KanaExtended-A", 0x1B100, 0x1B12F),
     );
     db.insert(
         "KanaExtended-B",
-        Block::new("KanaExtended-B", 0x1AFF0, 0x1AFFF)
+        Block::new("KanaExtended-B", 0x1AFF0, 0x1AFFF),
     );
     db.insert(
         "KanaSupplement",
-        Block::new("KanaSupplement", 0x1B000, 0x1B0FF)
+        Block::new("KanaSupplement", 0x1B000, 0x1B0FF),
     );
     db.insert("Kanbun", Block::new("Kanbun", 0x3190, 0x319F));
     db.insert(
         "KangxiRadicals",
-        Block::new("KangxiRadicals", 0x2F00, 0x2FDF)
+        Block::new("KangxiRadicals", 0x2F00, 0x2FDF),
     );
     db.insert("Kannada", Block::new("Kannada", 0xC80, 0xCFF));
     db.insert("Katakana", Block::new("Katakana", 0x30A0, 0x30FF));
     db.insert(
         "KatakanaPhoneticExtensions",
-        Block::new("KatakanaPhoneticExtensions", 0x31F0, 0x31FF)
+        Block::new("KatakanaPhoneticExtensions", 0x31F0, 0x31FF),
     );
     db.insert("Kawi", Block::new("Kawi", 0x11F00, 0x11F5F));
     db.insert("KayahLi", Block::new("KayahLi", 0xA900, 0xA92F));
     db.insert("Kharoshthi", Block::new("Kharoshthi", 0x10A00, 0x10A5F));
     db.insert(
         "KhitanSmallScript",
-        Block::new("KhitanSmallScript", 0x18B00, 0x18CFF)
+        Block::new("KhitanSmallScript", 0x18B00, 0x18CFF),
     );
     db.insert("Khmer", Block::new("Khmer", 0x1780, 0x17FF));
     db.insert("KhmerSymbols", Block::new("KhmerSymbols", 0x19E0, 0x19FF));
@@ -447,59 +447,59 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("Lao", Block::new("Lao", 0xE80, 0xEFF));
     db.insert(
         "Latin-1Supplement",
-        Block::new("Latin-1Supplement", 0x80, 0xFF)
+        Block::new("Latin-1Supplement", 0x80, 0xFF),
     );
     db.insert(
         "LatinExtended-A",
-        Block::new("LatinExtended-A", 0x100, 0x17F)
+        Block::new("LatinExtended-A", 0x100, 0x17F),
     );
     db.insert(
         "LatinExtended-B",
-        Block::new("LatinExtended-B", 0x180, 0x24F)
+        Block::new("LatinExtended-B", 0x180, 0x24F),
     );
     db.insert(
         "LatinExtended-C",
-        Block::new("LatinExtended-C", 0x2C60, 0x2C7F)
+        Block::new("LatinExtended-C", 0x2C60, 0x2C7F),
     );
     db.insert(
         "LatinExtended-D",
-        Block::new("LatinExtended-D", 0xA720, 0xA7FF)
+        Block::new("LatinExtended-D", 0xA720, 0xA7FF),
     );
     db.insert(
         "LatinExtended-E",
-        Block::new("LatinExtended-E", 0xAB30, 0xAB6F)
+        Block::new("LatinExtended-E", 0xAB30, 0xAB6F),
     );
     db.insert(
         "LatinExtended-F",
-        Block::new("LatinExtended-F", 0x10780, 0x107BF)
+        Block::new("LatinExtended-F", 0x10780, 0x107BF),
     );
     db.insert(
         "LatinExtended-G",
-        Block::new("LatinExtended-G", 0x1DF00, 0x1DFFF)
+        Block::new("LatinExtended-G", 0x1DF00, 0x1DFFF),
     );
     db.insert(
         "LatinExtendedAdditional",
-        Block::new("LatinExtendedAdditional", 0x1E00, 0x1EFF)
+        Block::new("LatinExtendedAdditional", 0x1E00, 0x1EFF),
     );
     db.insert("Lepcha", Block::new("Lepcha", 0x1C00, 0x1C4F));
     db.insert(
         "LetterlikeSymbols",
-        Block::new("LetterlikeSymbols", 0x2100, 0x214F)
+        Block::new("LetterlikeSymbols", 0x2100, 0x214F),
     );
     db.insert("Limbu", Block::new("Limbu", 0x1900, 0x194F));
     db.insert("LinearA", Block::new("LinearA", 0x10600, 0x1077F));
     db.insert(
         "LinearBIdeograms",
-        Block::new("LinearBIdeograms", 0x10080, 0x100FF)
+        Block::new("LinearBIdeograms", 0x10080, 0x100FF),
     );
     db.insert(
         "LinearBSyllabary",
-        Block::new("LinearBSyllabary", 0x10000, 0x1007F)
+        Block::new("LinearBSyllabary", 0x10000, 0x1007F),
     );
     db.insert("Lisu", Block::new("Lisu", 0xA4D0, 0xA4FF));
     db.insert(
         "LisuSupplement",
-        Block::new("LisuSupplement", 0x11FB0, 0x11FBF)
+        Block::new("LisuSupplement", 0x11FB0, 0x11FBF),
     );
     db.insert("Lycian", Block::new("Lycian", 0x10280, 0x1029F));
     db.insert("Lydian", Block::new("Lydian", 0x10920, 0x1093F));
@@ -513,80 +513,80 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("MasaramGondi", Block::new("MasaramGondi", 0x11D00, 0x11D5F));
     db.insert(
         "MathematicalAlphanumericSymbols",
-        Block::new("MathematicalAlphanumericSymbols", 0x1D400, 0x1D7FF)
+        Block::new("MathematicalAlphanumericSymbols", 0x1D400, 0x1D7FF),
     );
     db.insert(
         "MathematicalOperators",
-        Block::new("MathematicalOperators", 0x2200, 0x22FF)
+        Block::new("MathematicalOperators", 0x2200, 0x22FF),
     );
     db.insert(
         "MayanNumerals",
-        Block::new("MayanNumerals", 0x1D2E0, 0x1D2FF)
+        Block::new("MayanNumerals", 0x1D2E0, 0x1D2FF),
     );
     db.insert("Medefaidrin", Block::new("Medefaidrin", 0x16E40, 0x16E9F));
     db.insert("MeeteiMayek", Block::new("MeeteiMayek", 0xABC0, 0xABFF));
     db.insert(
         "MeeteiMayekExtensions",
-        Block::new("MeeteiMayekExtensions", 0xAAE0, 0xAAFF)
+        Block::new("MeeteiMayekExtensions", 0xAAE0, 0xAAFF),
     );
     db.insert("MendeKikakui", Block::new("MendeKikakui", 0x1E800, 0x1E8DF));
     db.insert(
         "MeroiticCursive",
-        Block::new("MeroiticCursive", 0x109A0, 0x109FF)
+        Block::new("MeroiticCursive", 0x109A0, 0x109FF),
     );
     db.insert(
         "MeroiticHieroglyphs",
-        Block::new("MeroiticHieroglyphs", 0x10980, 0x1099F)
+        Block::new("MeroiticHieroglyphs", 0x10980, 0x1099F),
     );
     db.insert("Miao", Block::new("Miao", 0x16F00, 0x16F9F));
     db.insert(
         "MiscellaneousMathematicalSymbols-A",
-        Block::new("MiscellaneousMathematicalSymbols-A", 0x27C0, 0x27EF)
+        Block::new("MiscellaneousMathematicalSymbols-A", 0x27C0, 0x27EF),
     );
     db.insert(
         "MiscellaneousMathematicalSymbols-B",
-        Block::new("MiscellaneousMathematicalSymbols-B", 0x2980, 0x29FF)
+        Block::new("MiscellaneousMathematicalSymbols-B", 0x2980, 0x29FF),
     );
     db.insert(
         "MiscellaneousSymbols",
-        Block::new("MiscellaneousSymbols", 0x2600, 0x26FF)
+        Block::new("MiscellaneousSymbols", 0x2600, 0x26FF),
     );
     db.insert(
         "MiscellaneousSymbolsandArrows",
-        Block::new("MiscellaneousSymbolsandArrows", 0x2B00, 0x2BFF)
+        Block::new("MiscellaneousSymbolsandArrows", 0x2B00, 0x2BFF),
     );
     db.insert(
         "MiscellaneousSymbolsandPictographs",
-        Block::new("MiscellaneousSymbolsandPictographs", 0x1F300, 0x1F5FF)
+        Block::new("MiscellaneousSymbolsandPictographs", 0x1F300, 0x1F5FF),
     );
     db.insert(
         "MiscellaneousTechnical",
-        Block::new("MiscellaneousTechnical", 0x2300, 0x23FF)
+        Block::new("MiscellaneousTechnical", 0x2300, 0x23FF),
     );
     db.insert("Modi", Block::new("Modi", 0x11600, 0x1165F));
     db.insert(
         "ModifierToneLetters",
-        Block::new("ModifierToneLetters", 0xA700, 0xA71F)
+        Block::new("ModifierToneLetters", 0xA700, 0xA71F),
     );
     db.insert("Mongolian", Block::new("Mongolian", 0x1800, 0x18AF));
     db.insert(
         "MongolianSupplement",
-        Block::new("MongolianSupplement", 0x11660, 0x1167F)
+        Block::new("MongolianSupplement", 0x11660, 0x1167F),
     );
     db.insert("Mro", Block::new("Mro", 0x16A40, 0x16A6F));
     db.insert("Multani", Block::new("Multani", 0x11280, 0x112AF));
     db.insert(
         "MusicalSymbols",
-        Block::new("MusicalSymbols", 0x1D100, 0x1D1FF)
+        Block::new("MusicalSymbols", 0x1D100, 0x1D1FF),
     );
     db.insert("Myanmar", Block::new("Myanmar", 0x1000, 0x109F));
     db.insert(
         "MyanmarExtended-A",
-        Block::new("MyanmarExtended-A", 0xAA60, 0xAA7F)
+        Block::new("MyanmarExtended-A", 0xAA60, 0xAA7F),
     );
     db.insert(
         "MyanmarExtended-B",
-        Block::new("MyanmarExtended-B", 0xA9E0, 0xA9FF)
+        Block::new("MyanmarExtended-B", 0xA9E0, 0xA9FF),
     );
     db.insert("NKo", Block::new("NKo", 0x7C0, 0x7FF));
     db.insert("Nabataean", Block::new("Nabataean", 0x10880, 0x108AF));
@@ -598,7 +598,7 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("Nushu", Block::new("Nushu", 0x1B170, 0x1B2FF));
     db.insert(
         "NyiakengPuachueHmong",
-        Block::new("NyiakengPuachueHmong", 0x1E100, 0x1E14F)
+        Block::new("NyiakengPuachueHmong", 0x1E100, 0x1E14F),
     );
     db.insert("Ogham", Block::new("Ogham", 0x1680, 0x169F));
     db.insert("OlChiki", Block::new("OlChiki", 0x1C50, 0x1C7F));
@@ -606,31 +606,31 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("OldItalic", Block::new("OldItalic", 0x10300, 0x1032F));
     db.insert(
         "OldNorthArabian",
-        Block::new("OldNorthArabian", 0x10A80, 0x10A9F)
+        Block::new("OldNorthArabian", 0x10A80, 0x10A9F),
     );
     db.insert("OldPermic", Block::new("OldPermic", 0x10350, 0x1037F));
     db.insert("OldPersian", Block::new("OldPersian", 0x103A0, 0x103DF));
     db.insert("OldSogdian", Block::new("OldSogdian", 0x10F00, 0x10F2F));
     db.insert(
         "OldSouthArabian",
-        Block::new("OldSouthArabian", 0x10A60, 0x10A7F)
+        Block::new("OldSouthArabian", 0x10A60, 0x10A7F),
     );
     db.insert("OldTurkic", Block::new("OldTurkic", 0x10C00, 0x10C4F));
     db.insert("OldUyghur", Block::new("OldUyghur", 0x10F70, 0x10FAF));
     db.insert(
         "OpticalCharacterRecognition",
-        Block::new("OpticalCharacterRecognition", 0x2440, 0x245F)
+        Block::new("OpticalCharacterRecognition", 0x2440, 0x245F),
     );
     db.insert("Oriya", Block::new("Oriya", 0xB00, 0xB7F));
     db.insert(
         "OrnamentalDingbats",
-        Block::new("OrnamentalDingbats", 0x1F650, 0x1F67F)
+        Block::new("OrnamentalDingbats", 0x1F650, 0x1F67F),
     );
     db.insert("Osage", Block::new("Osage", 0x104B0, 0x104FF));
     db.insert("Osmanya", Block::new("Osmanya", 0x10480, 0x104AF));
     db.insert(
         "OttomanSiyaqNumbers",
-        Block::new("OttomanSiyaqNumbers", 0x1ED00, 0x1ED4F)
+        Block::new("OttomanSiyaqNumbers", 0x1ED00, 0x1ED4F),
     );
     db.insert("PahawhHmong", Block::new("PahawhHmong", 0x16B00, 0x16B8F));
     db.insert("Palmyrene", Block::new("Palmyrene", 0x10860, 0x1087F));
@@ -640,25 +640,25 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("Phoenician", Block::new("Phoenician", 0x10900, 0x1091F));
     db.insert(
         "PhoneticExtensions",
-        Block::new("PhoneticExtensions", 0x1D00, 0x1D7F)
+        Block::new("PhoneticExtensions", 0x1D00, 0x1D7F),
     );
     db.insert(
         "PhoneticExtensionsSupplement",
-        Block::new("PhoneticExtensionsSupplement", 0x1D80, 0x1DBF)
+        Block::new("PhoneticExtensionsSupplement", 0x1D80, 0x1DBF),
     );
     db.insert("PlayingCards", Block::new("PlayingCards", 0x1F0A0, 0x1F0FF));
     db.insert(
         "PrivateUseArea",
-        Block::new("PrivateUseArea", 0xE000, 0xF8FF)
+        Block::new("PrivateUseArea", 0xE000, 0xF8FF),
     );
     db.insert(
         "PsalterPahlavi",
-        Block::new("PsalterPahlavi", 0x10B80, 0x10BAF)
+        Block::new("PsalterPahlavi", 0x10B80, 0x10BAF),
     );
     db.insert("Rejang", Block::new("Rejang", 0xA930, 0xA95F));
     db.insert(
         "RumiNumeralSymbols",
-        Block::new("RumiNumeralSymbols", 0x10E60, 0x10E7F)
+        Block::new("RumiNumeralSymbols", 0x10E60, 0x10E7F),
     );
     db.insert("Runic", Block::new("Runic", 0x16A0, 0x16FF));
     db.insert("Samaritan", Block::new("Samaritan", 0x800, 0x83F));
@@ -667,88 +667,88 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("Shavian", Block::new("Shavian", 0x10450, 0x1047F));
     db.insert(
         "ShorthandFormatControls",
-        Block::new("ShorthandFormatControls", 0x1BCA0, 0x1BCAF)
+        Block::new("ShorthandFormatControls", 0x1BCA0, 0x1BCAF),
     );
     db.insert("Siddham", Block::new("Siddham", 0x11580, 0x115FF));
     db.insert("Sinhala", Block::new("Sinhala", 0xD80, 0xDFF));
     db.insert(
         "SinhalaArchaicNumbers",
-        Block::new("SinhalaArchaicNumbers", 0x111E0, 0x111FF)
+        Block::new("SinhalaArchaicNumbers", 0x111E0, 0x111FF),
     );
     db.insert(
         "SmallFormVariants",
-        Block::new("SmallFormVariants", 0xFE50, 0xFE6F)
+        Block::new("SmallFormVariants", 0xFE50, 0xFE6F),
     );
     db.insert(
         "SmallKanaExtension",
-        Block::new("SmallKanaExtension", 0x1B130, 0x1B16F)
+        Block::new("SmallKanaExtension", 0x1B130, 0x1B16F),
     );
     db.insert("Sogdian", Block::new("Sogdian", 0x10F30, 0x10F6F));
     db.insert("SoraSompeng", Block::new("SoraSompeng", 0x110D0, 0x110FF));
     db.insert("Soyombo", Block::new("Soyombo", 0x11A50, 0x11AAF));
     db.insert(
         "SpacingModifierLetters",
-        Block::new("SpacingModifierLetters", 0x2B0, 0x2FF)
+        Block::new("SpacingModifierLetters", 0x2B0, 0x2FF),
     );
     db.insert("Specials", Block::new("Specials", 0xFFF0, 0xFFFF));
     db.insert("Sundanese", Block::new("Sundanese", 0x1B80, 0x1BBF));
     db.insert(
         "SundaneseSupplement",
-        Block::new("SundaneseSupplement", 0x1CC0, 0x1CCF)
+        Block::new("SundaneseSupplement", 0x1CC0, 0x1CCF),
     );
     db.insert(
         "SuperscriptsandSubscripts",
-        Block::new("SuperscriptsandSubscripts", 0x2070, 0x209F)
+        Block::new("SuperscriptsandSubscripts", 0x2070, 0x209F),
     );
     db.insert(
         "SupplementalArrows-A",
-        Block::new("SupplementalArrows-A", 0x27F0, 0x27FF)
+        Block::new("SupplementalArrows-A", 0x27F0, 0x27FF),
     );
     db.insert(
         "SupplementalArrows-B",
-        Block::new("SupplementalArrows-B", 0x2900, 0x297F)
+        Block::new("SupplementalArrows-B", 0x2900, 0x297F),
     );
     db.insert(
         "SupplementalArrows-C",
-        Block::new("SupplementalArrows-C", 0x1F800, 0x1F8FF)
+        Block::new("SupplementalArrows-C", 0x1F800, 0x1F8FF),
     );
     db.insert(
         "SupplementalMathematicalOperators",
-        Block::new("SupplementalMathematicalOperators", 0x2A00, 0x2AFF)
+        Block::new("SupplementalMathematicalOperators", 0x2A00, 0x2AFF),
     );
     db.insert(
         "SupplementalPunctuation",
-        Block::new("SupplementalPunctuation", 0x2E00, 0x2E7F)
+        Block::new("SupplementalPunctuation", 0x2E00, 0x2E7F),
     );
     db.insert(
         "SupplementalSymbolsandPictographs",
-        Block::new("SupplementalSymbolsandPictographs", 0x1F900, 0x1F9FF)
+        Block::new("SupplementalSymbolsandPictographs", 0x1F900, 0x1F9FF),
     );
     db.insert(
         "SupplementaryPrivateUseArea-A",
-        Block::new("SupplementaryPrivateUseArea-A", 0xF0000, 0xFFFFF)
+        Block::new("SupplementaryPrivateUseArea-A", 0xF0000, 0xFFFFF),
     );
     db.insert(
         "SupplementaryPrivateUseArea-B",
-        Block::new("SupplementaryPrivateUseArea-B", 0x0010_0000, 0x0010_FFFF)
+        Block::new("SupplementaryPrivateUseArea-B", 0x0010_0000, 0x0010_FFFF),
     );
     db.insert(
         "SuttonSignWriting",
-        Block::new("SuttonSignWriting", 0x1D800, 0x1DAAF)
+        Block::new("SuttonSignWriting", 0x1D800, 0x1DAAF),
     );
     db.insert("SylotiNagri", Block::new("SylotiNagri", 0xA800, 0xA82F));
     db.insert(
         "SymbolsandPictographsExtended-A",
-        Block::new("SymbolsandPictographsExtended-A", 0x1FA70, 0x1FAFF)
+        Block::new("SymbolsandPictographsExtended-A", 0x1FA70, 0x1FAFF),
     );
     db.insert(
         "SymbolsforLegacyComputing",
-        Block::new("SymbolsforLegacyComputing", 0x1FB00, 0x1FBFF)
+        Block::new("SymbolsforLegacyComputing", 0x1FB00, 0x1FBFF),
     );
     db.insert("Syriac", Block::new("Syriac", 0x700, 0x74F));
     db.insert(
         "SyriacSupplement",
-        Block::new("SyriacSupplement", 0x860, 0x86F)
+        Block::new("SyriacSupplement", 0x860, 0x86F),
     );
     db.insert("Tagalog", Block::new("Tagalog", 0x1700, 0x171F));
     db.insert("Tagbanwa", Block::new("Tagbanwa", 0x1760, 0x177F));
@@ -758,23 +758,23 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("TaiViet", Block::new("TaiViet", 0xAA80, 0xAADF));
     db.insert(
         "TaiXuanJingSymbols",
-        Block::new("TaiXuanJingSymbols", 0x1D300, 0x1D35F)
+        Block::new("TaiXuanJingSymbols", 0x1D300, 0x1D35F),
     );
     db.insert("Takri", Block::new("Takri", 0x11680, 0x116CF));
     db.insert("Tamil", Block::new("Tamil", 0xB80, 0xBFF));
     db.insert(
         "TamilSupplement",
-        Block::new("TamilSupplement", 0x11FC0, 0x11FFF)
+        Block::new("TamilSupplement", 0x11FC0, 0x11FFF),
     );
     db.insert("Tangsa", Block::new("Tangsa", 0x16A70, 0x16ACF));
     db.insert("Tangut", Block::new("Tangut", 0x17000, 0x187FF));
     db.insert(
         "TangutComponents",
-        Block::new("TangutComponents", 0x18800, 0x18AFF)
+        Block::new("TangutComponents", 0x18800, 0x18AFF),
     );
     db.insert(
         "TangutSupplement",
-        Block::new("TangutSupplement", 0x18D00, 0x18D7F)
+        Block::new("TangutSupplement", 0x18D00, 0x18D7F),
     );
     db.insert("Telugu", Block::new("Telugu", 0xC00, 0xC7F));
     db.insert("Thaana", Block::new("Thaana", 0x780, 0x7BF));
@@ -785,37 +785,37 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("Toto", Block::new("Toto", 0x1E290, 0x1E2BF));
     db.insert(
         "TransportandMapSymbols",
-        Block::new("TransportandMapSymbols", 0x1F680, 0x1F6FF)
+        Block::new("TransportandMapSymbols", 0x1F680, 0x1F6FF),
     );
     db.insert("Ugaritic", Block::new("Ugaritic", 0x10380, 0x1039F));
     db.insert(
         "UnifiedCanadianAboriginalSyllabics",
-        Block::new("UnifiedCanadianAboriginalSyllabics", 0x1400, 0x167F)
+        Block::new("UnifiedCanadianAboriginalSyllabics", 0x1400, 0x167F),
     );
     db.insert(
         "UnifiedCanadianAboriginalSyllabicsExtended",
-        Block::new("UnifiedCanadianAboriginalSyllabicsExtended", 0x18B0, 0x18FF)
+        Block::new("UnifiedCanadianAboriginalSyllabicsExtended", 0x18B0, 0x18FF),
     );
     db.insert(
         "UnifiedCanadianAboriginalSyllabicsExtended-A",
         Block::new(
             "UnifiedCanadianAboriginalSyllabicsExtended-A",
             0x11AB0,
-            0x11ABF
-        )
+            0x11ABF,
+        ),
     );
     db.insert("Vai", Block::new("Vai", 0xA500, 0xA63F));
     db.insert(
         "VariationSelectors",
-        Block::new("VariationSelectors", 0xFE00, 0xFE0F)
+        Block::new("VariationSelectors", 0xFE00, 0xFE0F),
     );
     db.insert(
         "VariationSelectorsSupplement",
-        Block::new("VariationSelectorsSupplement", 0xE0100, 0xE01EF)
+        Block::new("VariationSelectorsSupplement", 0xE0100, 0xE01EF),
     );
     db.insert(
         "VedicExtensions",
-        Block::new("VedicExtensions", 0x1CD0, 0x1CFF)
+        Block::new("VedicExtensions", 0x1CD0, 0x1CFF),
     );
     db.insert("VerticalForms", Block::new("VerticalForms", 0xFE10, 0xFE1F));
     db.insert("Vithkuqi", Block::new("Vithkuqi", 0x10570, 0x105BF));
@@ -826,15 +826,15 @@ pub fn get_blocks() -> HashMap<&'static str, Block> {
     db.insert("YiSyllables", Block::new("YiSyllables", 0xA000, 0xA48F));
     db.insert(
         "YijingHexagramSymbols",
-        Block::new("YijingHexagramSymbols", 0x4DC0, 0x4DFF)
+        Block::new("YijingHexagramSymbols", 0x4DC0, 0x4DFF),
     );
     db.insert(
         "ZanabazarSquare",
-        Block::new("ZanabazarSquare", 0x11A00, 0x11A4F)
+        Block::new("ZanabazarSquare", 0x11A00, 0x11A4F),
     );
     db.insert(
         "ZnamennyMusicalNotation",
-        Block::new("ZnamennyMusicalNotation", 0x1CF00, 0x1CFCF)
+        Block::new("ZnamennyMusicalNotation", 0x1CF00, 0x1CFCF),
     );
     db
 }

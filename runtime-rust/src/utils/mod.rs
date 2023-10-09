@@ -27,7 +27,7 @@ pub enum EitherMut<'a, T: 'a> {
     /// The immutable reference
     Immutable(&'a T),
     /// The mutable reference
-    Mutable(&'a mut T)
+    Mutable(&'a mut T),
 }
 
 impl<'a, T: 'a> Deref for EitherMut<'a, T> {
@@ -36,7 +36,7 @@ impl<'a, T: 'a> Deref for EitherMut<'a, T> {
     fn deref(&self) -> &Self::Target {
         match self {
             EitherMut::Mutable(data) => data,
-            EitherMut::Immutable(data) => data
+            EitherMut::Immutable(data) => data,
         }
     }
 }
@@ -45,7 +45,7 @@ impl<'a, T: 'a> DerefMut for EitherMut<'a, T> {
     fn deref_mut(&mut self) -> &mut T {
         match self {
             EitherMut::Mutable(data) => data,
-            EitherMut::Immutable(_) => panic!("Expected a mutable reference")
+            EitherMut::Immutable(_) => panic!("Expected a mutable reference"),
         }
     }
 }
@@ -56,7 +56,7 @@ pub enum OwnOrMut<'a, T> {
     /// The resource is directly owned
     Owned(T),
     /// The resource is held through a mutable reference
-    MutRef(&'a mut T)
+    MutRef(&'a mut T),
 }
 
 impl<'a, T> Deref for OwnOrMut<'a, T> {
@@ -65,7 +65,7 @@ impl<'a, T> Deref for OwnOrMut<'a, T> {
     fn deref(&self) -> &Self::Target {
         match self {
             OwnOrMut::Owned(data) => data,
-            OwnOrMut::MutRef(data) => data
+            OwnOrMut::MutRef(data) => data,
         }
     }
 }
@@ -74,7 +74,7 @@ impl<'a, T> DerefMut for OwnOrMut<'a, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         match self {
             OwnOrMut::Owned(data) => data,
-            OwnOrMut::MutRef(data) => data
+            OwnOrMut::MutRef(data) => data,
         }
     }
 }

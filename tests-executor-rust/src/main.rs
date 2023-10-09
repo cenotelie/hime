@@ -116,7 +116,7 @@ fn get_expected_output(my_path: &path::Path) -> String {
 fn get_parsed_input(
     my_path: &path::Path,
     library: &libloading::Library,
-    parser_name: &str
+    parser_name: &str,
 ) -> ParseResultAst {
     let mut function_name = String::new();
     function_name.push_str(parser_name);
@@ -136,14 +136,14 @@ fn execute(
     my_path: &path::Path,
     library: &libloading::Library,
     parser_name: &str,
-    verb: &str
+    verb: &str,
 ) -> i32 {
     match verb {
         VERB_MATCHES => execute_test_matches(my_path, library, parser_name),
         VERB_NOMATCHES => execute_test_no_matches(my_path, library, parser_name),
         VERB_FAILS => execute_test_fails(my_path, library, parser_name),
         VERB_OUTPUTS => execute_test_outputs(my_path, library, parser_name),
-        _ => RESULT_FAILURE_PARSING
+        _ => RESULT_FAILURE_PARSING,
     }
 }
 
@@ -151,7 +151,7 @@ fn execute(
 fn execute_test_matches(
     my_path: &path::Path,
     library: &libloading::Library,
-    parser_name: &str
+    parser_name: &str,
 ) -> i32 {
     let expected = get_expected_ast(my_path);
     if !expected.errors.errors.is_empty() {
@@ -175,7 +175,7 @@ fn execute_test_matches(
     }
     if compare(
         expected.get_ast().get_root(),
-        real_result.get_ast().get_root()
+        real_result.get_ast().get_root(),
     ) {
         RESULT_SUCCESS
     } else {
@@ -191,7 +191,7 @@ fn execute_test_matches(
 fn execute_test_no_matches(
     my_path: &path::Path,
     library: &libloading::Library,
-    parser_name: &str
+    parser_name: &str,
 ) -> i32 {
     let expected = get_expected_ast(my_path);
     if !expected.errors.errors.is_empty() {
@@ -215,7 +215,7 @@ fn execute_test_no_matches(
     }
     if compare(
         expected.get_ast().get_root(),
-        real_result.get_ast().get_root()
+        real_result.get_ast().get_root(),
     ) {
         println!("Produced AST incorrectly matches the specified expectation");
         RESULT_FAILURE_VERB
@@ -228,7 +228,7 @@ fn execute_test_no_matches(
 fn execute_test_fails(
     my_path: &path::Path,
     library: &libloading::Library,
-    parser_name: &str
+    parser_name: &str,
 ) -> i32 {
     let real_result = get_parsed_input(my_path, library, parser_name);
     if !real_result.is_success() {
@@ -245,7 +245,7 @@ fn execute_test_fails(
 fn execute_test_outputs(
     my_path: &path::Path,
     library: &libloading::Library,
-    parser_name: &str
+    parser_name: &str,
 ) -> i32 {
     let output = get_expected_output(my_path);
     let expected_lines: Vec<&str> = find_lines_in(&output);
@@ -320,7 +320,7 @@ fn compare(expected: AstNode, node: AstNode) -> bool {
             predicate_children
                 .at(1)
                 .get_value()
-                .expect("Malformed expected AST")
+                .expect("Malformed expected AST"),
         );
         let value_real = node.get_value().expect("Malformed input AST");
         if test.eq("=") && !value_expected.eq(&value_real)

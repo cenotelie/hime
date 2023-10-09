@@ -37,7 +37,7 @@ pub enum TableType {
     /// Table of variables
     Variable = 2,
     /// Tables of virtuals
-    Virtual = 3
+    Virtual = 3,
 }
 
 impl From<usize> for TableType {
@@ -46,7 +46,7 @@ impl From<usize> for TableType {
             1 => TableType::Token,
             2 => TableType::Variable,
             3 => TableType::Virtual,
-            _ => TableType::None
+            _ => TableType::None,
         }
     }
 }
@@ -55,7 +55,7 @@ impl From<usize> for TableType {
 #[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Hash)]
 pub struct TableElemRef {
     /// The backend data
-    data: usize
+    data: usize,
 }
 
 impl TableElemRef {
@@ -63,7 +63,7 @@ impl TableElemRef {
     #[must_use]
     pub fn new(t: TableType, index: usize) -> TableElemRef {
         TableElemRef {
-            data: ((t as usize) << 30) | index
+            data: ((t as usize) << 30) | index,
         }
     }
 
@@ -88,13 +88,13 @@ impl TableElemRef {
         &self,
         f: &mut Formatter<'_>,
         variables: &[Symbol],
-        virtuals: &[Symbol]
+        virtuals: &[Symbol],
     ) -> Result<(), Error> {
         match self.table_type() {
             TableType::None => write!(f, "none[{}]", self.index())?,
             TableType::Token => write!(f, "token[{}]", self.index())?,
             TableType::Variable => write!(f, "{}", variables[self.index()].name)?,
-            TableType::Virtual => write!(f, "{}", virtuals[self.index()].name)?
+            TableType::Virtual => write!(f, "{}", virtuals[self.index()].name)?,
         }
 
         Ok(())
@@ -109,7 +109,7 @@ pub struct AstCell {
     /// The number of children
     pub count: u32,
     /// The index of the first child
-    pub first: u32
+    pub first: u32,
 }
 
 impl AstCell {
@@ -119,7 +119,7 @@ impl AstCell {
         AstCell {
             label,
             count: 0,
-            first: 0
+            first: 0,
         }
     }
 
@@ -129,7 +129,7 @@ impl AstCell {
         AstCell {
             label,
             count,
-            first
+            first,
         }
     }
 }
@@ -142,7 +142,7 @@ pub struct AstImpl {
     /// The nodes' labels
     nodes: BigList<AstCell>,
     /// The index of the tree's root node
-    root: Option<usize>
+    root: Option<usize>,
 }
 
 impl AstImpl {
@@ -183,7 +183,7 @@ pub struct Ast<'s, 't, 'a> {
     /// The table of virtuals
     virtuals: &'a [Symbol<'s>],
     /// The data of the implementation
-    data: &'a AstImpl
+    data: &'a AstImpl,
 }
 
 impl<'s, 't, 'a> Ast<'s, 't, 'a> {
@@ -193,13 +193,13 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
         tokens: TokenRepository<'s, 't, 'a>,
         variables: &'a [Symbol<'s>],
         virtuals: &'a [Symbol<'s>],
-        data: &'a AstImpl
+        data: &'a AstImpl,
     ) -> Ast<'s, 't, 'a> {
         Ast {
             tokens,
             variables,
             virtuals,
-            data
+            data,
         }
     }
 
@@ -227,7 +227,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
             .root
             .map(|x| AstNode {
                 tree: self,
-                index: x
+                index: x,
             })
             .expect("No root defined!")
     }
@@ -237,7 +237,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     pub fn get_node(&'a self, id: usize) -> AstNode<'s, 't, 'a> {
         AstNode {
             tree: self,
-            index: id
+            index: id,
         }
     }
 
@@ -294,7 +294,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
         let mut total_span: Option<TextSpan> = None;
         let mut position = TextPosition {
             line: usize::MAX,
-            column: usize::MAX
+            column: usize::MAX,
         };
         self.traverse(node, |current| {
             if let Some(p) = self.get_position_at(current) {
@@ -349,7 +349,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
                 let token = self.get_token(cell.label.index());
                 token.get_span()
             }
-            _ => None
+            _ => None,
         }
     }
 
@@ -362,7 +362,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
                 let token = self.get_token(cell.label.index());
                 token.get_position()
             }
-            _ => None
+            _ => None,
         }
     }
 }
@@ -373,7 +373,7 @@ pub struct AstNode<'s, 't, 'a> {
     /// The original parse tree
     tree: &'a Ast<'s, 't, 'a>,
     /// The index of this node in the parse tree
-    index: usize
+    index: usize,
 }
 
 impl<'s, 't, 'a> AstNode<'s, 't, 'a> {
@@ -389,7 +389,7 @@ impl<'s, 't, 'a> AstNode<'s, 't, 'a> {
         let cell = self.tree.data.nodes[self.index];
         match cell.label.table_type() {
             TableType::Token => Some(cell.label.index()),
-            _ => None
+            _ => None,
         }
     }
 
@@ -404,7 +404,7 @@ impl<'s, 't, 'a> AstNode<'s, 't, 'a> {
     pub fn children(&self) -> AstFamily<'s, 't, 'a> {
         AstFamily {
             tree: self.tree,
-            parent: self.index
+            parent: self.index,
         }
     }
 
@@ -414,7 +414,7 @@ impl<'s, 't, 'a> AstNode<'s, 't, 'a> {
         let cell = self.tree.data.nodes[self.index];
         AstNode {
             tree: self.tree,
-            index: cell.first as usize + index
+            index: cell.first as usize + index,
         }
     }
 
@@ -456,7 +456,7 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for AstNode<'s, 't, 'a> {
                 let token = self.tree.get_token(cell.label.index());
                 token.get_context()
             }
-            _ => None
+            _ => None,
         }
     }
 
@@ -485,7 +485,7 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for AstNode<'s, 't, 'a> {
                 let token = self.tree.get_token(cell.label.index());
                 token.get_value()
             }
-            _ => None
+            _ => None,
         }
     }
 }
@@ -507,7 +507,7 @@ impl<'s, 't, 'a> IntoIterator for AstNode<'s, 't, 'a> {
         AstFamilyIterator {
             tree: self.tree,
             current: cell.first as usize,
-            end: (cell.first + cell.count) as usize
+            end: (cell.first + cell.count) as usize,
         }
     }
 }
@@ -541,7 +541,7 @@ impl<'s, 't, 'a> Display for AstNode<'s, 't, 'a> {
 impl<'s, 't, 'a> Serialize for AstNode<'s, 't, 'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: Serializer
+        S: Serializer,
     {
         let mut state = serializer.serialize_struct("AstNode", 5)?;
         state.serialize_field("symbol", &self.get_symbol())?;
@@ -559,7 +559,7 @@ pub struct AstFamily<'s, 't, 'a> {
     /// The original parse tree
     tree: &'a Ast<'s, 't, 'a>,
     /// The index of the parent node in the parse tree
-    parent: usize
+    parent: usize,
 }
 
 /// Represents and iterator for adjacents in this graph
@@ -569,7 +569,7 @@ pub struct AstFamilyIterator<'s, 't, 'a> {
     /// The index of the current child in the parse tree
     current: usize,
     /// The index of the last child (excluded) in the parse tree
-    end: usize
+    end: usize,
 }
 
 /// Implementation of the `Iterator` trait for `AstFamilyIterator`
@@ -581,7 +581,7 @@ impl<'s, 't, 'a> Iterator for AstFamilyIterator<'s, 't, 'a> {
         } else {
             let result = AstNode {
                 tree: self.tree,
-                index: self.current
+                index: self.current,
             };
             self.current += 1;
             Some(result)
@@ -601,7 +601,7 @@ impl<'s, 't, 'a> DoubleEndedIterator for AstFamilyIterator<'s, 't, 'a> {
         } else {
             let result = AstNode {
                 tree: self.tree,
-                index: self.end - 1
+                index: self.end - 1,
             };
             self.end -= 1;
             Some(result)
@@ -621,7 +621,7 @@ impl<'s, 't, 'a> IntoIterator for AstFamily<'s, 't, 'a> {
         AstFamilyIterator {
             tree: self.tree,
             current: cell.first as usize,
-            end: (cell.first + cell.count) as usize
+            end: (cell.first + cell.count) as usize,
         }
     }
 }
@@ -645,7 +645,7 @@ impl<'s, 't, 'a> AstFamily<'s, 't, 'a> {
         let cell = self.tree.data.nodes[self.parent];
         AstNode {
             tree: self.tree,
-            index: cell.first as usize + index
+            index: cell.first as usize + index,
         }
     }
 
@@ -656,7 +656,7 @@ impl<'s, 't, 'a> AstFamily<'s, 't, 'a> {
         AstFamilyIterator {
             tree: self.tree,
             current: cell.first as usize,
-            end: (cell.first + cell.count) as usize
+            end: (cell.first + cell.count) as usize,
         }
     }
 }
@@ -664,7 +664,7 @@ impl<'s, 't, 'a> AstFamily<'s, 't, 'a> {
 impl<'s, 't, 'a> Serialize for AstFamily<'s, 't, 'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: Serializer
+        S: Serializer,
     {
         let mut seq = serializer.serialize_seq(Some(self.len()))?;
         for node in self.iter() {

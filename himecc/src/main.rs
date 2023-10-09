@@ -275,7 +275,7 @@ fn execute_test<'a>(task: &CompilationTask<'a>) -> Result<(), Errors<'a>> {
             None => {
                 return Err(Errors::from(
                     data,
-                    vec![Error::GrammarNotFound(name.clone())]
+                    vec![Error::GrammarNotFound(name.clone())],
                 ));
             }
         }

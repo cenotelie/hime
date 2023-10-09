@@ -20,7 +20,7 @@
 use hime_redist::text::TextPosition;
 use miette::{
     Diagnostic, LabeledSpan, MietteError, Severity, SourceCode, SourceOffset, SourceSpan,
-    SpanContents
+    SpanContents,
 };
 
 use super::{ContextualizedError, Error};
@@ -34,7 +34,7 @@ struct TextSpanContents<'a> {
     content: &'a str,
     span: SourceSpan,
     position: TextPosition,
-    line_count: usize
+    line_count: usize,
 }
 
 impl<'a> SpanContents<'a> for TextSpanContents<'a> {
@@ -68,7 +68,7 @@ impl<'t> LoadedInput<'t> {
         &self,
         span: SourceSpan,
         context_lines_before: usize,
-        context_lines_after: usize
+        context_lines_after: usize,
     ) -> TextSpanContents {
         // compute lines
         let original_line = self.content.get_position_at(span.offset()).line;
@@ -99,9 +99,9 @@ impl<'t> LoadedInput<'t> {
             span: SourceSpan::new(SourceOffset::from(start_offset), SourceOffset::from(length)),
             position: TextPosition {
                 line: start_line,
-                column: 1
+                column: 1,
             },
-            line_count: end_line + 1 - start_line
+            line_count: end_line + 1 - start_line,
         }
     }
 }
@@ -111,7 +111,7 @@ impl<'t> SourceCode for LoadedInput<'t> {
         &'a self,
         span: &SourceSpan,
         context_lines_before: usize,
-        context_lines_after: usize
+        context_lines_after: usize,
     ) -> Result<Box<dyn SpanContents<'a> + 'a>, MietteError> {
         let contents = self.get_span_content(*span, context_lines_before, context_lines_after);
         Ok(Box::new(contents))
@@ -129,14 +129,14 @@ impl<'context, 'error, 't> ContextualizedError<'context, 'error, 't> {
         Box::new(std::iter::once(LabeledSpan::new(
             Some(self.to_string()),
             0,
-            0
+            0,
         )))
     }
 
     /// Gets a single miette label with a known location
     fn get_single_label_with_input(
         &self,
-        input: &InputReference
+        input: &InputReference,
     ) -> Box<dyn Iterator<Item = miette::LabeledSpan> + '_> {
         Box::new(std::iter::once(self.label_for_input(input)))
     }
@@ -144,7 +144,7 @@ impl<'context, 'error, 't> ContextualizedError<'context, 'error, 't> {
     /// Gets a single miette label with a known location
     fn get_single_label_with_grammar(
         &self,
-        grammar_index: usize
+        grammar_index: usize,
     ) -> Box<dyn Iterator<Item = miette::LabeledSpan> + '_> {
         let input = &self.context.grammars[grammar_index].input_ref;
         self.get_single_label_with_input(input)
@@ -276,7 +276,7 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
                     let terminal = grammar.get_terminal(overrider.sid()).unwrap();
                     labels.push(self.label_for_input_with_text(
                         &terminal.input_ref,
-                        format!("{} overrides {}", terminal.value, separator.value)
+                        format!("{} overrides {}", terminal.value, separator.value),
                     ));
                 }
                 Some(Box::new(labels.into_iter()))
@@ -304,10 +304,10 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
                     self.label_for_input(input),
                     self.label_for_input_with_text(
                         previous,
-                        format!("previous definition of {name}")
+                        format!("previous definition of {name}"),
                     ),
                 ]
-                .into_iter()
+                .into_iter(),
             )),
             Error::GrammarNotDefined(input, _name) => Some(self.get_single_label_with_input(input)),
             Error::LrConflict(grammar_index, conflict) => {
@@ -320,7 +320,7 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
                     let input_ref = choice.elements[item.position].input_ref.unwrap();
                     labels.push(self.label_for_input_with_text(
                         &input_ref,
-                        format!("Could consume `{value}` at this point")
+                        format!("Could consume `{value}` at this point"),
                     ));
                 }
                 for item in &conflict.reduce_items {
@@ -338,7 +338,7 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
                             &input_ref,
                             format!(
                                 "Could match the rule ending here when looking ahead to `{value}`"
-                            )
+                            ),
                         ));
                     } else {
                         let input_ref = choice.elements[item.position].input_ref.unwrap();
@@ -346,7 +346,7 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
                             &input_ref,
                             format!(
                                 "Could match the rule ending here when looking ahead to `{value}`"
-                            )
+                            ),
                         ));
                     }
                     for origin in &lookahead.origins {
@@ -356,7 +356,7 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
                         if let Some(input_ref) = choice.elements[choice_ref.position].input_ref {
                             labels.push(self.label_for_input_with_text(
                                 &input_ref,
-                                format!("`{value}` can be expected, looking from here")
+                                format!("`{value}` can be expected, looking from here"),
                             ));
                         }
                     }
@@ -372,7 +372,7 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
                     let input_ref = choice.elements[item.position].input_ref.unwrap();
                     labels.push(self.label_for_input_with_text(
                         &input_ref,
-                        String::from("Used outside required context")
+                        String::from("Used outside required context"),
                     ));
                 }
                 Some(Box::new(labels.into_iter()))
@@ -385,7 +385,7 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
                     let terminal = grammar.get_terminal(overrider.sid()).unwrap();
                     labels.push(self.label_for_input_with_text(
                         &terminal.input_ref,
-                        format!("{} overrides {}", terminal.value, separator.value)
+                        format!("{} overrides {}", terminal.value, separator.value),
                     ));
                 }
                 Some(Box::new(labels.into_iter()))
@@ -441,7 +441,7 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
                     )))
                 }
             }
-            _ => None
+            _ => None,
         }
     }
 }

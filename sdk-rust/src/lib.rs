@@ -42,7 +42,7 @@ use hime_redist::text::{Text, TextPosition};
 use crate::errors::{Error, Errors};
 use crate::grammars::{
     Grammar, OPTION_ACCESS_MODIFIER, OPTION_MODE, OPTION_NAMESPACE, OPTION_OUTPUT_PATH,
-    OPTION_RUNTIME
+    OPTION_RUNTIME,
 };
 use crate::sdk::InMemoryParser;
 
@@ -57,7 +57,7 @@ pub struct CharSpan {
     /// Beginning of the range (included)
     pub begin: u16,
     /// End of the range (included)
-    pub end: u16
+    pub end: u16,
 }
 
 /// Constant value for an invalid value
@@ -87,7 +87,7 @@ impl CharSpan {
     pub fn intersect(self, right: CharSpan) -> CharSpan {
         let result = CharSpan {
             begin: self.begin.max(right.begin),
-            end: self.end.min(right.end)
+            end: self.end.min(right.end),
         };
         if result.is_empty() {
             CHARSPAN_INVALID
@@ -106,29 +106,29 @@ impl CharSpan {
             return (
                 CharSpan {
                     begin: splitter.end + 1,
-                    end: self.end
+                    end: self.end,
                 },
-                CHARSPAN_INVALID
+                CHARSPAN_INVALID,
             );
         }
         if self.end == splitter.end {
             return (
                 CharSpan {
                     begin: self.begin,
-                    end: splitter.begin - 1
+                    end: splitter.begin - 1,
                 },
-                CHARSPAN_INVALID
+                CHARSPAN_INVALID,
             );
         }
         (
             CharSpan {
                 begin: self.begin,
-                end: splitter.begin - 1
+                end: splitter.begin - 1,
             },
             CharSpan {
                 begin: splitter.end + 1,
-                end: self.end
-            }
+                end: self.end,
+            },
         )
     }
 }
@@ -228,7 +228,7 @@ pub enum Input<'a> {
     /// A file name
     FileName(String),
     /// Raw input
-    Raw(&'a str)
+    Raw(&'a str),
 }
 
 impl<'a> Input<'a> {
@@ -237,7 +237,7 @@ impl<'a> Input<'a> {
     pub fn name(&self) -> String {
         match self {
             Input::FileName(file_name) => file_name.clone(),
-            Input::Raw(_) => String::from("raw input")
+            Input::Raw(_) => String::from("raw input"),
         }
     }
 
@@ -249,7 +249,7 @@ impl<'a> Input<'a> {
     pub fn open(&self) -> Result<Box<dyn Read + 'a>, std::io::Error> {
         match self {
             Input::FileName(file_name) => Ok(Box::new(fs::File::open(file_name)?)),
-            Input::Raw(text) => Ok(Box::new(text.as_bytes()))
+            Input::Raw(text) => Ok(Box::new(text.as_bytes())),
         }
     }
 }
@@ -260,14 +260,14 @@ pub struct LoadedInput<'t> {
     /// The input's name (file name)
     pub name: String,
     /// The input's content (full text)
-    pub content: Text<'t>
+    pub content: Text<'t>,
 }
 
 /// Transforms into an owned static version of the data
 fn loaded_input_into_static(input: LoadedInput<'_>) -> LoadedInput<'static> {
     LoadedInput {
         name: input.name,
-        content: input.content.into_static()
+        content: input.content.into_static(),
     }
 }
 
@@ -285,7 +285,7 @@ pub struct LoadedData<'t> {
     /// The loaded inputs
     pub inputs: Vec<LoadedInput<'t>>,
     /// The loaded grammars
-    pub grammars: Vec<Grammar>
+    pub grammars: Vec<Grammar>,
 }
 
 /// Transforms into an owned static version of the data
@@ -296,7 +296,7 @@ fn loaded_data_into_static(data: LoadedData<'_>) -> LoadedData<'static> {
             .into_iter()
             .map(loaded_input_into_static)
             .collect(),
-        grammars: data.grammars
+        grammars: data.grammars,
     }
 }
 
@@ -316,7 +316,7 @@ pub struct InputReference {
     /// The position in the input
     pub position: TextPosition,
     /// The length in the input
-    pub length: usize
+    pub length: usize,
 }
 
 impl InputReference {
@@ -348,7 +348,7 @@ impl InputReference {
         InputReference {
             input_index,
             position,
-            length: span.length
+            length: span.length,
         }
     }
 
@@ -374,7 +374,7 @@ pub enum ParsingMethod {
     /// The RNGLR parsing method based on a LR(1) graph
     RNGLR1,
     /// The RNGLR parsing method based on a LALR(1) graph
-    RNGLALR1
+    RNGLALR1,
 }
 
 impl ParsingMethod {
@@ -389,7 +389,7 @@ impl ParsingMethod {
     pub fn is_rnglr(self) -> bool {
         match self {
             ParsingMethod::LR0 | ParsingMethod::LR1 | ParsingMethod::LALR1 => false,
-            ParsingMethod::RNGLR1 | ParsingMethod::RNGLALR1 => true
+            ParsingMethod::RNGLR1 | ParsingMethod::RNGLALR1 => true,
         }
     }
 }
@@ -402,7 +402,7 @@ pub enum Mode {
     /// Generates the compiled assembly of the lexer and parser
     Assembly,
     /// Generates the source code for the lexer and parser and the compiled assembly
-    SourcesAndAssembly
+    SourcesAndAssembly,
 }
 
 impl Mode {
@@ -411,7 +411,7 @@ impl Mode {
     pub fn output_assembly(self) -> bool {
         match self {
             Mode::Sources => false,
-            Mode::Assembly | Mode::SourcesAndAssembly => true
+            Mode::Assembly | Mode::SourcesAndAssembly => true,
         }
     }
 }
@@ -424,7 +424,7 @@ pub enum Runtime {
     /// The Java platform
     Java,
     /// The Rust language
-    Rust
+    Rust,
 }
 
 /// Represents the access modifiers for the generated code
@@ -433,7 +433,7 @@ pub enum Modifier {
     /// Generated classes are public
     Public,
     /// Generated classes are internal
-    Internal
+    Internal,
 }
 
 /// Represents a compilation task for the generation of lexers and parsers from grammars
@@ -467,7 +467,7 @@ pub struct CompilationTask<'a> {
     /// blocked by [https://github.com/rust-lang/rust/issues/66920](https://github.com/rust-lang/rust/issues/66920)
     pub rust_suppress_module_doc: Option<bool>,
     /// Rust-only, indicates whether to compress automata binary files
-    pub rust_compress_automata: Option<bool>
+    pub rust_compress_automata: Option<bool>,
 }
 
 impl<'a> CompilationTask<'a> {
@@ -493,11 +493,11 @@ impl<'a> CompilationTask<'a> {
                             String::from("sources"),
                             String::from("all"),
                             String::from("assembly"),
-                        ]
-                    ))
+                        ],
+                    )),
                 },
-                None => Ok(Mode::Sources)
-            }
+                None => Ok(Mode::Sources),
+            },
         }
     }
 
@@ -511,7 +511,7 @@ impl<'a> CompilationTask<'a> {
     pub fn get_output_target_for(
         &self,
         grammar: &Grammar,
-        grammar_index: usize
+        grammar_index: usize,
     ) -> Result<Runtime, Error> {
         match self.output_target {
             Some(target) => Ok(target),
@@ -527,11 +527,11 @@ impl<'a> CompilationTask<'a> {
                             String::from("net"),
                             String::from("java"),
                             String::from("rust"),
-                        ]
-                    ))
+                        ],
+                    )),
                 },
-                None => Ok(Runtime::Net)
-            }
+                None => Ok(Runtime::Net),
+            },
         }
     }
 
@@ -542,7 +542,7 @@ impl<'a> CompilationTask<'a> {
             Some(path) => Some(path.clone()),
             None => grammar
                 .get_option(OPTION_OUTPUT_PATH)
-                .map(|path| path.value.clone())
+                .map(|path| path.value.clone()),
         }
     }
 
@@ -553,7 +553,7 @@ impl<'a> CompilationTask<'a> {
             Some(nmspace) => Some(nmspace.clone()),
             None => grammar
                 .get_option(OPTION_NAMESPACE)
-                .map(|path| path.value.clone())
+                .map(|path| path.value.clone()),
         }
     }
 
@@ -567,7 +567,7 @@ impl<'a> CompilationTask<'a> {
     pub fn get_output_modifier_for(
         &self,
         grammar: &Grammar,
-        grammar_index: usize
+        grammar_index: usize,
     ) -> Result<Modifier, Error> {
         match self.output_modifier {
             Some(modifier) => Ok(modifier),
@@ -578,11 +578,11 @@ impl<'a> CompilationTask<'a> {
                     _ => Err(Error::InvalidOption(
                         grammar_index,
                         OPTION_ACCESS_MODIFIER.to_string(),
-                        vec![String::from("internal"), String::from("public")]
-                    ))
+                        vec![String::from("internal"), String::from("public")],
+                    )),
                 },
-                None => Ok(Modifier::Internal)
-            }
+                None => Ok(Modifier::Internal),
+            },
         }
     }
 
@@ -625,7 +625,7 @@ impl<'a> CompilationTask<'a> {
         }
         let all_data = match self.execute_build_grammars(&mut data.grammars) {
             Ok(d) => d,
-            Err(errors) => return Err(Errors::from(data, errors))
+            Err(errors) => return Err(Errors::from(data, errors)),
         };
         if self.print_debug_data.unwrap_or_default() {
             for (grammar, data) in data.grammars.iter().zip(all_data.iter()) {
@@ -634,7 +634,7 @@ impl<'a> CompilationTask<'a> {
                 println!("================ {}, graph", &grammar.name);
                 let graph = lr::GraphWithGrammar {
                     grammar,
-                    graph: &data.graph
+                    graph: &data.graph,
                 };
                 println!("{graph}");
             }
@@ -672,7 +672,7 @@ impl<'a> CompilationTask<'a> {
     pub fn generate_in_memory<'g>(
         &self,
         grammar: &'g mut Grammar,
-        grammar_index: usize
+        grammar_index: usize,
     ) -> Result<InMemoryParser<'g>, Vec<Error>> {
         let data = grammar.build(self.method, grammar_index)?;
         output::build_in_memory_grammar(grammar, &data)
@@ -681,7 +681,7 @@ impl<'a> CompilationTask<'a> {
     /// Build the specified grammars
     fn execute_build_grammars(
         &self,
-        grammars: &mut [Grammar]
+        grammars: &mut [Grammar],
     ) -> Result<Vec<BuildData>, Vec<Error>> {
         let mut errors = Vec::new();
         let mut results = Vec::new();
@@ -707,7 +707,7 @@ impl<'a> CompilationTask<'a> {
     fn execute_grammar_artifacts(
         &self,
         grammars: &[Grammar],
-        data: &[BuildData]
+        data: &[BuildData],
     ) -> Result<(), Vec<Error>> {
         let mut errors = Vec::new();
         // prepare the grammars
@@ -728,7 +728,7 @@ impl<'a> CompilationTask<'a> {
         &self,
         grammars: &[Grammar],
         target: Runtime,
-        errors: &mut Vec<Error>
+        errors: &mut Vec<Error>,
     ) {
         // aggregate all targets for assembly
         let units = self.gather_grammars_for_assembly(grammars, target, errors);
@@ -749,7 +749,7 @@ impl<'a> CompilationTask<'a> {
         &self,
         grammars: &'g [Grammar],
         target: Runtime,
-        errors: &mut Vec<Error>
+        errors: &mut Vec<Error>,
     ) -> Vec<(usize, &'g Grammar)> {
         grammars
             .iter()

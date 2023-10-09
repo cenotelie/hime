@@ -37,13 +37,13 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
         &project_folder,
         "restore",
         &[],
-        task.output_target_runtime_path.as_deref()
+        task.output_target_runtime_path.as_deref(),
     )?;
     execute_dotnet_command(
         &project_folder,
         "build",
         &["-c", "Release"],
-        task.output_target_runtime_path.as_deref()
+        task.output_target_runtime_path.as_deref(),
     )?;
     // copy the output
     let mut output_file = project_folder.clone();
@@ -80,7 +80,7 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
 /// Builds the dotnet project
 fn build_dotnet_project(
     task: &CompilationTask,
-    units: &[(usize, &Grammar)]
+    units: &[(usize, &Grammar)],
 ) -> Result<PathBuf, Error> {
     let project_folder = output::temporary_folder();
     fs::create_dir_all(&project_folder)?;
@@ -100,7 +100,7 @@ fn execute_dotnet_command(
     project_folder: &Path,
     verb: &str,
     args: &[&str],
-    target_runtime: Option<&str>
+    target_runtime: Option<&str>,
 ) -> Result<(), Error> {
     let mut command = Command::new("dotnet");
     command.arg(verb).arg(project_folder.as_os_str()).args(args);

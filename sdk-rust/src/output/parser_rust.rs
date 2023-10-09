@@ -38,7 +38,7 @@ pub fn write(
     nmespace: &str,
     output_assembly: bool,
     with_std: bool,
-    compress_automata: bool
+    compress_automata: bool,
 ) -> Result<(), Error> {
     let mut final_path = PathBuf::new();
     if let Some(path) = path {
@@ -91,7 +91,7 @@ pub fn write(
         "ParseResultAst",
         "",
         with_std,
-        compress_automata
+        compress_automata,
     )?;
     if method.is_rnglr() {
         writeln!(writer)?;
@@ -107,7 +107,7 @@ pub fn write(
             "ParseResultSppf",
             "_to_sppf",
             with_std,
-            compress_automata
+            compress_automata,
         )?;
     }
     write_code_visitor(&mut writer, grammar, expected)?;
@@ -247,7 +247,7 @@ fn write_code_constructors(
     parse_result_type: &str,
     fn_suffix: &str,
     with_std: bool,
-    compress_automata: bool
+    compress_automata: bool,
 ) -> Result<(), Error> {
     let has_actions = !grammar.actions.is_empty();
     writeln!(writer, "/// Parses the specified string with this parser")?;
@@ -465,7 +465,7 @@ fn write_code_constructors(
 fn write_code_visitor(
     writer: &mut dyn Write,
     grammar: &Grammar,
-    expected: &TerminalSet
+    expected: &TerminalSet,
 ) -> Result<(), Error> {
     writeln!(writer)?;
     writeln!(writer, "/// Visitor interface")?;

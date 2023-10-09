@@ -28,14 +28,14 @@ struct TokenRepositoryCell {
     /// The terminal's index
     terminal: usize,
     /// The span of this token
-    span: TextSpan
+    span: TextSpan,
 }
 
 /// Implementation data of a repository of matched tokens
 #[derive(Debug, Default, Clone)]
 pub struct TokenRepositoryImpl {
     /// The token data in this content
-    cells: BigList<TokenRepositoryCell>
+    cells: BigList<TokenRepositoryCell>,
 }
 
 /// The proxy structure for a repository of matched tokens
@@ -45,7 +45,7 @@ pub struct TokenRepository<'s, 't, 'a> {
     /// The input text
     pub text: &'a Text<'t>,
     /// The table of matched tokens
-    data: EitherMut<'a, TokenRepositoryImpl>
+    data: EitherMut<'a, TokenRepositoryImpl>,
 }
 
 /// Represents a token as an output element of a lexer
@@ -54,7 +54,7 @@ pub struct Token<'s, 't, 'a> {
     /// The repository containing this token
     repository: &'a TokenRepository<'s, 't, 'a>,
     /// The index of this token in the text
-    pub index: usize
+    pub index: usize,
 }
 
 /// the iterator over the tokens in a repository
@@ -62,7 +62,7 @@ pub struct TokenRepositoryIterator<'s, 't, 'a> {
     /// The repository containing this token
     repository: &'a TokenRepository<'s, 't, 'a>,
     /// The current index within the repository
-    index: usize
+    index: usize,
 }
 
 /// Implementation of `Iterator` for `TokenRepositoryIterator`
@@ -74,7 +74,7 @@ impl<'s, 't, 'a> Iterator for TokenRepositoryIterator<'s, 't, 'a> {
         } else {
             let result = Token {
                 repository: self.repository,
-                index: self.index
+                index: self.index,
             };
             self.index += 1;
             Some(result)
@@ -88,12 +88,12 @@ impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
     pub fn new(
         terminals: &'a [Symbol<'s>],
         text: &'a Text<'t>,
-        tokens: &'a TokenRepositoryImpl
+        tokens: &'a TokenRepositoryImpl,
     ) -> TokenRepository<'s, 't, 'a> {
         TokenRepository {
             terminals,
             text,
-            data: EitherMut::Immutable(tokens)
+            data: EitherMut::Immutable(tokens),
         }
     }
 
@@ -102,12 +102,12 @@ impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
     pub fn new_mut(
         terminals: &'a [Symbol<'s>],
         text: &'a Text<'t>,
-        tokens: &'a mut TokenRepositoryImpl
+        tokens: &'a mut TokenRepositoryImpl,
     ) -> TokenRepository<'s, 't, 'a> {
         TokenRepository {
             terminals,
             text,
-            data: EitherMut::Mutable(tokens)
+            data: EitherMut::Mutable(tokens),
         }
     }
 
@@ -116,7 +116,7 @@ impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
     pub fn iter(&self) -> TokenRepositoryIterator {
         TokenRepositoryIterator {
             repository: self,
-            index: 0
+            index: 0,
         }
     }
 
@@ -124,7 +124,7 @@ impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
     pub fn add(&mut self, terminal: usize, index: usize, length: usize) -> usize {
         self.data.cells.push(TokenRepositoryCell {
             terminal,
-            span: TextSpan { index, length }
+            span: TextSpan { index, length },
         })
     }
 
@@ -145,7 +145,7 @@ impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
     pub fn get_token(&'a self, index: usize) -> Token<'s, 't, 'a> {
         Token {
             repository: self,
-            index
+            index,
         }
     }
 
@@ -174,7 +174,7 @@ impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
                 // within the token
                 return Some(Token {
                     repository: self,
-                    index: m
+                    index: m,
                 });
             } else {
                 // look on the right
@@ -192,7 +192,7 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for Token<'s, 't, 'a> {
         Some(
             self.repository
                 .text
-                .get_position_at(self.repository.data.cells[self.index].span.index)
+                .get_position_at(self.repository.data.cells[self.index].span.index),
         )
     }
 
@@ -207,7 +207,7 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for Token<'s, 't, 'a> {
     fn get_context(&self) -> Option<TextContext<'a>> {
         Some(self.repository.text.get_context_for(
             self.get_position().unwrap(),
-            self.repository.data.cells[self.index].span.length
+            self.repository.data.cells[self.index].span.length,
         ))
     }
 
@@ -223,7 +223,7 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for Token<'s, 't, 'a> {
         Some(
             self.repository
                 .text
-                .get_value_for(self.repository.data.cells[self.index].span)
+                .get_value_for(self.repository.data.cells[self.index].span),
         )
     }
 }

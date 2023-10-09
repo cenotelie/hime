@@ -24,7 +24,7 @@ use std::path::{Path, PathBuf};
 use hime_redist::text::TextPosition;
 use hime_sdk::errors::Error;
 use hime_sdk::grammars::{
-    Grammar, RuleBodyElement, Symbol, SymbolRef, OPTION_AXIOM, OPTION_SEPARATOR
+    Grammar, RuleBodyElement, Symbol, SymbolRef, OPTION_AXIOM, OPTION_SEPARATOR,
 };
 use hime_sdk::{CompilationTask, Input, InputReference, LoadedData, LoadedInput};
 use serde_json::Value;
@@ -32,7 +32,7 @@ use tower_lsp::jsonrpc::Error as JsonRpcError;
 use tower_lsp::lsp_types::{
     CodeLens, Command, Diagnostic, DiagnosticRelatedInformation, DiagnosticSeverity,
     DidChangeTextDocumentParams, FileChangeType, FileEvent, GotoDefinitionResponse, Hover,
-    HoverContents, Location, MarkedString, Position, Range, SymbolInformation, SymbolKind, Url
+    HoverContents, Location, MarkedString, Position, Range, SymbolInformation, SymbolKind, Url,
 };
 
 use crate::symbols::{SymbolRegistry, SymbolRegistryElement};
@@ -47,7 +47,7 @@ pub struct Document {
     /// The current version
     pub version: Option<i32>,
     /// The diagnostics for the document
-    pub diagnostics: Vec<Diagnostic>
+    pub diagnostics: Vec<Diagnostic>,
 }
 
 impl Document {
@@ -58,7 +58,7 @@ impl Document {
             url,
             content: Some(content),
             version: None,
-            diagnostics: Vec::new()
+            diagnostics: Vec::new(),
         }
     }
 }
@@ -72,7 +72,7 @@ pub struct WorkspaceData {
     /// The loaded grammars
     pub grammars: Vec<Grammar>,
     /// The registry of symbols
-    pub symbols: SymbolRegistry
+    pub symbols: SymbolRegistry,
 }
 
 impl WorkspaceData {
@@ -91,9 +91,9 @@ impl WorkspaceData {
         Range::new(
             Position::new(
                 (input_reference.position.line - 1) as u32,
-                (input_reference.position.column - 1) as u32
+                (input_reference.position.column - 1) as u32,
             ),
-            Position::new((end.line - 1) as u32, (end.column - 1) as u32)
+            Position::new((end.line - 1) as u32, (end.column - 1) as u32),
         )
     }
 
@@ -118,7 +118,7 @@ pub struct Workspace {
     /// The documents in the workspace
     pub documents: Vec<Document>,
     /// The currently loaded data, if any
-    pub data: Option<WorkspaceData>
+    pub data: Option<WorkspaceData>,
 }
 
 impl Workspace {
@@ -156,7 +156,7 @@ impl Workspace {
     fn scan_workspace_is_file_included(path: &Path) -> bool {
         match path.extension() {
             None => false,
-            Some(name) => name == "gram"
+            Some(name) => name == "gram",
         }
     }
 
@@ -164,7 +164,7 @@ impl Workspace {
     fn scan_workspace_is_dir_excluded(path: &Path) -> bool {
         match path.file_name() {
             None => true,
-            Some(name) => name == ".git" || name == ".hg" || name == ".svn"
+            Some(name) => name == ".git" || name == ".hg" || name == ".svn",
         }
     }
 
@@ -173,7 +173,7 @@ impl Workspace {
         let Ok(uri) = Url::from_file_path(path.canonicalize()?) else {
             return Err(io::Error::new(
                 ErrorKind::NotFound,
-                String::from("Path cannot be converted to Url")
+                String::from("Path cannot be converted to Url"),
             ));
         };
         self.resolve_document(uri, path)
@@ -262,7 +262,7 @@ impl Workspace {
                 self.data = Some(WorkspaceData {
                     inputs: data.inputs,
                     grammars: data.grammars,
-                    symbols
+                    symbols,
                 });
             }
             Err(errors) => {
@@ -304,13 +304,13 @@ impl Workspace {
         &self,
         grammar: &Grammar,
         buffer: &mut Vec<SymbolInformation>,
-        query: &str
+        query: &str,
     ) {
         if grammar.name.contains(query) {
             buffer.push(self.new_symbol(
                 grammar.name.to_string(),
                 SymbolKind::CLASS,
-                grammar.input_ref
+                grammar.input_ref,
             ));
         }
         for terminal in &grammar.terminals {
@@ -318,7 +318,7 @@ impl Workspace {
                 buffer.push(self.new_symbol(
                     format!("{}.{}", grammar.name, terminal.name),
                     SymbolKind::FIELD,
-                    terminal.input_ref
+                    terminal.input_ref,
                 ));
             }
         }
@@ -328,7 +328,7 @@ impl Workspace {
                     buffer.push(self.new_symbol(
                         format!("{}.{}", grammar.name, variable.name),
                         SymbolKind::PROPERTY,
-                        rule.head_input_ref
+                        rule.head_input_ref,
                     ));
                 }
             }
@@ -341,7 +341,7 @@ impl Workspace {
                     buffer.push(self.new_symbol(
                         format!("{}.{}", grammar.name, symbol.name),
                         SymbolKind::CONSTANT,
-                        element.input_ref.unwrap()
+                        element.input_ref.unwrap(),
                     ));
                 }
             }
@@ -354,7 +354,7 @@ impl Workspace {
                     buffer.push(self.new_symbol(
                         format!("{}.{}", grammar.name, symbol.name),
                         SymbolKind::METHOD,
-                        element.input_ref.unwrap()
+                        element.input_ref.unwrap(),
                     ));
                 }
             }
@@ -367,7 +367,7 @@ impl Workspace {
         &self,
         doc_uri: &str,
         line: u32,
-        character: u32
+        character: u32,
     ) -> Option<GotoDefinitionResponse> {
         let doc_index = self
             .documents
@@ -379,9 +379,9 @@ impl Workspace {
             input_index: doc_index,
             position: TextPosition {
                 line: line as usize + 1,
-                column: character as usize + 1
+                column: character as usize + 1,
             },
-            length: 0
+            length: 0,
         };
         let data = self.data.as_ref()?;
         let symbol = data.find_symbol_at(input_ref)?;
@@ -389,7 +389,7 @@ impl Workspace {
             None
         } else if symbol.definitions.len() == 1 {
             Some(GotoDefinitionResponse::Scalar(
-                self.get_location(symbol.definitions[0])
+                self.get_location(symbol.definitions[0]),
             ))
         } else {
             Some(GotoDefinitionResponse::Array(
@@ -397,7 +397,7 @@ impl Workspace {
                     .definitions
                     .iter()
                     .map(|input_ref| self.get_location(*input_ref))
-                    .collect()
+                    .collect(),
             ))
         }
     }
@@ -408,7 +408,7 @@ impl Workspace {
         &self,
         doc_uri: &str,
         line: u32,
-        character: u32
+        character: u32,
     ) -> Option<Vec<Location>> {
         let doc_index = self
             .documents
@@ -420,9 +420,9 @@ impl Workspace {
             input_index: doc_index,
             position: TextPosition {
                 line: line as usize + 1,
-                column: character as usize + 1
+                column: character as usize + 1,
             },
-            length: 0
+            length: 0,
         };
         let data = self.data.as_ref()?;
         let symbol = data.find_symbol_at(input_ref)?;
@@ -446,7 +446,7 @@ impl Workspace {
         &self,
         doc_uri: &str,
         line: u32,
-        character: u32
+        character: u32,
     ) -> Option<Hover> {
         let doc_index = self
             .documents
@@ -458,9 +458,9 @@ impl Workspace {
             input_index: doc_index,
             position: TextPosition {
                 line: line as usize + 1,
-                column: character as usize + 1
+                column: character as usize + 1,
             },
-            length: 0
+            length: 0,
         };
         let data = self.data.as_ref()?;
         let symbol = data.find_symbol_at(input_ref)?;
@@ -484,13 +484,13 @@ impl Workspace {
             SymbolRef::Action(sid) => data.grammars[symbol.grammar_index]
                 .get_action(sid)
                 .unwrap()
-                .get_description()
+                .get_description(),
         };
         Some(Hover {
             contents: HoverContents::Scalar(MarkedString::String(content)),
             range: symbol
                 .get_full_reference(&input_ref)
-                .map(|input_ref| self.get_location(input_ref).range)
+                .map(|input_ref| self.get_location(input_ref).range),
         })
     }
 
@@ -512,9 +512,9 @@ impl Workspace {
                     command: Some(Command {
                         command: String::from("hime.playground"),
                         title: String::from("Test grammar on input"),
-                        arguments: Some(vec![Value::String(grammar.name.clone())])
+                        arguments: Some(vec![Value::String(grammar.name.clone())]),
                     }),
-                    data: None
+                    data: None,
                 });
             }
         }
@@ -537,7 +537,7 @@ impl Workspace {
     pub fn parse_input(
         &self,
         grammar_name: &str,
-        input: &str
+        input: &str,
     ) -> Result<Option<Value>, JsonRpcError> {
         match &self.data {
             Some(data) => match data
@@ -554,12 +554,12 @@ impl Workspace {
                             let result = parser.parse(input);
                             Ok(Some(serde_json::to_value(result).unwrap()))
                         }
-                        Err(_) => Ok(None)
+                        Err(_) => Ok(None),
                     }
                 }
-                None => Err(JsonRpcError::invalid_request())
+                None => Err(JsonRpcError::invalid_request()),
             },
-            None => Err(JsonRpcError::invalid_request())
+            None => Err(JsonRpcError::invalid_request()),
         }
     }
 
@@ -583,7 +583,7 @@ impl Workspace {
         &self,
         name: String,
         kind: SymbolKind,
-        input_ref: InputReference
+        input_ref: InputReference,
     ) -> SymbolInformation {
         SymbolInformation {
             name,
@@ -591,7 +591,7 @@ impl Workspace {
             tags: None,
             deprecated: None,
             location: self.get_location(input_ref),
-            container_name: None
+            container_name: None,
         }
     }
 
@@ -603,7 +603,7 @@ impl Workspace {
         let document = &self.documents[input_ref.input_index];
         Location {
             range: data.get_range(input_ref),
-            uri: document.url.clone()
+            uri: document.url.clone(),
         }
     }
 }
@@ -613,7 +613,7 @@ impl Workspace {
 fn to_diagnostic(
     documents: &mut [Document],
     data: &LoadedData,
-    error: &Error
+    error: &Error,
 ) -> Option<(usize, Diagnostic)> {
     match error {
         Error::Parsing(input_reference, msg) => Some((
@@ -627,8 +627,8 @@ fn to_diagnostic(
                 message: msg.clone(),
                 related_information: None,
                 tags: None,
-                data: None
-            }
+                data: None,
+            },
         )),
         Error::InvalidOption(grammar_index, name, valid) => {
             let option = data.grammars[*grammar_index].get_option(name).unwrap();
@@ -649,8 +649,8 @@ fn to_diagnostic(
                     message: format!("Invalid value for grammar option `{name}`{expected}"),
                     related_information: None,
                     tags: None,
-                    data: None
-                }
+                    data: None,
+                },
             ))
         }
         Error::AxiomNotSpecified(grammar_index) => {
@@ -666,8 +666,8 @@ fn to_diagnostic(
                     message: "Grammar axiom has not been specified".to_string(),
                     related_information: None,
                     tags: None,
-                    data: None
-                }
+                    data: None,
+                },
             ))
         }
         Error::AxiomNotDefined(grammar_index) => {
@@ -686,8 +686,8 @@ fn to_diagnostic(
                     message: format!("Grammar axiom `{}` is not defined", &option.value),
                     related_information: None,
                     tags: None,
-                    data: None
-                }
+                    data: None,
+                },
             ))
         }
         Error::SeparatorNotDefined(grammar_index) => {
@@ -706,8 +706,8 @@ fn to_diagnostic(
                     message: format!("Grammar separator token `{}` is not defined", &option.value),
                     related_information: None,
                     tags: None,
-                    data: None
-                }
+                    data: None,
+                },
             ))
         }
         Error::SeparatorIsContextual(grammar_index, terminal_ref) => {
@@ -730,8 +730,8 @@ fn to_diagnostic(
                     ),
                     related_information: None,
                     tags: None,
-                    data: None
-                }
+                    data: None,
+                },
             ))
         }
         Error::SeparatorCannotBeMatched(grammar_index, error)
@@ -754,8 +754,8 @@ fn to_diagnostic(
                     ),
                     related_information: None,
                     tags: None,
-                    data: None
-                }
+                    data: None,
+                },
             ))
         }
         Error::TemplateRuleNotFound(input_reference, name) => Some((
@@ -769,8 +769,8 @@ fn to_diagnostic(
                 message: format!("Cannot find template rule `{name}`"),
                 related_information: None,
                 tags: None,
-                data: None
-            }
+                data: None,
+            },
         )),
         Error::TemplateRuleWrongNumberOfArgs(input_reference, expected, provided) => Some((
             input_reference.input_index,
@@ -783,8 +783,8 @@ fn to_diagnostic(
                 message: format!("Template expected {expected} arguments, {provided} given"),
                 related_information: None,
                 tags: None,
-                data: None
-            }
+                data: None,
+            },
         )),
         Error::SymbolNotFound(input_reference, name) => Some((
             input_reference.input_index,
@@ -797,8 +797,8 @@ fn to_diagnostic(
                 message: format!("Cannot find symbol `{name}`"),
                 related_information: None,
                 tags: None,
-                data: None
-            }
+                data: None,
+            },
         )),
         Error::InvalidCharacterSpan(input_reference) => Some((
             input_reference.input_index,
@@ -811,8 +811,8 @@ fn to_diagnostic(
                 message: "Invalid character span, end is before begin".to_string(),
                 related_information: None,
                 tags: None,
-                data: None
-            }
+                data: None,
+            },
         )),
         Error::UnknownUnicodeBlock(input_reference, name) => Some((
             input_reference.input_index,
@@ -825,8 +825,8 @@ fn to_diagnostic(
                 message: format!("Unknown unicode block `{name}`"),
                 related_information: None,
                 tags: None,
-                data: None
-            }
+                data: None,
+            },
         )),
         Error::UnknownUnicodeCategory(input_reference, name) => Some((
             input_reference.input_index,
@@ -839,8 +839,8 @@ fn to_diagnostic(
                 message: format!("Unknown unicode category `{name}`"),
                 related_information: None,
                 tags: None,
-                data: None
-            }
+                data: None,
+            },
         )),
         Error::UnsupportedNonPlane0InCharacterClass(input_reference, c) => Some((
             input_reference.input_index,
@@ -855,8 +855,8 @@ fn to_diagnostic(
                 ),
                 related_information: None,
                 tags: None,
-                data: None
-            }
+                data: None,
+            },
         )),
         Error::InvalidCodePoint(input_reference, c) => Some((
             input_reference.input_index,
@@ -869,8 +869,8 @@ fn to_diagnostic(
                 message: format!("The value U+{c:0X} is not a supported unicode code point"),
                 related_information: None,
                 tags: None,
-                data: None
-            }
+                data: None,
+            },
         )),
         Error::OverridingPreviousTerminal(input_reference, name, _previous) => Some((
             input_reference.input_index,
@@ -883,8 +883,8 @@ fn to_diagnostic(
                 message: format!("Overriding the previous definition of `{name}`"),
                 related_information: None,
                 tags: None,
-                data: None
-            }
+                data: None,
+            },
         )),
         Error::GrammarNotDefined(input_reference, name) => Some((
             input_reference.input_index,
@@ -897,8 +897,8 @@ fn to_diagnostic(
                 message: format!("Grammar `{name}` is not defined"),
                 related_information: None,
                 tags: None,
-                data: None
-            }
+                data: None,
+            },
         )),
         Error::LrConflict(grammar_index, conflict) => {
             let grammar = &data.grammars[*grammar_index];
@@ -932,16 +932,16 @@ fn to_diagnostic(
                                 DiagnosticRelatedInformation {
                                     location: Location {
                                         uri: documents[input_ref.input_index].url.clone(),
-                                        range: WorkspaceData::to_range(&data.inputs, input_ref)
+                                        range: WorkspaceData::to_range(&data.inputs, input_ref),
                                     },
-                                    message: String::from("Used outside required context")
+                                    message: String::from("Used outside required context"),
                                 }
                             })
-                            .collect()
+                            .collect(),
                     ),
                     tags: None,
-                    data: None
-                }
+                    data: None,
+                },
             ))
         }
         Error::TerminalMatchesEmpty(grammar_index, terminal_ref) => {
@@ -963,11 +963,11 @@ fn to_diagnostic(
                     ),
                     related_information: None,
                     tags: None,
-                    data: None
-                }
+                    data: None,
+                },
             ))
         }
-        _ => None
+        _ => None,
     }
 }
 
@@ -989,7 +989,7 @@ fn test_scan_workspace() -> io::Result<()> {
     let root = std::env::current_dir()?.parent().unwrap().to_owned();
     let url = match Url::from_file_path(root) {
         Ok(url) => url,
-        Err(_) => panic!("Failed to convert current dir to Url")
+        Err(_) => panic!("Failed to convert current dir to Url"),
     };
     workspace.scan_workspace(url)?;
     for doc in &workspace.documents {

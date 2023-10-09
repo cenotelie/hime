@@ -33,7 +33,7 @@ use tower_lsp::lsp_types::{
     GotoDefinitionResponse, Hover, HoverParams, HoverProviderCapability, InitializeParams,
     InitializeResult, Location, OneOf, ReferenceParams, ServerCapabilities, ServerInfo,
     SymbolInformation, TextDocumentSyncCapability, TextDocumentSyncKind, WorkDoneProgressOptions,
-    WorkspaceFoldersServerCapabilities, WorkspaceServerCapabilities, WorkspaceSymbolParams
+    WorkspaceFoldersServerCapabilities, WorkspaceServerCapabilities, WorkspaceSymbolParams,
 };
 use tower_lsp::{Client, LanguageServer, LspService, Server};
 use workspace::Workspace;
@@ -53,7 +53,7 @@ struct Backend {
     /// The LSP client
     client: Arc<Client>,
     /// The workspace
-    workspace: Arc<RwLock<Workspace>>
+    workspace: Arc<RwLock<Workspace>>,
 }
 
 impl Backend {
@@ -61,7 +61,7 @@ impl Backend {
     fn new(client: Client) -> Backend {
         Backend {
             client: Arc::new(client),
-            workspace: Arc::new(RwLock::new(Workspace::default()))
+            workspace: Arc::new(RwLock::new(Workspace::default())),
         }
     }
 
@@ -95,33 +95,33 @@ impl LanguageServer for Backend {
         Ok(InitializeResult {
             capabilities: ServerCapabilities {
                 text_document_sync: Some(TextDocumentSyncCapability::Kind(
-                    TextDocumentSyncKind::FULL
+                    TextDocumentSyncKind::FULL,
                 )),
                 workspace: Some(WorkspaceServerCapabilities {
                     workspace_folders: Some(WorkspaceFoldersServerCapabilities {
                         supported: Some(true),
-                        change_notifications: Some(OneOf::Left(true))
+                        change_notifications: Some(OneOf::Left(true)),
                     }),
-                    file_operations: None
+                    file_operations: None,
                 }),
                 execute_command_provider: Some(ExecuteCommandOptions {
                     commands: vec![String::from("test")],
                     work_done_progress_options: WorkDoneProgressOptions {
-                        work_done_progress: Some(false)
-                    }
+                        work_done_progress: Some(false),
+                    },
                 }),
                 hover_provider: Some(HoverProviderCapability::Simple(true)),
                 definition_provider: Some(OneOf::Left(true)),
                 references_provider: Some(OneOf::Left(true)),
                 code_lens_provider: Some(CodeLensOptions {
-                    resolve_provider: None
+                    resolve_provider: None,
                 }),
                 ..ServerCapabilities::default()
             },
             server_info: Some(ServerInfo {
                 name: String::from(CRATE_NAME),
-                version: Some(String::from(CRATE_VERSION))
-            })
+                version: Some(String::from(CRATE_VERSION)),
+            }),
         })
     }
 
@@ -145,7 +145,7 @@ impl LanguageServer for Backend {
 
     async fn symbol(
         &self,
-        params: WorkspaceSymbolParams
+        params: WorkspaceSymbolParams,
     ) -> Result<Option<Vec<SymbolInformation>>> {
         let workspace = self.workspace.read().await;
         let data = workspace.lookup_symbols(&params.query);
@@ -158,7 +158,7 @@ impl LanguageServer for Backend {
 
     async fn goto_definition(
         &self,
-        params: GotoDefinitionParams
+        params: GotoDefinitionParams,
     ) -> Result<Option<GotoDefinitionResponse>> {
         let workspace = self.workspace.read().await;
         Ok(workspace.get_definition_at(
@@ -168,7 +168,7 @@ impl LanguageServer for Backend {
                 .uri
                 .as_str(),
             params.text_document_position_params.position.line,
-            params.text_document_position_params.position.character
+            params.text_document_position_params.position.character,
         ))
     }
 
@@ -177,7 +177,7 @@ impl LanguageServer for Backend {
         Ok(workspace.get_references_at(
             params.text_document_position.text_document.uri.as_str(),
             params.text_document_position.position.line,
-            params.text_document_position.position.character
+            params.text_document_position.position.character,
         ))
     }
 
@@ -190,7 +190,7 @@ impl LanguageServer for Backend {
                 .uri
                 .as_str(),
             params.text_document_position_params.position.line,
-            params.text_document_position_params.position.character
+            params.text_document_position_params.position.character,
         ))
     }
 
@@ -201,7 +201,7 @@ impl LanguageServer for Backend {
 
     async fn execute_command(
         &self,
-        params: ExecuteCommandParams
+        params: ExecuteCommandParams,
     ) -> Result<Option<serde_json::Value>> {
         let workspace = self.workspace.read().await;
         match params.command.as_str() {
@@ -211,13 +211,13 @@ impl LanguageServer for Backend {
                         (serde_json::Value::String(grammar), serde_json::Value::String(input)) => {
                             workspace.parse_input(grammar, input)
                         }
-                        _ => Err(Error::invalid_params("Expected exactly 2 parameters"))
+                        _ => Err(Error::invalid_params("Expected exactly 2 parameters")),
                     }
                 } else {
                     Err(Error::invalid_params("Expected exactly 2 parameters"))
                 }
             }
-            _ => Err(Error::method_not_found())
+            _ => Err(Error::method_not_found()),
         }
     }
 }
@@ -227,17 +227,17 @@ async fn main() {
     std::panic::set_hook(Box::new(|info| {
         let location = match info.location() {
             Some(location) => format!("{}:{}", location.file(), location.line()),
-            None => String::from("unknown")
+            None => String::from("unknown"),
         };
         let message = match info.payload().downcast_ref::<String>() {
             Some(message) => message.clone(),
-            None => String::from("no message")
+            None => String::from("no message"),
         };
         eprintln!("Panic: {location} : {message}");
     }));
 
     let version = Box::leak::<'static>(
-        format!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}").into_boxed_str()
+        format!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}").into_boxed_str(),
     );
     let matches = Command::new("Hime Language Server")
         .version(version as &str)
@@ -248,7 +248,7 @@ async fn main() {
                 .long("tcp")
                 .help("Use a tcp stream to communicate with clients")
                 .required(false)
-                .action(ArgAction::SetTrue)
+                .action(ArgAction::SetTrue),
         )
         .arg(
             Arg::new("address")
@@ -256,7 +256,7 @@ async fn main() {
                 .long("address")
                 .short('a')
                 .help("The address to listen on, if using a TCP stream")
-                .required(false)
+                .required(false),
         )
         .arg(
             Arg::new("port")
@@ -264,7 +264,7 @@ async fn main() {
                 .long("port")
                 .short('p')
                 .help("The TCP port to listen to, if using a TCP stream")
-                .required(false)
+                .required(false),
         )
         .subcommand(Command::new("version").about("Display the version string"))
         .get_matches();

@@ -25,12 +25,12 @@ use std::path::PathBuf;
 use hime_redist::parsers::{
     LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_NONE, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT,
     LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE, LR_OP_CODE_BASE_ADD_VIRTUAL, LR_OP_CODE_BASE_POP_STACK,
-    LR_OP_CODE_BASE_SEMANTIC_ACTION
+    LR_OP_CODE_BASE_SEMANTIC_ACTION,
 };
 
 use crate::errors::Error;
 use crate::grammars::{
-    Grammar, Rule, RuleRef, SymbolRef, TerminalRef, TerminalSet, GENERATED_AXIOM
+    Grammar, Rule, RuleRef, SymbolRef, TerminalRef, TerminalSet, GENERATED_AXIOM,
 };
 use crate::lr::{Graph, State};
 use crate::output::helper::{write_u16, write_u32, write_u8};
@@ -41,7 +41,7 @@ pub fn write_parser_lrk_data_file(
     file_name: String,
     grammar: &Grammar,
     expected: &TerminalSet,
-    graph: &Graph
+    graph: &Graph,
 ) -> Result<(), Error> {
     let mut final_path = PathBuf::new();
     if let Some(path) = path {
@@ -58,7 +58,7 @@ pub fn write_parser_lrk_data(
     writer: &mut dyn Write,
     grammar: &Grammar,
     expected: &TerminalSet,
-    graph: &Graph
+    graph: &Graph,
 ) -> Result<(), Error> {
     let mut rules = Vec::new();
     for variable in &grammar.variables {
@@ -93,7 +93,7 @@ pub fn write_parser_lrk_data(
 fn write_parser_column_headers(
     writer: &mut dyn Write,
     grammar: &Grammar,
-    expected: &TerminalSet
+    expected: &TerminalSet,
 ) -> Result<(), Error> {
     // writes the columns's id
     for terminal_ref in &expected.content {
@@ -131,7 +131,7 @@ fn write_parser_lrk_data_state(
     grammar: &Grammar,
     expected: &TerminalSet,
     rules: &[RuleRef],
-    state: &State
+    state: &State,
 ) -> Result<(), Error> {
     // write action on epsilon
     if state.get_reduction_for(TerminalRef::Epsilon).is_some()
@@ -184,7 +184,7 @@ fn write_parser_lrk_data_state(
 fn write_parser_lrk_data_rule(
     writer: &mut dyn Write,
     grammar: &Grammar,
-    rule: &Rule
+    rule: &Rule,
 ) -> Result<(), Error> {
     let head_index = grammar
         .variables
@@ -200,7 +200,7 @@ fn write_parser_lrk_data_rule(
         .iter()
         .map(|element| match element.symbol {
             SymbolRef::Virtual(_) | SymbolRef::Action(_) => 2,
-            _ => 1
+            _ => 1,
         })
         .sum();
     write_u8(writer, length)?;
@@ -238,7 +238,7 @@ pub fn write_parser_rnglr_data_file(
     file_name: String,
     grammar: &Grammar,
     expected: &TerminalSet,
-    graph: &Graph
+    graph: &Graph,
 ) -> Result<(), Error> {
     let mut final_path = PathBuf::new();
     if let Some(path) = path {
@@ -255,7 +255,7 @@ pub fn write_parser_rnglr_data(
     writer: &mut dyn Write,
     grammar: &Grammar,
     expected: &TerminalSet,
-    graph: &Graph
+    graph: &Graph,
 ) -> Result<(), Error> {
     // complete list of rules, including new ones for the right-nullable parts
     let mut rules = Vec::new();
@@ -267,7 +267,7 @@ pub fn write_parser_rnglr_data(
             // Add normal rule
             temp.push((
                 RuleRef::new(variable.id, rule_index),
-                rule.body.choices[0].len()
+                rule.body.choices[0].len(),
             ));
             // Look for right-nullable choices
             for i in 1..rule.body.choices[0].len() {
@@ -318,7 +318,7 @@ pub fn write_parser_rnglr_data(
             &mut offsets,
             &mut counts,
             total,
-            state
+            state,
         );
     }
     let axiom_index = grammar
@@ -373,7 +373,7 @@ fn write_parser_rnglr_data_generate_offset(
     offsets: &mut Vec<u32>,
     counts: &mut Vec<u16>,
     mut total: u32,
-    state: &State
+    state: &State,
 ) -> u32 {
     let mut reductions_counter: HashMap<TerminalRef, usize> = HashMap::new();
     for reduction in &state.reductions {
@@ -395,7 +395,7 @@ fn write_parser_rnglr_data_generate_offset(
         let count = i32::from(
             state
                 .children
-                .contains_key(&SymbolRef::Variable(variable.id))
+                .contains_key(&SymbolRef::Variable(variable.id)),
         );
         offsets.push(total);
         counts.push(count as u16);
@@ -410,7 +410,7 @@ fn write_parser_rnglr_data_action_table(
     expected: &TerminalSet,
     grammar: &Grammar,
     rules: &[(RuleRef, usize)],
-    state: &State
+    state: &State,
 ) -> Result<(), Error> {
     if state.get_reduction_for(TerminalRef::Epsilon).is_some() {
         // There can be only one reduction on epsilon
@@ -451,7 +451,7 @@ fn write_parser_rnglr_data_rule(
     writer: &mut dyn Write,
     grammar: &Grammar,
     rule: &Rule,
-    length: usize
+    length: usize,
 ) -> Result<(), Error> {
     let head_index = grammar
         .variables
@@ -512,7 +512,7 @@ fn write_parser_rnglr_data_rule(
                             .unwrap();
                         write_u16(
                             writer,
-                            LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE | element.action
+                            LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE | element.action,
                         )?;
                         write_u16(writer, index as u16)?;
                     }

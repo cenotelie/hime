@@ -35,7 +35,7 @@ pub fn write_lexer_data_file(
     file_name: String,
     grammar: &Grammar,
     dfa: &DFA,
-    expected: &TerminalSet
+    expected: &TerminalSet,
 ) -> Result<(), Error> {
     let mut final_path = PathBuf::new();
     if let Some(path) = path {
@@ -52,7 +52,7 @@ pub fn write_lexer_data(
     writer: &mut dyn Write,
     grammar: &Grammar,
     dfa: &DFA,
-    expected: &TerminalSet
+    expected: &TerminalSet,
 ) -> Result<(), Error> {
     // write number of states
     write_u32(writer, dfa.len() as u32)?;
@@ -90,7 +90,7 @@ fn write_lexer_data_state(
     writer: &mut dyn Write,
     grammar: &Grammar,
     expected: &TerminalSet,
-    state: &DFAState
+    state: &DFAState,
 ) -> Result<(), Error> {
     let mut cache = [DEAD_STATE as u16; 256];
     let mut cached: u16 = 0; // number of cached transitions
@@ -125,7 +125,7 @@ fn write_lexer_data_state(
                     .content
                     .iter()
                     .position(|t| t == &terminal_ref)
-                    .unwrap()
+                    .unwrap(),
             );
         }
     }

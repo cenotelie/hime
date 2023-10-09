@@ -41,7 +41,7 @@ pub struct ParseResult<'s, 't, 'a, T> {
     /// The table of matched tokens
     pub tokens: TokenRepositoryImpl,
     /// The produced AST
-    parse_tree: T
+    parse_tree: T,
 }
 
 impl<'s, 't, 'a, T: Default> ParseResult<'s, 't, 'a, T> {
@@ -51,7 +51,7 @@ impl<'s, 't, 'a, T: Default> ParseResult<'s, 't, 'a, T> {
         terminals: &'a [Symbol<'s>],
         variables: &'a [Symbol<'s>],
         virtuals: &'a [Symbol<'s>],
-        text: Text<'t>
+        text: Text<'t>,
     ) -> ParseResult<'s, 't, 'a, T> {
         ParseResult {
             terminals,
@@ -60,7 +60,7 @@ impl<'s, 't, 'a, T: Default> ParseResult<'s, 't, 'a, T> {
             text,
             errors: ParseErrors::default(),
             tokens: TokenRepositoryImpl::default(),
-            parse_tree: T::default()
+            parse_tree: T::default(),
         }
     }
 
@@ -85,23 +85,23 @@ impl<'s, 't, 'a> ParseResult<'s, 't, 'a, AstImpl> {
             TokenRepository::new(self.terminals, &self.text, &self.tokens),
             self.variables,
             self.virtuals,
-            &self.parse_tree
+            &self.parse_tree,
         )
     }
 
     /// Gets the mutable data required for parsing
     #[must_use]
     pub fn get_parsing_data<'x>(
-        &'x mut self
+        &'x mut self,
     ) -> (
         TokenRepository<'s, 't, 'x>,
         &'x mut ParseErrors<'s>,
-        &'x mut AstImpl
+        &'x mut AstImpl,
     ) {
         (
             TokenRepository::new_mut(self.terminals, &self.text, &mut self.tokens),
             &mut self.errors,
-            &mut self.parse_tree
+            &mut self.parse_tree,
         )
     }
 }
@@ -120,23 +120,23 @@ impl<'s, 't, 'a> ParseResult<'s, 't, 'a, SppfImpl> {
             TokenRepository::new(self.terminals, &self.text, &self.tokens),
             self.variables,
             self.virtuals,
-            &self.parse_tree
+            &self.parse_tree,
         )
     }
 
     /// Gets the mutable data required for parsing
     #[must_use]
     pub fn get_parsing_data<'x>(
-        &'x mut self
+        &'x mut self,
     ) -> (
         TokenRepository<'s, 't, 'x>,
         &'x mut ParseErrors<'s>,
-        &'x mut SppfImpl
+        &'x mut SppfImpl,
     ) {
         (
             TokenRepository::new_mut(self.terminals, &self.text, &mut self.tokens),
             &mut self.errors,
-            &mut self.parse_tree
+            &mut self.parse_tree,
         )
     }
 }
@@ -144,7 +144,7 @@ impl<'s, 't, 'a> ParseResult<'s, 't, 'a, SppfImpl> {
 impl<'s, 't, 'a> Serialize for ParseResult<'s, 't, 'a, AstImpl> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: Serializer
+        S: Serializer,
     {
         let ast = self.get_ast();
         let root = if self.is_success() {

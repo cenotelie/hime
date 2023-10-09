@@ -132,7 +132,7 @@ fn get_system_ext() -> &'static str {
 /// Builds the cargo project
 fn build_cargo_project(
     task: &CompilationTask,
-    units: &[(usize, &Grammar)]
+    units: &[(usize, &Grammar)],
 ) -> Result<PathBuf, Error> {
     let project_folder = output::temporary_folder();
     fs::create_dir_all(&project_folder)?;
@@ -144,7 +144,7 @@ fn build_cargo_project(
             OpenOptions::new()
                 .create(true)
                 .append(true)
-                .open(file_path)?
+                .open(file_path)?,
         );
         writeln!(writer)?;
         writeln!(writer)?;
@@ -177,7 +177,7 @@ fn build_cargo_project(
                     OpenOptions::new()
                         .create(true)
                         .append(true)
-                        .open(file_path)?
+                        .open(file_path)?,
                 );
                 writeln!(writer, "pub mod {part}")?;
                 // create the module file
@@ -194,7 +194,7 @@ fn build_cargo_project(
             OpenOptions::new()
                 .create(true)
                 .append(true)
-                .open(file_path)?
+                .open(file_path)?,
         );
         writeln!(writer, "pub mod {};", parts[parts.len() - 1])?;
         for source in output::get_sources(task, grammar, *index)? {
@@ -221,7 +221,7 @@ fn write_lib_rs(src_folder: &Path) -> Result<(), Error> {
 fn get_module_name(task: &CompilationTask, grammar: &Grammar) -> String {
     let nmspace = match task.get_output_namespace(grammar) {
         Some(nmspace) => nmspace,
-        None => grammar.name.clone()
+        None => grammar.name.clone(),
     };
     helper::get_namespace_rust(&nmspace)
 }

@@ -41,7 +41,7 @@ pub trait ParseErrorDataTrait: Display {
 #[derive(Debug, Clone, Serialize)]
 pub struct ParseErrorEndOfInput {
     /// The error's position in the input text
-    position: TextPosition
+    position: TextPosition,
 }
 
 impl ParseErrorDataTrait for ParseErrorEndOfInput {
@@ -76,7 +76,7 @@ pub struct ParseErrorUnexpectedChar {
     /// The error's position in the input text
     position: TextPosition,
     /// The unexpected character
-    unexpected: char
+    unexpected: char,
 }
 
 impl ParseErrorDataTrait for ParseErrorUnexpectedChar {
@@ -107,7 +107,7 @@ impl ParseErrorUnexpectedChar {
     pub fn new(position: TextPosition, unexpected: char) -> ParseErrorUnexpectedChar {
         ParseErrorUnexpectedChar {
             position,
-            unexpected
+            unexpected,
         }
     }
 }
@@ -122,7 +122,7 @@ pub struct ParseErrorIncorrectEncodingSequence {
     #[serde(rename = "missingHigh")]
     missing_high: bool,
     /// The incorrect sequence
-    sequence: Utf16C
+    sequence: Utf16C,
 }
 
 impl ParseErrorDataTrait for ParseErrorIncorrectEncodingSequence {
@@ -156,12 +156,12 @@ impl ParseErrorIncorrectEncodingSequence {
     pub fn new(
         position: TextPosition,
         missing_high: bool,
-        sequence: Utf16C
+        sequence: Utf16C,
     ) -> ParseErrorIncorrectEncodingSequence {
         ParseErrorIncorrectEncodingSequence {
             position,
             missing_high,
-            sequence
+            sequence,
         }
     }
 }
@@ -181,7 +181,7 @@ pub struct ParseErrorUnexpectedToken<'s> {
     #[cfg(feature = "debug")]
     state_ids: Vec<u32>,
     /// The expected terminals
-    expected: Vec<Symbol<'s>>
+    expected: Vec<Symbol<'s>>,
 }
 
 impl<'s> ParseErrorDataTrait for ParseErrorUnexpectedToken<'s> {
@@ -233,7 +233,7 @@ impl<'s> ParseErrorUnexpectedToken<'s> {
         value: String,
         terminal: Symbol<'s>,
         #[cfg(feature = "debug")] state_ids: Vec<u32>,
-        expected: Vec<Symbol<'s>>
+        expected: Vec<Symbol<'s>>,
     ) -> ParseErrorUnexpectedToken<'s> {
         ParseErrorUnexpectedToken {
             position,
@@ -242,7 +242,7 @@ impl<'s> ParseErrorUnexpectedToken<'s> {
             terminal,
             #[cfg(feature = "debug")]
             state_ids,
-            expected
+            expected,
         }
     }
 }
@@ -260,7 +260,7 @@ pub enum ParseError<'s> {
     /// Lexical error occurring when the low surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
     IncorrectUTF16NoLowSurrogate(ParseErrorIncorrectEncodingSequence),
     /// Lexical error occurring when the high surrogate encoding point is missing in a UTF-16 encoding sequence with an expected high and low surrogate pair
-    IncorrectUTF16NoHighSurrogate(ParseErrorIncorrectEncodingSequence)
+    IncorrectUTF16NoHighSurrogate(ParseErrorIncorrectEncodingSequence),
 }
 
 impl<'s> ParseErrorDataTrait for ParseError<'s> {
@@ -271,7 +271,7 @@ impl<'s> ParseErrorDataTrait for ParseError<'s> {
             ParseError::UnexpectedChar(x) => x.get_position(),
             ParseError::UnexpectedToken(x) => x.get_position(),
             ParseError::IncorrectUTF16NoLowSurrogate(x)
-            | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_position()
+            | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_position(),
         }
     }
 
@@ -282,7 +282,7 @@ impl<'s> ParseErrorDataTrait for ParseError<'s> {
             ParseError::UnexpectedChar(x) => x.get_length(),
             ParseError::UnexpectedToken(x) => x.get_length(),
             ParseError::IncorrectUTF16NoLowSurrogate(x)
-            | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_length()
+            | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_length(),
         }
     }
 }
@@ -295,7 +295,7 @@ impl<'s> Display for ParseError<'s> {
             ParseError::UnexpectedChar(x) => x.fmt(f),
             ParseError::UnexpectedToken(x) => x.fmt(f),
             ParseError::IncorrectUTF16NoLowSurrogate(x)
-            | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.fmt(f)
+            | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.fmt(f),
         }
     }
 }
@@ -307,7 +307,7 @@ impl<'s> std::error::Error for ParseError<'s> {}
 #[derive(Debug, Default, Clone)]
 pub struct ParseErrors<'s> {
     /// The overall errors
-    pub errors: Vec<ParseError<'s>>
+    pub errors: Vec<ParseError<'s>>,
 }
 
 impl<'s> ParseErrors<'s> {
@@ -329,7 +329,7 @@ impl<'s> ParseErrors<'s> {
     /// Handles the incorrect encoding sequence error
     pub fn push_error_no_low_utf16_surrogate(
         &mut self,
-        error: ParseErrorIncorrectEncodingSequence
+        error: ParseErrorIncorrectEncodingSequence,
     ) {
         self.errors
             .push(ParseError::IncorrectUTF16NoLowSurrogate(error));
@@ -338,7 +338,7 @@ impl<'s> ParseErrors<'s> {
     /// Handles the incorrect encoding sequence error
     pub fn push_error_no_high_utf16_surrogate(
         &mut self,
-        error: ParseErrorIncorrectEncodingSequence
+        error: ParseErrorIncorrectEncodingSequence,
     ) {
         self.errors
             .push(ParseError::IncorrectUTF16NoHighSurrogate(error));

@@ -42,7 +42,7 @@ pub fn write(
     is_rnglr: bool,
     with_std: bool,
     suppress_module_doc: bool,
-    compress_automata: bool
+    compress_automata: bool,
 ) -> Result<(), Error> {
     let mut final_path = PathBuf::new();
     if let Some(path) = path {
@@ -61,7 +61,7 @@ pub fn write(
     let bin_name = get_lexer_bin_name_rust(grammar);
     let separator = match separator {
         None => 0xFFFF,
-        Some(terminal_ref) => terminal_ref.sid()
+        Some(terminal_ref) => terminal_ref.sid(),
     };
 
     if !suppress_module_doc {

@@ -38,7 +38,7 @@ pub struct BigList<T> {
     /// The index of the current chunk
     chunk_index: usize,
     /// The index of the next available cell within the current chunk
-    cell_index: usize
+    cell_index: usize,
 }
 
 impl<T: Default + Copy> Default for BigList<T> {
@@ -48,7 +48,7 @@ impl<T: Default + Copy> Default for BigList<T> {
         BigList {
             chunks: my_chunks,
             chunk_index: 0,
-            cell_index: 0
+            cell_index: 0,
         }
     }
 }
@@ -64,7 +64,7 @@ impl<T: Copy> Clone for BigList<T> {
         Self {
             chunks: self.chunks.clone(),
             chunk_index: self.chunk_index,
-            cell_index: self.cell_index
+            cell_index: self.cell_index,
         }
     }
 }
@@ -112,7 +112,7 @@ impl<T: Default + Copy> BigList<T> {
     pub fn iter(&self) -> BigListIterator<T> {
         BigListIterator {
             list: self,
-            index: 0
+            index: 0,
         }
     }
 }
@@ -137,7 +137,7 @@ pub struct BigListIterator<'a, T: 'a> {
     /// The parent list
     list: &'a BigList<T>,
     /// The current index within the list
-    index: usize
+    index: usize,
 }
 
 /// Implementation of the `Iterator` trait for `BigListIterator`

@@ -36,7 +36,7 @@ pub enum ParserAutomaton {
     /// A LR(k) automaton
     Lrk(LRkAutomaton),
     /// A RNGLR automaton
-    Rnglr(RNGLRAutomaton)
+    Rnglr(RNGLRAutomaton),
 }
 
 /// Represents complete data for a parser
@@ -57,7 +57,7 @@ pub struct InMemoryParser<'s> {
     /// Whether the lexer is context-sensitive
     pub lexer_is_context_sensitive: bool,
     /// The parser's automaton
-    pub parser_automaton: ParserAutomaton
+    pub parser_automaton: ParserAutomaton,
 }
 
 impl<'s> InMemoryParser<'s> {
@@ -81,7 +81,7 @@ impl<'s> InMemoryParser<'s> {
         &'a self,
         lexer: &'a mut Lexer<'s, 't, 'a>,
         ast: &'a mut AstImpl,
-        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
     ) {
         let mut parser: Box<dyn Parser> = match &self.parser_automaton {
             ParserAutomaton::Lrk(automaton) => Box::new(LRkParser::new(
@@ -90,7 +90,7 @@ impl<'s> InMemoryParser<'s> {
                 &self.virtuals,
                 automaton.clone(),
                 ast,
-                actions
+                actions,
             )),
             ParserAutomaton::Rnglr(automaton) => Box::new(RNGLRParser::new_with_ast(
                 lexer,
@@ -98,8 +98,8 @@ impl<'s> InMemoryParser<'s> {
                 &self.virtuals,
                 automaton.clone(),
                 ast,
-                actions
-            ))
+                actions,
+            )),
         };
         parser.parse();
     }
@@ -108,21 +108,21 @@ impl<'s> InMemoryParser<'s> {
     fn new_lexer<'a, 't>(
         &'a self,
         repository: TokenRepository<'s, 't, 'a>,
-        errors: &'a mut ParseErrors<'s>
+        errors: &'a mut ParseErrors<'s>,
     ) -> Lexer<'s, 't, 'a> {
         if self.lexer_is_context_sensitive {
             Lexer::ContextFree(ContextFreeLexer::new(
                 repository,
                 errors,
                 self.lexer_automaton.clone(),
-                self.separator
+                self.separator,
             ))
         } else {
             Lexer::ContextSensitive(ContextSensitiveLexer::new(
                 repository,
                 errors,
                 self.lexer_automaton.clone(),
-                self.separator
+                self.separator,
             ))
         }
     }

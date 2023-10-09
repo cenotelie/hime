@@ -37,7 +37,7 @@ pub trait ContextProvider {
         &self,
         token_count: usize,
         context: u16,
-        terminal_id: u32
+        terminal_id: u32,
     ) -> Option<usize>;
 }
 
@@ -49,7 +49,7 @@ impl ContextProvider for DefaultContextProvider {
         &self,
         _token_count: usize,
         context: u16,
-        _terminal_id: u32
+        _terminal_id: u32,
     ) -> Option<usize> {
         if context == DEFAULT_CONTEXT {
             Some(usize::MAX)
@@ -65,7 +65,7 @@ pub struct TokenKernel {
     /// The identifier of the matched terminal
     pub terminal_id: u32,
     /// The token's index in its repository
-    pub index: u32
+    pub index: u32,
 }
 
 /// Represents a context-free lexer (lexing rules do not depend on the context)
@@ -84,7 +84,7 @@ pub struct LexerData<'s, 't, 'a> {
     pub index: usize,
     /// The maximum Levenshtein distance to go to for the recovery of a matching failure.
     /// A distance of 0 indicates no recovery.
-    pub recovery: usize
+    pub recovery: usize,
 }
 
 pub use impls::Lexer;

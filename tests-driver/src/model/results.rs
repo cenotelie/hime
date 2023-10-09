@@ -38,7 +38,7 @@ pub struct Statistics {
     /// The start time for the test
     pub start_time: Instant,
     /// The time spent in the test
-    pub spent_time: Duration
+    pub spent_time: Duration,
 }
 
 impl Default for Statistics {
@@ -48,7 +48,7 @@ impl Default for Statistics {
             failure: 0,
             error: 0,
             start_time: Instant::now(),
-            spent_time: Duration::default()
+            spent_time: Duration::default(),
         }
     }
 }
@@ -61,7 +61,7 @@ impl Add<Statistics> for Statistics {
             failure: self.failure + rhs.failure,
             error: self.error + rhs.error,
             start_time: self.start_time.min(rhs.start_time),
-            spent_time: self.spent_time + rhs.spent_time
+            spent_time: self.spent_time + rhs.spent_time,
         }
     }
 }
@@ -85,7 +85,7 @@ impl Sum for Statistics {
             failure,
             error,
             start_time,
-            spent_time
+            spent_time,
         }
     }
 }
@@ -145,7 +145,7 @@ pub struct FixtureResults {
     /// The fixture's name
     pub name: String,
     /// The tests results
-    pub tests: Vec<TestResult>
+    pub tests: Vec<TestResult>,
 }
 
 impl FixtureResults {
@@ -183,7 +183,7 @@ pub struct TestResult {
     /// The result of the test on the Java runtime
     pub java: Option<TestResultOnRuntime>,
     /// The result of the test on the Rust runtime
-    pub rust: Option<TestResultOnRuntime>
+    pub rust: Option<TestResultOnRuntime>,
 }
 
 impl TestResult {
@@ -238,7 +238,7 @@ pub enum TestResultStatus {
     /// The test failed on the test assertion
     Failure,
     /// The test is on error
-    Error
+    Error,
 }
 
 /// The result of a single test on a specific runtime
@@ -255,7 +255,7 @@ pub struct TestResultOnRuntime {
     /// The console output for the test
     pub stdout: String,
     /// The console output for the test
-    pub stderr: String
+    pub stderr: String,
 }
 
 impl TestResultOnRuntime {
@@ -267,22 +267,22 @@ impl TestResultOnRuntime {
                 failure: 0,
                 error: 0,
                 start_time: self.start_time,
-                spent_time: self.spent_time
+                spent_time: self.spent_time,
             },
             TestResultStatus::Failure => Statistics {
                 success: 0,
                 failure: 1,
                 error: 0,
                 start_time: self.start_time,
-                spent_time: self.spent_time
+                spent_time: self.spent_time,
             },
             TestResultStatus::Error => Statistics {
                 success: 0,
                 failure: 0,
                 error: 1,
                 start_time: self.start_time,
-                spent_time: self.spent_time
-            }
+                spent_time: self.spent_time,
+            },
         }
     }
 

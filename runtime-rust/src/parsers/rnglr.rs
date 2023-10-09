@@ -27,7 +27,7 @@ use super::{
     LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT,
     LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE, LR_OP_CODE_BASE_ADD_VIRTUAL,
     LR_OP_CODE_BASE_SEMANTIC_ACTION, TREE_ACTION_DROP, TREE_ACTION_PROMOTE,
-    TREE_ACTION_REPLACE_BY_CHILDREN, TREE_ACTION_REPLACE_BY_EPSILON
+    TREE_ACTION_REPLACE_BY_CHILDREN, TREE_ACTION_REPLACE_BY_EPSILON,
 };
 use crate::ast::{AstCell, AstImpl, TableElemRef, TableType};
 use crate::errors::ParseErrorUnexpectedToken;
@@ -43,7 +43,7 @@ struct RNGLRAutomatonCell {
     /// The number of actions in this cell
     count: u32,
     /// Index of the cell's data
-    index: u32
+    index: u32,
 }
 
 /// Represents the RNGLR parsing table and productions
@@ -66,7 +66,7 @@ pub struct RNGLRAutomaton {
     /// The table of LR productions
     productions: Vec<LRProduction>,
     /// The table of nullable variables
-    nullables: Vec<u16>
+    nullables: Vec<u16>,
 }
 
 impl RNGLRAutomaton {
@@ -100,7 +100,7 @@ impl RNGLRAutomaton {
         for _i in 0..(columns_count * states_count) {
             cells.push(RNGLRAutomatonCell {
                 count: u32::from(read_u16(data, index)),
-                index: read_u32(data, index + 2)
+                index: read_u32(data, index + 2),
             });
             index += 6;
         }
@@ -126,7 +126,7 @@ impl RNGLRAutomaton {
             cells,
             table,
             productions,
-            nullables
+            nullables,
         }
     }
 
@@ -186,7 +186,7 @@ impl RNGLRAutomaton {
         let cell = self.cells[state as usize * self.columns_count + column];
         LRAction {
             table: &self.table,
-            offset: (cell.index as usize + index) * 2
+            offset: (cell.index as usize + index) * 2,
         }
     }
 
@@ -207,7 +207,7 @@ impl RNGLRAutomaton {
     pub fn get_nullable_production(&self, index: usize) -> Option<&LRProduction> {
         match self.nullables.get(index) {
             None | Some(0xFFFF) => None,
-            Some(&prod_index) => Some(&self.productions[prod_index as usize])
+            Some(&prod_index) => Some(&self.productions[prod_index as usize]),
         }
     }
 
@@ -231,7 +231,7 @@ impl RNGLRAutomaton {
             for i in 0..cell.count as usize {
                 let action = LRAction {
                     table: &self.table,
-                    offset: (cell.index as usize + i) * 2
+                    offset: (cell.index as usize + i) * 2,
                 };
                 if action.get_code() == LR_ACTION_CODE_SHIFT {
                     expected.add_unique_shift(*terminal);
@@ -250,7 +250,7 @@ struct GSSLabel {
     /// The identifier of the SPPF node in this edge
     sppf_node: SppfImplNodeRef,
     /// The symbol identifier of the original symbol on the SPPF node
-    symbol_id: u32
+    symbol_id: u32,
 }
 
 /// Represents an edge in a Graph-Structured Stack
@@ -261,7 +261,7 @@ struct GSSEdge {
     /// The index of the node to which this edge arrives to
     to: u32,
     /// The label for this edge
-    label: GSSLabel
+    label: GSSLabel,
 }
 
 /// Represents a generation in a Graph-Structured Stack
@@ -272,7 +272,7 @@ struct GSSGeneration {
     /// The start index of this generation in the list of nodes
     start: usize,
     /// The number of nodes in this generation
-    count: usize
+    count: usize,
 }
 
 /// Represents a path in a GSS
@@ -283,7 +283,7 @@ struct GSSPath {
     /// The generation containing the final target of this path
     generation: usize,
     /// The labels on this GSS path
-    labels: Vec<GSSLabel>
+    labels: Vec<GSSLabel>,
 }
 
 impl GSSPath {
@@ -296,7 +296,7 @@ impl GSSPath {
                 Vec::new()
             } else {
                 Vec::with_capacity(length)
-            }
+            },
         }
     }
 
@@ -305,7 +305,7 @@ impl GSSPath {
         GSSPath {
             last_node,
             generation,
-            labels: Vec::new()
+            labels: Vec::new(),
         }
     }
 
@@ -314,12 +314,12 @@ impl GSSPath {
         previous: &GSSPath,
         last_node: usize,
         generation: usize,
-        label: GSSLabel
+        label: GSSLabel,
     ) -> GSSPath {
         let mut result = GSSPath {
             last_node,
             generation,
-            labels: previous.labels.clone()
+            labels: previous.labels.clone(),
         };
         result.labels.push(label);
         result
@@ -345,7 +345,7 @@ struct GSS {
     /// The generations for the edges
     edges_generations: BigList<GSSGeneration>,
     /// Index of the current generation
-    current_generation: usize
+    current_generation: usize,
 }
 
 impl GSS {
@@ -356,7 +356,7 @@ impl GSS {
             node_generations: BigList::default(),
             edges: BigList::default(),
             edges_generations: BigList::default(),
-            current_generation: 0
+            current_generation: 0,
         }
     }
 
@@ -397,11 +397,11 @@ impl GSS {
     pub fn create_generation(&mut self) -> usize {
         self.node_generations.push(GSSGeneration {
             start: self.node_labels.len(),
-            count: 0
+            count: 0,
         });
         self.edges_generations.push(GSSGeneration {
             start: self.edges.len(),
-            count: 0
+            count: 0,
         });
         if self.node_generations.len() == 1 {
             // this is the first generation
@@ -424,7 +424,7 @@ impl GSS {
         self.edges.push(GSSEdge {
             from: from as u32,
             to: to as u32,
-            label
+            label,
         });
         self.edges_generations[self.current_generation].count += 1;
     }
@@ -478,7 +478,7 @@ impl GSS {
                                     &paths[p],
                                     edge.to as usize,
                                     self.get_generation_of(edge.to as usize),
-                                    edge.label
+                                    edge.label,
                                 );
                                 paths.push(new_path);
                             }
@@ -497,7 +497,7 @@ impl GSS {
                         paths[m].push(
                             edge.to as usize,
                             self.get_generation_of(edge.to as usize),
-                            edge.label
+                            edge.label,
                         );
                         // goto next
                         m += 1;
@@ -524,7 +524,7 @@ impl GSS {
 /// Represents the epsilon node
 const EPSILON: GSSLabel = GSSLabel {
     sppf_node: SppfImplNodeRef::new(0xFFFF_FFFF),
-    symbol_id: SID_EPSILON
+    symbol_id: SID_EPSILON,
 };
 
 /// The data about a reduction for a SPPF
@@ -536,7 +536,7 @@ struct SPPFReduction {
     /// The stack of semantic objects for the reduction
     stack: Vec<GSSLabel>,
     /// The number of items popped from the stack
-    pop_count: usize
+    pop_count: usize,
 }
 
 /// Represents a structure that helps build a Shared Packed Parse Forest (SPPF)
@@ -553,7 +553,7 @@ struct SPPFBuilder<'s, 't, 'a, 'l> {
     /// The data of the current reductions
     reduction: Option<SPPFReduction>,
     /// The AST being built, if any
-    ast: Option<&'a mut AstImpl>
+    ast: Option<&'a mut AstImpl>,
 }
 
 impl<'s, 't, 'a, 'l> SemanticBody for SPPFBuilder<'s, 't, 'a, 'l> {
@@ -589,7 +589,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         lexer: &'l mut Lexer<'s, 't, 'a>,
         variables: &'a [Symbol<'s>],
         virtuals: &'a [Symbol<'s>],
-        ast: &'a mut AstImpl
+        ast: &'a mut AstImpl,
     ) -> SPPFBuilder<'s, 't, 'a, 'l> {
         SPPFBuilder {
             lexer,
@@ -597,7 +597,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             virtuals,
             sppf: OwnOrMut::Owned(SppfImpl::default()),
             reduction: None,
-            ast: Some(ast)
+            ast: Some(ast),
         }
     }
 
@@ -606,7 +606,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         lexer: &'l mut Lexer<'s, 't, 'a>,
         variables: &'a [Symbol<'s>],
         virtuals: &'a [Symbol<'s>],
-        sppf: &'a mut SppfImpl
+        sppf: &'a mut SppfImpl,
     ) -> SPPFBuilder<'s, 't, 'a, 'l> {
         SPPFBuilder {
             lexer,
@@ -614,7 +614,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             virtuals,
             sppf: OwnOrMut::MutRef(sppf),
             reduction: None,
-            ast: None
+            ast: None,
         }
     }
 
@@ -638,7 +638,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             cache: Vec::with_capacity(length),
             actions: Vec::with_capacity(length),
             stack,
-            pop_count: 0
+            pop_count: 0,
         });
     }
 
@@ -647,7 +647,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         reduction: &mut SPPFReduction,
         sppf: &SppfImpl,
         sppf_node_ref: SppfImplNodeRef,
-        action: TreeAction
+        action: TreeAction,
     ) {
         if action == TREE_ACTION_DROP {
             return;
@@ -671,7 +671,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     fn reduction_add_to_cache_node(
         reduction: &mut SPPFReduction,
         sppf_node_ref: SppfImplNodeRef,
-        action: TreeAction
+        action: TreeAction,
     ) {
         // add the node in the cache
         reduction.cache.push(sppf_node_ref);
@@ -707,7 +707,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         &mut self,
         variable_index: usize,
         head_action: TreeAction,
-        target: Option<SppfImplNodeRef>
+        target: Option<SppfImplNodeRef>,
     ) -> SppfImplNodeRef {
         if head_action == TREE_ACTION_REPLACE_BY_CHILDREN {
             self.reduce_replaceable(variable_index)
@@ -721,7 +721,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         &mut self,
         variable_index: usize,
         head_action: TreeAction,
-        target: Option<SppfImplNodeRef>
+        target: Option<SppfImplNodeRef>,
     ) -> SppfImplNodeRef {
         let reduction: &mut SPPFReduction = self.reduction.as_mut().expect("Not in a reduction");
         let mut promoted: Option<SppfImplNodeRef> = None;
@@ -795,7 +795,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     fn build_final_ast(
         sppf: &SppfImpl,
         sppf_node_ref: SppfImplNodeRef,
-        result: &mut AstImpl
+        result: &mut AstImpl,
     ) -> AstCell {
         let node = sppf.get_node(sppf_node_ref).as_normal();
         let version = &node.versions[0];
@@ -803,7 +803,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             AstCell {
                 label: version.label,
                 first: 0,
-                count: 0
+                count: 0,
             }
         } else {
             let mut buffer = Vec::with_capacity(version.children.len());
@@ -814,7 +814,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             AstCell {
                 label: version.label,
                 first: first as u32,
-                count: version.children.len() as u32
+                count: version.children.len() as u32,
             }
         }
     }
@@ -832,7 +832,7 @@ struct RNGLRReduction {
     /// The LR production for the reduction
     production: usize,
     /// The first label in the GSS
-    first: GSSLabel
+    first: GSSLabel,
 }
 
 /// Represents a shift operation to be performed
@@ -841,7 +841,7 @@ struct RNGLRShift {
     /// GSS node to shift from
     from: usize,
     /// The target RNGLR state
-    to: usize
+    to: usize,
 }
 
 struct RNGLRParserData<'s, 'a> {
@@ -858,7 +858,7 @@ struct RNGLRParserData<'s, 'a> {
     /// The grammar variables
     variables: &'a [Symbol<'s>],
     /// The semantic actions
-    actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+    actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
 }
 
 impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
@@ -874,7 +874,7 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
         &self,
         token_count: usize,
         context: u16,
-        terminal_id: u32
+        terminal_id: u32,
     ) -> Option<usize> {
         // the default context is always active
         if context == DEFAULT_CONTEXT {
@@ -1039,13 +1039,13 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
                     // we reach the GSS
                     let paths = self.gss.get_paths(
                         gss_node,
-                        production.reduction_length - queue_vstack[i].len()
+                        production.reduction_length - queue_vstack[i].len(),
                     );
                     for path in &paths {
                         // get the target GLR state
                         let next = self.get_next_by_var(
                             self.gss.get_represented_state(path.last_node),
-                            self.variables[production.head].id
+                            self.variables[production.head].id,
                         );
                         // enqueue the info, top GSS stack node and target GLR state
                         queue_gss_heads.push(path.last_node);
@@ -1079,7 +1079,7 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
     fn get_next_token_id(&self) -> u32 {
         match self.next_token.as_ref() {
             None => SID_EPSILON,
-            Some(kernel) => kernel.terminal_id
+            Some(kernel) => kernel.terminal_id,
         }
     }
 
@@ -1100,7 +1100,7 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
                 let action = self.automaton.get_action(
                     self.gss.get_represented_state(gss_node),
                     terminal.id,
-                    j
+                    j,
                 );
                 if action.get_code() != LR_ACTION_CODE_REDUCE {
                     continue;
@@ -1111,7 +1111,7 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
                     // get the target GLR state
                     let next = self.get_next_by_var(
                         self.gss.get_represented_state(path.last_node),
-                        self.variables[production.head].id
+                        self.variables[production.head].id,
                     );
                     // enqueue the info, top GSS stack node and target GLR state
                     queue_gss_heads.push(path.last_node);
@@ -1165,13 +1165,13 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
                     // we reach the GSS
                     let paths = self.gss.get_paths(
                         gss_node,
-                        production.reduction_length - queue_vstack[i].len()
+                        production.reduction_length - queue_vstack[i].len(),
                     );
                     for path in &paths {
                         // get the target GLR state
                         let next = self.get_next_by_var(
                             self.gss.get_represented_state(path.last_node),
-                            self.variables[production.head].id
+                            self.variables[production.head].id,
                         );
                         // enqueue the info, top GSS stack node and target GLR state
                         queue_gss_heads.push(path.last_node);
@@ -1218,7 +1218,7 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
                         self.reductions.push_back(RNGLRReduction {
                             node: shift.from,
                             production: action.get_data() as usize,
-                            first: label
+                            first: label,
                         });
                     }
                 }
@@ -1238,7 +1238,7 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
                 if action.get_code() == LR_ACTION_CODE_SHIFT {
                     self.shifts.push_back(RNGLRShift {
                         from: w,
-                        to: action.get_data() as usize
+                        to: action.get_data() as usize,
                     });
                 } else if action.get_code() == LR_ACTION_CODE_REDUCE {
                     let production = self.automaton.get_production(action.get_data() as usize);
@@ -1247,14 +1247,14 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
                         self.reductions.push_back(RNGLRReduction {
                             node: w,
                             production: action.get_data() as usize,
-                            first: EPSILON
+                            first: EPSILON,
                         });
                     } else {
                         // reduce from the second node on the path
                         self.reductions.push_back(RNGLRReduction {
                             node: shift.from,
                             production: action.get_data() as usize,
-                            first: label
+                            first: label,
                         });
                     }
                 }
@@ -1270,7 +1270,7 @@ pub struct RNGLRParser<'s, 't, 'a, 'l> {
     /// The AST builder
     builder: SPPFBuilder<'s, 't, 'a, 'l>,
     /// The sub-trees for the constant nullable variables
-    nullables: Vec<usize>
+    nullables: Vec<usize>,
 }
 
 impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
@@ -1281,7 +1281,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
         virtuals: &'a [Symbol<'s>],
         automaton: RNGLRAutomaton,
         ast: &'a mut AstImpl,
-        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
     ) -> RNGLRParser<'s, 't, 'a, 'l> {
         let mut parser = RNGLRParser {
             data: RNGLRParserData {
@@ -1291,17 +1291,17 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                 reductions: VecDeque::new(),
                 shifts: VecDeque::new(),
                 variables,
-                actions
+                actions,
             },
             builder: SPPFBuilder::new_ast(lexer, variables, virtuals, ast),
-            nullables: alloc::vec![0xFFFF_FFFF ; variables.len()]
+            nullables: alloc::vec![0xFFFF_FFFF ; variables.len()],
         };
         RNGLRParser::build_nullables(
             &mut parser.builder,
             &mut parser.data.actions,
             &mut parser.nullables,
             &parser.data.automaton,
-            parser.data.variables
+            parser.data.variables,
         );
         parser
     }
@@ -1313,7 +1313,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
         virtuals: &'a [Symbol<'s>],
         automaton: RNGLRAutomaton,
         sppf: &'a mut SppfImpl,
-        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
     ) -> RNGLRParser<'s, 't, 'a, 'l> {
         let mut parser = RNGLRParser {
             data: RNGLRParserData {
@@ -1323,17 +1323,17 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                 reductions: VecDeque::new(),
                 shifts: VecDeque::new(),
                 variables,
-                actions
+                actions,
             },
             builder: SPPFBuilder::new_sppf(lexer, variables, virtuals, sppf),
-            nullables: alloc::vec![0xFFFF_FFFF ; variables.len()]
+            nullables: alloc::vec![0xFFFF_FFFF ; variables.len()],
         };
         RNGLRParser::build_nullables(
             &mut parser.builder,
             &mut parser.data.actions,
             &mut parser.nullables,
             &parser.data.automaton,
-            parser.data.variables
+            parser.data.variables,
         );
         parser
     }
@@ -1344,7 +1344,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
         actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
         nullables: &mut [usize],
         automaton: &RNGLRAutomaton,
-        variables: &[Symbol]
+        variables: &[Symbol],
     ) {
         // Get the dependency table
         let mut dependencies = RNGLRParser::build_nullables_dependencies(automaton, variables);
@@ -1370,7 +1370,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                         production.unwrap(),
                         EPSILON,
                         &path,
-                        None
+                        None,
                     )
                     .node_id();
                     dependencies[i].clear();
@@ -1391,7 +1391,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
     /// Builds the dependency table between nullable variables
     fn build_nullables_dependencies(
         automaton: &RNGLRAutomaton,
-        variables: &[Symbol]
+        variables: &[Symbol],
     ) -> Vec<Vec<usize>> {
         variables
             .iter()
@@ -1436,7 +1436,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
         production: &LRProduction,
         first: GSSLabel,
         path: &GSSPath,
-        target: Option<SppfImplNodeRef>
+        target: Option<SppfImplNodeRef>,
     ) -> SppfImplNodeRef {
         let variable = builder.variables[production.head];
         builder.reduction_prepare(first, path, production.reduction_length);
@@ -1460,7 +1460,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                     i += 1;
                     builder.reduction_add_nullable(
                         SppfImplNodeRef::new_usize(nullables[index]),
-                        get_op_code_tree_action(op_code)
+                        get_op_code_tree_action(op_code),
                     );
                 }
                 _ => {
@@ -1511,7 +1511,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
         &mut self,
         generation: usize,
         reduction: RNGLRReduction,
-        path: &GSSPath
+        path: &GSSPath,
     ) {
         let production = self.data.automaton.get_production(reduction.production);
         // Get the rule's head
@@ -1544,12 +1544,12 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                     path,
                     previous_edge_label
                         .as_ref()
-                        .map(|previous| previous.sppf_node)
+                        .map(|previous| previous.sppf_node),
                 )
             };
         let label = previous_edge_label.unwrap_or(GSSLabel {
             sppf_node,
-            symbol_id: head.id
+            symbol_id: head.id,
         });
 
         if let Some(w) = w {
@@ -1578,7 +1578,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                                 self.data.reductions.push_back(RNGLRReduction {
                                     node: path.last_node,
                                     production: action.get_data() as usize,
-                                    first: label
+                                    first: label,
                                 });
                             }
                         }
@@ -1602,7 +1602,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                 if action.get_code() == LR_ACTION_CODE_SHIFT {
                     self.data.shifts.push_back(RNGLRShift {
                         from: w,
-                        to: action.get_data() as usize
+                        to: action.get_data() as usize,
                     });
                 } else if action.get_code() == LR_ACTION_CODE_REDUCE {
                     let new_production = self
@@ -1613,13 +1613,13 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                         self.data.reductions.push_back(RNGLRReduction {
                             node: w,
                             production: action.get_data() as usize,
-                            first: EPSILON
+                            first: EPSILON,
                         });
                     } else {
                         self.data.reductions.push_back(RNGLRReduction {
                             node: path.last_node,
                             production: action.get_data() as usize,
-                            first: label
+                            first: label,
                         });
                     }
                 }
@@ -1636,7 +1636,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
         let sppf_node = self.builder.get_single_node(symbol);
         let label = GSSLabel {
             sppf_node,
-            symbol_id: old_token.terminal_id
+            symbol_id: old_token.terminal_id,
         };
         // Execute all shifts in the queue at this point
         let count = self.data.shifts.len();
@@ -1694,7 +1694,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
             token.get_symbol(),
             #[cfg(feature = "debug")]
             my_states,
-            my_expected
+            my_expected,
         )
     }
 }
@@ -1719,13 +1719,13 @@ impl<'s, 't, 'a, 'l> Parser for RNGLRParser<'s, 't, 'a, 'l> {
                 if action.get_code() == LR_ACTION_CODE_SHIFT {
                     self.data.shifts.push_back(RNGLRShift {
                         from: state0,
-                        to: action.get_data() as usize
+                        to: action.get_data() as usize,
                     });
                 } else if action.get_code() == LR_ACTION_CODE_REDUCE {
                     self.data.reductions.push_back(RNGLRReduction {
                         node: state0,
                         production: action.get_data() as usize,
-                        first: EPSILON
+                        first: EPSILON,
                     });
                 }
             }

@@ -35,12 +35,12 @@ fn run_fuzzy_matcher<'s, 't, 'a>(
     separator_id: u32,
     recovery: usize,
     errors: &'a mut ParseErrors<'s>,
-    origin_index: usize
+    origin_index: usize,
 ) -> Option<TokenMatch> {
     if recovery == 0 {
         errors.push_error_unexpected_char(ParseErrorUnexpectedChar::new(
             repository.text.get_position_at(origin_index),
-            repository.text.at(origin_index)
+            repository.text.at(origin_index),
         ));
         None
     } else {
@@ -58,7 +58,7 @@ fn run_fuzzy_matcher<'s, 't, 'a>(
             repository.text,
             errors,
             recovery,
-            origin_index
+            origin_index,
         );
         matcher.run()
     }
@@ -67,7 +67,7 @@ fn run_fuzzy_matcher<'s, 't, 'a>(
 /// Represents a context-free lexer (lexing rules do not depend on the context)
 pub struct ContextFreeLexer<'s, 't, 'a> {
     /// The lexer's innner data
-    data: LexerData<'s, 't, 'a>
+    data: LexerData<'s, 't, 'a>,
 }
 
 impl<'s, 't, 'a> ContextFreeLexer<'s, 't, 'a> {
@@ -76,7 +76,7 @@ impl<'s, 't, 'a> ContextFreeLexer<'s, 't, 'a> {
         repository: TokenRepository<'s, 't, 'a>,
         errors: &'a mut ParseErrors<'s>,
         automaton: Automaton,
-        separator_id: u32
+        separator_id: u32,
     ) -> ContextFreeLexer<'s, 't, 'a> {
         ContextFreeLexer {
             data: LexerData {
@@ -86,8 +86,8 @@ impl<'s, 't, 'a> ContextFreeLexer<'s, 't, 'a> {
                 has_run: false,
                 separator_id,
                 index: 0,
-                recovery: DEFAULT_RECOVERY_MATCHING_DISTANCE
-            }
+                recovery: DEFAULT_RECOVERY_MATCHING_DISTANCE,
+            },
         }
     }
 
@@ -104,7 +104,7 @@ impl<'s, 't, 'a> ContextFreeLexer<'s, 't, 'a> {
         let id = self.data.repository.get_symbol_id_for(self.data.index);
         let result = TokenKernel {
             terminal_id: id,
-            index: self.data.index as u32
+            index: self.data.index as u32,
         };
         self.data.index += 1;
         Some(result)
@@ -123,7 +123,7 @@ impl<'s, 't, 'a> ContextFreeLexer<'s, 't, 'a> {
                     self.data.separator_id,
                     self.data.recovery,
                     self.data.errors,
-                    index
+                    index,
                 );
             }
             if let Some(the_match) = result {
@@ -160,7 +160,7 @@ pub struct ContextSensitiveLexer<'s, 't, 'a> {
     /// The lexer's innner data
     data: LexerData<'s, 't, 'a>,
     /// The current index in the input
-    input_index: usize
+    input_index: usize,
 }
 
 impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
@@ -169,7 +169,7 @@ impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
         repository: TokenRepository<'s, 't, 'a>,
         errors: &'a mut ParseErrors<'s>,
         automaton: Automaton,
-        separator_id: u32
+        separator_id: u32,
     ) -> ContextSensitiveLexer<'s, 't, 'a> {
         ContextSensitiveLexer {
             data: LexerData {
@@ -179,9 +179,9 @@ impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
                 has_run: false,
                 separator_id,
                 index: 0,
-                recovery: DEFAULT_RECOVERY_MATCHING_DISTANCE
+                recovery: DEFAULT_RECOVERY_MATCHING_DISTANCE,
             },
-            input_index: 0
+            input_index: 0,
         }
     }
 
@@ -194,7 +194,7 @@ impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
             let mut result = run_dfa(
                 &self.data.automaton,
                 self.data.repository.text,
-                self.input_index
+                self.input_index,
             );
             if result.is_none() {
                 // failed to match, retry with error handling
@@ -204,7 +204,7 @@ impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
                     self.data.separator_id,
                     self.data.recovery,
                     self.data.errors,
-                    self.input_index
+                    self.input_index,
                 );
             }
             if let Some(the_match) = result {
@@ -215,7 +215,7 @@ impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
                     self.data.has_run = true;
                     return Some(TokenKernel {
                         terminal_id: SID_DOLLAR,
-                        index: token_index as u32
+                        index: token_index as u32,
                     });
                 }
                 // matched something
@@ -225,12 +225,12 @@ impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
                     let token_index = self.data.repository.add(
                         terminal_index as usize,
                         self.input_index,
-                        the_match.length as usize
+                        the_match.length as usize,
                     );
                     self.input_index += the_match.length as usize;
                     return Some(TokenKernel {
                         terminal_id,
-                        index: token_index as u32
+                        index: token_index as u32,
                     });
                 }
                 self.input_index += the_match.length as usize;
@@ -263,7 +263,7 @@ impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
             let priority_candidate = contexts.get_context_priority(
                 self.data.repository.get_count(),
                 matched.context,
-                id
+                id,
             );
             if priority_candidate.is_none() {
                 continue;
@@ -282,7 +282,7 @@ pub enum Lexer<'s, 't, 'a> {
     /// A context-free lexer
     ContextFree(ContextFreeLexer<'s, 't, 'a>),
     /// A context-sensitive lexer
-    ContextSensitive(ContextSensitiveLexer<'s, 't, 'a>)
+    ContextSensitive(ContextSensitiveLexer<'s, 't, 'a>),
 }
 
 impl<'s, 't, 'a> Lexer<'s, 't, 'a> {
@@ -291,7 +291,7 @@ impl<'s, 't, 'a> Lexer<'s, 't, 'a> {
     pub fn get_data(&self) -> &LexerData<'s, 't, 'a> {
         match self {
             Lexer::ContextFree(lexer) => &lexer.data,
-            Lexer::ContextSensitive(lexer) => &lexer.data
+            Lexer::ContextSensitive(lexer) => &lexer.data,
         }
     }
 
@@ -299,7 +299,7 @@ impl<'s, 't, 'a> Lexer<'s, 't, 'a> {
     pub fn get_data_mut(&mut self) -> &mut LexerData<'s, 't, 'a> {
         match self {
             Lexer::ContextFree(ref mut lexer) => &mut lexer.data,
-            Lexer::ContextSensitive(ref mut lexer) => &mut lexer.data
+            Lexer::ContextSensitive(ref mut lexer) => &mut lexer.data,
         }
     }
 
@@ -307,7 +307,7 @@ impl<'s, 't, 'a> Lexer<'s, 't, 'a> {
     pub fn get_next_token(&mut self, contexts: &dyn ContextProvider) -> Option<TokenKernel> {
         match self {
             Lexer::ContextFree(ref mut lexer) => lexer.get_next_token(),
-            Lexer::ContextSensitive(ref mut lexer) => lexer.get_next_token(contexts)
+            Lexer::ContextSensitive(ref mut lexer) => lexer.get_next_token(contexts),
         }
     }
 }

@@ -30,7 +30,7 @@ pub struct MatchedTerminal {
     /// The context
     pub context: u16,
     /// The terminal's index
-    pub index: u16
+    pub index: u16,
 }
 
 /// Represents a transition in the automaton of a lexer
@@ -43,7 +43,7 @@ pub struct AutomatonTransition {
     /// End of the range
     pub end: Utf16C,
     /// The transition's target
-    pub target: u32
+    pub target: u32,
 }
 
 impl AutomatonTransition {
@@ -74,7 +74,7 @@ pub struct AutomatonState<'a> {
     /// The automaton table
     table: &'a [u16],
     /// The offset of this state within the table
-    offset: usize
+    offset: usize,
 }
 
 impl<'a> AutomatonState<'a> {
@@ -89,7 +89,7 @@ impl<'a> AutomatonState<'a> {
     pub fn get_terminal(&self, index: usize) -> MatchedTerminal {
         MatchedTerminal {
             context: self.table[self.offset + index * 2 + 3],
-            index: self.table[self.offset + index * 2 + 4]
+            index: self.table[self.offset + index * 2 + 4],
         }
     }
 
@@ -115,7 +115,7 @@ impl<'a> AutomatonState<'a> {
     #[must_use]
     pub fn get_cached_transition(&self, value: Utf16C) -> u32 {
         u32::from(
-            self.table[self.offset + 3 + self.table[self.offset] as usize * 2 + value as usize]
+            self.table[self.offset + 3 + self.table[self.offset] as usize * 2 + value as usize],
         )
     }
 
@@ -133,7 +133,7 @@ impl<'a> AutomatonState<'a> {
         AutomatonTransition {
             start: self.table[offset],
             end: self.table[offset + 1],
-            target: u32::from(self.table[offset + 2])
+            target: u32::from(self.table[offset + 2]),
         }
     }
 
@@ -173,7 +173,7 @@ pub struct Automaton {
     /// Lexer's DFA table of states
     states: Vec<u16>,
     /// The number of states in the automaton
-    states_count: usize
+    states_count: usize,
 }
 
 impl Automaton {
@@ -187,7 +187,7 @@ impl Automaton {
         Automaton {
             table,
             states,
-            states_count
+            states_count,
         }
     }
 
@@ -202,7 +202,7 @@ impl Automaton {
     pub fn get_state(&self, state: u32) -> AutomatonState {
         AutomatonState {
             table: &self.states,
-            offset: self.table[state as usize] as usize
+            offset: self.table[state as usize] as usize,
         }
     }
 
@@ -217,7 +217,7 @@ pub struct TokenMatch {
     /// The matching DFA state
     pub state: u32,
     /// Length of the matched input
-    pub length: u32
+    pub length: u32,
 }
 
 /// Runs the lexer's DFA to match a terminal in the input ahead
@@ -226,7 +226,7 @@ pub fn run_dfa(automaton: &Automaton, input: &Text, index: usize) -> Option<Toke
     if input.is_end(index) {
         return Some(TokenMatch {
             state: 0,
-            length: 0
+            length: 0,
         });
     }
 
@@ -241,7 +241,7 @@ pub fn run_dfa(automaton: &Automaton, input: &Text, index: usize) -> Option<Toke
         if state_data.get_terminals_count() > 0 {
             result = Some(TokenMatch {
                 state,
-                length: (position - index) as u32
+                length: (position - index) as u32,
             });
         }
         // No further transition => exit

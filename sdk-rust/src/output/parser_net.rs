@@ -35,7 +35,7 @@ pub fn write(
     expected: &TerminalSet,
     method: ParsingMethod,
     nmespace: &str,
-    modifier: Modifier
+    modifier: Modifier,
 ) -> Result<(), Error> {
     let mut final_path = PathBuf::new();
     if let Some(path) = path {
@@ -48,7 +48,7 @@ pub fn write(
     let name = to_upper_camel_case(&grammar.name);
     let modifier = match modifier {
         Modifier::Public => "public",
-        Modifier::Internal => "internal"
+        Modifier::Internal => "internal",
     };
     let (parser_type, automaton_type) = if method.is_rnglr() {
         ("RNGLRParser", "RNGLRAutomaton")
@@ -374,7 +374,7 @@ fn write_code_constructors(writer: &mut dyn Write, grammar: &Grammar) -> Result<
 fn write_code_visitor(
     writer: &mut dyn Write,
     grammar: &Grammar,
-    expected: &TerminalSet
+    expected: &TerminalSet,
 ) -> Result<(), Error> {
     writeln!(writer)?;
     writeln!(writer, "\t\t/// <summary>")?;

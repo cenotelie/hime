@@ -85,7 +85,7 @@ pub struct Span {
     /// Beginning of the range (included)
     pub begin: CodePoint,
     /// End of the range (included)
-    pub end: CodePoint
+    pub end: CodePoint,
 }
 
 impl Span {
@@ -94,7 +94,7 @@ impl Span {
     pub fn new(begin: u32, end: u32) -> Span {
         Span {
             begin: CodePoint::new(begin),
-            end: CodePoint::new(end)
+            end: CodePoint::new(end),
         }
     }
 
@@ -123,7 +123,7 @@ pub struct Block {
     /// The block's name
     pub name: String,
     /// The block's character span
-    pub span: Span
+    pub span: Span,
 }
 
 impl Block {
@@ -132,7 +132,7 @@ impl Block {
     pub fn new(name: &str, begin: u32, end: u32) -> Block {
         Block {
             name: name.to_string(),
-            span: Span::new(begin, end)
+            span: Span::new(begin, end),
         }
     }
 
@@ -141,7 +141,7 @@ impl Block {
     pub fn new_owned(name: String, begin: u32, end: u32) -> Block {
         Block {
             name,
-            span: Span::new(begin, end)
+            span: Span::new(begin, end),
         }
     }
 }
@@ -152,7 +152,7 @@ pub struct Category {
     /// The category's name
     pub name: String,
     /// The list of character spans contained in this category
-    pub spans: Vec<Span>
+    pub spans: Vec<Span>,
 }
 
 impl Category {
@@ -161,7 +161,7 @@ impl Category {
     pub fn new(name: &'static str) -> Category {
         Category {
             name: name.to_string(),
-            spans: Vec::new()
+            spans: Vec::new(),
         }
     }
 
@@ -170,7 +170,7 @@ impl Category {
     pub fn new_owned(name: String) -> Category {
         Category {
             name,
-            spans: Vec::new()
+            spans: Vec::new(),
         }
     }
 

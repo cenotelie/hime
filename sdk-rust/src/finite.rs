@@ -32,7 +32,7 @@ pub enum FinalItem {
     /// Represents a fake marker of a final state in an automaton
     Dummy,
     /// A terminal symbol in a grammar
-    Terminal(usize, usize)
+    Terminal(usize, usize),
 }
 
 impl FinalItem {
@@ -55,7 +55,7 @@ impl FinalItem {
     pub fn priority(self) -> usize {
         match self {
             FinalItem::Dummy => 0,
-            FinalItem::Terminal(id, _) => id
+            FinalItem::Terminal(id, _) => id,
         }
     }
 
@@ -69,7 +69,7 @@ impl FinalItem {
         match terminal {
             TerminalRef::Dummy => FinalItem::Dummy,
             TerminalRef::Terminal(id) => FinalItem::Terminal(id, context),
-            _ => panic!("Cannot turn this terminal into a DFA final item")
+            _ => panic!("Cannot turn this terminal into a DFA final item"),
         }
     }
 }
@@ -90,7 +90,7 @@ impl From<FinalItem> for TerminalRef {
     fn from(final_item: FinalItem) -> Self {
         match final_item {
             FinalItem::Dummy => TerminalRef::Dummy,
-            FinalItem::Terminal(id, _) => TerminalRef::Terminal(id)
+            FinalItem::Terminal(id, _) => TerminalRef::Terminal(id),
         }
     }
 }
@@ -103,7 +103,7 @@ pub struct DFAState {
     /// The transitions from this state
     pub transitions: HashMap<CharSpan, usize>,
     /// List of the items on this state
-    pub items: Vec<FinalItem>
+    pub items: Vec<FinalItem>,
 }
 
 impl DFAState {
@@ -113,7 +113,7 @@ impl DFAState {
         DFAState {
             id,
             transitions: HashMap::new(),
-            items: Vec::new()
+            items: Vec::new(),
         }
     }
 
@@ -204,7 +204,7 @@ impl DFAState {
                     if k2.begin <= k1.end + 1 {
                         k1 = CharSpan {
                             begin: k1.begin,
-                            end: k2.end.max(k1.end)
+                            end: k2.end.max(k1.end),
                         };
                         values[i] = k1;
                         values.remove(j);
@@ -234,7 +234,7 @@ impl Eq for DFAState {}
 #[derive(Debug, Clone, Default)]
 pub struct DFA {
     /// The list of states in this automaton
-    pub states: Vec<DFAState>
+    pub states: Vec<DFAState>,
 }
 
 struct DFAInverse {
@@ -243,20 +243,20 @@ struct DFAInverse {
     /// The inverse graph data
     inverses: HashMap<usize, Vec<usize>>,
     /// The final states
-    finals: Vec<usize>
+    finals: Vec<usize>,
 }
 
 /// Represents a group of DFA states within a partition
 struct DFAStateGroup<'a> {
     /// The states in this group
-    states: Vec<&'a DFAState>
+    states: Vec<&'a DFAState>,
 }
 
 /// Represents a partition of a DFA
 /// This is used to compute minimal DFAs
 struct DFAPartition<'a> {
     /// The groups in this partition
-    groups: Vec<DFAStateGroup<'a>>
+    groups: Vec<DFAStateGroup<'a>>,
 }
 
 impl DFA {
@@ -379,7 +379,7 @@ impl DFA {
             new_partition = current.refine(self);
         }
         DFA {
-            states: current.into_dfa_states(self)
+            states: current.into_dfa_states(self),
         }
     }
 
@@ -458,7 +458,7 @@ impl DFAInverse {
         DFAInverse {
             reachable,
             inverses,
-            finals
+            finals,
         }
     }
 
@@ -494,7 +494,7 @@ impl<'a> DFAStateGroup<'a> {
     /// Initializes this group with a representative state
     fn new(state: &'a DFAState) -> DFAStateGroup {
         DFAStateGroup {
-            states: vec![state]
+            states: vec![state],
         }
     }
 }
@@ -521,7 +521,7 @@ impl<'a> DFAPartition<'a> {
                     .find(|g: &&mut DFAStateGroup| state.same_finals(g.states[0]))
                 {
                     None => groups.push(DFAStateGroup::new(state)),
-                    Some(group) => group.states.push(state)
+                    Some(group) => group.states.push(state),
                 }
             } else {
                 // the state is not final
@@ -648,7 +648,7 @@ pub struct NFATransition {
     /// The value on this transition
     pub value: CharSpan,
     /// The next state by this transition
-    pub next: usize
+    pub next: usize,
 }
 
 /// Represents a state in a Non-deterministic Finite Automaton
@@ -661,7 +661,7 @@ pub struct NFAState {
     /// List of the items on this state
     pub items: Vec<FinalItem>,
     /// The watermark of this state
-    pub mark: i32
+    pub mark: i32,
 }
 
 impl NFAState {
@@ -672,7 +672,7 @@ impl NFAState {
             id,
             transitions: Vec::new(),
             items: Vec::new(),
-            mark: 0
+            mark: 0,
         }
     }
 
@@ -786,7 +786,7 @@ pub struct NFA {
     /// The entry set for this automaton
     pub entry: usize,
     /// The exit state for this automaton
-    pub exit: usize
+    pub exit: usize,
 }
 
 impl NFA {
@@ -796,7 +796,7 @@ impl NFA {
         NFA {
             states: vec![NFAState::new(0), NFAState::new(1)],
             entry: 0,
-            exit: 1
+            exit: 1,
         }
     }
 
@@ -959,14 +959,14 @@ impl NFA {
                         .iter()
                         .map(|(value, next)| NFATransition {
                             value: *value,
-                            next: *next
+                            next: *next,
                         })
                         .collect(),
-                    mark: 0
+                    mark: 0,
                 })
                 .collect(),
             entry: 0,
-            exit: std::usize::MAX
+            exit: std::usize::MAX,
         }
     }
 
@@ -1005,11 +1005,11 @@ impl NFA {
                     id: state.id,
                     items: Vec::new(),
                     transitions: state.transitions.clone(),
-                    mark: 0
+                    mark: 0,
                 })
                 .collect(),
             entry: self.entry,
-            exit: self.exit
+            exit: self.exit,
         }
     }
 
@@ -1026,9 +1026,9 @@ impl NFA {
                     .iter()
                     .map(|t| NFATransition {
                         value: t.value,
-                        next: t.next + offset
+                        next: t.next + offset,
                     })
-                    .collect()
+                    .collect(),
             });
         }
         (nfa.entry + offset, nfa.exit + offset)
@@ -1039,7 +1039,7 @@ impl NFA {
 /// A state can only appear once in a set
 struct NFAStateSet {
     /// The backend storage for the states in this set
-    states: Vec<usize>
+    states: Vec<usize>,
 }
 
 impl NFAStateSet {
@@ -1080,7 +1080,7 @@ impl NFAStateSet {
             match nfa.states[*state].mark.cmp(&0) {
                 Ordering::Greater => state_positive = Some(*state),
                 Ordering::Less => state_negative = Some(*state),
-                Ordering::Equal => ()
+                Ordering::Equal => (),
             }
         }
         // With both negative and positive states

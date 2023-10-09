@@ -32,7 +32,7 @@ pub enum SymbolType {
     /// A variable symbol, defined in the original grammar
     Variable,
     /// A virtual symbol, defined in the original grammar
-    Virtual
+    Virtual,
 }
 
 /// Symbol ID for inexistant symbol
@@ -48,7 +48,7 @@ pub struct Symbol<'a> {
     /// The symbol's unique identifier
     pub id: u32,
     /// The symbol's name
-    pub name: &'a str
+    pub name: &'a str,
 }
 
 /// Implementation of `Display` for `Symbol`
@@ -90,7 +90,7 @@ pub enum SemanticElement<'s, 't, 'a> {
     /// A variable symbol defined in the original grammar
     Variable(Symbol<'s>),
     /// A virtual symbol, defined in the original grammar
-    Virtual(Symbol<'s>)
+    Virtual(Symbol<'s>),
 }
 
 impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for SemanticElement<'s, 't, 'a> {
@@ -99,7 +99,7 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for SemanticElement<'s, 't, 'a> {
             SemanticElement::Token(token) => token.get_position(),
             SemanticElement::Terminal(_symbol) => None,
             SemanticElement::Variable(_symbol) => None,
-            SemanticElement::Virtual(_symbol) => None
+            SemanticElement::Virtual(_symbol) => None,
         }
     }
 
@@ -108,7 +108,7 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for SemanticElement<'s, 't, 'a> {
             SemanticElement::Token(token) => token.get_span(),
             SemanticElement::Terminal(_symbol) => None,
             SemanticElement::Variable(_symbol) => None,
-            SemanticElement::Virtual(_symbol) => None
+            SemanticElement::Virtual(_symbol) => None,
         }
     }
 
@@ -117,7 +117,7 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for SemanticElement<'s, 't, 'a> {
             SemanticElement::Token(token) => token.get_context(),
             SemanticElement::Terminal(_symbol) => None,
             SemanticElement::Variable(_symbol) => None,
-            SemanticElement::Virtual(_symbol) => None
+            SemanticElement::Virtual(_symbol) => None,
         }
     }
 
@@ -126,7 +126,7 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for SemanticElement<'s, 't, 'a> {
             SemanticElement::Token(token) => token.get_symbol(),
             SemanticElement::Terminal(symbol)
             | SemanticElement::Variable(symbol)
-            | SemanticElement::Virtual(symbol) => *symbol
+            | SemanticElement::Virtual(symbol) => *symbol,
         }
     }
 
@@ -135,7 +135,7 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for SemanticElement<'s, 't, 'a> {
             SemanticElement::Token(token) => token.get_value(),
             SemanticElement::Terminal(_symbol) => None,
             SemanticElement::Variable(_symbol) => None,
-            SemanticElement::Virtual(_symbol) => None
+            SemanticElement::Virtual(_symbol) => None,
         }
     }
 }
@@ -148,7 +148,7 @@ impl<'s, 't, 'a> SemanticElement<'s, 't, 'a> {
             SemanticElement::Token(_token) => SymbolType::Terminal,
             SemanticElement::Terminal(_symbol) => SymbolType::Terminal,
             SemanticElement::Variable(_symbol) => SymbolType::Variable,
-            SemanticElement::Virtual(_symbol) => SymbolType::Virtual
+            SemanticElement::Virtual(_symbol) => SymbolType::Virtual,
         }
     }
 }

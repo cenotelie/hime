@@ -42,14 +42,14 @@ fn main() {
                 .value_name("LIBRARY")
                 .help("Path to the compiled library containing the parser")
                 .takes_value(true)
-                .required(true)
+                .required(true),
         )
         .arg(
             Arg::new("module")
                 .value_name("MODULE")
                 .help("The module inside the library that contains the parser")
                 .takes_value(true)
-                .required(true)
+                .required(true),
         )
         .get_matches();
 

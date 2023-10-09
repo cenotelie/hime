@@ -52,7 +52,7 @@ impl Fixtures {
         for (index, fixture) in self.0.iter().enumerate() {
             match fixture.grammars(index, filter) {
                 Ok(mut fixture_grammars) => grammars.append(&mut fixture_grammars),
-                Err(mut fixture_errors) => errors.append(&mut fixture_errors)
+                Err(mut fixture_errors) => errors.append(&mut fixture_errors),
             }
         }
 
@@ -61,7 +61,7 @@ impl Fixtures {
         for (index, grammar) in grammars.iter_mut().enumerate() {
             match grammar.build(None, index) {
                 Ok(data) => grammars_data.push(data),
-                Err(mut errs) => errors.append(&mut errs)
+                Err(mut errs) => errors.append(&mut errs),
             }
         }
 
@@ -89,7 +89,7 @@ impl Fixtures {
     fn build_rust_inner(
         grammars: &[Grammar],
         grammars_data: &[BuildData],
-        errors: &mut Vec<Error>
+        errors: &mut Vec<Error>,
     ) -> Result<(), Error> {
         let temp_dir = hime_sdk::output::temporary_folder();
         fs::create_dir_all(&temp_dir)?;
@@ -141,7 +141,7 @@ impl Fixtures {
     fn build_net_inner(
         grammars: &[Grammar],
         grammars_data: &[BuildData],
-        errors: &mut Vec<Error>
+        errors: &mut Vec<Error>,
     ) -> Result<(), Error> {
         let temp_dir = hime_sdk::output::temporary_folder();
         fs::create_dir_all(&temp_dir)?;
@@ -191,7 +191,7 @@ impl Fixtures {
     fn build_java_inner(
         grammars: &[Grammar],
         grammars_data: &[BuildData],
-        errors: &mut Vec<Error>
+        errors: &mut Vec<Error>,
     ) -> Result<(), Error> {
         let temp_dir = hime_sdk::output::temporary_folder();
         fs::create_dir_all(&temp_dir)?;
@@ -206,7 +206,7 @@ impl Fixtures {
             output_target_runtime_path: runtime_path.to_str().map(ToString::to_string),
             java_maven_repository: match std::env::var("HOME") {
                 Ok(home) => Some(format!("{home}/.m2/repository")),
-                Err(_) => None
+                Err(_) => None,
             },
             ..CompilationTask::default()
         };
@@ -240,7 +240,7 @@ impl Fixtures {
             .iter()
             .map(|fixture| LoadedInput {
                 name: fixture.name.clone(),
-                content: fixture.content.text.clone()
+                content: fixture.content.text.clone(),
             })
             .collect()
     }
@@ -250,9 +250,9 @@ impl Fixtures {
         Errors {
             context: LoadedData {
                 inputs: self.get_loaded_inputs(),
-                grammars
+                grammars,
             },
-            errors
+            errors,
         }
     }
 
@@ -274,7 +274,7 @@ pub struct Fixture {
     /// The inner content for this ficture
     content: ParseResultAst,
     /// The tests in the fixture
-    pub tests: Vec<Test>
+    pub tests: Vec<Test>,
 }
 
 impl Fixture {
@@ -289,13 +289,13 @@ impl Fixture {
                 crate::loaders::ID_VARIABLE_TEST_OUTPUT => {
                     Test::Output(OutputTest::from_ast(node, index))
                 }
-                _ => Test::Parsing(ParsingTest::from_ast(node, index))
+                _ => Test::Parsing(ParsingTest::from_ast(node, index)),
             });
         }
         Fixture {
             name: name.to_string(),
             content,
-            tests
+            tests,
         }
     }
 
@@ -310,7 +310,7 @@ impl Fixture {
                 Some(filter) => test_node
                     .child(0)
                     .get_value()
-                    .map_or(true, |name| name.contains(filter))
+                    .map_or(true, |name| name.contains(filter)),
             })
             .map(|test_node| (index, test_node.child(1)))
             .collect();
@@ -322,7 +322,7 @@ impl Fixture {
                 reference,
                 reference,
                 OPTION_METHOD.to_string(),
-                method_node.get_value().unwrap().to_lowercase()
+                method_node.get_value().unwrap().to_lowercase(),
             );
         }
         Ok(grammars)
@@ -338,7 +338,7 @@ impl Fixture {
             .collect::<Result<Vec<_>, _>>()?;
         Ok(FixtureResults {
             name: self.name.clone(),
-            tests: results
+            tests: results,
         })
     }
 }
@@ -348,7 +348,7 @@ pub enum Test {
     /// An output test
     Output(OutputTest),
     /// A parsing test
-    Parsing(ParsingTest)
+    Parsing(ParsingTest),
 }
 
 impl Test {
@@ -358,8 +358,8 @@ impl Test {
             None => true,
             Some(filter) => match self {
                 Test::Output(inner) => inner.name.contains(filter),
-                Test::Parsing(inner) => inner.name.contains(filter)
-            }
+                Test::Parsing(inner) => inner.name.contains(filter),
+            },
         }
     }
 
@@ -367,7 +367,7 @@ impl Test {
     pub fn execute(&self) -> Result<TestResult, Error> {
         match self {
             Test::Output(inner) => inner.execute(),
-            Test::Parsing(inner) => inner.execute()
+            Test::Parsing(inner) => inner.execute(),
         }
     }
 }
@@ -381,7 +381,7 @@ pub struct OutputTest {
     /// The input for the parser
     pub input: String,
     /// The expected output
-    pub output: Vec<String>
+    pub output: Vec<String>,
 }
 
 impl OutputTest {
@@ -403,7 +403,7 @@ impl OutputTest {
             name: name.to_string(),
             index,
             input: input.to_string(),
-            output
+            output,
         }
     }
 
@@ -428,7 +428,7 @@ impl OutputTest {
             name: self.name.clone(),
             dot_net: Some(result_net),
             java: Some(result_java),
-            rust: Some(result_rust)
+            rust: Some(result_rust),
         })
     }
 
@@ -442,7 +442,7 @@ impl OutputTest {
         execute_command(
             Runtime::Net,
             "mono",
-            &["executor-net.exe", &name, "outputs"]
+            &["executor-net.exe", &name, "outputs"],
         )
     }
 
@@ -456,7 +456,7 @@ impl OutputTest {
         execute_command(
             Runtime::Java,
             "java",
-            &["-jar", "executor-java.jar", &name, "outputs"]
+            &["-jar", "executor-java.jar", &name, "outputs"],
         )
     }
 
@@ -472,7 +472,7 @@ impl OutputTest {
         execute_command(
             Runtime::Rust,
             program.to_str().unwrap(),
-            &[&name, "outputs"]
+            &[&name, "outputs"],
         )
     }
 }
@@ -484,7 +484,7 @@ pub enum ParsingTestVerb {
     /// The produced AST does NOT match the provided one
     NoMatch,
     /// The parsing fails
-    Fails
+    Fails,
 }
 
 impl ParsingTestVerb {
@@ -493,7 +493,7 @@ impl ParsingTestVerb {
         match self {
             ParsingTestVerb::Matches => "matches",
             ParsingTestVerb::NoMatch => "nomatches",
-            ParsingTestVerb::Fails => "fails"
+            ParsingTestVerb::Fails => "fails",
         }
     }
 }
@@ -509,7 +509,7 @@ pub struct ParsingTest {
     /// The input for the parser
     pub input: String,
     /// The string serialization of the reference AST
-    pub tree: String
+    pub tree: String,
 }
 
 impl ParsingTest {
@@ -519,7 +519,7 @@ impl ParsingTest {
         let verb = match node.get_symbol().id {
             crate::loaders::ID_VARIABLE_TEST_MATCHES => ParsingTestVerb::Matches,
             crate::loaders::ID_VARIABLE_TEST_NO_MATCH => ParsingTestVerb::NoMatch,
-            _ => ParsingTestVerb::Fails
+            _ => ParsingTestVerb::Fails,
         };
         let input = hime_sdk::loaders::replace_escapees(node.child(3).get_value().unwrap());
         let tree = if node.children_count() >= 5 {
@@ -534,7 +534,7 @@ impl ParsingTest {
             index,
             verb,
             input: input.to_string(),
-            tree
+            tree,
         }
     }
 
@@ -589,7 +589,7 @@ impl ParsingTest {
             name: self.name.clone(),
             dot_net: Some(result_net),
             java: Some(result_java),
-            rust: Some(result_rust)
+            rust: Some(result_rust),
         })
     }
 
@@ -603,7 +603,7 @@ impl ParsingTest {
         execute_command(
             Runtime::Net,
             "mono",
-            &["executor-net.exe", &name, self.verb.as_str()]
+            &["executor-net.exe", &name, self.verb.as_str()],
         )
     }
 
@@ -617,7 +617,7 @@ impl ParsingTest {
         execute_command(
             Runtime::Java,
             "java",
-            &["-jar", "executor-java.jar", &name, self.verb.as_str()]
+            &["-jar", "executor-java.jar", &name, self.verb.as_str()],
         )
     }
 
@@ -633,7 +633,7 @@ impl ParsingTest {
         execute_command(
             Runtime::Rust,
             program.to_str().unwrap(),
-            &[&name, self.verb.as_str()]
+            &[&name, self.verb.as_str()],
         )
     }
 }
@@ -642,7 +642,7 @@ impl ParsingTest {
 fn execute_command(
     runtime: Runtime,
     program: &str,
-    args: &[&str]
+    args: &[&str],
 ) -> Result<TestResultOnRuntime, Error> {
     let mut command = Command::new(program);
     command.args(args);
@@ -655,7 +655,7 @@ fn execute_command(
     let status = match output.status.code() {
         Some(0) => TestResultStatus::Success,
         Some(1) => TestResultStatus::Failure,
-        _ => TestResultStatus::Error
+        _ => TestResultStatus::Error,
     };
     Ok(TestResultOnRuntime {
         runtime,
@@ -663,7 +663,7 @@ fn execute_command(
         spent_time,
         status,
         stdout,
-        stderr
+        stderr,
     })
 }
 

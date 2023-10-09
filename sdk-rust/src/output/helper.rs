@@ -319,7 +319,7 @@ pub fn write_u32(writer: &mut dyn Write, value: u32) -> Result<(), io::Error> {
         (value & 0xFF) as u8,
         ((value & 0x0000_FF00) >> 8) as u8,
         ((value & 0x00FF_0000) >> 16) as u8,
-        (value >> 24) as u8
+        (value >> 24) as u8,
     ];
     writer.write_all(&buffer)
 }

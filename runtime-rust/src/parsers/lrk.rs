@@ -27,7 +27,7 @@ use super::{
     LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_NONE, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT,
     LR_OP_CODE_BASE_ADD_VIRTUAL, LR_OP_CODE_BASE_SEMANTIC_ACTION, TREE_ACTION_DROP,
     TREE_ACTION_NONE, TREE_ACTION_PROMOTE, TREE_ACTION_REPLACE_BY_CHILDREN,
-    TREE_ACTION_REPLACE_BY_EPSILON
+    TREE_ACTION_REPLACE_BY_EPSILON,
 };
 use crate::ast::{AstImpl, TableElemRef, TableType};
 use crate::errors::ParseErrorUnexpectedToken;
@@ -48,7 +48,7 @@ pub struct LRkAutomaton {
     /// The LR table
     table: Vec<u16>,
     /// The table of LR productions
-    productions: Vec<LRProduction>
+    productions: Vec<LRProduction>,
 }
 
 impl LRkAutomaton {
@@ -84,7 +84,7 @@ impl LRkAutomaton {
             columns_map,
             contexts,
             table,
-            productions
+            productions,
         }
     }
 
@@ -124,7 +124,7 @@ impl LRkAutomaton {
     pub fn get_action_at(&self, state: u32, column: usize) -> LRAction {
         LRAction {
             table: &self.table,
-            offset: (state as usize * self.columns_count + column) * 2
+            offset: (state as usize * self.columns_count + column) * 2,
         }
     }
 
@@ -161,7 +161,7 @@ struct LRkAstReduction {
     /// The sub-tree build-up cache
     cache: SubTree,
     /// The number of items popped from the stack
-    pop_count: usize
+    pop_count: usize,
 }
 
 impl LRkAstReduction {
@@ -186,7 +186,7 @@ struct LRkAstBuilder<'s, 't, 'a> {
     /// The reduction handle represented as the indices of the sub-trees in the cache
     handle: Vec<usize>,
     /// The data of the current reduction
-    reduction: Option<LRkAstReduction>
+    reduction: Option<LRkAstReduction>,
 }
 
 impl<'s, 't, 'a> SemanticBody for LRkAstBuilder<'s, 't, 'a> {
@@ -197,7 +197,7 @@ impl<'s, 't, 'a> SemanticBody for LRkAstBuilder<'s, 't, 'a> {
                 let label = data.cache.get_label_at(self.handle[index]);
                 match label.table_type() {
                     TableType::Token => SemanticElement::Token(
-                        self.lexer.get_data().repository.get_token(label.index())
+                        self.lexer.get_data().repository.get_token(label.index()),
                     ),
                     TableType::Variable => SemanticElement::Variable(self.variables[label.index()]),
                     TableType::Virtual => SemanticElement::Virtual(self.virtuals[label.index()]),
@@ -220,7 +220,7 @@ impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
         lexer: &'a mut Lexer<'s, 't, 'a>,
         variables: &'a [Symbol<'s>],
         virtuals: &'a [Symbol<'s>],
-        result: &'a mut AstImpl
+        result: &'a mut AstImpl,
     ) -> LRkAstBuilder<'s, 't, 'a> {
         LRkAstBuilder {
             lexer,
@@ -229,7 +229,7 @@ impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
             stack: Vec::new(),
             result,
             handle: Vec::new(),
-            reduction: None
+            reduction: None,
         }
     }
 
@@ -249,12 +249,12 @@ impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
         let mut cache = SubTree::new(estimation);
         cache.setup_root(
             TableElemRef::new(TableType::Variable, variable_index),
-            action
+            action,
         );
         self.reduction = Some(LRkAstReduction {
             length,
             cache,
-            pop_count: 0
+            pop_count: 0,
         });
     }
 
@@ -263,7 +263,7 @@ impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
         reduction: &mut LRkAstReduction,
         handle: &mut Vec<usize>,
         sub: &SubTree,
-        action: TreeAction
+        action: TreeAction,
     ) {
         if sub.get_action_at(0) == TREE_ACTION_REPLACE_BY_CHILDREN {
             let children_count = sub.get_children_count_at(0);
@@ -397,7 +397,7 @@ struct LRkHead {
     /// The automaton's state
     state: u32,
     /// The symbol identifier
-    identifier: u32
+    identifier: u32,
 }
 
 struct LRkParserData<'s, 'a> {
@@ -408,7 +408,7 @@ struct LRkParserData<'s, 'a> {
     /// The grammar variables
     variables: &'a [Symbol<'s>],
     /// The semantic actions
-    actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+    actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
 }
 
 impl<'s, 'a> ContextProvider for LRkParserData<'s, 'a> {
@@ -419,7 +419,7 @@ impl<'s, 'a> ContextProvider for LRkParserData<'s, 'a> {
         &self,
         token_count: usize,
         context: u16,
-        terminal_id: u32
+        terminal_id: u32,
     ) -> Option<usize> {
         // the default context is always active
         if context == DEFAULT_CONTEXT {
@@ -499,7 +499,7 @@ impl<'s, 'a> ContextProvider for LRkParserData<'s, 'a> {
                 .get_action(my_stack[my_stack.len() - 1].state, variable.id);
             my_stack.push(LRkHead {
                 state: u32::from(action.get_data()),
-                identifier: variable.id
+                identifier: variable.id,
             });
             // now, get the new action for the terminal
             action = self
@@ -547,7 +547,7 @@ impl<'s, 't, 'a> LRkParserData<'s, 'a> {
                     .get_action(my_stack[my_stack.len() - 1].state, variable.id);
                 my_stack.push(LRkHead {
                     state: u32::from(action.get_data()),
-                    identifier: variable.id
+                    identifier: variable.id,
                 });
                 // now, get the new action for the terminal
                 action = self
@@ -569,7 +569,7 @@ impl<'s, 't, 'a> LRkParserData<'s, 'a> {
             if action.get_code() == LR_ACTION_CODE_SHIFT {
                 stack.push(LRkHead {
                     state: u32::from(action.get_data()),
-                    identifier: kernel.terminal_id
+                    identifier: kernel.terminal_id,
                 });
                 builder.push_token(kernel.index as usize);
                 return action.get_code();
@@ -584,11 +584,11 @@ impl<'s, 't, 'a> LRkParserData<'s, 'a> {
             stack.truncate(length - production.reduction_length);
             let action = self.automaton.get_action(
                 stack[stack.len() - 1].state,
-                builder.variables[production.head].id
+                builder.variables[production.head].id,
             );
             stack.push(LRkHead {
                 state: u32::from(action.get_data()),
-                identifier: variable.id
+                identifier: variable.id,
             });
         }
     }
@@ -597,13 +597,13 @@ impl<'s, 't, 'a> LRkParserData<'s, 'a> {
     fn reduce(
         production: &LRProduction,
         builder: &mut LRkAstBuilder<'s, 't, 'a>,
-        actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+        actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
     ) -> Symbol<'s> {
         let variable = builder.variables[production.head];
         builder.reduction_prepare(
             production.head,
             production.reduction_length,
-            production.head_action
+            production.head_action,
         );
         let mut i = 0;
         while i < production.bytecode.len() {
@@ -635,7 +635,7 @@ pub struct LRkParser<'s, 't, 'a> {
     /// The parser's data
     data: LRkParserData<'s, 'a>,
     /// The AST builder
-    builder: LRkAstBuilder<'s, 't, 'a>
+    builder: LRkAstBuilder<'s, 't, 'a>,
 }
 
 impl<'s, 't, 'a> LRkParser<'s, 't, 'a> {
@@ -646,7 +646,7 @@ impl<'s, 't, 'a> LRkParser<'s, 't, 'a> {
         virtuals: &'a [Symbol<'s>],
         automaton: LRkAutomaton,
         ast: &'a mut AstImpl,
-        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody)
+        actions: &'a mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
     ) -> LRkParser<'s, 't, 'a> {
         LRkParser {
             data: LRkParserData {
@@ -656,9 +656,9 @@ impl<'s, 't, 'a> LRkParser<'s, 't, 'a> {
                     identifier: 0
                 }],
                 variables,
-                actions
+                actions,
             },
-            builder: LRkAstBuilder::<'s, 't, 'a>::new(lexer, variables, virtuals, ast)
+            builder: LRkAstBuilder::<'s, 't, 'a>::new(lexer, variables, virtuals, ast),
         }
     }
 
@@ -697,7 +697,7 @@ impl<'s, 't, 'a> LRkParser<'s, 't, 'a> {
             token.get_symbol(),
             #[cfg(feature = "debug")]
             alloc::vec![state],
-            my_expected
+            my_expected,
         )
     }
 }

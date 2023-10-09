@@ -34,7 +34,7 @@ pub struct SubTree {
     /// The nodes in this buffer
     nodes: Vec<AstCell>,
     /// The tree actions for the nodes
-    actions: Vec<TreeAction>
+    actions: Vec<TreeAction>,
 }
 
 impl SubTree {
@@ -43,7 +43,7 @@ impl SubTree {
     pub fn new(size: usize) -> SubTree {
         SubTree {
             nodes: Vec::with_capacity(size),
-            actions: Vec::with_capacity(size)
+            actions: Vec::with_capacity(size),
         }
     }
 
@@ -99,7 +99,7 @@ impl SubTree {
         self.nodes.push(AstCell {
             label: symbol,
             count: 0,
-            first: 0
+            first: 0,
         });
         self.actions.push(action);
     }
@@ -158,7 +158,7 @@ impl SubTree {
         self.nodes.push(AstCell {
             label: symbol,
             count: 0,
-            first: 0
+            first: 0,
         });
         self.actions.push(action);
         result

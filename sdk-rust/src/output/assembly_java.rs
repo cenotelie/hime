@@ -36,7 +36,7 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
         execute_mvn_command(
             &runtime_path,
             &["clean", "install", "-Dgpg.skip=true"],
-            task.java_maven_repository.as_deref()
+            task.java_maven_repository.as_deref(),
         )?;
     }
     // build the project
@@ -45,7 +45,7 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
     execute_mvn_command(
         &project_folder,
         &["package"],
-        task.java_maven_repository.as_deref()
+        task.java_maven_repository.as_deref(),
     )?;
     // copy the output
     let mut output_file = project_folder.clone();
@@ -95,7 +95,7 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
 /// Builds the cargo project
 fn build_maven_project(
     task: &CompilationTask,
-    units: &[(usize, &Grammar)]
+    units: &[(usize, &Grammar)],
 ) -> Result<PathBuf, Error> {
     let project_folder = output::temporary_folder();
     fs::create_dir_all(&project_folder)?;
@@ -149,7 +149,7 @@ fn create_namespace_folder(root: &Path, parts: &[&str]) -> Result<PathBuf, Error
 fn get_namespace(task: &CompilationTask, grammar: &Grammar) -> String {
     let nmspace = match task.get_output_namespace(grammar) {
         Some(nmspace) => nmspace,
-        None => grammar.name.clone()
+        None => grammar.name.clone(),
     };
     helper::get_namespace_java(&nmspace)
 }
@@ -158,7 +158,7 @@ fn get_namespace(task: &CompilationTask, grammar: &Grammar) -> String {
 fn execute_mvn_command(
     project_folder: &Path,
     args: &[&str],
-    maven_repository: Option<&str>
+    maven_repository: Option<&str>,
 ) -> Result<(), Error> {
     let (executable, prefix_args) = get_mvn_command();
     let mut command = Command::new(executable);

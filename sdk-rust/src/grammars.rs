@@ -48,7 +48,7 @@ pub struct TerminalReference {
     /// The identifier of the referring terminal
     pub referring_id: usize,
     /// The input reference
-    pub input_ref: InputReference
+    pub input_ref: InputReference,
 }
 
 /// Represents a terminal symbol in a grammar
@@ -71,7 +71,7 @@ pub struct Terminal {
     /// Whether the terminal is a fragment
     pub is_fragment: bool,
     /// The references to this terminal by others
-    pub terminal_references: Vec<TerminalReference>
+    pub terminal_references: Vec<TerminalReference>,
 }
 
 impl Terminal {
@@ -139,7 +139,7 @@ pub enum TerminalRef {
     /// Represents the absence of terminal, used as a marker by LR-related algorithms
     NullTerminal,
     /// A terminal in a grammar
-    Terminal(usize)
+    Terminal(usize),
 }
 
 impl TerminalRef {
@@ -150,7 +150,7 @@ impl TerminalRef {
             TerminalRef::Dummy | TerminalRef::NullTerminal => 0,
             TerminalRef::Epsilon => 1,
             TerminalRef::Dollar => 2,
-            TerminalRef::Terminal(id) => id
+            TerminalRef::Terminal(id) => id,
         }
     }
 
@@ -177,7 +177,7 @@ impl PartialOrd for TerminalRef {
 #[derive(Debug, Clone, Default, Eq)]
 pub struct TerminalSet {
     /// The backing content
-    pub content: Vec<TerminalRef>
+    pub content: Vec<TerminalRef>,
 }
 
 impl PartialEq for TerminalSet {
@@ -195,7 +195,7 @@ impl TerminalSet {
     #[must_use]
     pub fn single(terminal: TerminalRef) -> TerminalSet {
         TerminalSet {
-            content: vec![terminal]
+            content: vec![terminal],
         }
     }
 
@@ -255,7 +255,7 @@ pub struct Virtual {
     /// The unique indentifier (within a grammar) of this symbol
     pub id: usize,
     /// The name of this symbol
-    pub name: String
+    pub name: String,
 }
 
 impl Virtual {
@@ -297,7 +297,7 @@ pub struct Action {
     /// The unique indentifier (within a grammar) of this symbol
     pub id: usize,
     /// The name of this symbol
-    pub name: String
+    pub name: String,
 }
 
 impl Action {
@@ -347,7 +347,7 @@ pub struct Variable {
     /// The FIRSTS set for this variable
     pub firsts: TerminalSet,
     /// The FOLLOWERS set for this variable
-    pub followers: TerminalSet
+    pub followers: TerminalSet,
 }
 
 impl Variable {
@@ -360,7 +360,7 @@ impl Variable {
             generated_for,
             rules: Vec::new(),
             firsts: TerminalSet::default(),
-            followers: TerminalSet::default()
+            followers: TerminalSet::default(),
         }
     }
 
@@ -452,7 +452,7 @@ pub enum SymbolRef {
     /// A virtual symbol in a grammar
     Virtual(usize),
     /// An action symbol in a grammar
-    Action(usize)
+    Action(usize),
 }
 
 impl SymbolRef {
@@ -466,7 +466,7 @@ impl SymbolRef {
             SymbolRef::Terminal(id)
             | SymbolRef::Variable(id)
             | SymbolRef::Virtual(id)
-            | SymbolRef::Action(id) => id
+            | SymbolRef::Action(id) => id,
         }
     }
 }
@@ -490,7 +490,7 @@ impl From<TerminalRef> for SymbolRef {
             TerminalRef::Epsilon => SymbolRef::Epsilon,
             TerminalRef::Dollar => SymbolRef::Dollar,
             TerminalRef::NullTerminal => SymbolRef::NullTerminal,
-            TerminalRef::Terminal(id) => SymbolRef::Terminal(id)
+            TerminalRef::Terminal(id) => SymbolRef::Terminal(id),
         }
     }
 }
@@ -503,7 +503,7 @@ pub struct RuleBodyElement {
     /// The action applied on this element
     pub action: TreeAction,
     /// The reference to this body element in the input
-    pub input_ref: Option<InputReference>
+    pub input_ref: Option<InputReference>,
 }
 
 impl PartialEq for RuleBodyElement {
@@ -518,12 +518,12 @@ impl RuleBodyElement {
     pub fn new(
         symbol: SymbolRef,
         action: TreeAction,
-        input_ref: Option<InputReference>
+        input_ref: Option<InputReference>,
     ) -> RuleBodyElement {
         RuleBodyElement {
             symbol,
             action,
-            input_ref
+            input_ref,
         }
     }
 
@@ -533,7 +533,7 @@ impl RuleBodyElement {
         RuleBodyElement {
             symbol: self.symbol,
             action: TREE_ACTION_NONE,
-            input_ref: self.input_ref
+            input_ref: self.input_ref,
         }
     }
 }
@@ -544,7 +544,7 @@ pub struct RuleChoice {
     /// The elements in this body
     pub elements: Vec<RuleBodyElement>,
     /// The FIRSTS set of terminals
-    pub firsts: TerminalSet
+    pub firsts: TerminalSet,
 }
 
 impl RuleChoice {
@@ -553,7 +553,7 @@ impl RuleChoice {
     pub fn from_single_part(element: &RuleBodyElement) -> RuleChoice {
         RuleChoice {
             elements: vec![element.no_action()],
-            firsts: TerminalSet::default()
+            firsts: TerminalSet::default(),
         }
     }
 
@@ -563,7 +563,7 @@ impl RuleChoice {
         RuleBody {
             elements,
             firsts: TerminalSet::default(),
-            choices: Vec::new()
+            choices: Vec::new(),
         }
     }
 
@@ -595,7 +595,7 @@ impl RuleChoice {
     pub fn compute_firsts(
         &mut self,
         next: &TerminalSet,
-        firsts_for_var: &mut HashMap<usize, TerminalSet>
+        firsts_for_var: &mut HashMap<usize, TerminalSet>,
     ) -> bool {
         // If the choice is empty : Add the ε to the Firsts and return
         if self.elements.is_empty() {
@@ -623,7 +623,7 @@ impl RuleChoice {
             SymbolRef::Epsilon => self.firsts.add(TerminalRef::Epsilon),
             SymbolRef::Dollar => self.firsts.add(TerminalRef::Dollar),
             SymbolRef::NullTerminal => self.firsts.add(TerminalRef::NullTerminal),
-            _ => false
+            _ => false,
         }
     }
 }
@@ -653,7 +653,7 @@ pub trait RuleBodyTrait {
 /// A set of rule bodies
 pub struct BodySet<T: RuleBodyTrait> {
     /// The bodies in the set
-    pub bodies: Vec<T>
+    pub bodies: Vec<T>,
 }
 
 impl<T: RuleBodyTrait> BodySet<T> {
@@ -694,7 +694,7 @@ pub struct RuleBody {
     /// The FIRSTS set of terminals
     pub firsts: TerminalSet,
     /// The choices in this body
-    pub choices: Vec<RuleChoice>
+    pub choices: Vec<RuleChoice>,
 }
 
 impl RuleBodyTrait for RuleBody {
@@ -709,7 +709,7 @@ impl RuleBodyTrait for RuleBody {
         RuleBody {
             elements,
             firsts: TerminalSet::default(),
-            choices: Vec::new()
+            choices: Vec::new(),
         }
     }
 
@@ -727,7 +727,7 @@ impl RuleBody {
         RuleBody {
             elements: Vec::new(),
             firsts: TerminalSet::default(),
-            choices: Vec::new()
+            choices: Vec::new(),
         }
     }
 
@@ -738,10 +738,10 @@ impl RuleBody {
             elements: vec![RuleBodyElement::new(
                 symbol,
                 TREE_ACTION_NONE,
-                Some(input_ref)
+                Some(input_ref),
             )],
             firsts: TerminalSet::default(),
-            choices: Vec::new()
+            choices: Vec::new(),
         }
     }
 
@@ -751,7 +751,7 @@ impl RuleBody {
         RuleBody {
             elements,
             firsts: TerminalSet::default(),
-            choices: Vec::new()
+            choices: Vec::new(),
         }
     }
 
@@ -838,7 +838,7 @@ impl RuleBody {
     pub fn propagate_followers(
         &self,
         head: usize,
-        followers: &mut HashMap<usize, TerminalSet>
+        followers: &mut HashMap<usize, TerminalSet>,
     ) -> bool {
         let mut modified = false;
         // For all choices but the last (empty)
@@ -885,7 +885,7 @@ pub struct Rule {
     /// The rule's body
     pub body: RuleBody,
     /// The lexical context pushed by this rule
-    pub context: usize
+    pub context: usize,
 }
 
 impl Rule {
@@ -896,14 +896,14 @@ impl Rule {
         head_action: TreeAction,
         input_ref: InputReference,
         body: RuleBody,
-        context: usize
+        context: usize,
     ) -> Rule {
         Rule {
             head,
             head_action,
             head_input_ref: input_ref,
             body,
-            context
+            context,
         }
     }
 }
@@ -922,7 +922,7 @@ pub struct RuleRef {
     /// The identifier of the variable
     pub variable: usize,
     /// The index of the rule for the variable
-    pub index: usize
+    pub index: usize,
 }
 
 impl RuleRef {
@@ -954,7 +954,7 @@ pub struct RuleChoiceRef {
     /// The associated rule
     pub rule: RuleRef,
     /// The position within the rule
-    pub position: usize
+    pub position: usize,
 }
 
 impl RuleChoiceRef {
@@ -963,7 +963,7 @@ impl RuleChoiceRef {
     pub fn new(variable: usize, index: usize, position: usize) -> RuleChoiceRef {
         RuleChoiceRef {
             rule: RuleRef::new(variable, index),
-            position
+            position,
         }
     }
 }
@@ -976,7 +976,7 @@ pub struct TemplateRuleRef {
     /// The input reference for this call
     pub input_ref: InputReference,
     /// The arguments to the template
-    pub arguments: Vec<TemplateRuleSymbol>
+    pub arguments: Vec<TemplateRuleSymbol>,
 }
 
 /// A symbol in a template rule
@@ -987,7 +987,7 @@ pub enum TemplateRuleSymbol {
     /// A usual reference to a grammar symbol
     Symbol(SymbolRef),
     /// A call to template rule
-    Template(TemplateRuleRef)
+    Template(TemplateRuleRef),
 }
 
 /// An element in a template rule
@@ -998,7 +998,7 @@ pub struct TemplateRuleElement {
     /// The action applied on this element
     pub action: TreeAction,
     /// The reference to this body element in the input
-    pub input_ref: InputReference
+    pub input_ref: InputReference,
 }
 
 impl PartialEq for TemplateRuleElement {
@@ -1013,12 +1013,12 @@ impl TemplateRuleElement {
     pub fn new(
         symbol: TemplateRuleSymbol,
         action: TreeAction,
-        input_ref: InputReference
+        input_ref: InputReference,
     ) -> TemplateRuleElement {
         TemplateRuleElement {
             symbol,
             action,
-            input_ref
+            input_ref,
         }
     }
 }
@@ -1029,7 +1029,7 @@ pub struct TemplateRuleInstance {
     /// The arguments used for this instance
     pub arguments: Vec<SymbolRef>,
     /// The identifier of the produced head variable
-    pub head: usize
+    pub head: usize,
 }
 
 impl PartialEq for TemplateRuleInstance {
@@ -1049,7 +1049,7 @@ impl Eq for TemplateRuleInstance {}
 #[derive(Debug, Clone)]
 pub struct TemplateRuleBody {
     /// The elements in the rule's body
-    pub elements: Vec<TemplateRuleElement>
+    pub elements: Vec<TemplateRuleElement>,
 }
 
 impl RuleBodyTrait for TemplateRuleBody {
@@ -1076,7 +1076,7 @@ impl TemplateRuleBody {
     #[must_use]
     pub fn empty() -> TemplateRuleBody {
         TemplateRuleBody {
-            elements: Vec::new()
+            elements: Vec::new(),
         }
     }
 
@@ -1087,8 +1087,8 @@ impl TemplateRuleBody {
             elements: vec![TemplateRuleElement::new(
                 symbol,
                 TREE_ACTION_NONE,
-                input_ref
-            )]
+                input_ref,
+            )],
         }
     }
 }
@@ -1099,7 +1099,7 @@ pub struct TemplateRuleParam {
     /// The name of the parameter
     pub name: String,
     /// The input reference
-    pub input_ref: InputReference
+    pub input_ref: InputReference,
 }
 
 /// A template rule in a grammar
@@ -1118,7 +1118,7 @@ pub struct TemplateRule {
     /// The possible bodies for the template rule
     pub bodies: Vec<TemplateRuleBody>,
     /// The known instanes of this rule
-    pub instances: Vec<TemplateRuleInstance>
+    pub instances: Vec<TemplateRuleInstance>,
 }
 
 impl TemplateRule {
@@ -1127,7 +1127,7 @@ impl TemplateRule {
     pub fn new(
         name: String,
         input_ref: InputReference,
-        parameters: Vec<TemplateRuleParam>
+        parameters: Vec<TemplateRuleParam>,
     ) -> TemplateRule {
         TemplateRule {
             name,
@@ -1136,7 +1136,7 @@ impl TemplateRule {
             head_action: TREE_ACTION_NONE,
             context: 0,
             bodies: Vec::new(),
-            instances: Vec::new()
+            instances: Vec::new(),
         }
     }
 
@@ -1196,7 +1196,7 @@ pub struct GrammarOption {
     /// The reference in the input for this option's value
     pub value_input_ref: InputReference,
     /// The option's value
-    pub value: String
+    pub value: String,
 }
 
 /// Represents a grammar
@@ -1221,7 +1221,7 @@ pub struct Grammar {
     /// The grammar's action symbols
     pub actions: Vec<Action>,
     /// The template rules
-    pub template_rules: Vec<TemplateRule>
+    pub template_rules: Vec<TemplateRule>,
 }
 
 /// Represents the build data for a grammar
@@ -1236,7 +1236,7 @@ pub struct BuildData {
     /// The parsing method
     pub method: ParsingMethod,
     /// The LR graph
-    pub graph: Graph
+    pub graph: Graph,
 }
 
 impl Grammar {
@@ -1253,7 +1253,7 @@ impl Grammar {
             variables: Vec::new(),
             virtuals: Vec::new(),
             actions: Vec::new(),
-            template_rules: Vec::new()
+            template_rules: Vec::new(),
         }
     }
 
@@ -1270,15 +1270,15 @@ impl Grammar {
         name_input_ref: InputReference,
         value_input_ref: InputReference,
         name: String,
-        value: String
+        value: String,
     ) {
         self.options.insert(
             name,
             GrammarOption {
                 name_input_ref,
                 value_input_ref,
-                value
-            }
+                value,
+            },
         );
     }
 
@@ -1340,7 +1340,7 @@ impl Grammar {
                 .iter()
                 .find(|s| s.id == id)
                 .map(|s| &s.name)
-                .unwrap()
+                .unwrap(),
         }
     }
 
@@ -1358,7 +1358,7 @@ impl Grammar {
                 .find(|s| s.id == id)
                 .map(|s| &s.value)
                 .unwrap(),
-            _ => self.get_symbol_name(symbol)
+            _ => self.get_symbol_name(symbol),
         }
     }
 
@@ -1378,7 +1378,7 @@ impl Grammar {
         &mut self,
         value: String,
         input_ref: InputReference,
-        nfa: NFA
+        nfa: NFA,
     ) -> &mut Terminal {
         let name = format!("{}{}", PREFIX_GENERATED_TERMINAL, generate_unique_id());
         self.add_terminal(name, value, input_ref, nfa, 0, true, false)
@@ -1395,7 +1395,7 @@ impl Grammar {
         input_ref: InputReference,
         nfa: NFA,
         context: &str,
-        is_fragment: bool
+        is_fragment: bool,
     ) -> &mut Terminal {
         let context = self.contexts.iter().position(|c| c == context).unwrap();
         let value = name.clone();
@@ -1412,7 +1412,7 @@ impl Grammar {
         nfa: NFA,
         context: usize,
         is_anonymous: bool,
-        is_fragment: bool
+        is_fragment: bool,
     ) -> &mut Terminal {
         let index = self.terminals.len();
         let terminal = Terminal {
@@ -1424,7 +1424,7 @@ impl Grammar {
             context,
             is_anonymous,
             is_fragment,
-            terminal_references: Vec::new()
+            terminal_references: Vec::new(),
         };
         self.terminals.push(terminal);
         &mut self.terminals[index]
@@ -1465,7 +1465,9 @@ impl Grammar {
             | TerminalRef::Epsilon
             | TerminalRef::Dollar
             | TerminalRef::NullTerminal => 0,
-            TerminalRef::Terminal(id) => self.terminals.iter().find(|t| t.id == id).unwrap().context
+            TerminalRef::Terminal(id) => {
+                self.terminals.iter().find(|t| t.id == id).unwrap().context
+            }
         }
     }
 
@@ -1570,7 +1572,7 @@ impl Grammar {
         &mut self,
         name: &str,
         input_ref: InputReference,
-        parameters: Vec<TemplateRuleParam>
+        parameters: Vec<TemplateRuleParam>,
     ) -> &mut TemplateRule {
         if let Some(index) = self.template_rules.iter().position(|v| v.name == name) {
             return &mut self.template_rules[index];
@@ -1585,7 +1587,7 @@ impl Grammar {
     pub fn generate_template_rule(
         &mut self,
         input_ref: InputReference,
-        parameters: Vec<TemplateRuleParam>
+        parameters: Vec<TemplateRuleParam>,
     ) -> &mut TemplateRule {
         let sid = self.get_next_sid();
         let name = format!("{PREFIX_GENERATED_VARIABLE}{sid}");
@@ -1601,7 +1603,7 @@ impl Grammar {
         &mut self,
         name: &str,
         call_ref: InputReference,
-        arguments: Vec<SymbolRef>
+        arguments: Vec<SymbolRef>,
     ) -> Result<SymbolRef, Error> {
         match self.template_rules.iter().position(|r| r.name == name) {
             None => Err(Error::TemplateRuleNotFound(call_ref, name.to_string())),
@@ -1613,7 +1615,7 @@ impl Grammar {
                     Err(Error::TemplateRuleWrongNumberOfArgs(
                         call_ref,
                         rule.parameters.len(),
-                        arguments.len()
+                        arguments.len(),
                     ))
                 }
             }
@@ -1625,7 +1627,7 @@ impl Grammar {
         &mut self,
         template_index: usize,
         instance_index: usize,
-        symbol: &TemplateRuleSymbol
+        symbol: &TemplateRuleSymbol,
     ) -> SymbolRef {
         match symbol {
             TemplateRuleSymbol::Parameter(index) => {
@@ -1638,13 +1640,13 @@ impl Grammar {
                     new_arguments.push(self.instantiate_template_symbol(
                         template_index,
                         instance_index,
-                        arg
+                        arg,
                     ));
                 }
                 self.instantiate_template_rule_at(
                     template_ref.template,
                     template_ref.input_ref,
-                    new_arguments
+                    new_arguments,
                 )
             }
         }
@@ -1655,7 +1657,7 @@ impl Grammar {
         &mut self,
         template_index: usize,
         call_ref: InputReference,
-        arguments: Vec<SymbolRef>
+        arguments: Vec<SymbolRef>,
     ) -> SymbolRef {
         let mut new_instance = TemplateRuleInstance { arguments, head: 0 };
         if let Some(instance) = self.template_rules[template_index]
@@ -1693,10 +1695,10 @@ impl Grammar {
                         symbol: self.instantiate_template_symbol(
                             template_index,
                             instance_index,
-                            &element.symbol
+                            &element.symbol,
                         ),
                         action: element.action,
-                        input_ref: Some(element.input_ref)
+                        input_ref: Some(element.input_ref),
                     });
                 }
                 bodies.push(RuleBody::from_parts(elements));
@@ -1709,7 +1711,7 @@ impl Grammar {
                         head_action,
                         head_input_ref: call_ref,
                         body,
-                        context
+                        context,
                     });
                 }
                 variable.id
@@ -1762,7 +1764,7 @@ impl Grammar {
                     context,
                     is_fragment: terminal.is_fragment,
                     is_anonymous: terminal.is_anonymous,
-                    terminal_references: Vec::new()
+                    terminal_references: Vec::new(),
                 });
             }
         }
@@ -1816,7 +1818,7 @@ impl Grammar {
                             RuleBodyElement::new(
                                 self.map_symbol_ref(other, element.symbol),
                                 element.action,
-                                element.input_ref
+                                element.input_ref,
                             )
                         })
                         .collect();
@@ -1825,7 +1827,7 @@ impl Grammar {
                         rule.head_action,
                         rule.head_input_ref,
                         RuleBody::from_parts(elements),
-                        context
+                        context,
                     )
                 })
                 .collect();
@@ -1842,7 +1844,7 @@ impl Grammar {
     fn inherit_template_rule_symbol(
         &self,
         other: &Grammar,
-        symbol: &TemplateRuleSymbol
+        symbol: &TemplateRuleSymbol,
     ) -> TemplateRuleSymbol {
         match symbol {
             TemplateRuleSymbol::Parameter(index) => TemplateRuleSymbol::Parameter(*index),
@@ -1865,7 +1867,7 @@ impl Grammar {
                         .arguments
                         .iter()
                         .map(|symbol| self.inherit_template_rule_symbol(other, symbol))
-                        .collect()
+                        .collect(),
                 })
             }
         }
@@ -1905,10 +1907,10 @@ impl Grammar {
                                     .iter()
                                     .map(|arg| self.map_symbol_ref(other, *arg))
                                     .collect(),
-                                head: new_variable.id
+                                head: new_variable.id,
                             }
                         })
-                        .collect()
+                        .collect(),
                 });
                 couples.push((index, rule));
             }
@@ -1922,7 +1924,7 @@ impl Grammar {
                     elements.push(TemplateRuleElement {
                         symbol,
                         action: element.action,
-                        input_ref: element.input_ref
+                        input_ref: element.input_ref,
                     });
                 }
                 self.template_rules[index]
@@ -2032,7 +2034,7 @@ impl Grammar {
                 RuleBodyElement::new(SymbolRef::Variable(axiom_id), TREE_ACTION_PROMOTE, None),
                 RuleBodyElement::new(SymbolRef::Dollar, TREE_ACTION_DROP, None),
             ]),
-            0
+            0,
         ));
         Ok(())
     }
@@ -2079,7 +2081,7 @@ impl Grammar {
     pub fn build(
         &mut self,
         parsing_method: Option<ParsingMethod>,
-        grammar_index: usize
+        grammar_index: usize,
     ) -> Result<BuildData, Vec<Error>> {
         if let Err(error) = self.prepare(grammar_index) {
             return Err(vec![error]);
@@ -2098,11 +2100,11 @@ impl Grammar {
         let expected = dfa.get_expected();
         let separator = match self.get_separator(grammar_index, &expected, &dfa) {
             Ok(separator) => separator,
-            Err(error) => return Err(vec![error])
+            Err(error) => return Err(vec![error]),
         };
         let method = match self.get_parsing_method(parsing_method, grammar_index) {
             Ok(method) => method,
-            Err(error) => return Err(vec![error])
+            Err(error) => return Err(vec![error]),
         };
         // Build the data for the parser
         let graph = crate::lr::build_graph(self, grammar_index, &expected, &dfa, method)?;
@@ -2111,7 +2113,7 @@ impl Grammar {
             expected,
             separator,
             method,
-            graph
+            graph,
         })
     }
 
@@ -2120,7 +2122,7 @@ impl Grammar {
         &self,
         grammar_index: usize,
         expected: &TerminalSet,
-        dfa: &DFA
+        dfa: &DFA,
     ) -> Result<Option<TerminalRef>, Error> {
         let Some(option) = self.get_option(OPTION_SEPARATOR) else {
             return Ok(None);
@@ -2143,8 +2145,8 @@ impl Grammar {
             grammar_index,
             UnmatchableTokenError {
                 terminal: terminal_ref,
-                overriders
-            }
+                overriders,
+            },
         ))
     }
 
@@ -2152,7 +2154,7 @@ impl Grammar {
     fn get_parsing_method(
         &self,
         parsing_method: Option<ParsingMethod>,
-        grammar_index: usize
+        grammar_index: usize,
     ) -> Result<ParsingMethod, Error> {
         match parsing_method {
             Some(method) => Ok(method),
@@ -2172,11 +2174,11 @@ impl Grammar {
                             String::from("lalr1"),
                             String::from("rnglr1"),
                             String::from("rnglalr1"),
-                        ]
-                    ))
+                        ],
+                    )),
                 },
-                None => Ok(ParsingMethod::LALR1)
-            }
+                None => Ok(ParsingMethod::LALR1),
+            },
         }
     }
 

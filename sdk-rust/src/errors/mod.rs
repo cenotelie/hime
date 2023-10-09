@@ -33,7 +33,7 @@ pub struct UnmatchableTokenError {
     /// The problematic terminal
     pub terminal: TerminalRef,
     /// The terminals that override the problematic one
-    pub overriders: Vec<TerminalRef>
+    pub overriders: Vec<TerminalRef>,
 }
 
 /// The global error type
@@ -95,7 +95,7 @@ pub enum Error {
     TerminalCannotBeMatched(usize, UnmatchableTokenError),
     /// A terminal matches the empty string
     /// (grammar_index, terminal)
-    TerminalMatchesEmpty(usize, TerminalRef)
+    TerminalMatchesEmpty(usize, TerminalRef),
 }
 
 impl From<io::Error> for Error {
@@ -167,7 +167,7 @@ impl Display for Error {
                     "{} conflict, cannot decide what to do",
                     match conflict.kind {
                         ConflictKind::ShiftReduce => "Shift/Reduce",
-                        ConflictKind::ReduceReduce => "Reduce/Reduce"
+                        ConflictKind::ReduceReduce => "Reduce/Reduce",
                     }
                 )
             }
@@ -188,7 +188,7 @@ impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Io(e) => Some(e),
-            _ => None
+            _ => None,
         }
     }
 }
@@ -198,11 +198,11 @@ impl Error {
     #[must_use]
     pub fn with_context<'context, 'error, 't>(
         &'error self,
-        context: &'context LoadedData<'t>
+        context: &'context LoadedData<'t>,
     ) -> ContextualizedError<'context, 'error, 't> {
         ContextualizedError {
             context,
-            error: self
+            error: self,
         }
     }
 }
@@ -213,7 +213,7 @@ pub struct ContextualizedError<'context, 'error, 't> {
     /// The contextual data
     pub context: &'context LoadedData<'t>,
     /// The error itself
-    pub error: &'error Error
+    pub error: &'error Error,
 }
 
 impl<'context, 'error, 't> Display for ContextualizedError<'context, 'error, 't> {
@@ -310,7 +310,7 @@ impl<'context, 'error, 't> Display for ContextualizedError<'context, 'error, 't>
                     "{} conflict, cannot decide what to do facing `{}`",
                     match conflict.kind {
                         ConflictKind::ShiftReduce => "Shift/Reduce",
-                        ConflictKind::ReduceReduce => "Reduce/Reduce"
+                        ConflictKind::ReduceReduce => "Reduce/Reduce",
                     },
                     terminal
                 )
@@ -349,7 +349,7 @@ pub struct Errors<'t> {
     /// The associated context
     pub context: LoadedData<'t>,
     /// The errors
-    pub errors: Vec<Error>
+    pub errors: Vec<Error>,
 }
 
 impl<'t> Errors<'t> {
@@ -386,6 +386,6 @@ impl<'t> std::error::Error for Errors<'t> {
 fn errors_into_static(errors: Errors<'_>) -> Errors<'static> {
     Errors {
         context: errors.context.into_static(),
-        errors: errors.errors
+        errors: errors.errors,
     }
 }

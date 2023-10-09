@@ -57,29 +57,29 @@ pub fn output_grammar_artifacts(
     task: &CompilationTask,
     grammar: &Grammar,
     grammar_index: usize,
-    data: &BuildData
+    data: &BuildData,
 ) -> Result<(), Vec<Error>> {
     // gather required options
     let mode = match task.get_mode_for(grammar, grammar_index) {
         Ok(mode) => mode,
-        Err(error) => return Err(vec![error])
+        Err(error) => return Err(vec![error]),
     };
     let runtime = match task.get_output_target_for(grammar, grammar_index) {
         Ok(runtime) => runtime,
-        Err(error) => return Err(vec![error])
+        Err(error) => return Err(vec![error]),
     };
     let nmspace = match task.get_output_namespace(grammar) {
         Some(nmspace) => nmspace,
-        None => grammar.name.clone()
+        None => grammar.name.clone(),
     };
     let nmspace = match runtime {
         Runtime::Net => helper::get_namespace_net(&nmspace),
         Runtime::Java => helper::get_namespace_java(&nmspace),
-        Runtime::Rust => helper::get_namespace_rust(&nmspace)
+        Runtime::Rust => helper::get_namespace_rust(&nmspace),
     };
     let modifier = match task.get_output_modifier_for(grammar, grammar_index) {
         Ok(modifier) => modifier,
-        Err(error) => return Err(vec![error])
+        Err(error) => return Err(vec![error]),
     };
 
     // write data
@@ -89,7 +89,7 @@ pub fn output_grammar_artifacts(
         get_lexer_bin_name(grammar, runtime),
         grammar,
         &data.dfa,
-        &data.expected
+        &data.expected,
     ) {
         return Err(vec![error]);
     }
@@ -100,7 +100,7 @@ pub fn output_grammar_artifacts(
                 get_parser_bin_name(grammar, runtime),
                 grammar,
                 &data.expected,
-                &data.graph
+                &data.graph,
             )
         }
         ParsingMethod::RNGLR1 | ParsingMethod::RNGLALR1 => {
@@ -109,7 +109,7 @@ pub fn output_grammar_artifacts(
                 get_parser_bin_name(grammar, runtime),
                 grammar,
                 &data.expected,
-                &data.graph
+                &data.graph,
             )
         }
     } {
@@ -125,7 +125,7 @@ pub fn output_grammar_artifacts(
                 &data.expected,
                 data.separator,
                 &nmspace,
-                modifier
+                modifier,
             ) {
                 return Err(vec![error]);
             }
@@ -136,7 +136,7 @@ pub fn output_grammar_artifacts(
                 &data.expected,
                 data.method,
                 &nmspace,
-                modifier
+                modifier,
             ) {
                 return Err(vec![error]);
             }
@@ -149,7 +149,7 @@ pub fn output_grammar_artifacts(
                 &data.expected,
                 data.separator,
                 &nmspace,
-                modifier
+                modifier,
             ) {
                 return Err(vec![error]);
             }
@@ -160,7 +160,7 @@ pub fn output_grammar_artifacts(
                 &data.expected,
                 data.method,
                 &nmspace,
-                modifier
+                modifier,
             ) {
                 return Err(vec![error]);
             }
@@ -178,7 +178,7 @@ pub fn output_grammar_artifacts(
                 data.method.is_rnglr(),
                 with_std,
                 suppress_module_doc,
-                compress_automata
+                compress_automata,
             ) {
                 return Err(vec![error]);
             }
@@ -191,7 +191,7 @@ pub fn output_grammar_artifacts(
                 &nmspace,
                 mode.output_assembly(),
                 with_std,
-                compress_automata
+                compress_automata,
             ) {
                 return Err(vec![error]);
             }
@@ -207,24 +207,24 @@ pub fn output_grammar_artifacts(
 /// Returns the errors produced by the grammar's compilation
 pub fn build_in_memory_grammar<'a>(
     grammar: &'a Grammar,
-    data: &BuildData
+    data: &BuildData,
 ) -> Result<InMemoryParser<'a>, Vec<Error>> {
     // get symbols
     let mut terminals: Vec<Symbol<'a>> = vec![
         Symbol {
             id: 0x01,
-            name: "ε"
+            name: "ε",
         },
         Symbol {
             id: 0x02,
-            name: "$"
+            name: "$",
         },
     ];
     for terminal_ref in data.expected.content.iter().skip(2) {
         if let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) {
             terminals.push(Symbol {
                 id: terminal.id as u32,
-                name: &terminal.value
+                name: &terminal.value,
             });
         }
     }
@@ -233,7 +233,7 @@ pub fn build_in_memory_grammar<'a>(
         .iter()
         .map(|variable| Symbol {
             id: variable.id as u32,
-            name: &variable.name
+            name: &variable.name,
         })
         .collect();
     let virtuals: Vec<Symbol<'a>> = grammar
@@ -241,7 +241,7 @@ pub fn build_in_memory_grammar<'a>(
         .iter()
         .map(|symbol| Symbol {
             id: symbol.id as u32,
-            name: &symbol.name
+            name: &symbol.name,
         })
         .collect();
 
@@ -258,14 +258,14 @@ pub fn build_in_memory_grammar<'a>(
             &mut parser_automaton,
             grammar,
             &data.expected,
-            &data.graph
+            &data.graph,
         )
     } else {
         parser_data::write_parser_rnglr_data(
             &mut parser_automaton,
             grammar,
             &data.expected,
-            &data.graph
+            &data.graph,
         )
     } {
         return Err(vec![error]);
@@ -278,7 +278,7 @@ pub fn build_in_memory_grammar<'a>(
         virtuals,
         separator: match data.separator {
             None => 0xFFFF,
-            Some(terminal_ref) => terminal_ref.sid() as u32
+            Some(terminal_ref) => terminal_ref.sid() as u32,
         },
         lexer_automaton: Automaton::new(&lexer_automaton),
         lexer_is_context_sensitive: grammar.contexts.len() > 1,
@@ -286,7 +286,7 @@ pub fn build_in_memory_grammar<'a>(
             ParserAutomaton::Rnglr(RNGLRAutomaton::new(&parser_automaton))
         } else {
             ParserAutomaton::Lrk(LRkAutomaton::new(&parser_automaton))
-        }
+        },
     })
 }
 
@@ -298,7 +298,7 @@ pub fn build_in_memory_grammar<'a>(
 pub fn get_sources(
     task: &CompilationTask,
     grammar: &Grammar,
-    grammar_index: usize
+    grammar_index: usize,
 ) -> Result<Vec<PathBuf>, Error> {
     let runtime = task.get_output_target_for(grammar, grammar_index)?;
     let output_path = task.get_output_path_for(grammar);
@@ -306,11 +306,11 @@ pub fn get_sources(
         Runtime::Net => vec![
             build_file(
                 output_path.as_ref(),
-                format!("{}Lexer.cs", helper::to_upper_camel_case(&grammar.name))
+                format!("{}Lexer.cs", helper::to_upper_camel_case(&grammar.name)),
             ),
             build_file(
                 output_path.as_ref(),
-                format!("{}Parser.cs", helper::to_upper_camel_case(&grammar.name))
+                format!("{}Parser.cs", helper::to_upper_camel_case(&grammar.name)),
             ),
             build_file(output_path.as_ref(), get_lexer_bin_name_net(grammar)),
             build_file(output_path.as_ref(), get_parser_bin_name_net(grammar)),
@@ -318,11 +318,11 @@ pub fn get_sources(
         Runtime::Java => vec![
             build_file(
                 output_path.as_ref(),
-                format!("{}Lexer.java", helper::to_upper_camel_case(&grammar.name))
+                format!("{}Lexer.java", helper::to_upper_camel_case(&grammar.name)),
             ),
             build_file(
                 output_path.as_ref(),
-                format!("{}Parser.java", helper::to_upper_camel_case(&grammar.name))
+                format!("{}Parser.java", helper::to_upper_camel_case(&grammar.name)),
             ),
             build_file(output_path.as_ref(), get_lexer_bin_name_java(grammar)),
             build_file(output_path.as_ref(), get_parser_bin_name_java(grammar)),
@@ -330,11 +330,11 @@ pub fn get_sources(
         Runtime::Rust => vec![
             build_file(
                 output_path.as_ref(),
-                format!("{}.rs", helper::to_snake_case(&grammar.name))
+                format!("{}.rs", helper::to_snake_case(&grammar.name)),
             ),
             build_file(output_path.as_ref(), get_lexer_bin_name_rust(grammar)),
             build_file(output_path.as_ref(), get_parser_bin_name_rust(grammar)),
-        ]
+        ],
     })
 }
 
@@ -357,12 +357,12 @@ fn build_file(path: Option<&String>, file_name: String) -> PathBuf {
 pub fn build_assembly(
     task: &CompilationTask,
     units: &[(usize, &Grammar)],
-    runtime: Runtime
+    runtime: Runtime,
 ) -> Result<(), Error> {
     match runtime {
         Runtime::Net => assembly_net::build(task, units),
         Runtime::Java => assembly_java::build(task, units),
-        Runtime::Rust => assembly_rust::build(task, units)
+        Runtime::Rust => assembly_rust::build(task, units),
     }
 }
 
@@ -371,7 +371,7 @@ fn get_lexer_bin_name(grammar: &Grammar, runtime: Runtime) -> String {
     match runtime {
         Runtime::Net => get_lexer_bin_name_net(grammar),
         Runtime::Java => get_lexer_bin_name_java(grammar),
-        Runtime::Rust => get_lexer_bin_name_rust(grammar)
+        Runtime::Rust => get_lexer_bin_name_rust(grammar),
     }
 }
 
@@ -395,7 +395,7 @@ fn get_parser_bin_name(grammar: &Grammar, runtime: Runtime) -> String {
     match runtime {
         Runtime::Net => get_parser_bin_name_net(grammar),
         Runtime::Java => get_parser_bin_name_java(grammar),
-        Runtime::Rust => get_parser_bin_name_rust(grammar)
+        Runtime::Rust => get_parser_bin_name_rust(grammar),
     }
 }
 

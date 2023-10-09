@@ -36,7 +36,7 @@ pub fn write(
     expected: &TerminalSet,
     separator: Option<TerminalRef>,
     nmespace: &str,
-    modifier: Modifier
+    modifier: Modifier,
 ) -> Result<(), Error> {
     let mut final_path = PathBuf::new();
     if let Some(path) = path {
@@ -54,12 +54,12 @@ pub fn write(
     };
     let modifier = match modifier {
         Modifier::Public => "public ",
-        Modifier::Internal => ""
+        Modifier::Internal => "",
     };
     let bin_name = get_lexer_bin_name_java(grammar);
     let separator = match separator {
         None => 0xFFFF,
-        Some(terminal_ref) => terminal_ref.sid()
+        Some(terminal_ref) => terminal_ref.sid(),
     };
 
     writeln!(writer, "/*")?;

@@ -26,7 +26,7 @@ use crate::errors::{Error, UnmatchableTokenError};
 use crate::finite::DFA;
 use crate::grammars::{
     Grammar, RuleChoice, RuleChoiceRef, RuleRef, SymbolRef, Terminal, TerminalRef, TerminalSet,
-    GENERATED_AXIOM
+    GENERATED_AXIOM,
 };
 use crate::ParsingMethod;
 
@@ -38,14 +38,14 @@ pub enum LookaheadMode {
     /// LR(1) item (exactly one lookahead)
     LR1,
     /// LALR(1) item (multiple lookahead)
-    LALR1
+    LALR1,
 }
 
 /// The possible origin of a lookahead
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum LookaheadOrigin {
     /// From the FIRSTS set of a rule choice
-    FirstOf(RuleChoiceRef)
+    FirstOf(RuleChoiceRef),
 }
 
 /// A lookahead in a LR automaton
@@ -54,7 +54,7 @@ pub struct Lookahead {
     /// The terminal
     pub terminal: TerminalRef,
     /// Its origin
-    pub origins: Vec<LookaheadOrigin>
+    pub origins: Vec<LookaheadOrigin>,
 }
 
 impl PartialEq for Lookahead {
@@ -75,7 +75,7 @@ impl Lookahead {
     pub fn from(terminal: TerminalRef) -> Lookahead {
         Lookahead {
             terminal,
-            origins: Vec::new()
+            origins: Vec::new(),
         }
     }
 }
@@ -141,9 +141,9 @@ impl Lookaheads {
                 .iter()
                 .map(|terminal| Lookahead {
                     terminal: *terminal,
-                    origins: vec![LookaheadOrigin::FirstOf(choice)]
+                    origins: vec![LookaheadOrigin::FirstOf(choice)],
                 })
-                .collect()
+                .collect(),
         )
     }
 
@@ -162,7 +162,7 @@ pub struct Item {
     /// The position in the grammar rule
     pub position: usize,
     /// The lookaheads for this item
-    pub lookaheads: Lookaheads
+    pub lookaheads: Lookaheads,
 }
 
 impl Item {
@@ -206,7 +206,7 @@ impl Item {
         Item {
             rule: self.rule,
             position: self.position + 1,
-            lookaheads: self.lookaheads.clone()
+            lookaheads: self.lookaheads.clone(),
         }
     }
 
@@ -243,8 +243,8 @@ impl Item {
                 &self.get_next_choice(grammar).unwrap().firsts,
                 RuleChoiceRef {
                     rule: self.rule,
-                    position: self.position + 1
-                }
+                    position: self.position + 1,
+                },
             );
             // If beta is nullifiable (contains ε) :
             if firsts.contains(TerminalRef::Epsilon) {
@@ -261,7 +261,7 @@ impl Item {
                         let candidate = Item {
                             rule: RuleRef::new(sid, index),
                             position: 0,
-                            lookaheads: Lookaheads::default()
+                            lookaheads: Lookaheads::default(),
                         };
                         if !closure.contains(&candidate) {
                             closure.push(candidate);
@@ -272,7 +272,7 @@ impl Item {
                             let candidate = Item {
                                 rule: RuleRef::new(sid, index),
                                 position: 0,
-                                lookaheads: Lookaheads::from_single(lookahead)
+                                lookaheads: Lookaheads::from_single(lookahead),
                             };
                             if !closure.contains(&candidate) {
                                 closure.push(candidate);
@@ -283,7 +283,7 @@ impl Item {
                         let candidate = Item {
                             rule: RuleRef::new(sid, index),
                             position: 0,
-                            lookaheads: firsts.clone()
+                            lookaheads: firsts.clone(),
                         };
                         if let Some(other) =
                             closure.iter_mut().find(|item| item.same_base(&candidate))
@@ -373,7 +373,7 @@ pub struct GraphWithGrammar<'a> {
     /// The grammar
     pub grammar: &'a Grammar,
     /// The built LR graph
-    pub graph: &'a Graph
+    pub graph: &'a Graph,
 }
 
 impl<'a> Display for GraphWithGrammar<'a> {
@@ -386,7 +386,7 @@ impl<'a> Display for GraphWithGrammar<'a> {
 #[derive(Debug, Clone, Eq, Default)]
 pub struct StateKernel {
     /// The items in this kernel
-    pub items: Vec<Item>
+    pub items: Vec<Item>,
 }
 
 impl PartialEq for StateKernel {
@@ -411,7 +411,7 @@ impl StateKernel {
             items,
             children: HashMap::new(),
             opening_contexts: HashMap::new(),
-            reductions: Vec::new()
+            reductions: Vec::new(),
         }
     }
 
@@ -431,7 +431,7 @@ pub struct Reduction {
     /// The rule to reduce with
     pub rule: RuleRef,
     /// The length of the reduction for RNGLR parsers
-    pub length: usize
+    pub length: usize,
 }
 
 /// Represents a LR state
@@ -446,7 +446,7 @@ pub struct State {
     /// The contexts opening by transitions from this state
     pub opening_contexts: HashMap<TerminalRef, Vec<usize>>,
     /// The reductions on this state
-    pub reductions: Vec<Reduction>
+    pub reductions: Vec<Reduction>,
 }
 
 impl State {
@@ -465,7 +465,7 @@ impl State {
                     id,
                     grammar,
                     item.clone(),
-                    Lookahead::from(TerminalRef::NullTerminal)
+                    Lookahead::from(TerminalRef::NullTerminal),
                 );
             }
             if let Some(previous_index) = reduce_index {
@@ -475,14 +475,14 @@ impl State {
                     id,
                     previous.clone(),
                     item.clone(),
-                    Lookahead::from(TerminalRef::NullTerminal)
+                    Lookahead::from(TerminalRef::NullTerminal),
                 );
             } else {
                 reduce_index = Some(index);
                 self.reductions.push(Reduction {
                     lookahead: Lookahead::from(TerminalRef::NullTerminal),
                     rule: item.rule,
-                    length: item.position
+                    length: item.position,
                 });
             }
         }
@@ -506,7 +506,7 @@ impl State {
                         id,
                         grammar,
                         item.clone(),
-                        lookahead.clone()
+                        lookahead.clone(),
                     );
                 } else if let Some(previous_index) = reductions.get(&lookahead.terminal) {
                     // There is already a reduction action for the lookahead => conflict
@@ -515,7 +515,7 @@ impl State {
                         id,
                         previous.clone(),
                         item.clone(),
-                        lookahead.clone()
+                        lookahead.clone(),
                     );
                 } else {
                     // no conflict
@@ -523,7 +523,7 @@ impl State {
                     self.reductions.push(Reduction {
                         lookahead: lookahead.clone(),
                         rule: item.rule,
-                        length: item.position
+                        length: item.position,
                     });
                 }
             }
@@ -555,7 +555,7 @@ impl State {
                         id,
                         grammar,
                         item.clone(),
-                        lookahead.clone()
+                        lookahead.clone(),
                     );
                 } else if let Some(previous_index) = reductions.get(&lookahead.terminal) {
                     // There is already a reduction action for the lookahead => conflict
@@ -564,14 +564,14 @@ impl State {
                         id,
                         previous.clone(),
                         item.clone(),
-                        lookahead.clone()
+                        lookahead.clone(),
                     );
                 }
                 reductions.insert(lookahead.terminal, index);
                 self.reductions.push(Reduction {
                     lookahead: lookahead.clone(),
                     rule: item.rule,
-                    length: item.position
+                    length: item.position,
                 });
             }
         }
@@ -595,7 +595,7 @@ impl State {
         &self,
         f: &mut Formatter,
         state_index: usize,
-        grammar: &Grammar
+        grammar: &Grammar,
     ) -> std::fmt::Result {
         writeln!(f, "state {state_index} {{")?;
         writeln!(f, "  transitions {{")?;
@@ -635,7 +635,7 @@ impl State {
 #[derive(Debug, Clone, Default)]
 pub struct Graph {
     /// The states in this graph
-    pub states: Vec<State>
+    pub states: Vec<State>,
 }
 
 impl Graph {
@@ -671,7 +671,7 @@ impl Graph {
         for (next, kernel) in shifts {
             let child_index = match self.get_state_for(&kernel) {
                 Some(child_index) => child_index,
-                None => self.add_state(kernel.into_state(grammar, mode))
+                None => self.add_state(kernel.into_state(grammar, mode)),
             };
             self.states[state_id].children.insert(next, child_index);
         }
@@ -783,7 +783,7 @@ struct PNode {
     /// The transition to investigate
     transition: Option<SymbolRef>,
     /// The next element
-    next: Option<usize>
+    next: Option<usize>,
 }
 
 impl PNode {
@@ -792,7 +792,7 @@ impl PNode {
         PNode {
             state,
             transition,
-            next
+            next,
         }
     }
 }
@@ -803,7 +803,7 @@ pub struct PathElem {
     /// The LR state at this step
     pub state: usize,
     /// The symbol to use as a transition
-    pub transition: Option<SymbolRef>
+    pub transition: Option<SymbolRef>,
 }
 
 /// A path in a LR graph
@@ -855,7 +855,7 @@ impl InverseGraph {
             // for the first state, a single path that is empty
             return vec![Path(vec![PathElem {
                 state: 0,
-                transition: None
+                transition: None,
             }])];
         }
         let mut elements: Vec<PNode> = vec![PNode::new(target, None, None)];
@@ -892,7 +892,7 @@ impl InverseGraph {
                     let node = &elements[current_id];
                     parts.push(PathElem {
                         state: node.state,
-                        transition: node.transition
+                        transition: node.transition,
                     });
                     current = node.next;
                 }
@@ -985,7 +985,7 @@ pub enum ConflictKind {
     /// Conflict between a shift action and a reduce action
     ShiftReduce,
     /// Conflict between two reduce actions
-    ReduceReduce
+    ReduceReduce,
 }
 
 /// A conflict between items
@@ -1002,7 +1002,7 @@ pub struct Conflict {
     /// The terminal that poses the conflict
     pub lookahead: Lookahead,
     /// Example phrases for the conflict
-    pub phrases: Vec<Phrase>
+    pub phrases: Vec<Phrase>,
 }
 
 impl PartialEq for Conflict {
@@ -1030,7 +1030,7 @@ impl Conflicts {
         state_id: usize,
         grammar: &Grammar,
         reducing: Item,
-        lookahead: Lookahead
+        lookahead: Lookahead,
     ) {
         // look for previous conflict
         if let Some(previous) = self.find_similar(ConflictKind::ShiftReduce, &lookahead) {
@@ -1055,7 +1055,7 @@ impl Conflicts {
             shift_items,
             reduce_items: vec![reducing],
             lookahead,
-            phrases: Vec::new()
+            phrases: Vec::new(),
         });
     }
 
@@ -1065,7 +1065,7 @@ impl Conflicts {
         state_id: usize,
         previous: Item,
         reducing: Item,
-        lookahead: Lookahead
+        lookahead: Lookahead,
     ) {
         // look for previous conflict
         if let Some(previous) = self.find_similar(ConflictKind::ReduceReduce, &lookahead) {
@@ -1079,7 +1079,7 @@ impl Conflicts {
             shift_items: Vec::new(),
             reduce_items: vec![previous, reducing],
             lookahead,
-            phrases: Vec::new()
+            phrases: Vec::new(),
         });
     }
 
@@ -1114,7 +1114,7 @@ pub struct ContextError {
     /// The problematic contextual terminal
     pub terminal: TerminalRef,
     /// The problematic phrases
-    pub phrases: Vec<Phrase>
+    pub phrases: Vec<Phrase>,
 }
 
 impl PartialEq for ContextError {
@@ -1132,7 +1132,7 @@ fn get_graph_lr0(grammar: &Grammar) -> Graph {
     let item = Item {
         rule: RuleRef::new(axiom.id, 0),
         position: 0,
-        lookaheads: Lookaheads::default()
+        lookaheads: Lookaheads::default(),
     };
     let kernel = StateKernel { items: vec![item] };
     let state0 = kernel.into_state(grammar, LookaheadMode::LR0);
@@ -1154,7 +1154,7 @@ fn get_graph_lr1(grammar: &Grammar) -> Graph {
     let item = Item {
         rule: RuleRef::new(axiom.id, 0),
         position: 0,
-        lookaheads: Lookaheads::default()
+        lookaheads: Lookaheads::default(),
     };
     let kernel = StateKernel { items: vec![item] };
     let state0 = kernel.into_state(grammar, LookaheadMode::LR1);
@@ -1198,14 +1198,14 @@ struct Propagation {
     from_state: usize,
     from_item: usize,
     to_state: usize,
-    to_item: usize
+    to_item: usize,
 }
 
 /// Builds the propagation table for a LALR(1) graph
 fn build_graph_lalr1_propagation_table(
     graph0: &Graph,
     grammar: &Grammar,
-    kernels: &mut [StateKernel]
+    kernels: &mut [StateKernel],
 ) -> Vec<Propagation> {
     let mut propagation = Vec::new();
     for i in 0..kernels.len() {
@@ -1226,8 +1226,8 @@ fn build_graph_lalr1_propagation_table(
                 items: vec![Item {
                     rule: kernels[i].items[item_id].rule,
                     position: kernels[i].items[item_id].position,
-                    lookaheads: Lookaheads::from_single(Lookahead::from(TerminalRef::Dummy))
-                }]
+                    lookaheads: Lookaheads::from_single(Lookahead::from(TerminalRef::Dummy)),
+                }],
             }
             .into_state(grammar, LookaheadMode::LR1);
             // For each item in the closure of the dummy item
@@ -1249,7 +1249,7 @@ fn build_graph_lalr1_propagation_table(
                             from_state: i,
                             from_item: item_id,
                             to_state: child_state,
-                            to_item: child_item
+                            to_item: child_item,
                         });
                     } else {
                         // => Spontaneous generation of lookaheads
@@ -1333,7 +1333,7 @@ pub fn build_graph_rnglalr1(grammar: &Grammar) -> (Graph, Conflicts) {
 fn find_context_errors(
     graph: &Graph,
     inverse: &InverseGraph,
-    grammar: &Grammar
+    grammar: &Grammar,
 ) -> Vec<ContextError> {
     let mut errors = Vec::new();
     for (from_state, state) in graph.states.iter().enumerate() {
@@ -1351,7 +1351,7 @@ fn find_context_errors(
                     &mut errors,
                     from_state,
                     *to_state,
-                    terminal
+                    terminal,
                 );
             }
         }
@@ -1367,13 +1367,13 @@ fn find_context_errors_in(
     errors: &mut Vec<ContextError>,
     from_state: usize,
     to_state: usize,
-    terminal: &Terminal
+    terminal: &Terminal,
 ) {
     let mut paths = inverse.get_paths_to(from_state);
     for path in &mut paths {
         path.0.push(PathElem {
             state: to_state,
-            transition: Some(SymbolRef::Terminal(terminal.id))
+            transition: Some(SymbolRef::Terminal(terminal.id)),
         });
     }
     paths.retain(|path| {
@@ -1421,7 +1421,7 @@ fn find_context_errors_in(
             phrases: paths
                 .into_iter()
                 .map(|path| path.get_phrase(grammar))
-                .collect()
+                .collect(),
         });
     }
 }
@@ -1430,7 +1430,7 @@ fn find_context_errors_in(
 fn find_unmatchable_tokens(
     graph: &Graph,
     grammar: &Grammar,
-    expected: &TerminalSet
+    expected: &TerminalSet,
 ) -> TerminalSet {
     let mut unexpected = TerminalSet::default();
     for state in &graph.states {
@@ -1463,14 +1463,14 @@ pub fn build_graph(
     grammar_index: usize,
     expected: &TerminalSet,
     dfa: &DFA,
-    method: ParsingMethod
+    method: ParsingMethod,
 ) -> Result<Graph, Vec<Error>> {
     let (graph, conflicts) = match method {
         ParsingMethod::LR0 => build_graph_lr0(grammar),
         ParsingMethod::LR1 => build_graph_lr1(grammar),
         ParsingMethod::LALR1 => build_graph_lalr1(grammar),
         ParsingMethod::RNGLR1 => build_graph_rnglr1(grammar),
-        ParsingMethod::RNGLALR1 => build_graph_rnglalr1(grammar)
+        ParsingMethod::RNGLALR1 => build_graph_rnglalr1(grammar),
     };
     let inverse = graph.inverse();
     let mut errors = Vec::new();
@@ -1492,8 +1492,8 @@ pub fn build_graph(
             grammar_index,
             UnmatchableTokenError {
                 terminal: unexpected,
-                overriders: dfa.get_overriders(unexpected, context)
-            }
+                overriders: dfa.get_overriders(unexpected, context),
+            },
         ));
     }
     if errors.is_empty() {

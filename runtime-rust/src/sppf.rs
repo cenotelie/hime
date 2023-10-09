@@ -37,7 +37,7 @@ pub struct SppfImplNodeVersRef {
     /// The identifier of the node
     pub node_id: u32,
     /// The version to refer to
-    pub version: u32
+    pub version: u32,
 }
 
 impl SppfImplNodeVersRef {
@@ -52,7 +52,7 @@ impl SppfImplNodeVersRef {
     pub fn new_usize(node_id: usize, version: usize) -> Self {
         Self {
             node_id: node_id as u32,
-            version: version as u32
+            version: version as u32,
         }
     }
 
@@ -73,7 +73,7 @@ impl Display for SppfImplNodeVersRef {
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Hash)]
 pub struct SppfImplNodeRef {
     /// The identifier of the node
-    pub node_id: u32
+    pub node_id: u32,
 }
 
 impl SppfImplNodeRef {
@@ -87,7 +87,7 @@ impl SppfImplNodeRef {
     #[must_use]
     pub fn new_usize(node_id: usize) -> Self {
         Self {
-            node_id: node_id as u32
+            node_id: node_id as u32,
         }
     }
 
@@ -96,7 +96,7 @@ impl SppfImplNodeRef {
     pub fn with_version(self, version: u32) -> SppfImplNodeVersRef {
         SppfImplNodeVersRef {
             node_id: self.node_id,
-            version
+            version,
         }
     }
 
@@ -105,7 +105,7 @@ impl SppfImplNodeRef {
     pub fn with_version_usize(self, version: usize) -> SppfImplNodeVersRef {
         SppfImplNodeVersRef {
             node_id: self.node_id,
-            version: version as u32
+            version: version as u32,
         }
     }
 
@@ -119,7 +119,7 @@ impl SppfImplNodeRef {
 impl From<SppfImplNodeVersRef> for SppfImplNodeRef {
     fn from(value: SppfImplNodeVersRef) -> Self {
         Self {
-            node_id: value.node_id
+            node_id: value.node_id,
         }
     }
 }
@@ -145,7 +145,7 @@ pub enum SppfImplNodeChildren {
     /// Four children
     Four([SppfImplNodeRef; 4]),
     /// More than four children
-    More(Vec<SppfImplNodeRef>)
+    More(Vec<SppfImplNodeRef>),
 }
 
 impl From<&[SppfImplNodeRef]> for SppfImplNodeChildren {
@@ -177,7 +177,7 @@ impl SppfImplNodeChildren {
             SppfImplNodeChildren::Two(_) => 2,
             SppfImplNodeChildren::Three(_) => 3,
             SppfImplNodeChildren::Four(_) => 4,
-            SppfImplNodeChildren::More(data) => data.len()
+            SppfImplNodeChildren::More(data) => data.len(),
         }
     }
 
@@ -198,7 +198,7 @@ impl Index<usize> for SppfImplNodeChildren {
             SppfImplNodeChildren::Three(children) => &children[index],
             SppfImplNodeChildren::Four(children) => &children[index],
             SppfImplNodeChildren::More(children) => &children[index],
-            SppfImplNodeChildren::None => todo!()
+            SppfImplNodeChildren::None => todo!(),
         }
     }
 }
@@ -211,7 +211,7 @@ impl<'a> IntoIterator for &'a SppfImplNodeChildren {
         SppfImplNodeChildrenIterator {
             children: self,
             index: 0,
-            end: self.len()
+            end: self.len(),
         }
     }
 }
@@ -223,7 +223,7 @@ pub struct SppfImplNodeChildrenIterator<'a> {
     /// The next index
     index: usize,
     /// The last index (excluded)
-    end: usize
+    end: usize,
 }
 
 impl<'a> Iterator for SppfImplNodeChildrenIterator<'a> {
@@ -251,7 +251,7 @@ impl<'a> Iterator for SppfImplNodeChildrenIterator<'a> {
                 self.index += 1;
                 Some(children[index])
             }
-            _ => None
+            _ => None,
         }
     }
 
@@ -282,7 +282,7 @@ pub struct SppfImplNodeVersion {
     /// The label of the node for this version
     pub label: TableElemRef,
     /// The children of the node for this version
-    pub children: SppfImplNodeChildren
+    pub children: SppfImplNodeChildren,
 }
 
 impl SppfImplNodeVersion {
@@ -291,7 +291,7 @@ impl SppfImplNodeVersion {
     pub fn new(label: TableElemRef) -> SppfImplNodeVersion {
         SppfImplNodeVersion {
             label,
-            children: SppfImplNodeChildren::None
+            children: SppfImplNodeChildren::None,
         }
     }
 
@@ -300,7 +300,7 @@ impl SppfImplNodeVersion {
     pub fn from(label: TableElemRef, children: &[SppfImplNodeRef]) -> SppfImplNodeVersion {
         SppfImplNodeVersion {
             label,
-            children: SppfImplNodeChildren::from(children)
+            children: SppfImplNodeChildren::from(children),
         }
     }
 
@@ -361,7 +361,7 @@ impl SppfImplNodeVersion {
         &self,
         f: &mut Formatter,
         variables: &[Symbol],
-        virtuals: &[Symbol]
+        virtuals: &[Symbol],
     ) -> Result<(), Error> {
         self.label.fmt(f, variables, virtuals)?;
         if !self.is_empty() {
@@ -380,7 +380,7 @@ pub enum SppfImplNodeVersions {
     /// The node has a single version
     Single(SppfImplNodeVersion),
     /// The node has multiple versions
-    Multiple(Vec<SppfImplNodeVersion>)
+    Multiple(Vec<SppfImplNodeVersion>),
 }
 
 impl Default for SppfImplNodeVersions {
@@ -395,7 +395,7 @@ impl SppfImplNodeVersions {
     pub fn with_new_version(
         self,
         label: TableElemRef,
-        children: &[SppfImplNodeRef]
+        children: &[SppfImplNodeRef],
     ) -> (Self, usize) {
         match self {
             SppfImplNodeVersions::Single(first) => {
@@ -407,7 +407,7 @@ impl SppfImplNodeVersions {
                             first,
                             SppfImplNodeVersion::from(label, children)
                         ]),
-                        0
+                        0,
                     )
                 }
             }
@@ -432,7 +432,7 @@ impl SppfImplNodeVersions {
     pub fn len(&self) -> usize {
         match self {
             SppfImplNodeVersions::Single(_) => 1,
-            SppfImplNodeVersions::Multiple(versions) => versions.len()
+            SppfImplNodeVersions::Multiple(versions) => versions.len(),
         }
     }
 
@@ -451,7 +451,7 @@ impl Index<usize> for SppfImplNodeVersions {
         match (self, index) {
             (SppfImplNodeVersions::Single(first), 0) => first,
             (SppfImplNodeVersions::Multiple(versions), index) => &versions[index],
-            _ => panic!("version {index} does not exist")
+            _ => panic!("version {index} does not exist"),
         }
     }
 }
@@ -464,7 +464,7 @@ impl<'a> IntoIterator for &'a SppfImplNodeVersions {
         SppfImplNodeVersionsIterator {
             versions: self,
             index: 0,
-            end: self.len()
+            end: self.len(),
         }
     }
 }
@@ -476,7 +476,7 @@ pub struct SppfImplNodeVersionsIterator<'a> {
     /// The next index
     index: usize,
     /// The last index (excluded)
-    end: usize
+    end: usize,
 }
 
 impl<'a> Iterator for SppfImplNodeVersionsIterator<'a> {
@@ -516,7 +516,7 @@ impl<'a> FusedIterator for SppfImplNodeVersionsIterator<'a> {}
 #[derive(Debug, Clone)]
 pub struct SppfImplNodeNormal {
     /// The different versions of this node
-    pub versions: SppfImplNodeVersions
+    pub versions: SppfImplNodeVersions,
 }
 
 impl SppfImplNodeNormal {
@@ -524,7 +524,7 @@ impl SppfImplNodeNormal {
     #[must_use]
     pub fn new(label: TableElemRef) -> SppfImplNodeNormal {
         SppfImplNodeNormal {
-            versions: SppfImplNodeVersions::Single(SppfImplNodeVersion::new(label))
+            versions: SppfImplNodeVersions::Single(SppfImplNodeVersion::new(label)),
         }
     }
 
@@ -532,10 +532,10 @@ impl SppfImplNodeNormal {
     #[must_use]
     pub fn new_with_children(
         label: TableElemRef,
-        children: &[SppfImplNodeRef]
+        children: &[SppfImplNodeRef],
     ) -> SppfImplNodeNormal {
         SppfImplNodeNormal {
-            versions: SppfImplNodeVersions::Single(SppfImplNodeVersion::from(label, children))
+            versions: SppfImplNodeVersions::Single(SppfImplNodeVersion::from(label, children)),
         }
     }
 
@@ -584,7 +584,7 @@ impl SppfImplNodeNormal {
         &self,
         f: &mut Formatter,
         variables: &[Symbol],
-        virtuals: &[Symbol]
+        virtuals: &[Symbol],
     ) -> Result<(), Error> {
         match &self.versions {
             SppfImplNodeVersions::Single(version) => {
@@ -611,7 +611,7 @@ pub struct SppfImplNodeReplaceable {
     /// The children of this node
     pub children: Vec<SppfImplNodeRef>,
     /// The tree actions on the children of this node
-    pub actions: Vec<TreeAction>
+    pub actions: Vec<TreeAction>,
 }
 
 impl SppfImplNodeReplaceable {
@@ -620,19 +620,19 @@ impl SppfImplNodeReplaceable {
     pub fn new(
         label: TableElemRef,
         children: &[SppfImplNodeRef],
-        actions: &[TreeAction]
+        actions: &[TreeAction],
     ) -> SppfImplNodeReplaceable {
         if children.is_empty() {
             SppfImplNodeReplaceable {
                 original: label,
                 children: Vec::new(),
-                actions: Vec::new()
+                actions: Vec::new(),
             }
         } else {
             SppfImplNodeReplaceable {
                 original: label,
                 children: children.to_vec(),
-                actions: actions.to_vec()
+                actions: actions.to_vec(),
             }
         }
     }
@@ -646,7 +646,7 @@ impl SppfImplNodeReplaceable {
         &self,
         f: &mut Formatter,
         variables: &[Symbol],
-        virtuals: &[Symbol]
+        virtuals: &[Symbol],
     ) -> Result<(), Error> {
         self.original.fmt(f, variables, virtuals)?;
         if !self.children.is_empty() {
@@ -665,7 +665,7 @@ pub enum SppfImplNode {
     /// A normal node
     Normal(SppfImplNodeNormal),
     /// A replaceable node
-    Replaceable(SppfImplNodeReplaceable)
+    Replaceable(SppfImplNodeReplaceable),
 }
 
 impl SppfImplNode {
@@ -678,7 +678,7 @@ impl SppfImplNode {
     pub fn as_normal(&self) -> &SppfImplNodeNormal {
         match self {
             SppfImplNode::Normal(node) => node,
-            SppfImplNode::Replaceable(_node) => panic!("Expected a normal node")
+            SppfImplNode::Replaceable(_node) => panic!("Expected a normal node"),
         }
     }
 
@@ -690,7 +690,7 @@ impl SppfImplNode {
     pub fn as_normal_mut(&mut self) -> &mut SppfImplNodeNormal {
         match self {
             SppfImplNode::Normal(node) => node,
-            SppfImplNode::Replaceable(_node) => panic!("Expected a normal node")
+            SppfImplNode::Replaceable(_node) => panic!("Expected a normal node"),
         }
     }
 
@@ -703,11 +703,11 @@ impl SppfImplNode {
         &self,
         f: &mut Formatter,
         variables: &[Symbol],
-        virtuals: &[Symbol]
+        virtuals: &[Symbol],
     ) -> Result<(), Error> {
         match self {
             SppfImplNode::Normal(node) => node.fmt(f, variables, virtuals),
-            SppfImplNode::Replaceable(node) => node.fmt(f, variables, virtuals)
+            SppfImplNode::Replaceable(node) => node.fmt(f, variables, virtuals),
         }
     }
 }
@@ -718,7 +718,7 @@ pub struct SppfImpl {
     /// The nodes in the SPPF
     pub nodes: Vec<SppfImplNode>,
     /// The root, if any
-    pub root: Option<usize>
+    pub root: Option<usize>,
 }
 
 impl SppfImpl {
@@ -764,12 +764,12 @@ impl SppfImpl {
     pub fn new_normal_node_with_children(
         &mut self,
         label: TableElemRef,
-        children: &[SppfImplNodeRef]
+        children: &[SppfImplNodeRef],
     ) -> SppfImplNodeRef {
         let identifier = self.nodes.len();
         self.nodes
             .push(SppfImplNode::Normal(SppfImplNodeNormal::new_with_children(
-                label, children
+                label, children,
             )));
         SppfImplNodeRef::new_usize(identifier)
     }
@@ -779,12 +779,12 @@ impl SppfImpl {
         &mut self,
         label: TableElemRef,
         children: &[SppfImplNodeRef],
-        actions: &[TreeAction]
+        actions: &[TreeAction],
     ) -> SppfImplNodeRef {
         let identifier = self.nodes.len();
         self.nodes
             .push(SppfImplNode::Replaceable(SppfImplNodeReplaceable::new(
-                label, children, actions
+                label, children, actions,
             )));
         SppfImplNodeRef::new_usize(identifier)
     }
@@ -799,7 +799,7 @@ pub struct SppfImplNodeDisplay<'a, 's> {
     /// The table of variables
     pub variables: &'a [Symbol<'s>],
     /// The table of virtuals
-    pub virtuals: &'a [Symbol<'s>]
+    pub virtuals: &'a [Symbol<'s>],
 }
 
 impl<'a, 's> Display for SppfImplNodeDisplay<'a, 's> {
@@ -823,7 +823,7 @@ pub struct Sppf<'s, 't, 'a> {
     /// The table of virtuals
     virtuals: &'a [Symbol<'s>],
     /// The SPPF itself
-    data: &'a SppfImpl
+    data: &'a SppfImpl,
 }
 
 impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
@@ -833,13 +833,13 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
         tokens: TokenRepository<'s, 't, 'a>,
         variables: &'a [Symbol<'s>],
         virtuals: &'a [Symbol<'s>],
-        data: &'a SppfImpl
+        data: &'a SppfImpl,
     ) -> Sppf<'s, 't, 'a> {
         Self {
             tokens,
             variables,
             virtuals,
-            data
+            data,
         }
     }
 
@@ -863,7 +863,7 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
         SppfNode {
             sppf: self,
             node_ref: SppfImplNodeRef::new_usize(root),
-            node
+            node,
         }
     }
 
@@ -883,7 +883,7 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
                     }
                 }
                 None
-            }
+            },
         )
         .map(|node_ref| SppfNode::new(self, node_ref.into()))
     }
@@ -911,7 +911,7 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
     #[must_use]
     pub fn find_parent_of(
         &'a self,
-        node_ref: SppfImplNodeRef
+        node_ref: SppfImplNodeRef,
     ) -> Option<SppfNodeVersion<'s, 't, 'a>> {
         let root = self.get_root();
         self.traverse(
@@ -924,7 +924,7 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
                     }
                 }
                 None
-            }
+            },
         )
         .map(|node_ref| SppfNodeVersion::new(self, node_ref))
     }
@@ -933,12 +933,12 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
     #[must_use]
     pub fn get_total_position_and_span(
         &self,
-        node: &SppfImplNodeNormal
+        node: &SppfImplNodeNormal,
     ) -> Option<(TextPosition, TextSpan)> {
         let mut total_span: Option<TextSpan> = None;
         let mut position = TextPosition {
             line: usize::MAX,
-            column: usize::MAX
+            column: usize::MAX,
         };
         self.get_total_position_and_span_accumulate(&mut total_span, &mut position, node);
         total_span.map(|span| (position, span))
@@ -948,12 +948,12 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
     #[must_use]
     pub fn get_total_position_and_span_version(
         &self,
-        node: &SppfImplNodeVersion
+        node: &SppfImplNodeVersion,
     ) -> Option<(TextPosition, TextSpan)> {
         let mut total_span: Option<TextSpan> = None;
         let mut position = TextPosition {
             line: usize::MAX,
-            column: usize::MAX
+            column: usize::MAX,
         };
         for child in &node.children {
             let child = self.data.get_node(child).as_normal();
@@ -967,7 +967,7 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
         &self,
         total_span: &mut Option<TextSpan>,
         position: &mut TextPosition,
-        node: &SppfImplNodeNormal
+        node: &SppfImplNodeNormal,
     ) {
         self.traverse(node, SppfImplNodeRef::default(), |current, _| {
             for version in &current.versions {
@@ -1015,10 +1015,10 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
         &self,
         from: &'a SppfImplNodeNormal,
         from_ref: SppfImplNodeRef,
-        mut action: F
+        mut action: F,
     ) -> Option<R>
     where
-        F: FnMut(&'a SppfImplNodeNormal, SppfImplNodeRef) -> Option<R>
+        F: FnMut(&'a SppfImplNodeNormal, SppfImplNodeRef) -> Option<R>,
     {
         let mut stack = alloc::vec![(from, from_ref)];
         while let Some((current, current_ref)) = stack.pop() {
@@ -1044,7 +1044,7 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
                 let token = self.tokens.get_token(label.index());
                 token.get_span()
             }
-            _ => None
+            _ => None,
         }
     }
 
@@ -1057,7 +1057,7 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
                 let token = self.tokens.get_token(label.index());
                 token.get_position()
             }
-            _ => None
+            _ => None,
         }
     }
 }
@@ -1070,7 +1070,7 @@ pub struct SppfNode<'s, 't, 'a> {
     /// The node's identifier
     node_ref: SppfImplNodeRef,
     /// The underlying node in the SPPF implementation
-    node: &'a SppfImplNodeNormal
+    node: &'a SppfImplNodeNormal,
 }
 
 impl<'s, 't, 'a> SppfNode<'s, 't, 'a> {
@@ -1081,7 +1081,7 @@ impl<'s, 't, 'a> SppfNode<'s, 't, 'a> {
         SppfNode {
             sppf,
             node_ref,
-            node
+            node,
         }
     }
 
@@ -1110,7 +1110,7 @@ impl<'s, 't, 'a> SppfNode<'s, 't, 'a> {
         SppfNodeVersion {
             sppf: self.sppf,
             version,
-            node_ref: self.node_ref.with_version_usize(index)
+            node_ref: self.node_ref.with_version_usize(index),
         }
     }
 
@@ -1120,7 +1120,7 @@ impl<'s, 't, 'a> SppfNode<'s, 't, 'a> {
         SppfNodeVersions {
             sppf: self.sppf,
             node_ref: self.node_ref,
-            node: self.node
+            node: self.node,
         }
     }
 
@@ -1146,7 +1146,7 @@ impl<'s, 't, 'a> SppfNode<'s, 't, 'a> {
 impl<'s, 't, 'a> Serialize for SppfNode<'s, 't, 'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: Serializer
+        S: Serializer,
     {
         let version = self.first_version();
         let mut state = serializer.serialize_struct("SppfNode", 5)?;
@@ -1166,7 +1166,7 @@ pub struct SppfNodeVersions<'s, 't, 'a> {
     /// The node's identifier
     node_ref: SppfImplNodeRef,
     /// The underlying node in the SPPF implementation
-    node: &'a SppfImplNodeNormal
+    node: &'a SppfImplNodeNormal,
 }
 
 impl<'s, 't, 'a> SppfNodeVersions<'s, 't, 'a> {
@@ -1194,7 +1194,7 @@ impl<'s, 't, 'a> IntoIterator for SppfNodeVersions<'s, 't, 'a> {
             node_ref: self.node_ref,
             node: self.node,
             current: 0,
-            end: self.node.versions.len()
+            end: self.node.versions.len(),
         }
     }
 }
@@ -1209,7 +1209,7 @@ pub struct SppfNodeVersionsIterator<'s, 't, 'a> {
     /// The current (next) index
     current: usize,
     /// The end index (excluded)
-    end: usize
+    end: usize,
 }
 
 impl<'s, 't, 'a> Iterator for SppfNodeVersionsIterator<'s, 't, 'a> {
@@ -1221,7 +1221,7 @@ impl<'s, 't, 'a> Iterator for SppfNodeVersionsIterator<'s, 't, 'a> {
             Some(SppfNodeVersion {
                 sppf: self.sppf,
                 version: &self.node.versions[index],
-                node_ref: self.node_ref.with_version_usize(index)
+                node_ref: self.node_ref.with_version_usize(index),
             })
         } else {
             None
@@ -1242,7 +1242,7 @@ impl<'s, 't, 'a> DoubleEndedIterator for SppfNodeVersionsIterator<'s, 't, 'a> {
             let result = SppfNodeVersion {
                 sppf: self.sppf,
                 version: &self.node.versions[self.end - 1],
-                node_ref: self.node_ref.with_version_usize(self.end - 1)
+                node_ref: self.node_ref.with_version_usize(self.end - 1),
             };
             self.end -= 1;
             Some(result)
@@ -1260,7 +1260,7 @@ pub struct SppfNodeVersion<'s, 't, 'a> {
     /// The underlying version in the SPPF implementation
     version: &'a SppfImplNodeVersion,
     /// The reference to this specific version
-    node_ref: SppfImplNodeVersRef
+    node_ref: SppfImplNodeVersRef,
 }
 
 impl<'s, 't, 'a> SppfNodeVersion<'s, 't, 'a> {
@@ -1268,13 +1268,13 @@ impl<'s, 't, 'a> SppfNodeVersion<'s, 't, 'a> {
     #[must_use]
     fn new(
         sppf: &'a Sppf<'s, 't, 'a>,
-        node_ref: SppfImplNodeVersRef
+        node_ref: SppfImplNodeVersRef,
     ) -> SppfNodeVersion<'s, 't, 'a> {
         let version = sppf.data.get_node_version(node_ref);
         SppfNodeVersion {
             sppf,
             version,
-            node_ref
+            node_ref,
         }
     }
 
@@ -1290,7 +1290,7 @@ impl<'s, 't, 'a> SppfNodeVersion<'s, 't, 'a> {
         let label = self.version.label;
         match label.table_type() {
             TableType::Token => Some(label.index()),
-            _ => None
+            _ => None,
         }
     }
 
@@ -1305,7 +1305,7 @@ impl<'s, 't, 'a> SppfNodeVersion<'s, 't, 'a> {
     pub fn children(&self) -> SppfNodeChildren<'s, 't, 'a> {
         SppfNodeChildren {
             sppf: self.sppf,
-            version: self.version
+            version: self.version,
         }
     }
 
@@ -1354,7 +1354,7 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for SppfNodeVersion<'s, 't, 'a> {
                 let token = self.sppf.tokens.get_token(label.index());
                 token.get_context()
             }
-            _ => None
+            _ => None,
         }
     }
 
@@ -1383,7 +1383,7 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for SppfNodeVersion<'s, 't, 'a> {
                 let token = self.sppf.tokens.get_token(label.index());
                 token.get_value()
             }
-            _ => None
+            _ => None,
         }
     }
 }
@@ -1417,7 +1417,7 @@ impl<'s, 't, 'a> Display for SppfNodeVersion<'s, 't, 'a> {
 impl<'s, 't, 'a> Serialize for SppfNodeVersion<'s, 't, 'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: Serializer
+        S: Serializer,
     {
         let mut state = serializer.serialize_struct("SppfNodeVersion", 5)?;
         state.serialize_field("symbol", &self.get_symbol())?;
@@ -1434,7 +1434,7 @@ pub struct SppfNodeChildren<'s, 't, 'a> {
     /// The parent SPPF
     sppf: &'a Sppf<'s, 't, 'a>,
     /// The underlying version in the SPPF implementation
-    version: &'a SppfImplNodeVersion
+    version: &'a SppfImplNodeVersion,
 }
 
 impl<'s, 't, 'a> SppfNodeChildren<'s, 't, 'a> {
@@ -1467,7 +1467,7 @@ impl<'s, 't, 'a> IntoIterator for SppfNodeChildren<'s, 't, 'a> {
             sppf: self.sppf,
             version: self.version,
             index: 0,
-            end: self.version.len()
+            end: self.version.len(),
         }
     }
 }
@@ -1475,7 +1475,7 @@ impl<'s, 't, 'a> IntoIterator for SppfNodeChildren<'s, 't, 'a> {
 impl<'s, 't, 'a> Serialize for SppfNodeChildren<'s, 't, 'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: Serializer
+        S: Serializer,
     {
         let mut seq = serializer.serialize_seq(Some(self.len()))?;
         for version in self.into_iter() {
@@ -1494,7 +1494,7 @@ pub struct SppfNodeChildrenIterator<'s, 't, 'a> {
     /// The next index
     index: usize,
     /// The last index (excluded)
-    end: usize
+    end: usize,
 }
 
 impl<'s, 't, 'a> Iterator for SppfNodeChildrenIterator<'s, 't, 'a> {

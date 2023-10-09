@@ -30,7 +30,7 @@ pub struct SymbolRegistryElement {
     /// The input reference for its definition
     pub definitions: Vec<InputReference>,
     /// All the usage references
-    pub references: Vec<InputReference>
+    pub references: Vec<InputReference>,
 }
 
 impl SymbolRegistryElement {
@@ -58,7 +58,7 @@ impl SymbolRegistryElement {
 #[derive(Debug, Clone, Default)]
 pub struct SymbolRegistry {
     /// The symbols for each grammar
-    pub grammars: Vec<HashMap<SymbolRef, SymbolRegistryElement>>
+    pub grammars: Vec<HashMap<SymbolRef, SymbolRegistryElement>>,
 }
 
 impl SymbolRegistry {
@@ -82,8 +82,8 @@ impl SymbolRegistry {
                                     .terminal_references
                                     .iter()
                                     .map(|term_ref| term_ref.input_ref)
-                                    .collect()
-                            }
+                                    .collect(),
+                            },
                         );
                     }
                     for variable in grammar
@@ -101,8 +101,8 @@ impl SymbolRegistry {
                                     .iter()
                                     .map(|rule| rule.head_input_ref)
                                     .collect(),
-                                references: Vec::new()
-                            }
+                                references: Vec::new(),
+                            },
                         );
                     }
                     for symbol in &grammar.virtuals {
@@ -112,8 +112,8 @@ impl SymbolRegistry {
                                 grammar_index,
                                 symbol_ref: SymbolRef::Virtual(symbol.id),
                                 definitions: Vec::new(),
-                                references: Vec::new()
-                            }
+                                references: Vec::new(),
+                            },
                         );
                     }
                     for symbol in &grammar.actions {
@@ -123,8 +123,8 @@ impl SymbolRegistry {
                                 grammar_index,
                                 symbol_ref: SymbolRef::Action(symbol.id),
                                 definitions: Vec::new(),
-                                references: Vec::new()
-                            }
+                                references: Vec::new(),
+                            },
                         );
                     }
                     // retrieve all references in syntactic rules
@@ -141,7 +141,7 @@ impl SymbolRegistry {
                     }
                     map
                 })
-                .collect()
+                .collect(),
         }
     }
 }
