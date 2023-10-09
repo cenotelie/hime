@@ -385,7 +385,7 @@ impl Variable {
             modified |= self.firsts.add_others(&rule.body.firsts);
             modified |= firsts_for_var
                 .entry(self.id)
-                .or_insert_with(TerminalSet::default)
+                .or_default()
                 .add_others(&rule.body.firsts);
             modified |= rule.body.compute_firsts(firsts_for_var);
         }

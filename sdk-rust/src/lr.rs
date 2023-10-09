@@ -659,10 +659,7 @@ impl Graph {
         // Build the children kernels from the shift actions
         for item in &self.states[state_id].items {
             if let Some(next) = item.get_next_symbol(grammar) {
-                shifts
-                    .entry(next)
-                    .or_insert_with(StateKernel::default)
-                    .add_item(item.get_child());
+                shifts.entry(next).or_default().add_item(item.get_child());
             }
         }
         // Close the children and add them to the graph
@@ -850,6 +847,7 @@ impl InverseGraph {
     }
 
     /// Gets all the paths from state 0 to the specified one
+    #[must_use]
     pub fn get_paths_to(&self, target: usize) -> Vec<Path> {
         if target == 0 {
             // for the first state, a single path that is empty
@@ -867,7 +865,7 @@ impl InverseGraph {
             if let Some(transitions) = self.0.get(&elements[current].state) {
                 for (symbol, antecedents) in transitions {
                     for previous in antecedents {
-                        let visited_with = visited.entry(*previous).or_insert_with(Vec::new);
+                        let visited_with = visited.entry(*previous).or_default();
                         if visited_with.contains(symbol) {
                             continue;
                         }

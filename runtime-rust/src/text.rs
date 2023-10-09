@@ -49,17 +49,16 @@ pub struct TextSpan {
 
 impl PartialOrd for TextSpan {
     fn partial_cmp(&self, other: &TextSpan) -> Option<Ordering> {
-        match self.index.cmp(&other.index) {
-            Ordering::Greater => Some(Ordering::Greater),
-            Ordering::Less => Some(Ordering::Less),
-            Ordering::Equal => Some(self.length.cmp(&other.length)),
-        }
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for TextSpan {
     fn cmp(&self, other: &TextSpan) -> Ordering {
-        self.partial_cmp(other).unwrap()
+        match self.index.cmp(&other.index) {
+            Ordering::Equal => self.length.cmp(&other.length),
+            o => o,
+        }
     }
 }
 
@@ -81,17 +80,16 @@ pub struct TextPosition {
 
 impl PartialOrd for TextPosition {
     fn partial_cmp(&self, other: &TextPosition) -> Option<Ordering> {
-        match self.line.cmp(&other.line) {
-            Ordering::Greater => Some(Ordering::Greater),
-            Ordering::Less => Some(Ordering::Less),
-            Ordering::Equal => Some(self.column.cmp(&other.column)),
-        }
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for TextPosition {
     fn cmp(&self, other: &TextPosition) -> Ordering {
-        self.partial_cmp(other).unwrap()
+        match self.line.cmp(&other.line) {
+            Ordering::Equal => self.column.cmp(&other.column),
+            o => o,
+        }
     }
 }
 
