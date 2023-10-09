@@ -104,3 +104,41 @@ test Issue078_PingPong:
 	parser RNGLALR1
 	on "PINGPONGPINGPONGPING"
 	yields s(ping(PING pong(PONG ping(PING pong(PONG ping(PING))))))
+
+test Issue088_Rnglr_Ast:
+	grammar Issue088_Rnglr_Ast { options {Axiom="s";} terminals {
+		A -> 'a';
+		B -> 'b';
+		C -> 'c';
+		D -> 'd';
+		X -> 'x';
+		Y -> 'y';
+		Z -> 'z';
+	} rules {
+		s -> A x B y^ C z^ D;
+		x -> X ;
+		y -> Y ;
+		z -> Z ;
+	} }
+	parser LALR1
+	on "axbyczd"
+	yields z(y(A x(X) B Y C) Z D)
+
+test Issue088_Rnglr_Sppf:
+	grammar Issue088_Rnglr_Sppf { options {Axiom="s";} terminals {
+		A -> 'a';
+		B -> 'b';
+		C -> 'c';
+		D -> 'd';
+		X -> 'x';
+		Y -> 'y';
+		Z -> 'z';
+	} rules {
+		s -> A x B y^ C z^ D;
+		x -> X ;
+		y -> Y ;
+		z -> Z ;
+	} }
+	parser RNGLALR1
+	on "axbyczd"
+	yields z(y(A x(X) B Y C) Z D)

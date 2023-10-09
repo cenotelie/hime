@@ -791,7 +791,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     }
 
     /// Gets the name of the symbol for an SPPF label
-    // #[cfg(feature = "debug")]
+    #[cfg(feature = "debug")]
     fn get_label_symbol(&self, label: TableElemRef) -> &str {
         match label.table_type() {
             TableType::Token => {
