@@ -442,6 +442,24 @@ impl SppfImplNodeVersions {
     pub fn is_empty(&self) -> bool {
         false
     }
+
+    /// Gets the first version
+    #[must_use]
+    pub fn first(&self) -> &SppfImplNodeVersion {
+        match self {
+            SppfImplNodeVersions::Single(version) => version,
+            SppfImplNodeVersions::Multiple(versions) => &versions[0],
+        }
+    }
+
+    /// Gets the last version
+    #[must_use]
+    pub fn last(&self) -> &SppfImplNodeVersion {
+        match self {
+            SppfImplNodeVersions::Single(version) => version,
+            SppfImplNodeVersions::Multiple(versions) => versions.last().unwrap(),
+        }
+    }
 }
 
 impl Index<usize> for SppfImplNodeVersions {
@@ -573,6 +591,18 @@ impl SppfImplNodeNormal {
                 }
             }
         }
+    }
+
+    /// Gets the first version
+    #[must_use]
+    pub fn first_version(&self) -> &SppfImplNodeVersion {
+        self.versions.first()
+    }
+
+    /// Gets the last version
+    #[must_use]
+    pub fn last_version(&self) -> &SppfImplNodeVersion {
+        self.versions.last()
     }
 
     /// Format this node

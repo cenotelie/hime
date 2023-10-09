@@ -560,8 +560,12 @@ impl<'s, 't, 'a, 'l> SemanticBody for SPPFBuilder<'s, 't, 'a, 'l> {
     fn get_element_at(&self, index: usize) -> SemanticElement {
         let reduction = self.reduction.as_ref().expect("Not in a reduction");
         let reference = reduction.cache[index];
-        let node = self.sppf.get_node(reference).as_normal();
-        let label = node.versions[0].label;
+        let label = self
+            .sppf
+            .get_node(reference)
+            .as_normal()
+            .first_version()
+            .label;
         match label.table_type() {
             TableType::Token => {
                 SemanticElement::Token(self.lexer.get_data().repository.get_token(label.index()))
@@ -712,7 +716,95 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         if head_action == TREE_ACTION_REPLACE_BY_CHILDREN {
             self.reduce_replaceable(variable_index)
         } else {
-            self.reduce_normal(variable_index, head_action, target)
+            #[cfg(all(feature = "std", feature = "debug"))]
+            self.reduce_normal_pre_print(variable_index, head_action, target);
+            let result = self.reduce_normal(variable_index, head_action, target);
+            #[cfg(all(feature = "std", feature = "debug"))]
+            self.reduce_normal_post_print(result);
+            result
+        }
+    }
+
+    /// Prints the data for the current reduction
+    #[cfg(all(feature = "std", feature = "debug"))]
+    fn reduce_normal_pre_print(
+        &self,
+        variable_index: usize,
+        head_action: TreeAction,
+        target: Option<SppfImplNodeRef>,
+    ) {
+        std::print!("reducing");
+        if let Some(target) = target {
+            std::print!(" ([{:03}]+)", target.node_id());
+        }
+        std::print!(
+            " {}{} ->",
+            self.variables[variable_index].name,
+            if head_action == TREE_ACTION_REPLACE_BY_CHILDREN {
+                "^"
+            } else {
+                ""
+            }
+        );
+        let reduction = self.reduction.as_ref().expect("Not in a reduction");
+        for (&sppf_ref, &action) in reduction.cache.iter().zip(&reduction.actions) {
+            let label = self.sppf.get_node(sppf_ref).as_normal().versions[0].label;
+            std::print!(" {}", self.get_label_symbol(label));
+            if action == TREE_ACTION_PROMOTE {
+                std::print!("^");
+            }
+        }
+        std::println!();
+    }
+
+    /// Prints the output sub-tree for a reduction
+    #[cfg(all(feature = "std", feature = "debug"))]
+    fn reduce_normal_post_print(&self, sub_root: SppfImplNodeRef) {
+        let sub_root_node = self.sppf.get_node(sub_root).as_normal();
+        let version_id = sub_root_node.versions.len() - 1;
+        let version = sub_root_node.last_version();
+        std::print!(
+            "[{:03}]+{} {} ->",
+            sub_root.node_id(),
+            version_id,
+            self.get_label_symbol(version.label)
+        );
+        for child in &version.children {
+            std::print!(" [{:03}]", child.node_id());
+            let child = self.sppf.get_node(child).as_normal();
+            if child.versions.len() == 1 {
+                // single version
+                std::print!(" {}", self.get_label_symbol(child.first_version().label));
+            } else {
+                // multiple versions
+                std::print!(" ");
+                for (index, version) in child.versions.into_iter().enumerate() {
+                    if index > 0 {
+                        std::print!("|");
+                    }
+                    std::print!("{}", self.get_label_symbol(version.label));
+                }
+            }
+        }
+        std::println!();
+        std::println!();
+    }
+
+    /// Gets the name of the symbol for an SPPF label
+    // #[cfg(feature = "debug")]
+    fn get_label_symbol(&self, label: TableElemRef) -> &str {
+        match label.table_type() {
+            TableType::Token => {
+                self.lexer
+                    .get_data()
+                    .repository
+                    .get_token(label.index())
+                    .get_symbol()
+                    .name
+            }
+            TableType::Variable => self.variables[label.index()].name,
+            TableType::Virtual => self.virtuals[label.index()].name,
+            TableType::None => "ε",
         }
     }
 
@@ -765,7 +857,8 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
                 TableElemRef::new(TableType::Variable, variable_index)
             };
             if let Some(target) = target {
-                self.sppf
+                let _version = self
+                    .sppf
                     .get_node_mut(target)
                     .as_normal_mut()
                     .new_version(original_label, &reduction.cache);
