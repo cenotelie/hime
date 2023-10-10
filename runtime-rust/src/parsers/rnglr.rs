@@ -816,56 +816,69 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         target: Option<SppfImplNodeRef>,
     ) -> SppfImplNodeRef {
         let reduction: &mut SPPFReduction = self.reduction.as_mut().expect("Not in a reduction");
-        let mut promoted: Option<SppfImplNodeRef> = None;
+        let mut promoted: Option<(usize, SppfImplNodeRef)> = None;
 
         let mut b = 0;
         let mut e = 0;
         while e < reduction.cache.len() {
             if reduction.actions[e] == TREE_ACTION_PROMOTE {
-                if let Some(promoted_ref) = promoted {
-                    // not the first promotion, add the tail to the old promoted
-                    let promoted = self.sppf.get_node_mut(promoted_ref).as_normal_mut();
-                    promoted.add_tail(&reduction.cache[b..e]);
-                    // insert the old promoted as the head for the newly promoted
-                    let current = self.sppf.get_node_mut(reduction.cache[e]).as_normal_mut();
-                    current.insert_head(&[promoted_ref]);
-                } else {
-                    assert_eq!(b, 0);
-                    // capture the current head
-                    let current = self.sppf.get_node_mut(reduction.cache[e]).as_normal_mut();
-                    current.insert_head(&reduction.cache[..e]);
+                if let Some((promoted_index, promoted_ref)) = promoted {
+                    // not the first promotion, materialize the previous promotion
+                    let promoted_ref = self.sppf.new_promoted_node(
+                        promoted_ref,
+                        &reduction.cache[b..promoted_index],
+                        &reduction.cache[(promoted_index + 1)..e],
+                    );
+                    // repack in the cache
+                    b = e - 1;
+                    reduction.cache[b] = promoted_ref;
                 }
-
-                // promote
-                promoted = Some(reduction.cache[e]);
-                // advance
-                b = e + 1;
+                // register the promotion
+                promoted = Some((e, reduction.cache[e]));
             }
             e += 1;
         }
 
-        if let Some(promoted) = promoted {
-            // capture the tail
-            let current = self.sppf.get_node_mut(promoted).as_normal_mut();
-            current.add_tail(&reduction.cache[b..]);
-            promoted
+        let original_label = if head_action == TREE_ACTION_REPLACE_BY_EPSILON {
+            TableElemRef::new(TableType::None, 0)
         } else {
-            assert_eq!(b, 0);
-            let original_label = if head_action == TREE_ACTION_REPLACE_BY_EPSILON {
-                TableElemRef::new(TableType::None, 0)
-            } else {
-                TableElemRef::new(TableType::Variable, variable_index)
-            };
-            if let Some(target) = target {
+            TableElemRef::new(TableType::Variable, variable_index)
+        };
+        match (target, promoted) {
+            (None, None) => {
+                // no target for a new version, no promotion
+                self.sppf
+                    .new_normal_node_with_children(original_label, &reduction.cache)
+            }
+            (Some(target), None) => {
+                // new version of an existing node, no promotion
                 let _version = self
                     .sppf
                     .get_node_mut(target)
                     .as_normal_mut()
-                    .new_version(original_label, &reduction.cache);
+                    .add_version(original_label, &reduction.cache);
                 target
-            } else {
+            }
+            (None, Some((promoted_index, promoted_ref))) => {
+                // no target for a new version, got a promotion
+                self.sppf.new_promoted_node(
+                    promoted_ref,
+                    &reduction.cache[b..promoted_index],
+                    &reduction.cache[(promoted_index + 1)..],
+                )
+            }
+            (Some(target), Some((promoted_index, promoted_ref))) => {
+                // new version of an existing node, got a promotion
+                let promoted = self.sppf.create_promoted_node(
+                    promoted_ref,
+                    &reduction.cache[b..promoted_index],
+                    &reduction.cache[(promoted_index + 1)..],
+                );
                 self.sppf
-                    .new_normal_node_with_children(original_label, &reduction.cache)
+                    .get_node_mut(target)
+                    .as_normal_mut()
+                    .add_versions(promoted.versions);
+                target
             }
         }
     }

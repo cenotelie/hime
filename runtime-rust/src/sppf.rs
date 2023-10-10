@@ -131,7 +131,7 @@ impl Display for SppfImplNodeRef {
 }
 
 /// The children for a SPPF node
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub enum SppfImplNodeChildren {
     /// No children
     #[default]
@@ -277,7 +277,7 @@ impl<'a> ExactSizeIterator for SppfImplNodeChildrenIterator<'a> {}
 impl<'a> FusedIterator for SppfImplNodeChildrenIterator<'a> {}
 
 /// Represents a version of a node in a Shared-Packed Parse Forest
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct SppfImplNodeVersion {
     /// The label of the node for this version
     pub label: TableElemRef,
@@ -302,6 +302,23 @@ impl SppfImplNodeVersion {
             label,
             children: SppfImplNodeChildren::from(children),
         }
+    }
+
+    /// Creates a new version with added head and tail
+    #[must_use]
+    pub fn with_head_tail(&self, head: &[SppfImplNodeRef], tail: &[SppfImplNodeRef]) -> Self {
+        let total = head.len() + self.len() + tail.len();
+        let mut children = Vec::with_capacity(total);
+        for &c in head {
+            children.push(c);
+        }
+        for c in &self.children {
+            children.push(c);
+        }
+        for &c in tail {
+            children.push(c);
+        }
+        Self::from(self.label, &children)
     }
 
     /// Gets the number of children
@@ -427,6 +444,44 @@ impl SppfImplNodeVersions {
         }
     }
 
+    /// Adds new versions
+    #[must_use]
+    pub fn with_new_versions(self, others: Self) -> Self {
+        match (self, others) {
+            (SppfImplNodeVersions::Single(left), SppfImplNodeVersions::Single(right)) => {
+                if left == right {
+                    SppfImplNodeVersions::Single(left)
+                } else {
+                    SppfImplNodeVersions::Multiple(alloc::vec![left, right])
+                }
+            }
+            (SppfImplNodeVersions::Single(left), SppfImplNodeVersions::Multiple(mut right)) => {
+                if right.contains(&left) {
+                    SppfImplNodeVersions::Multiple(right)
+                } else {
+                    right.push(left);
+                    SppfImplNodeVersions::Multiple(right)
+                }
+            }
+            (SppfImplNodeVersions::Multiple(mut left), SppfImplNodeVersions::Single(right)) => {
+                if left.contains(&right) {
+                    SppfImplNodeVersions::Multiple(left)
+                } else {
+                    left.push(right);
+                    SppfImplNodeVersions::Multiple(left)
+                }
+            }
+            (
+                SppfImplNodeVersions::Multiple(mut left),
+                SppfImplNodeVersions::Multiple(mut right),
+            ) => {
+                left.append(&mut right);
+                left.dedup();
+                SppfImplNodeVersions::Multiple(left)
+            }
+        }
+    }
+
     /// Gets the number of versions
     #[must_use]
     pub fn len(&self) -> usize {
@@ -453,6 +508,12 @@ impl SppfImplNodeVersions {
     }
 
     /// Gets the last version
+    ///
+    /// # Panics
+    ///
+    /// Cannot panic.
+    /// In the case of the `SppfImplNodeVersions::Multiple` variant,
+    /// it is guaranteed that the vector is not empty.
     #[must_use]
     pub fn last(&self) -> &SppfImplNodeVersion {
         match self {
@@ -558,11 +619,16 @@ impl SppfImplNodeNormal {
     }
 
     /// Adds a new version to this node
-    pub fn new_version(&mut self, label: TableElemRef, children: &[SppfImplNodeRef]) -> usize {
+    pub fn add_version(&mut self, label: TableElemRef, children: &[SppfImplNodeRef]) -> usize {
         let result;
         (self.versions, result) =
             std::mem::take(&mut self.versions).with_new_version(label, children);
         result
+    }
+
+    /// Adds new versions to this node
+    pub fn add_versions(&mut self, versions: SppfImplNodeVersions) {
+        self.versions = std::mem::take(&mut self.versions).with_new_versions(versions);
     }
 
     /// Insert a series of children at the front
@@ -802,6 +868,44 @@ impl SppfImpl {
                 label, children,
             )));
         SppfImplNodeRef::new_usize(identifier)
+    }
+
+    /// Creates a new single node in the SPPF as a promotion of another, with a head and a tail
+    pub fn new_promoted_node(
+        &mut self,
+        previous: SppfImplNodeRef,
+        head: &[SppfImplNodeRef],
+        tail: &[SppfImplNodeRef],
+    ) -> SppfImplNodeRef {
+        let identifier = self.nodes.len();
+        self.nodes.push(SppfImplNode::Normal(
+            self.create_promoted_node(previous, head, tail),
+        ));
+        SppfImplNodeRef::new_usize(identifier)
+    }
+
+    /// Creates a new single node in the SPPF as a promotion of another, with a head and a tail
+    #[must_use]
+    pub fn create_promoted_node(
+        &self,
+        previous: SppfImplNodeRef,
+        head: &[SppfImplNodeRef],
+        tail: &[SppfImplNodeRef],
+    ) -> SppfImplNodeNormal {
+        let previous = self.get_node(previous).as_normal();
+        match &previous.versions {
+            SppfImplNodeVersions::Single(version) => SppfImplNodeNormal {
+                versions: SppfImplNodeVersions::Single(version.with_head_tail(head, tail)),
+            },
+            SppfImplNodeVersions::Multiple(versions) => SppfImplNodeNormal {
+                versions: SppfImplNodeVersions::Multiple(
+                    versions
+                        .iter()
+                        .map(|version| version.with_head_tail(head, tail))
+                        .collect(),
+                ),
+            },
+        }
     }
 
     /// Creates a new replaceable node in the SPPF
