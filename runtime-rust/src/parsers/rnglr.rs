@@ -32,7 +32,10 @@ use super::{
 use crate::ast::{AstCell, AstImpl, TableElemRef, TableType};
 use crate::errors::ParseErrorUnexpectedToken;
 use crate::lexers::{Lexer, TokenKernel, DEFAULT_CONTEXT};
-use crate::sppf::{SppfImpl, SppfImplNode, SppfImplNodeRef};
+use crate::sppf::{
+    SppfImpl, SppfImplNodeRef, SppfImplNodeReplaceable, SppfImplNodeReplaceableVersion,
+    SppfImplNodeVersions,
+};
 use crate::symbols::{SemanticBody, SemanticElement, SemanticElementTrait, SID_EPSILON};
 use crate::utils::biglist::BigList;
 use crate::utils::OwnOrMut;
@@ -527,16 +530,48 @@ const EPSILON: GSSLabel = GSSLabel {
     symbol_id: SID_EPSILON,
 };
 
-/// The data about a reduction for a SPPF
-struct SPPFReduction {
-    /// The adjacency cache for the reduction
-    cache: Vec<SppfImplNodeRef>,
+/// A specific version of a reduction
+#[derive(Debug, Default, Clone)]
+struct SPPFReductionVersion {
+    /// The buffer of nodes for the reduction
+    nodes: Vec<SppfImplNodeRef>,
     /// The actions for the reduction
     actions: Vec<TreeAction>,
+}
+
+impl SPPFReductionVersion {
+    /// Creates a new version with the specified capacity
+    fn new(capacity: usize) -> Self {
+        Self {
+            nodes: Vec::with_capacity(capacity),
+            actions: Vec::with_capacity(capacity),
+        }
+    }
+}
+
+/// The data about a reduction for a SPPF
+struct SPPFReduction {
+    /// The different versions for the reduction
+    versions: Vec<SPPFReductionVersion>,
     /// The stack of semantic objects for the reduction
     stack: Vec<GSSLabel>,
     /// The number of items popped from the stack
     pop_count: usize,
+}
+
+impl SPPFReduction {
+    /// Duplicate the versions n times
+    /// Returns the original number of versions
+    #[must_use]
+    pub fn duplicate_versions(&mut self, count: usize) -> usize {
+        let l = self.versions.len();
+        for _ in 0..count {
+            for i in 0..l {
+                self.versions.push(self.versions[i].clone());
+            }
+        }
+        l
+    }
 }
 
 /// Represents a structure that helps build a Shared Packed Parse Forest (SPPF)
@@ -550,6 +585,9 @@ struct SPPFBuilder<'s, 't, 'a, 'l> {
     virtuals: &'a [Symbol<'s>],
     /// The SPPF front to build the SPPF
     sppf: OwnOrMut<'a, SppfImpl>,
+    /// The list of replaceable nodes
+    /// Replaceable nodes do not appear in the SPPF, only in this list
+    replaceables: Vec<SppfImplNodeReplaceable>,
     /// The data of the current reductions
     reduction: Option<SPPFReduction>,
     /// The AST being built, if any
@@ -559,13 +597,8 @@ struct SPPFBuilder<'s, 't, 'a, 'l> {
 impl<'s, 't, 'a, 'l> SemanticBody for SPPFBuilder<'s, 't, 'a, 'l> {
     fn get_element_at(&self, index: usize) -> SemanticElement {
         let reduction = self.reduction.as_ref().expect("Not in a reduction");
-        let reference = reduction.cache[index];
-        let label = self
-            .sppf
-            .get_node(reference)
-            .as_normal()
-            .first_version()
-            .label;
+        let reference = reduction.versions[0].nodes[index];
+        let label = self.sppf.get_node(reference).first_version().label;
         match label.table_type() {
             TableType::Token => {
                 SemanticElement::Token(self.lexer.get_data().repository.get_token(label.index()))
@@ -582,7 +615,8 @@ impl<'s, 't, 'a, 'l> SemanticBody for SPPFBuilder<'s, 't, 'a, 'l> {
         self.reduction
             .as_ref()
             .expect("Not in a reduction")
-            .cache
+            .versions[0]
+            .nodes
             .len()
     }
 }
@@ -600,6 +634,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             variables,
             virtuals,
             sppf: OwnOrMut::Owned(SppfImpl::default()),
+            replaceables: Vec::new(),
             reduction: None,
             ast: Some(ast),
         }
@@ -617,6 +652,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             variables,
             virtuals,
             sppf: OwnOrMut::MutRef(sppf),
+            replaceables: Vec::new(),
             reduction: None,
             ast: None,
         }
@@ -639,8 +675,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             stack.push(first);
         }
         self.reduction = Some(SPPFReduction {
-            cache: Vec::with_capacity(length),
-            actions: Vec::with_capacity(length),
+            versions: alloc::vec![SPPFReductionVersion::new(length)],
             stack,
             pop_count: 0,
         });
@@ -649,37 +684,57 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     /// Adds the specified GSS label to the reduction cache with the given tree action
     fn reduction_add_to_cache(
         reduction: &mut SPPFReduction,
-        sppf: &SppfImpl,
+        replaceables: &[SppfImplNodeReplaceable],
         sppf_node_ref: SppfImplNodeRef,
         action: TreeAction,
     ) {
         if action == TREE_ACTION_DROP {
             return;
         }
-        let node = sppf.get_node(sppf_node_ref);
-        match node {
-            SppfImplNode::Normal(_) => {
-                // this is a simple reference to an existing SPPF node
-                SPPFBuilder::reduction_add_to_cache_node(reduction, sppf_node_ref, action);
-            }
-            SppfImplNode::Replaceable(replaceable) => {
-                // this is replaceable sub-tree
-                for (&node_ref, &action) in replaceable.children.iter().zip(&replaceable.actions) {
-                    SPPFBuilder::reduction_add_to_cache(reduction, sppf, node_ref, action);
+        if sppf_node_ref.is_replaceable() {
+            // this is replaceable sub-tree
+            let replaceable = &replaceables[sppf_node_ref.node_id()];
+            let replaceable_versions_count = replaceable.versions.len();
+            if replaceable_versions_count == 1 {
+                let version = replaceable.versions.first();
+                for (&node_ref, &action) in version.children.iter().zip(&version.actions) {
+                    SPPFBuilder::reduction_add_to_cache_node(
+                        &mut reduction.versions,
+                        node_ref,
+                        action,
+                    );
+                }
+            } else {
+                // compute the cross-product
+                let l = reduction.duplicate_versions(replaceable_versions_count - 1);
+                for (index, version) in replaceable.versions.into_iter().enumerate() {
+                    let targets = &mut reduction.versions[(index * l)..((index + 1) * l)];
+                    for (&node_ref, &action) in version.children.iter().zip(&version.actions) {
+                        SPPFBuilder::reduction_add_to_cache_node(targets, node_ref, action);
+                    }
                 }
             }
+        } else {
+            // this is a simple reference to an existing SPPF node
+            SPPFBuilder::reduction_add_to_cache_node(
+                &mut reduction.versions,
+                sppf_node_ref,
+                action,
+            );
         }
     }
 
     /// Adds the specified GSS label to the reduction cache with the given tree action
     fn reduction_add_to_cache_node(
-        reduction: &mut SPPFReduction,
+        versions: &mut [SPPFReductionVersion],
         sppf_node_ref: SppfImplNodeRef,
         action: TreeAction,
     ) {
-        // add the node in the cache
-        reduction.cache.push(sppf_node_ref);
-        reduction.actions.push(action);
+        // add the node in the cache for each version
+        for version in versions {
+            version.nodes.push(sppf_node_ref);
+            version.actions.push(action);
+        }
     }
 
     /// During a reduction, pops the top symbol from the stack and gives it a tree action
@@ -687,26 +742,26 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         let reduction = self.reduction.as_mut().expect("Not in a reduction");
         let label = reduction.stack[reduction.pop_count];
         reduction.pop_count += 1;
-        SPPFBuilder::reduction_add_to_cache(reduction, &self.sppf, label.sppf_node, action);
+        SPPFBuilder::reduction_add_to_cache(reduction, &self.replaceables, label.sppf_node, action);
     }
 
     /// During a reduction, inserts a virtual symbol
     pub fn reduction_add_virtual(&mut self, index: usize, action: TreeAction) {
         let reduction = self.reduction.as_mut().expect("Not in a reduction");
-        let node_id = self
+        let sppf_node_ref = self
             .sppf
             .new_normal_node(TableElemRef::new(TableType::Virtual, index));
-        reduction.cache.push(node_id);
-        reduction.actions.push(action);
+        SPPFBuilder::reduction_add_to_cache_node(&mut reduction.versions, sppf_node_ref, action);
     }
 
     /// During a reduction, inserts the sub-tree of a nullable variable
     pub fn reduction_add_nullable(&mut self, nullable: SppfImplNodeRef, action: TreeAction) {
         let reduction = self.reduction.as_mut().expect("Not in a reduction");
-        SPPFBuilder::reduction_add_to_cache(reduction, &self.sppf, nullable, action);
+        SPPFBuilder::reduction_add_to_cache(reduction, &self.replaceables, nullable, action);
     }
 
     /// Finalizes the reduction operation
+    #[allow(clippy::let_and_return)]
     pub fn reduce(
         &mut self,
         variable_index: usize,
@@ -714,7 +769,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         target: Option<SppfImplNodeRef>,
     ) -> SppfImplNodeRef {
         if head_action == TREE_ACTION_REPLACE_BY_CHILDREN {
-            self.reduce_replaceable(variable_index)
+            self.reduce_replaceable(variable_index, target)
         } else {
             #[cfg(all(feature = "std", feature = "debug"))]
             self.reduce_normal_pre_print(variable_index, head_action, target);
@@ -733,34 +788,36 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         head_action: TreeAction,
         target: Option<SppfImplNodeRef>,
     ) {
-        std::print!("reducing");
-        if let Some(target) = target {
-            std::print!(" ([{:03}]+)", target.node_id());
-        }
-        std::print!(
-            " {}{} ->",
-            self.variables[variable_index].name,
-            if head_action == TREE_ACTION_REPLACE_BY_CHILDREN {
-                "^"
-            } else {
-                ""
-            }
-        );
         let reduction = self.reduction.as_ref().expect("Not in a reduction");
-        for (&sppf_ref, &action) in reduction.cache.iter().zip(&reduction.actions) {
-            let label = self.sppf.get_node(sppf_ref).as_normal().versions[0].label;
-            std::print!(" {}", self.get_label_symbol(label));
-            if action == TREE_ACTION_PROMOTE {
-                std::print!("^");
+        for (index, version) in reduction.versions.iter().enumerate() {
+            std::print!("reducing [{index}]");
+            if let Some(target) = target {
+                std::print!(" ([{:03}]+)", target.node_id());
             }
+            std::print!(
+                " {}{} ->",
+                self.variables[variable_index].name,
+                if head_action == TREE_ACTION_REPLACE_BY_CHILDREN {
+                    "^"
+                } else {
+                    ""
+                }
+            );
+            for (&sppf_ref, &action) in version.nodes.iter().zip(&version.actions) {
+                let label = self.sppf.get_node(sppf_ref).versions[0].label;
+                std::print!(" {}", self.get_label_symbol(label));
+                if action == TREE_ACTION_PROMOTE {
+                    std::print!("^");
+                }
+            }
+            std::println!();
         }
-        std::println!();
     }
 
     /// Prints the output sub-tree for a reduction
     #[cfg(all(feature = "std", feature = "debug"))]
     fn reduce_normal_post_print(&self, sub_root: SppfImplNodeRef) {
-        let sub_root_node = self.sppf.get_node(sub_root).as_normal();
+        let sub_root_node = self.sppf.get_node(sub_root);
         let version_id = sub_root_node.versions.len() - 1;
         let version = sub_root_node.last_version();
         std::print!(
@@ -771,7 +828,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         );
         for child in &version.children {
             std::print!(" [{:03}]", child.node_id());
-            let child = self.sppf.get_node(child).as_normal();
+            let child = self.sppf.get_node(child);
             if child.versions.len() == 1 {
                 // single version
                 std::print!(" {}", self.get_label_symbol(child.first_version().label));
@@ -815,26 +872,48 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         head_action: TreeAction,
         target: Option<SppfImplNodeRef>,
     ) -> SppfImplNodeRef {
-        let reduction: &mut SPPFReduction = self.reduction.as_mut().expect("Not in a reduction");
+        let reduction = self.reduction.as_mut().expect("not in a reduction");
+        let sppf = &mut self.sppf;
+        let first = Self::reduce_normal_version(
+            &mut reduction.versions[0],
+            sppf,
+            variable_index,
+            head_action,
+            target,
+        );
+        for version in reduction.versions.iter_mut().skip(1) {
+            Self::reduce_normal_version(version, sppf, variable_index, head_action, Some(first));
+        }
+        first
+    }
+
+    /// Executes the reduction as a normal reduction
+    pub fn reduce_normal_version(
+        version: &mut SPPFReductionVersion,
+        sppf: &mut SppfImpl,
+        variable_index: usize,
+        head_action: TreeAction,
+        target: Option<SppfImplNodeRef>,
+    ) -> SppfImplNodeRef {
         let mut promoted: Option<(usize, SppfImplNodeRef)> = None;
 
         let mut b = 0;
         let mut e = 0;
-        while e < reduction.cache.len() {
-            if reduction.actions[e] == TREE_ACTION_PROMOTE {
+        while e < version.nodes.len() {
+            if version.actions[e] == TREE_ACTION_PROMOTE {
                 if let Some((promoted_index, promoted_ref)) = promoted {
                     // not the first promotion, materialize the previous promotion
-                    let promoted_ref = self.sppf.new_promoted_node(
+                    let promoted_ref = sppf.new_promoted_node(
                         promoted_ref,
-                        &reduction.cache[b..promoted_index],
-                        &reduction.cache[(promoted_index + 1)..e],
+                        &version.nodes[b..promoted_index],
+                        &version.nodes[(promoted_index + 1)..e],
                     );
                     // repack in the cache
                     b = e - 1;
-                    reduction.cache[b] = promoted_ref;
+                    version.nodes[b] = promoted_ref;
                 }
                 // register the promotion
-                promoted = Some((e, reduction.cache[e]));
+                promoted = Some((e, version.nodes[e]));
             }
             e += 1;
         }
@@ -847,48 +926,79 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         match (target, promoted) {
             (None, None) => {
                 // no target for a new version, no promotion
-                self.sppf
-                    .new_normal_node_with_children(original_label, &reduction.cache)
+                sppf.new_normal_node_with_children(original_label, &version.nodes)
             }
             (Some(target), None) => {
                 // new version of an existing node, no promotion
-                let _version = self
-                    .sppf
+                let _version = sppf
                     .get_node_mut(target)
-                    .as_normal_mut()
-                    .add_version(original_label, &reduction.cache);
+                    .add_version(original_label, &version.nodes);
                 target
             }
             (None, Some((promoted_index, promoted_ref))) => {
                 // no target for a new version, got a promotion
-                self.sppf.new_promoted_node(
+                sppf.new_promoted_node(
                     promoted_ref,
-                    &reduction.cache[b..promoted_index],
-                    &reduction.cache[(promoted_index + 1)..],
+                    &version.nodes[b..promoted_index],
+                    &version.nodes[(promoted_index + 1)..],
                 )
             }
             (Some(target), Some((promoted_index, promoted_ref))) => {
                 // new version of an existing node, got a promotion
-                let promoted = self.sppf.create_promoted_node(
+                let promoted = sppf.create_promoted_node(
                     promoted_ref,
-                    &reduction.cache[b..promoted_index],
-                    &reduction.cache[(promoted_index + 1)..],
+                    &version.nodes[b..promoted_index],
+                    &version.nodes[(promoted_index + 1)..],
                 );
-                self.sppf
-                    .get_node_mut(target)
-                    .as_normal_mut()
-                    .add_versions(promoted.versions);
+                sppf.get_node_mut(target).add_versions(promoted.versions);
                 target
             }
         }
     }
 
     /// Executes the reduction as the reduction of a replaceable variable
-    pub fn reduce_replaceable(&mut self, variable_index: usize) -> SppfImplNodeRef {
+    pub fn reduce_replaceable(
+        &mut self,
+        variable_index: usize,
+        target: Option<SppfImplNodeRef>,
+    ) -> SppfImplNodeRef {
         let reduction = self.reduction.as_mut().expect("Not in a reduction");
         let label = TableElemRef::new(TableType::Variable, variable_index);
-        self.sppf
-            .new_replaceable_node(label, &reduction.cache, &reduction.actions)
+        if let Some(target) = target {
+            assert!(target.is_replaceable());
+            let node = &mut self.replaceables[target.node_id()];
+            for version in &reduction.versions {
+                node.add_version(label, &version.nodes, &version.actions);
+            }
+            target
+        } else {
+            let index = self.replaceables.len();
+            if reduction.versions.len() == 1 {
+                let version = reduction.versions.pop().unwrap();
+                self.replaceables.push(SppfImplNodeReplaceable {
+                    versions: SppfImplNodeVersions::Single(SppfImplNodeReplaceableVersion {
+                        children: version.nodes,
+                        actions: version.actions,
+                        label,
+                    }),
+                });
+            } else {
+                self.replaceables.push(SppfImplNodeReplaceable {
+                    versions: SppfImplNodeVersions::Multiple(
+                        reduction
+                            .versions
+                            .drain(..)
+                            .map(|version| SppfImplNodeReplaceableVersion {
+                                children: version.nodes,
+                                actions: version.actions,
+                                label,
+                            })
+                            .collect(),
+                    ),
+                });
+            }
+            SppfImplNodeRef::new_replaceable(index)
+        }
     }
 
     /// Finalizes the parse tree
@@ -896,7 +1006,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         self.sppf.store_root(root);
         if let Some(ast) = self.ast.as_mut() {
             let sppf = &self.sppf;
-            let cell_root = SPPFBuilder::build_final_ast(sppf, root, ast);
+            let cell_root = Self::build_final_ast(sppf, root, ast);
             ast.store_root(cell_root);
         }
     }
@@ -907,7 +1017,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
         sppf_node_ref: SppfImplNodeRef,
         result: &mut AstImpl,
     ) -> AstCell {
-        let node = sppf.get_node(sppf_node_ref).as_normal();
+        let node = sppf.get_node(sppf_node_ref);
         let version = &node.versions[0];
         if version.children.is_empty() {
             AstCell {
