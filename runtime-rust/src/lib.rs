@@ -58,3 +58,5 @@ pub mod utils;
 
 /// The version of this program
 pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
+
+pub use dyn_clone;
