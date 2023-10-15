@@ -17,7 +17,7 @@
 
 //! Module for the definition of grammar symbols
 
-use alloc::fmt::{Display, Error, Formatter};
+use core::fmt::{Display, Error, Formatter};
 
 use serde::{Deserialize, Serialize};
 

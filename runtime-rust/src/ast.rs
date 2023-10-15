@@ -17,7 +17,7 @@
 
 //! Module for Abstract-Syntax Trees
 
-use alloc::fmt::{Display, Error, Formatter};
+use core::fmt::{Display, Error, Formatter};
 use core::iter::FusedIterator;
 
 use serde::ser::{Serialize, SerializeSeq, SerializeStruct, Serializer};
