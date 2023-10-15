@@ -506,7 +506,7 @@ fn write_code_ast_visitor(
     writeln!(writer, "/// Walk the AST of a result using a visitor")?;
     writeln!(
         writer,
-        "pub fn visit(result: &ParseResult<AstImpl>, visitor: &dyn AstVisitor) {{"
+        "pub fn visit_ast(result: &ParseResult<AstImpl>, visitor: &dyn AstVisitor) {{"
     )?;
     writeln!(writer, "    let ast = result.get_ast();")?;
     writeln!(writer, "    let root = ast.get_root();")?;
@@ -608,7 +608,7 @@ fn write_code_sppf_visitor(
     writeln!(writer, "/// Walk the AST of a result using a visitor")?;
     writeln!(
         writer,
-        "pub fn visit(result: &ParseResult<AstImpl>, visitor: &dyn SppfVisitor) {{"
+        "pub fn visit_sppf(result: &ParseResult<AstImpl>, visitor: &dyn SppfVisitor) {{"
     )?;
     writeln!(writer, "    let sppf = result.get_ast();")?;
     writeln!(writer, "    let root = sppf.get_root();")?;
