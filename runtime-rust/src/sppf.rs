@@ -1358,13 +1358,9 @@ impl<'s, 't, 'a> Serialize for SppfNode<'s, 't, 'a> {
     where
         S: Serializer,
     {
-        let version = self.first_version();
-        let mut state = serializer.serialize_struct("SppfNode", 5)?;
-        state.serialize_field("symbol", &version.get_symbol())?;
-        state.serialize_field("position", &version.get_position())?;
-        state.serialize_field("span", &version.get_span())?;
-        state.serialize_field("value", &version.get_value())?;
-        state.serialize_field("children", &version.children())?;
+        let versions = self.versions();
+        let mut state = serializer.serialize_struct("SppfNode", 1)?;
+        state.serialize_field("versions", &versions)?;
         state.end()
     }
 }
@@ -1391,6 +1387,19 @@ impl<'s, 't, 'a> SppfNodeVersions<'s, 't, 'a> {
     #[must_use]
     pub fn is_empty(&self) -> bool {
         false
+    }
+}
+
+impl<'s, 't, 'a> Serialize for SppfNodeVersions<'s, 't, 'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut seq = serializer.serialize_seq(Some(self.len()))?;
+        for version in self.into_iter() {
+            seq.serialize_element(&version)?;
+        }
+        seq.end()
     }
 }
 
@@ -1688,8 +1697,8 @@ impl<'s, 't, 'a> Serialize for SppfNodeChildren<'s, 't, 'a> {
         S: Serializer,
     {
         let mut seq = serializer.serialize_seq(Some(self.len()))?;
-        for version in self.into_iter() {
-            seq.serialize_element(&version)?;
+        for child in self.into_iter() {
+            seq.serialize_element(&child)?;
         }
         seq.end()
     }
