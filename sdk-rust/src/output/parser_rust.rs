@@ -608,7 +608,7 @@ fn write_code_sppf_visitor(
     writeln!(writer, "/// Walk the AST of a result using a visitor")?;
     writeln!(
         writer,
-        "pub fn visit_sppf(result: &ParseResult<SppfImpl>, visitor: Box<dyn SppfVisitor>) {{"
+        "pub fn visit_sppf(result: &ParseResult<SppfImpl>, visitor: &Box<dyn SppfVisitor>) {{"
     )?;
     writeln!(writer, "    let sppf = result.get_ast();")?;
     writeln!(writer, "    let root = sppf.get_root();")?;
