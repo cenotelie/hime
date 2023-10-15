@@ -640,13 +640,13 @@ impl SppfImplNode {
     pub fn add_version(&mut self, label: TableElemRef, children: &[SppfImplNodeRef]) -> usize {
         let result;
         (self.versions, result) =
-            std::mem::take(&mut self.versions).with_new_version(label, children);
+            core::mem::take(&mut self.versions).with_new_version(label, children);
         result
     }
 
     /// Adds new versions to this node
     pub fn add_versions(&mut self, versions: SppfImplNodeVersions<SppfImplNodeVersion>) {
-        self.versions = std::mem::take(&mut self.versions).with_new_versions(versions);
+        self.versions = core::mem::take(&mut self.versions).with_new_versions(versions);
     }
 
     /// Insert a series of children at the front
@@ -758,7 +758,7 @@ impl SppfImplNodeReplaceable {
     ) -> usize {
         let result;
         (self.versions, result) =
-            std::mem::take(&mut self.versions).with_new_version(label, children, actions);
+            core::mem::take(&mut self.versions).with_new_version(label, children, actions);
         result
     }
 

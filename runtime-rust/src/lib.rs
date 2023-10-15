@@ -40,6 +40,7 @@
 #![forbid(unsafe_code)]
 #![warn(clippy::pedantic)]
 #![allow(clippy::cast_possible_truncation, clippy::module_name_repetitions)]
+#![warn(clippy::std_instead_of_core, clippy::std_instead_of_alloc, clippy::alloc_instead_of_core)]
 
 extern crate alloc;
 #[cfg(feature = "std")]

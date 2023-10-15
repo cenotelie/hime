@@ -18,7 +18,7 @@
 //! Module for text-handling APIs
 
 use alloc::borrow::Cow;
-use alloc::fmt::{Display, Error, Formatter};
+use core::fmt::{Display, Error, Formatter};
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::cmp::{Ord, Ordering};

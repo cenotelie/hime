@@ -17,7 +17,7 @@
 
 //! Module for the definition of `BigList`
 
-use alloc::fmt::{self, Debug, Formatter};
+use core::fmt::{self, Debug, Formatter};
 use alloc::vec::Vec;
 use core::ops::{Index, IndexMut};
 
