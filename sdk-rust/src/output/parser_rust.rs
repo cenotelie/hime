@@ -622,14 +622,22 @@ fn write_code_sppf_visitor(
     )?;
     writeln!(
         writer,
-        "pub fn visit_sppf_node(node: SppfNode, visitor: Box<dyn SppfVisitor>) {{"
+        "pub fn visit_sppf_node(node: SppfNode, visitor: &Box<dyn SppfVisitor>) {{"
     )?;
-    writeln!(writer, "    let versions = node.versions();")?;
-    writeln!(writer, "    for version in versions {{")?;
-    writeln!(writer, "        let visitor = clone_box(&*visitor);")?;
-    writeln!(writer, "        visit_sppf_version_node(version, visitor);")?;
+
+    writeln!(writer, "      if node.versions_count() == 1 {{")?;
+    writeln!(writer, "            let version = node.first_version();")?;
+    writeln!(writer, "            visit_sppf_version_node(version, visitor);")?;
+    writeln!(writer, "      }} else {{")?;
+    writeln!(writer, "            let versions = node.versions();")?;
+    writeln!(writer, "            for version in versions {{")?;
+    writeln!(writer, "                let visitor = clone_box(&**visitor);")?;
+    writeln!(writer, "                visit_sppf_version_node(version, &visitor);")?;
+    writeln!(writer, "            }}")?;
+    writeln!(writer, "        }}")?;
     writeln!(writer, "    }}")?;
     writeln!(writer, "}}")?;
+    writeln!(writer)?;
 
     writeln!(
         writer,
@@ -637,7 +645,7 @@ fn write_code_sppf_visitor(
     )?;
     writeln!(
         writer,
-        "pub fn visit_sppf_version_node(node: SppfNodeVersion, visitor: Box<dyn SppfVisitor>) {{"
+        "pub fn visit_sppf_version_node(node: SppfNodeVersion, visitor: &Box<dyn SppfVisitor>) {{"
     )?;
     writeln!(writer, "    let children = node.children();")?;
     writeln!(writer, "    for child in children {{")?;
