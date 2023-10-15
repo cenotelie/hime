@@ -159,6 +159,24 @@ impl<'s, 't, 'a> Serialize for ParseResult<'s, 't, 'a, AstImpl> {
     }
 }
 
+impl<'s, 't, 'a> Serialize for ParseResult<'s, 't, 'a, SppfImpl> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let ast = self.get_ast();
+        let root = if self.is_success() {
+            Some(ast.get_root())
+        } else {
+            None
+        };
+        let mut state = serializer.serialize_struct("ParseResult", 2)?;
+        state.serialize_field("errors", &self.errors.errors)?;
+        state.serialize_field("root", &root)?;
+        state.end()
+    }
+}
+
 /// A parse result with an AST
 pub type ParseResultAst = ParseResult<'static, 'static, 'static, AstImpl>;
 
