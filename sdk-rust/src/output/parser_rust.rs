@@ -637,7 +637,7 @@ fn write_code_sppf_visitor(
     )?;
     writeln!(
         writer,
-        "pub fn visit_sppf_version_node(node: SppfNode, visitor: Box<dyn SppfVisitor>) {{"
+        "pub fn visit_sppf_version_node(node: SppfNodeVersion<, visitor: Box<dyn SppfVisitor>) {{"
     )?;
     writeln!(writer, "    let children = node.children();")?;
     writeln!(writer, "    for child in children {{")?;
