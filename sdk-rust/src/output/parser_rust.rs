@@ -605,6 +605,8 @@ fn write_code_sppf_visitor(
     }
     writeln!(writer, "}}")?;
     writeln!(writer)?;
+    writeln!(writer, "clone_trait_object!(SppfVisitor)")?;
+    writeln!(writer)?;
     writeln!(writer, "/// Walk the AST of a result using a visitor")?;
     writeln!(
         writer,
@@ -628,7 +630,7 @@ fn write_code_sppf_visitor(
     writeln!(writer, "    if node.versions_count() > 1 {{")?;
     writeln!(writer, "        let versions = node.versions();")?;
     writeln!(writer, "        for version in versions {{")?;
-    writeln!(writer, "            let mut visitor = clone_box(&**visitor);")?;
+    writeln!(writer, "            let mut visitor = visitor.clone();")?;
     writeln!(writer, "            visit_sppf_version_node(version, &mut visitor);")?;
     writeln!(writer, "        }}")?;
     writeln!(writer, "    }} else {{")?;

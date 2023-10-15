@@ -99,7 +99,7 @@ pub fn write(
     )?;
     if is_rnglr {
         writeln!(writer, "use hime_redist::sppf::{{SppfImpl, SppfNode, SppfNodeVersion}};")?;
-        writeln!(writer, "use hime_redist::dyn_clone::{{DynClone, clone_box}};")?;
+        writeln!(writer, "use hime_redist::dyn_clone::{{DynClone, clone_trait_object}};")?;
         writeln!(writer, "use alloc::boxed::Box;")?;
     }
     writeln!(writer, "use hime_redist::symbols::SemanticBody;")?;
