@@ -480,7 +480,7 @@ fn write_code_ast_visitor(
         }
         writeln!(
             writer,
-            "    fn on_terminal_{}(&self, _node: &AstNode) {{}}",
+            "    fn on_terminal_{}(&mut self, _node: &AstNode) {{}}",
             to_snake_case(&terminal.name)
         )?;
     }
@@ -490,14 +490,14 @@ fn write_code_ast_visitor(
         }
         writeln!(
             writer,
-            "    fn on_variable_{}(&self, _node: &AstNode) {{}}",
+            "    fn on_variable_{}(&mut self, _node: &AstNode) {{}}",
             to_snake_case(&variable.name)
         )?;
     }
     for symbol in &grammar.virtuals {
         writeln!(
             writer,
-            "    fn on_virtual_{}(&self, _node: &AstNode) {{}}",
+            "    fn on_virtual_{}(&mut self, _node: &AstNode) {{}}",
             to_snake_case(&symbol.name)
         )?;
     }
@@ -506,7 +506,7 @@ fn write_code_ast_visitor(
     writeln!(writer, "/// Walk the AST of a result using a visitor")?;
     writeln!(
         writer,
-        "pub fn visit_ast(result: &ParseResult<AstImpl>, visitor: &dyn AstVisitor) {{"
+        "pub fn visit_ast(result: &ParseResult<AstImpl>, visitor: &mut dyn AstVisitor) {{"
     )?;
     writeln!(writer, "    let ast = result.get_ast();")?;
     writeln!(writer, "    let root = ast.get_root();")?;
@@ -519,7 +519,7 @@ fn write_code_ast_visitor(
     )?;
     writeln!(
         writer,
-        "pub fn visit_ast_node(node: AstNode, visitor: &dyn AstVisitor) {{"
+        "pub fn visit_ast_node(node: AstNode, visitor: &mut dyn AstVisitor) {{"
     )?;
     writeln!(writer, "    let children = node.children();")?;
     writeln!(writer, "    for child in children.iter() {{")?;
