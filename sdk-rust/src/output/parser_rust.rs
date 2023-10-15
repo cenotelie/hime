@@ -214,6 +214,7 @@ fn write_code_actions(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
         writer,
         "/// Represents a set of semantic actions in this parser"
     )?;
+    writeln!(writer, "#[allow(unused_variables)]")?;
     writeln!(writer, "pub trait Actions {{")?;
     for action in &grammar.actions {
         writeln!(writer, "    /// The {} semantic action", &action.name)?;
@@ -469,6 +470,7 @@ fn write_code_visitor(
 ) -> Result<(), Error> {
     writeln!(writer)?;
     writeln!(writer, "/// Visitor interface")?;
+    writeln!(writer, "#[allow(unused_variables)]")?;
     writeln!(writer, "pub trait Visitor {{")?;
     for terminal_ref in &expected.content {
         let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) else {
@@ -479,7 +481,7 @@ fn write_code_visitor(
         }
         writeln!(
             writer,
-            "    fn on_terminal_{}(&self, _node: &AstNode) {{}}",
+            "    fn on_terminal_{}(&self, node: &AstNode) {{}}",
             to_snake_case(&terminal.name)
         )?;
     }
@@ -489,14 +491,14 @@ fn write_code_visitor(
         }
         writeln!(
             writer,
-            "    fn on_variable_{}(&self, _node: &AstNode) {{}}",
+            "    fn on_variable_{}(&self, node: &AstNode) {{}}",
             to_snake_case(&variable.name)
         )?;
     }
     for symbol in &grammar.virtuals {
         writeln!(
             writer,
-            "    fn on_virtual_{}(&self, _node: &AstNode) {{}}",
+            "    fn on_virtual_{}(&self, node: &AstNode) {{}}",
             to_snake_case(&symbol.name)
         )?;
     }
