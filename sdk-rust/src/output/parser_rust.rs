@@ -572,7 +572,7 @@ fn write_code_sppf_visitor(
 ) -> Result<(), Error> {
     writeln!(writer)?;
     writeln!(writer, "/// SPPF Visitor interface")?;
-    writeln!(writer, "pub trait SppfVisitor {{")?;
+    writeln!(writer, "pub trait SppfVisitor: DynClone {{")?;
     for terminal_ref in &expected.content {
         let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) else {
             continue;
@@ -582,7 +582,7 @@ fn write_code_sppf_visitor(
         }
         writeln!(
             writer,
-            "    fn on_terminal_{}(&self, _node: &SppfNodeVersions) {{}}",
+            "    fn on_terminal_{}(&self, _node: &SppfNodeVersion) {{}}",
             to_snake_case(&terminal.name)
         )?;
     }
@@ -592,14 +592,14 @@ fn write_code_sppf_visitor(
         }
         writeln!(
             writer,
-            "    fn on_variable_{}(&self, _node: &SppfNodeVersions) {{}}",
+            "    fn on_variable_{}(&self, _node: &SppfNodeVersion) {{}}",
             to_snake_case(&variable.name)
         )?;
     }
     for symbol in &grammar.virtuals {
         writeln!(
             writer,
-            "    fn on_virtual_{}(&self, _node: &SppfNodeVersions) {{}}",
+            "    fn on_virtual_{}(&self, _node: &SppfNodeVersion) {{}}",
             to_snake_case(&symbol.name)
         )?;
     }
@@ -608,7 +608,7 @@ fn write_code_sppf_visitor(
     writeln!(writer, "/// Walk the AST of a result using a visitor")?;
     writeln!(
         writer,
-        "pub fn visit_sppf(result: &ParseResult<AstImpl>, visitor: &dyn SppfVisitor) {{"
+        "pub fn visit_sppf(result: &ParseResult<SppfImpl>, visitor: Box<dyn SppfVisitor>) {{"
     )?;
     writeln!(writer, "    let sppf = result.get_ast();")?;
     writeln!(writer, "    let root = sppf.get_root();")?;
@@ -622,10 +622,11 @@ fn write_code_sppf_visitor(
     )?;
     writeln!(
         writer,
-        "pub fn visit_sppf_node(node: SppfNode, visitor: &dyn SppfVisitor) {{"
+        "pub fn visit_sppf_node(node: SppfNode, visitor: Box<dyn SppfVisitor>) {{"
     )?;
     writeln!(writer, "    let versions = node.versions();")?;
-    writeln!(writer, "    for version in versions.iter() {{")?;
+    writeln!(writer, "    for version in versions {{")?;
+    writeln!(writer, "        let visitor = clone_box(&*visitor);")?;
     writeln!(writer, "        visit_sppf_version_node(version, visitor);")?;
     writeln!(writer, "    }}")?;
     writeln!(writer, "}}")?;
@@ -636,10 +637,10 @@ fn write_code_sppf_visitor(
     )?;
     writeln!(
         writer,
-        "pub fn visit_sppf_version_node(node: SppfNode, visitor: &dyn SppfVisitor) {{"
+        "pub fn visit_sppf_version_node(node: SppfNode, visitor: Box<dyn SppfVisitor>) {{"
     )?;
     writeln!(writer, "    let children = node.children();")?;
-    writeln!(writer, "    for child in children.iter() {{")?;
+    writeln!(writer, "    for child in children {{")?;
     writeln!(writer, "        visit_sppf_node(child, visitor);")?;
     writeln!(writer, "    }}")?;
     writeln!(writer, "    match node.get_symbol().id {{")?;
