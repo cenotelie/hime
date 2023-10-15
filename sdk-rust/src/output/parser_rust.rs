@@ -268,7 +268,7 @@ fn write_code_constructors(
         writer,
         "    parse_text{fn_suffix}(text{})",
         if has_actions {
-            ", &mut NoActions {{}}"
+            ", &mut NoActions {}"
         } else {
             ""
         }
@@ -312,7 +312,7 @@ fn write_code_constructors(
         writer,
         "    parse_text{fn_suffix}(text{})",
         if has_actions {
-            ", &mut NoActions {{}}"
+            ", &mut NoActions {}"
         } else {
             ""
         }
@@ -366,7 +366,7 @@ fn write_code_constructors(
             writer,
             "    Ok(parse_text{fn_suffix}(text{}))",
             if has_actions {
-                ", &mut NoActions {{}}"
+                ", &mut NoActions {}"
             } else {
                 ""
             }
