@@ -1358,10 +1358,21 @@ impl<'s, 't, 'a> Serialize for SppfNode<'s, 't, 'a> {
     where
         S: Serializer,
     {
-        let versions = self.versions();
-        let mut state = serializer.serialize_struct("SppfNode", 1)?;
-        state.serialize_field("versions", &versions)?;
-        state.end()
+        if self.versions_count() == 1 {
+            let version = self.first_version();
+            let mut state = serializer.serialize_struct("SppfNode", 5)?;
+            state.serialize_field("symbol", &version.get_symbol())?;
+            state.serialize_field("position", &version.get_position())?;
+            state.serialize_field("span", &version.get_span())?;
+            state.serialize_field("value", &version.get_value())?;
+            state.serialize_field("children", &version.children())?;
+            state.end()
+        } else {
+            let versions = self.versions();
+            let mut state = serializer.serialize_struct("SppfNode", 1)?;
+            state.serialize_field("versions", &versions)?;
+            state.end()
+        }
     }
 }
 
