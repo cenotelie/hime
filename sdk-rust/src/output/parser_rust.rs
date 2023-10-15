@@ -605,7 +605,7 @@ fn write_code_sppf_visitor(
     }
     writeln!(writer, "}}")?;
     writeln!(writer)?;
-    writeln!(writer, "clone_trait_object!(SppfVisitor)")?;
+    writeln!(writer, "clone_trait_object!(SppfVisitor);")?;
     writeln!(writer)?;
     writeln!(writer, "/// Walk the AST of a result using a visitor")?;
     writeln!(
