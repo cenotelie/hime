@@ -1406,11 +1406,7 @@ impl<'s, 't, 'a> Serialize for SppfNodeVersions<'s, 't, 'a> {
     where
         S: Serializer,
     {
-        let mut seq = serializer.serialize_seq(Some(self.len()))?;
-        for version in self.into_iter() {
-            seq.serialize_element(&version)?;
-        }
-        seq.end()
+        serializer.collect_seq(self.into_iter())
     }
 }
 
@@ -1707,11 +1703,7 @@ impl<'s, 't, 'a> Serialize for SppfNodeChildren<'s, 't, 'a> {
     where
         S: Serializer,
     {
-        let mut seq = serializer.serialize_seq(Some(self.len()))?;
-        for child in self.into_iter() {
-            seq.serialize_element(&child)?;
-        }
-        seq.end()
+        serializer.collect_seq(self.into_iter())
     }
 }
 
