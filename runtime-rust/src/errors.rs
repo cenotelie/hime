@@ -17,9 +17,9 @@
 
 //! Module for the definition of lexical and syntactic errors
 
-use core::fmt::{Display, Formatter};
 use alloc::string::String;
 use alloc::vec::Vec;
+use core::fmt::{Display, Formatter};
 
 use serde::Serialize;
 
