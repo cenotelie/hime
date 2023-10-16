@@ -22,7 +22,7 @@ use core::fmt::{Display, Error, Formatter};
 use core::iter::FusedIterator;
 use core::ops::Index;
 
-use serde::ser::{SerializeSeq, SerializeStruct};
+use serde::ser::SerializeStruct;
 use serde::{Serialize, Serializer};
 
 use crate::ast::{TableElemRef, TableType};
@@ -1406,7 +1406,7 @@ impl<'s, 't, 'a> Serialize for SppfNodeVersions<'s, 't, 'a> {
     where
         S: Serializer,
     {
-        serializer.collect_seq(self.into_iter())
+        serializer.collect_seq(*self)
     }
 }
 
@@ -1703,7 +1703,7 @@ impl<'s, 't, 'a> Serialize for SppfNodeChildren<'s, 't, 'a> {
     where
         S: Serializer,
     {
-        serializer.collect_seq(self.into_iter())
+        serializer.collect_seq(*self)
     }
 }
 
