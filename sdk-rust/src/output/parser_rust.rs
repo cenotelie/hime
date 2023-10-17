@@ -661,8 +661,8 @@ fn write_code_sppf_visitor(
         }
         writeln!(
             writer,
-            "        0x{:04X} => visitor.on_terminal_{}(&node),",
-            terminal.id,
+            "        ID_TERMINAL_{} => visitor.on_terminal_{}(&node),",
+            to_upper_case(&terminal.name),
             to_snake_case(&terminal.name)
         )?;
     }
@@ -672,16 +672,16 @@ fn write_code_sppf_visitor(
         }
         writeln!(
             writer,
-            "        0x{:04X} => visitor.on_variable_{}(&node),",
-            variable.id,
+            "        ID_VARIABLE_{} => visitor.on_variable_{}(&node),",
+            to_upper_case(&variable.name),
             to_snake_case(&variable.name)
         )?;
     }
     for symbol in &grammar.virtuals {
         writeln!(
             writer,
-            "        0x{:04X} => visitor.on_virtual_{}(&node),",
-            symbol.id,
+            "        ID_VIRTUAL_{} => visitor.on_virtual_{}(&node),",
+            to_upper_case(&symbol.name),
             to_snake_case(&symbol.name)
         )?;
     }
