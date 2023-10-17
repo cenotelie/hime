@@ -215,6 +215,7 @@ fn write_code_actions(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
         writer,
         "/// Represents a set of semantic actions in this parser"
     )?;
+    writeln!(writer, "#[allow(unused_variables)]")?;
     writeln!(writer, "pub trait Actions {{")?;
     for action in &grammar.actions {
         writeln!(writer, "    /// The {} semantic action", &action.name)?;
@@ -269,7 +270,7 @@ fn write_code_constructors(
         writer,
         "    parse_text{fn_suffix}(text{})",
         if has_actions {
-            ", &mut NoActions {{}}"
+            ", &mut NoActions {}"
         } else {
             ""
         }
@@ -313,7 +314,7 @@ fn write_code_constructors(
         writer,
         "    parse_text{fn_suffix}(text{})",
         if has_actions {
-            ", &mut NoActions {{}}"
+            ", &mut NoActions {}"
         } else {
             ""
         }
@@ -367,7 +368,7 @@ fn write_code_constructors(
             writer,
             "    Ok(parse_text{fn_suffix}(text{}))",
             if has_actions {
-                ", &mut NoActions {{}}"
+                ", &mut NoActions {}"
             } else {
                 ""
             }
@@ -470,6 +471,7 @@ fn write_code_ast_visitor(
 ) -> Result<(), Error> {
     writeln!(writer)?;
     writeln!(writer, "/// AST Visitor interface")?;
+    writeln!(writer, "#[allow(unused_variables)]")?;
     writeln!(writer, "pub trait AstVisitor {{")?;
     for terminal_ref in &expected.content {
         let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) else {
@@ -480,7 +482,7 @@ fn write_code_ast_visitor(
         }
         writeln!(
             writer,
-            "    fn on_terminal_{}(&mut self, _node: &AstNode) {{}}",
+            "    fn on_terminal_{}(&mut self, node: &AstNode) {{}}",
             to_snake_case(&terminal.name)
         )?;
     }
@@ -490,14 +492,14 @@ fn write_code_ast_visitor(
         }
         writeln!(
             writer,
-            "    fn on_variable_{}(&mut self, _node: &AstNode) {{}}",
+            "    fn on_variable_{}(&mut self, node: &AstNode) {{}}",
             to_snake_case(&variable.name)
         )?;
     }
     for symbol in &grammar.virtuals {
         writeln!(
             writer,
-            "    fn on_virtual_{}(&mut self, _node: &AstNode) {{}}",
+            "    fn on_virtual_{}(&mut self, node: &AstNode) {{}}",
             to_snake_case(&symbol.name)
         )?;
     }
