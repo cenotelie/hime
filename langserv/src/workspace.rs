@@ -979,7 +979,7 @@ fn test_scan_workspace_in() -> io::Result<()> {
     for doc in &workspace.documents {
         println!("{}", &doc.url);
     }
-    assert_eq!(workspace.documents.is_empty(), false);
+    assert!(!workspace.documents.is_empty());
     Ok(())
 }
 
@@ -995,6 +995,6 @@ fn test_scan_workspace() -> io::Result<()> {
     for doc in &workspace.documents {
         println!("{}", &doc.url);
     }
-    assert_eq!(workspace.documents.is_empty(), false);
+    assert!(!workspace.documents.is_empty());
     Ok(())
 }

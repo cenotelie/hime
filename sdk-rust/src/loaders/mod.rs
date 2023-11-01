@@ -39,7 +39,7 @@ use crate::grammars::{
     TemplateRuleRef, TemplateRuleSymbol, TerminalReference, DEFAULT_CONTEXT_NAME,
 };
 use crate::unicode::{Span, BLOCKS, CATEGORIES};
-use crate::{CharSpan, Input, InputReference, LoadedData, LoadedInput};
+use crate::{CharSpan, Input, InputReference, LoadedData, LoadedInput, CHARSPAN_INVALID};
 
 /// Represents a generalised input for a loader
 pub struct LoadInput<'a>(String, Box<dyn Read + 'a>);
@@ -779,36 +779,16 @@ fn load_nfa_reference(
 
 /// Adds a unicode character span to an existing NFA automaton
 fn add_unicode_span_to_nfa(nfa: &mut NFA, span: Span) {
-    let b = span.begin.get_utf16();
-    let e = span.end.get_utf16();
-    if span.is_plane0() {
-        // this span is entirely in plane 0
-        nfa.add_transition(nfa.entry, CharSpan::new(b[0], e[0]), nfa.exit);
-    } else if span.begin.is_plane0() {
-        // this span has only a part in plane 0
-        if b[0] < 0xD800 {
-            nfa.add_transition(nfa.entry, CharSpan::new(b[0], 0xD7FF), nfa.exit);
-            nfa.add_transition(nfa.entry, CharSpan::new(0xE000, 0xFFFF), nfa.exit);
+    for [first, second] in span.get_char_spans() {
+        if second == CHARSPAN_INVALID {
+            // single
+            nfa.add_transition(nfa.entry, first, nfa.exit);
         } else {
-            nfa.add_transition(nfa.entry, CharSpan::new(b[0], 0xFFFF), nfa.exit);
+            // use an intermediate state
+            let intermediate = nfa.add_state().id;
+            nfa.add_transition(nfa.entry, first, intermediate);
+            nfa.add_transition(intermediate, second, nfa.exit);
         }
-        let intermediate = nfa.add_state().id;
-        nfa.add_transition(nfa.entry, CharSpan::new(0xD800, e[0]), intermediate);
-        nfa.add_transition(intermediate, CharSpan::new(0xDC00, e[1]), nfa.exit);
-    } else {
-        // there is at least one surrogate value between the first surrogates of begin and end
-        // build lower part
-        let ia = nfa.add_state().id;
-        nfa.add_transition(nfa.entry, CharSpan::new(b[0], b[0]), ia);
-        nfa.add_transition(ia, CharSpan::new(b[1], 0xDFFF), nfa.exit);
-        // build intermediate part
-        let im = nfa.add_state().id;
-        nfa.add_transition(nfa.entry, CharSpan::new(b[0] + 1, e[0] - 1), im);
-        nfa.add_transition(im, CharSpan::new(0xDC00, 0xDFFF), nfa.exit);
-        // build upper part
-        let iz = nfa.add_state().id;
-        nfa.add_transition(nfa.entry, CharSpan::new(e[0], e[0]), iz);
-        nfa.add_transition(iz, CharSpan::new(0xDC00, e[1]), nfa.exit);
     }
 }
 

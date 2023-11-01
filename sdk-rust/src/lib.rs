@@ -65,8 +65,13 @@ pub const CHARSPAN_INVALID: CharSpan = CharSpan { begin: 1, end: 0 };
 
 impl CharSpan {
     /// Creates a new span
+    ///
+    /// # Panics
+    ///
+    /// Panic is raised when the span would be invalid (begin is after end)
     #[must_use]
     pub fn new(begin: u16, end: u16) -> CharSpan {
+        assert!(begin <= end, "invalid char span: {begin:04X}-{end:04X}");
         CharSpan { begin, end }
     }
 
@@ -80,6 +85,12 @@ impl CharSpan {
     #[must_use]
     pub fn is_empty(self) -> bool {
         self.end < self.begin
+    }
+
+    /// Gets whether this span contains the specified value
+    #[must_use]
+    pub fn contains(self, value: u16) -> bool {
+        value >= self.begin && value <= self.end
     }
 
     /// Gets the intersection between two spans
@@ -135,7 +146,7 @@ impl CharSpan {
 
 impl Ord for CharSpan {
     fn cmp(&self, other: &CharSpan) -> Ordering {
-        self.begin.cmp(&other.begin)
+        self.begin.cmp(&other.begin).then(self.end.cmp(&other.end))
     }
 }
 
@@ -149,15 +160,15 @@ impl PartialOrd for CharSpan {
 fn test_charspan_intersect() {
     // empty charspan
     assert_eq!(
-        CharSpan::new(1, 0).intersect(CharSpan::new(3, 4)),
+        CHARSPAN_INVALID.intersect(CharSpan::new(3, 4)),
         CHARSPAN_INVALID
     );
     assert_eq!(
-        CharSpan::new(3, 4).intersect(CharSpan::new(1, 0)),
+        CharSpan::new(3, 4).intersect(CHARSPAN_INVALID),
         CHARSPAN_INVALID
     );
     assert_eq!(
-        CharSpan::new(1, 0).intersect(CharSpan::new(1, 0)),
+        CHARSPAN_INVALID.intersect(CHARSPAN_INVALID),
         CHARSPAN_INVALID
     );
     // no intersection

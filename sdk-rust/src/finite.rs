@@ -651,6 +651,44 @@ pub struct NFATransition {
     pub next: usize,
 }
 
+/// An effect for a bound for a set of NFA transitions
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NFATransitionBoundEffect {
+    /// Starts a range of transition to a next state
+    Start { tid: usize, next: usize },
+    /// Ends a range of transition to a next state
+    End { tid: usize },
+    /// Start of a range for another state
+    OtherStart,
+    /// End of a range for another state
+    OtherEnd,
+}
+
+/// A bound for NFA transitions
+#[derive(Debug, Clone)]
+pub struct NFATransitionBound {
+    /// The character value, included
+    value: u16,
+    /// The effects on the bounds
+    effects: Vec<NFATransitionBoundEffect>,
+}
+
+impl NFATransitionBound {
+    /// Counts the number of starts and ends in the effects    
+    #[must_use]
+    pub fn count_starts_ends(&self) -> (usize, usize) {
+        self.effects
+            .iter()
+            .fold((0, 0), |(starts, ends), effect| match effect {
+                NFATransitionBoundEffect::Start { tid: _, next: _ }
+                | NFATransitionBoundEffect::OtherStart => (starts + 1, ends),
+                NFATransitionBoundEffect::End { tid: _ } | NFATransitionBoundEffect::OtherEnd => {
+                    (starts, ends + 1)
+                }
+            })
+    }
+}
+
 /// Represents a state in a Non-deterministic Finite Automaton
 #[derive(Debug, Clone)]
 pub struct NFAState {
@@ -720,53 +758,218 @@ impl NFAState {
         self.transitions.clear();
     }
 
+    /// Fill a mpa of bounds with data from transitions from this state
+    fn fill_bounds_map(&self, map: &mut Vec<NFATransitionBound>) {
+        for transition in &self.transitions {
+            if transition.value != EPSILON {
+                Self::insert_sorted_in(
+                    map,
+                    transition.value.begin,
+                    NFATransitionBoundEffect::OtherStart,
+                );
+                Self::insert_sorted_in(
+                    map,
+                    transition.value.end,
+                    NFATransitionBoundEffect::OtherEnd,
+                );
+            }
+        }
+    }
+
+    /// Insert a bound in a sorted map of transition bounds
+    fn insert_sorted_in(
+        map: &mut Vec<NFATransitionBound>,
+        value: u16,
+        effect: NFATransitionBoundEffect,
+    ) {
+        let mut index = 0;
+        while index < map.len() {
+            if map[index].value == value {
+                map[index].effects.push(effect);
+                return;
+            }
+            if map[index].value > value {
+                map.insert(
+                    index,
+                    NFATransitionBound {
+                        value,
+                        effects: vec![effect],
+                    },
+                );
+                return;
+            }
+            index += 1;
+        }
+        map.push(NFATransitionBound {
+            value,
+            effects: vec![effect],
+        });
+    }
+
     /// Normalize the transitions in this state
-    pub fn normalize_self(&mut self) -> bool {
-        let mut modified = false;
-        let mut i = 0;
-        while i < self.transitions.len() {
-            let mut j = i + 1;
-            while j < self.transitions.len() {
-                modified |= self.normalize_split(i, self.transitions[j].value);
-                j += 1;
+    fn normalize(&mut self, map: &[NFATransitionBound]) {
+        let mut map = map.to_vec();
+        let mut transitions = Vec::new();
+        for (index, transition) in self.transitions.iter().enumerate() {
+            if transition.value == EPSILON || transition.value.len() == 1 {
+                transitions.push(*transition);
+            } else {
+                Self::insert_sorted_in(
+                    &mut map,
+                    transition.value.begin,
+                    NFATransitionBoundEffect::Start {
+                        tid: index,
+                        next: transition.next,
+                    },
+                );
+                Self::insert_sorted_in(
+                    &mut map,
+                    transition.value.end,
+                    NFATransitionBoundEffect::End { tid: index },
+                );
             }
-            i += 1;
         }
-        modified
+        let mut current_start = 0;
+        let mut current_nexts = Vec::new();
+        for bound in map {
+            let (starts, ends) = bound.count_starts_ends();
+
+            // end all ongoing ranges
+            for &(_tid, next) in &current_nexts {
+                transitions.push(NFATransition {
+                    value: CharSpan::new(
+                        current_start,
+                        if starts == 0 {
+                            bound.value
+                        } else {
+                            bound.value - 1
+                        },
+                    ),
+                    next,
+                });
+            }
+            let ongoings = current_nexts
+                .iter()
+                .map(|&(tid, _)| tid)
+                .collect::<Vec<_>>();
+
+            // apply effects
+            for effect in bound.effects {
+                match effect {
+                    NFATransitionBoundEffect::OtherStart | NFATransitionBoundEffect::OtherEnd => {}
+                    NFATransitionBoundEffect::Start { tid, next } => {
+                        current_nexts.push((tid, next));
+                        if ends > 0 {
+                            // there are ends, we will re-start from +1
+                            // add a single transition
+                            transitions.push(NFATransition {
+                                value: CharSpan::new(bound.value, bound.value),
+                                next,
+                            });
+                        }
+                    }
+                    NFATransitionBoundEffect::End { tid } => {
+                        let index = current_nexts
+                            .iter()
+                            .position(|&(id, _next)| id == tid)
+                            .unwrap();
+                        let (_tid, next) = current_nexts.swap_remove(index);
+                        if starts > 0 {
+                            // there are starts, we ends ongoing before
+                            // add a single transition
+                            transitions.push(NFATransition {
+                                value: CharSpan::new(bound.value, bound.value),
+                                next,
+                            });
+                        }
+                    }
+                }
+            }
+
+            // all surviving spans, use this bound
+            if starts > 0 && ends > 0 {
+                for &(tid, next) in &current_nexts {
+                    if ongoings.contains(&tid) {
+                        transitions.push(NFATransition {
+                            value: CharSpan::new(bound.value, bound.value),
+                            next,
+                        });
+                    }
+                }
+            }
+
+            // starts from this bounds if all starts (no ends) effect, else use the next
+            current_start = if ends == 0 || bound.value == u16::MAX {
+                bound.value
+            } else {
+                bound.value + 1
+            };
+        }
+
+        if cfg!(debug_assertions) {
+            Self::assert_equivalent_transitions(&self.transitions, &transitions);
+        }
+        self.transitions = transitions;
+        assert!(current_nexts.is_empty());
     }
 
-    /// Normalize the transitions in this state with another state
-    pub fn normalize_with_other(&mut self, others: &[NFATransition]) -> bool {
-        let mut modified = false;
-        let mut i = 0;
-        while i < self.transitions.len() {
-            for transition in others {
-                modified |= self.normalize_split(i, transition.value);
-            }
-            i += 1;
-        }
-        modified
+    /// Gets all the possible nexts given transactions and an input
+    #[must_use]
+    fn get_nexts_by(transitions: &[NFATransition], c: u16) -> Vec<usize> {
+        transitions
+            .iter()
+            .filter_map(|transition| {
+                if transition.value.contains(c) {
+                    Some(transition.next)
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 
-    /// Normalize a specific transition for a specific state in this set
-    pub fn normalize_split(&mut self, t: usize, splitter: CharSpan) -> bool {
-        let transition = self.transitions[t];
-        if transition.value == EPSILON || transition.value == splitter {
-            return false;
+    /// Checks that two sets of transitions are equivalent
+    fn assert_equivalent_transitions(left: &[NFATransition], right: &[NFATransition]) {
+        for left in left {
+            if left.value == EPSILON {
+                assert!(
+                    right
+                        .iter()
+                        .any(|r| r.value == EPSILON && r.next == left.next),
+                    "missing transition on EPSILON to {}",
+                    left.next
+                );
+            } else {
+                for v in left.value.begin..=left.value.end {
+                    assert!(
+                        Self::get_nexts_by(right, v).contains(&left.next),
+                        "missing transition on {} to {}",
+                        v,
+                        left.next
+                    );
+                }
+            }
         }
-        let intersection = transition.value.intersect(splitter);
-        if intersection == CHARSPAN_INVALID {
-            return false;
+
+        for right in right {
+            if right.value == EPSILON {
+                assert!(
+                    left.iter()
+                        .any(|l| l.value == EPSILON && l.next == right.next),
+                    "spurious on EPSILON to {}",
+                    right.next
+                );
+            } else {
+                for v in right.value.begin..=right.value.end {
+                    assert!(
+                        Self::get_nexts_by(left, v).contains(&right.next),
+                        "spurious transition on {} to {}",
+                        v,
+                        right.next
+                    );
+                }
+            }
         }
-        let (part1, part2) = transition.value.split(intersection);
-        self.transitions[t].value = intersection;
-        if part1 != CHARSPAN_INVALID {
-            self.add_transition(part1, transition.next);
-        }
-        if part2 != CHARSPAN_INVALID {
-            self.add_transition(part2, transition.next);
-        }
-        true
     }
 }
 
@@ -777,6 +980,272 @@ impl PartialEq for NFAState {
 }
 
 impl Eq for NFAState {}
+
+#[cfg(test)]
+mod tests_nfa_normalize {
+    use crate::{
+        finite::{NFATransitionBound, NFATransitionBoundEffect},
+        CharSpan,
+    };
+
+    use super::{NFAState, NFATransition};
+
+    #[test]
+    fn test_no_overlap_start_0() {
+        let mut state = NFAState::new(0);
+        state.add_transition(CharSpan::new(0, 10), 1);
+        state.add_transition(CharSpan::new(11, 20), 2);
+        state.add_transition(CharSpan::new(30, 40), 3);
+        let mut map = Vec::new();
+        state.fill_bounds_map(&mut map);
+        let bounds = map.iter().map(|b| b.value).collect::<Vec<_>>();
+        assert_eq!(bounds, vec![0, 10, 11, 20, 30, 40]);
+        state.normalize(&map);
+        assert_eq!(
+            state.transitions,
+            vec![
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(0, 10)
+                },
+                NFATransition {
+                    next: 2,
+                    value: CharSpan::new(11, 20)
+                },
+                NFATransition {
+                    next: 3,
+                    value: CharSpan::new(30, 40)
+                },
+            ]
+        )
+    }
+
+    #[test]
+    fn test_no_overlap_start_1() {
+        let mut state = NFAState::new(0);
+        state.add_transition(CharSpan::new(1, 10), 1);
+        state.add_transition(CharSpan::new(11, 20), 2);
+        state.add_transition(CharSpan::new(30, 40), 3);
+        let mut map = Vec::new();
+        state.fill_bounds_map(&mut map);
+        let bounds = map.iter().map(|b| b.value).collect::<Vec<_>>();
+        assert_eq!(bounds, vec![1, 10, 11, 20, 30, 40]);
+        state.normalize(&map);
+        assert_eq!(
+            state.transitions,
+            vec![
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(1, 10)
+                },
+                NFATransition {
+                    next: 2,
+                    value: CharSpan::new(11, 20)
+                },
+                NFATransition {
+                    next: 3,
+                    value: CharSpan::new(30, 40)
+                },
+            ]
+        )
+    }
+
+    #[test]
+    fn test_no_overlap_ends_max() {
+        let mut state = NFAState::new(0);
+        state.add_transition(CharSpan::new(0, 10), 1);
+        state.add_transition(CharSpan::new(11, 20), 2);
+        state.add_transition(CharSpan::new(30, 0xFFFF), 3);
+        let mut map = Vec::new();
+        state.fill_bounds_map(&mut map);
+        let bounds = map.iter().map(|b| b.value).collect::<Vec<_>>();
+        assert_eq!(bounds, vec![0, 10, 11, 20, 30, 0xFFFF]);
+        state.normalize(&map);
+        assert_eq!(
+            state.transitions,
+            vec![
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(0, 10)
+                },
+                NFATransition {
+                    next: 2,
+                    value: CharSpan::new(11, 20)
+                },
+                NFATransition {
+                    next: 3,
+                    value: CharSpan::new(30, 0xFFFF)
+                },
+            ]
+        )
+    }
+
+    #[test]
+    fn test_overlap_1() {
+        let mut state = NFAState::new(0);
+        state.add_transition(CharSpan::new(0, 10), 1);
+        state.add_transition(CharSpan::new(5, 15), 2);
+        let mut map = Vec::new();
+        state.fill_bounds_map(&mut map);
+        let bounds = map.iter().map(|b| b.value).collect::<Vec<_>>();
+        assert_eq!(bounds, vec![0, 5, 10, 15]);
+        state.normalize(&map);
+        assert_eq!(
+            state.transitions,
+            vec![
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(0, 4)
+                },
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(5, 10)
+                },
+                NFATransition {
+                    next: 2,
+                    value: CharSpan::new(5, 10)
+                },
+                NFATransition {
+                    next: 2,
+                    value: CharSpan::new(11, 15)
+                },
+            ]
+        )
+    }
+
+    #[test]
+    fn test_overlap_1_other() {
+        let mut state = NFAState::new(0);
+        state.add_transition(CharSpan::new(0, 10), 1);
+        let mut map = vec![
+            NFATransitionBound {
+                value: 5,
+                effects: vec![NFATransitionBoundEffect::OtherStart],
+            },
+            NFATransitionBound {
+                value: 15,
+                effects: vec![NFATransitionBoundEffect::OtherEnd],
+            },
+        ];
+        state.fill_bounds_map(&mut map);
+        let bounds = map.iter().map(|b| b.value).collect::<Vec<_>>();
+        assert_eq!(bounds, vec![0, 5, 10, 15]);
+        state.normalize(&map);
+        assert_eq!(
+            state.transitions,
+            vec![
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(0, 4)
+                },
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(5, 10)
+                },
+            ]
+        )
+    }
+
+    #[test]
+    fn test_overlap_start_end_bound() {
+        let mut state = NFAState::new(0);
+        state.add_transition(CharSpan::new(0, 10), 1);
+        state.add_transition(CharSpan::new(10, 15), 2);
+        let mut map = Vec::new();
+        state.fill_bounds_map(&mut map);
+        let bounds = map.iter().map(|b| b.value).collect::<Vec<_>>();
+        assert_eq!(bounds, vec![0, 10, 15]);
+        state.normalize(&map);
+        assert_eq!(
+            state.transitions,
+            vec![
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(0, 9)
+                },
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(10, 10)
+                },
+                NFATransition {
+                    next: 2,
+                    value: CharSpan::new(10, 10)
+                },
+                NFATransition {
+                    next: 2,
+                    value: CharSpan::new(11, 15)
+                },
+            ]
+        )
+    }
+
+    #[test]
+    fn test_overlap_start_end_bound_other() {
+        let mut state = NFAState::new(0);
+        state.add_transition(CharSpan::new(0, 10), 1);
+        let mut map = vec![
+            NFATransitionBound {
+                value: 10,
+                effects: vec![NFATransitionBoundEffect::OtherStart],
+            },
+            NFATransitionBound {
+                value: 15,
+                effects: vec![NFATransitionBoundEffect::OtherEnd],
+            },
+        ];
+        state.fill_bounds_map(&mut map);
+        let bounds = map.iter().map(|b| b.value).collect::<Vec<_>>();
+        assert_eq!(bounds, vec![0, 10, 15]);
+        state.normalize(&map);
+        assert_eq!(
+            state.transitions,
+            vec![
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(0, 9)
+                },
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(10, 10)
+                },
+            ]
+        )
+    }
+
+    #[test]
+    fn test_overlap_start_end_bound_other_2() {
+        let mut state = NFAState::new(0);
+        state.add_transition(CharSpan::new(0, 10), 1);
+        let mut map = vec![NFATransitionBound {
+            value: 5,
+            effects: vec![
+                NFATransitionBoundEffect::OtherStart,
+                NFATransitionBoundEffect::OtherEnd,
+            ],
+        }];
+        state.fill_bounds_map(&mut map);
+        let bounds = map.iter().map(|b| b.value).collect::<Vec<_>>();
+        assert_eq!(bounds, vec![0, 5, 10]);
+        state.normalize(&map);
+        assert_eq!(
+            state.transitions,
+            vec![
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(0, 4)
+                },
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(5, 5)
+                },
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(6, 10)
+                },
+            ]
+        )
+    }
+}
 
 /// Represents a Non-deterministic Finite Automaton
 #[derive(Debug, Clone)]
@@ -1133,30 +1602,15 @@ impl NFAStateSet {
         transitions
     }
 
-    /// Normalize this set
+    /// Normalize this set so that no transition overlap with another from the set
     fn normalize(&self, nfa: &mut NFA) {
-        while self.normalize_once(nfa) {}
-    }
-
-    /// Normalize this set
-    fn normalize_once(&self, nfa: &mut NFA) -> bool {
-        let mut modified = false;
-        let nb_states = self.states.len();
-        let mut s1 = 0;
-        // For each NFA state in the set
-        while s1 < nb_states {
-            modified |= nfa.states[self.states[s1]].normalize_self();
-            let mut s2 = s1 + 1;
-            while s2 < nb_states {
-                let transitions = nfa.states[self.states[s2]].transitions.clone();
-                modified |= nfa.states[self.states[s1]].normalize_with_other(&transitions);
-                let transitions = nfa.states[self.states[s1]].transitions.clone();
-                modified |= nfa.states[self.states[s2]].normalize_with_other(&transitions);
-                s2 += 1;
-            }
-            s1 += 1;
+        let mut map = Vec::new();
+        for &index in &self.states {
+            nfa.states[index].fill_bounds_map(&mut map);
         }
-        modified
+        for &index in &self.states {
+            nfa.states[index].normalize(&map);
+        }
     }
 }
 
