@@ -110,7 +110,8 @@ pub fn write(
             compress_automata,
         )?;
     }
-    write_code_visitor(&mut writer, grammar, expected)?;
+    write_code_ast_visitor(&mut writer, grammar, expected)?;
+    write_code_sppf_visitor(&mut writer, grammar, expected)?;
     Ok(())
 }
 
@@ -463,15 +464,15 @@ fn write_code_constructors(
 }
 
 /// Generates the visitor for the parse result
-fn write_code_visitor(
+fn write_code_ast_visitor(
     writer: &mut dyn Write,
     grammar: &Grammar,
     expected: &TerminalSet,
 ) -> Result<(), Error> {
     writeln!(writer)?;
-    writeln!(writer, "/// Visitor interface")?;
+    writeln!(writer, "/// AST Visitor interface")?;
     writeln!(writer, "#[allow(unused_variables)]")?;
-    writeln!(writer, "pub trait Visitor {{")?;
+    writeln!(writer, "pub trait AstVisitor {{")?;
     for terminal_ref in &expected.content {
         let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) else {
             continue;
@@ -481,7 +482,7 @@ fn write_code_visitor(
         }
         writeln!(
             writer,
-            "    fn on_terminal_{}(&self, node: &AstNode) {{}}",
+            "    fn on_terminal_{}(&mut self, node: &AstNode) {{}}",
             to_snake_case(&terminal.name)
         )?;
     }
@@ -491,14 +492,14 @@ fn write_code_visitor(
         }
         writeln!(
             writer,
-            "    fn on_variable_{}(&self, node: &AstNode) {{}}",
+            "    fn on_variable_{}(&mut self, node: &AstNode) {{}}",
             to_snake_case(&variable.name)
         )?;
     }
     for symbol in &grammar.virtuals {
         writeln!(
             writer,
-            "    fn on_virtual_{}(&self, node: &AstNode) {{}}",
+            "    fn on_virtual_{}(&mut self, node: &AstNode) {{}}",
             to_snake_case(&symbol.name)
         )?;
     }
@@ -507,7 +508,7 @@ fn write_code_visitor(
     writeln!(writer, "/// Walk the AST of a result using a visitor")?;
     writeln!(
         writer,
-        "pub fn visit(result: &ParseResult<AstImpl>, visitor: &dyn Visitor) {{"
+        "pub fn visit_ast(result: &ParseResult<AstImpl>, visitor: &mut dyn AstVisitor) {{"
     )?;
     writeln!(writer, "    let ast = result.get_ast();")?;
     writeln!(writer, "    let root = ast.get_root();")?;
@@ -520,7 +521,7 @@ fn write_code_visitor(
     )?;
     writeln!(
         writer,
-        "pub fn visit_ast_node(node: AstNode, visitor: &dyn Visitor) {{"
+        "pub fn visit_ast_node(node: AstNode, visitor: &mut dyn AstVisitor) {{"
     )?;
     writeln!(writer, "    let children = node.children();")?;
     writeln!(writer, "    for child in children.iter() {{")?;
@@ -562,6 +563,134 @@ fn write_code_visitor(
     }
     writeln!(writer, "        _ => ()")?;
     writeln!(writer, "    }};")?;
+    writeln!(writer, "}}")?;
+    Ok(())
+}
+
+fn write_code_sppf_visitor(
+    writer: &mut dyn Write,
+    grammar: &Grammar,
+    expected: &TerminalSet,
+) -> Result<(), Error> {
+    writeln!(writer)?;
+    writeln!(writer, "/// SPPF Visitor interface")?;
+    writeln!(writer, "pub trait SppfVisitor: DynClone {{")?;
+    for terminal_ref in &expected.content {
+        let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) else {
+            continue;
+        };
+        if terminal.name.starts_with(PREFIX_GENERATED_TERMINAL) {
+            continue;
+        }
+        writeln!(
+            writer,
+            "    fn on_terminal_{}(&mut self, node: &SppfNodeVersion) {{}}",
+            to_snake_case(&terminal.name)
+        )?;
+    }
+    for variable in &grammar.variables {
+        if variable.name.starts_with(PREFIX_GENERATED_VARIABLE) {
+            continue;
+        }
+        writeln!(
+            writer,
+            "    fn on_variable_{}(&mut self, node: &SppfNodeVersion) {{}}",
+            to_snake_case(&variable.name)
+        )?;
+    }
+    for symbol in &grammar.virtuals {
+        writeln!(
+            writer,
+            "    fn on_virtual_{}(&mut self, node: &SppfNodeVersion) {{}}",
+            to_snake_case(&symbol.name)
+        )?;
+    }
+    writeln!(writer, "}}")?;
+    writeln!(writer)?;
+    writeln!(writer, "clone_trait_object!(SppfVisitor);")?;
+    writeln!(writer)?;
+    writeln!(writer, "/// Walk the AST of a result using a visitor")?;
+    writeln!(
+        writer,
+        "pub fn visit_sppf(result: &ParseResult<SppfImpl>, visitor: &mut Box<dyn SppfVisitor>, trees: &mut Vec<Box<dyn SppfVisitor>>) {{"
+    )?;
+    writeln!(writer, "    let sppf = result.get_ast();")?;
+    writeln!(writer, "    let root = sppf.get_root();")?;
+    writeln!(writer, "    visit_sppf_node(root, visitor, trees);")?;
+    writeln!(writer, "}}")?;
+    writeln!(writer)?;
+
+    writeln!(
+        writer,
+        "/// Walk the sub-AST from the specified node using a visitor"
+    )?;
+    writeln!(
+        writer,
+        "pub fn visit_sppf_node(node: SppfNode, visitor: &mut Box<dyn SppfVisitor>, trees: &mut Vec<Box<dyn SppfVisitor>>) {{"
+    )?;
+
+    writeln!(writer, "    if node.versions_count() > 1 {{")?;
+    writeln!(writer, "        let versions = node.versions();")?;
+    writeln!(writer, "        for version in versions {{")?;
+    writeln!(writer, "            let mut visitor = visitor.clone();")?;
+    writeln!(writer, "            visit_sppf_version_node(version, &mut visitor, trees);")?;
+    writeln!(writer, "            trees.push(visitor);")?;
+    writeln!(writer, "        }}")?;
+    writeln!(writer, "    }} else {{")?;
+    writeln!(writer, "        let version = node.first_version();")?;
+    writeln!(writer, "        visit_sppf_version_node(version, visitor, trees);")?;
+    writeln!(writer, "    }}")?;
+    writeln!(writer, "}}")?;
+    writeln!(writer)?;
+
+    writeln!(
+        writer,
+        "/// Walk the sub-AST from the specified node using a visitor"
+    )?;
+    writeln!(
+        writer,
+        "pub fn visit_sppf_version_node(node: SppfNodeVersion, visitor: &mut Box<dyn SppfVisitor>, trees: &mut Vec<Box<dyn SppfVisitor>>) {{"
+    )?;
+    writeln!(writer, "    match node.get_symbol().id {{")?;
+    for terminal_ref in &expected.content {
+        let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) else {
+            continue;
+        };
+        if terminal.name.starts_with(PREFIX_GENERATED_TERMINAL) {
+            continue;
+        }
+        writeln!(
+            writer,
+            "        ID_TERMINAL_{} => visitor.on_terminal_{}(&node),",
+            to_upper_case(&terminal.name),
+            to_snake_case(&terminal.name)
+        )?;
+    }
+    for variable in &grammar.variables {
+        if variable.name.starts_with(PREFIX_GENERATED_VARIABLE) {
+            continue;
+        }
+        writeln!(
+            writer,
+            "        ID_VARIABLE_{} => visitor.on_variable_{}(&node),",
+            to_upper_case(&variable.name),
+            to_snake_case(&variable.name)
+        )?;
+    }
+    for symbol in &grammar.virtuals {
+        writeln!(
+            writer,
+            "        ID_VIRTUAL_{} => visitor.on_virtual_{}(&node),",
+            to_upper_case(&symbol.name),
+            to_snake_case(&symbol.name)
+        )?;
+    }
+    writeln!(writer, "        _ => ()")?;
+    writeln!(writer, "    }};")?;
+    writeln!(writer, "    let children = node.children();")?;
+    writeln!(writer, "    for child in children {{")?;
+    writeln!(writer, "        visit_sppf_node(child, visitor, trees);")?;
+    writeln!(writer, "    }}")?;
     writeln!(writer, "}}")?;
     Ok(())
 }

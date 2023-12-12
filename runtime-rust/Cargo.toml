@@ -19,6 +19,7 @@ debug = []
 std = ["serde/std"]
 
 [dependencies]
+dyn-clone = "1.0.14"
 serde = { version = "1", default-features = false, features = ["derive", "alloc"] }
 
 [badges]

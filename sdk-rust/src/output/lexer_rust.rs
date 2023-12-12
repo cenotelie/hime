@@ -98,7 +98,9 @@ pub fn write(
         if is_rnglr { ", ParseResultSppf" } else { "" }
     )?;
     if is_rnglr {
-        writeln!(writer, "use hime_redist::sppf::SppfImpl;")?;
+        writeln!(writer, "use hime_redist::sppf::{{SppfImpl, SppfNode, SppfNodeVersion}};")?;
+        writeln!(writer, "use hime_redist::dyn_clone::{{DynClone, clone_trait_object}};")?;
+        writeln!(writer, "use alloc::boxed::Box;")?;
     }
     writeln!(writer, "use hime_redist::symbols::SemanticBody;")?;
     writeln!(writer, "use hime_redist::symbols::SemanticElementTrait;")?;
