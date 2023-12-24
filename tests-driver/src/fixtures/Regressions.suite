@@ -142,3 +142,39 @@ test Issue088_Rnglr_Sppf:
 	parser RNGLALR1
 	on "axbyczd"
 	yields z(y(A x(X) B Y C) Z D)
+
+test Issue105:
+	grammar Issue105 { options {Axiom="s"; Separator = "SEPARATOR";} terminals {
+		// A.1.1 Line terminators
+		NEW_LINE		-> U+000D /* CR */
+						|  U+000A /* LF */
+						|  U+000D U+000A /* CR LF */
+						|  U+0085 // Next line character
+						|  U+2028 // Line separator character
+						|  U+2029 ; //Paragraph separator character (U+2029)
+
+		// A.1.2 White space
+		WHITE_SPACE		-> uc{Zs} | U+0009 | U+000B | U+000C ;
+
+		// A.1.3 Comments
+		COMMENT_LINE	-> '//' (.* - (.* NEW_LINE .*)) ;
+		COMMENT_BLOCK	-> '/*' (.* - (.* '*/' .*)) '*/' ;
+
+		SEPARATOR		-> (NEW_LINE | WHITE_SPACE | COMMENT_LINE | COMMENT_BLOCK)+;
+
+		A -> 'a';
+		B -> 'b';
+		C -> 'c';
+		D -> 'd';
+		X -> 'x';
+		Y -> 'y';
+		Z -> 'z';
+	} rules {
+		s -> A x B y^ C z^ D;
+		x -> X ;
+		y -> Y ;
+		z -> Z ;
+	} }
+	parser RNGLALR1
+	on "axbyczd"
+	yields z(y(A x(X) B Y C) Z D)
