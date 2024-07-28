@@ -110,7 +110,7 @@ impl<'s> InMemoryParser<'s> {
         repository: TokenRepository<'s, 't, 'a>,
         errors: &'a mut ParseErrors<'s>,
     ) -> Lexer<'s, 't, 'a> {
-        if self.lexer_is_context_sensitive {
+        if !self.lexer_is_context_sensitive {
             Lexer::ContextFree(ContextFreeLexer::new(
                 repository,
                 errors,

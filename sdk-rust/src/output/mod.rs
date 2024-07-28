@@ -253,7 +253,7 @@ pub fn build_in_memory_grammar<'a>(
         return Err(vec![error]);
     }
     let mut parser_automaton = Vec::new();
-    if let Err(error) = if data.method.is_rnglr() {
+    if let Err(error) = if !data.method.is_rnglr() {
         parser_data::write_parser_lrk_data(
             &mut parser_automaton,
             grammar,
