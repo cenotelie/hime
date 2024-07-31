@@ -36,29 +36,14 @@ pub const GIT_HASH: &str = env!("GIT_HASH");
 pub const GIT_TAG: &str = env!("GIT_TAG");
 
 const FIXTURES: [FixtureDef; 8] = [
-    FixtureDef(
-        "ContextSensitive",
-        include_bytes!("fixtures/ContextSensitive.suite"),
-    ),
+    FixtureDef("ContextSensitive", include_bytes!("fixtures/ContextSensitive.suite")),
     FixtureDef("Errors", include_bytes!("fixtures/Errors.suite")),
-    FixtureDef(
-        "GrammarOptions",
-        include_bytes!("fixtures/GrammarOptions.suite"),
-    ),
-    FixtureDef(
-        "LexicalRules",
-        include_bytes!("fixtures/LexicalRules.suite"),
-    ),
+    FixtureDef("GrammarOptions", include_bytes!("fixtures/GrammarOptions.suite")),
+    FixtureDef("LexicalRules", include_bytes!("fixtures/LexicalRules.suite")),
     FixtureDef("Regressions", include_bytes!("fixtures/Regressions.suite")),
-    FixtureDef(
-        "SyntacticRules",
-        include_bytes!("fixtures/SyntacticRules.suite"),
-    ),
+    FixtureDef("SyntacticRules", include_bytes!("fixtures/SyntacticRules.suite")),
     FixtureDef("TreeActions", include_bytes!("fixtures/TreeActions.suite")),
-    FixtureDef(
-        "UnicodeBlocks",
-        include_bytes!("fixtures/UnicodeBlocks.suite"),
-    ),
+    FixtureDef("UnicodeBlocks", include_bytes!("fixtures/UnicodeBlocks.suite")),
 ];
 
 /// Main entry point

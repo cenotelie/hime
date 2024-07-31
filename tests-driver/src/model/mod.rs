@@ -86,11 +86,7 @@ impl Fixtures {
     }
 
     /// Build the Rust parsers for the fixtures
-    fn build_rust_inner(
-        grammars: &[Grammar],
-        grammars_data: &[BuildData],
-        errors: &mut Vec<Error>,
-    ) -> Result<(), Error> {
+    fn build_rust_inner(grammars: &[Grammar], grammars_data: &[BuildData], errors: &mut Vec<Error>) -> Result<(), Error> {
         let temp_dir = hime_sdk::output::temporary_folder();
         fs::create_dir_all(&temp_dir)?;
         let mut runtime_path = get_repo_root();
@@ -106,9 +102,7 @@ impl Fixtures {
 
         // Build all parser data
         for (index, (grammar, data)) in grammars.iter().zip(grammars_data.iter()).enumerate() {
-            if let Err(mut errs) =
-                hime_sdk::output::output_grammar_artifacts(&task, grammar, index, data)
-            {
+            if let Err(mut errs) = hime_sdk::output::output_grammar_artifacts(&task, grammar, index, data) {
                 errors.append(&mut errs);
             }
         }
@@ -138,11 +132,7 @@ impl Fixtures {
     }
 
     /// Build the .Net parsers for the fixtures
-    fn build_net_inner(
-        grammars: &[Grammar],
-        grammars_data: &[BuildData],
-        errors: &mut Vec<Error>,
-    ) -> Result<(), Error> {
+    fn build_net_inner(grammars: &[Grammar], grammars_data: &[BuildData], errors: &mut Vec<Error>) -> Result<(), Error> {
         let temp_dir = hime_sdk::output::temporary_folder();
         fs::create_dir_all(&temp_dir)?;
         let mut runtime_path = get_repo_root();
@@ -158,9 +148,7 @@ impl Fixtures {
 
         // Build all parser data
         for (index, (grammar, data)) in grammars.iter().zip(grammars_data.iter()).enumerate() {
-            if let Err(mut errs) =
-                hime_sdk::output::output_grammar_artifacts(&task, grammar, index, data)
-            {
+            if let Err(mut errs) = hime_sdk::output::output_grammar_artifacts(&task, grammar, index, data) {
                 errors.append(&mut errs);
             }
         }
@@ -188,11 +176,7 @@ impl Fixtures {
     }
 
     /// Build the Java parsers for the fixtures
-    fn build_java_inner(
-        grammars: &[Grammar],
-        grammars_data: &[BuildData],
-        errors: &mut Vec<Error>,
-    ) -> Result<(), Error> {
+    fn build_java_inner(grammars: &[Grammar], grammars_data: &[BuildData], errors: &mut Vec<Error>) -> Result<(), Error> {
         let temp_dir = hime_sdk::output::temporary_folder();
         fs::create_dir_all(&temp_dir)?;
         let mut runtime_path = get_repo_root();
@@ -213,9 +197,7 @@ impl Fixtures {
 
         // Build all parser data
         for (index, (grammar, data)) in grammars.iter().zip(grammars_data.iter()).enumerate() {
-            if let Err(mut errs) =
-                hime_sdk::output::output_grammar_artifacts(&task, grammar, index, data)
-            {
+            if let Err(mut errs) = hime_sdk::output::output_grammar_artifacts(&task, grammar, index, data) {
                 errors.append(&mut errs);
             }
         }
@@ -284,12 +266,10 @@ impl Fixture {
         let root = ast.get_root();
         let name = root.get_value().unwrap();
         let mut tests = Vec::new();
-        for (index, node) in root.into_iter().enumerate() {
+        for node in root.into_iter() {
             tests.push(match node.get_symbol().id {
-                crate::loaders::ID_VARIABLE_TEST_OUTPUT => {
-                    Test::Output(OutputTest::from_ast(node, index))
-                }
-                _ => Test::Parsing(ParsingTest::from_ast(node, index)),
+                crate::loaders::ID_VARIABLE_TEST_OUTPUT => Test::Output(OutputTest::from_ast(node)),
+                _ => Test::Parsing(ParsingTest::from_ast(node)),
             });
         }
         Fixture {
@@ -307,10 +287,7 @@ impl Fixture {
             .into_iter()
             .filter(|test_node| match filter {
                 None => true,
-                Some(filter) => test_node
-                    .child(0)
-                    .get_value()
-                    .map_or(true, |name| name.contains(filter)),
+                Some(filter) => test_node.child(0).get_value().map_or(true, |name| name.contains(filter)),
             })
             .map(|test_node| (index, test_node.child(1)))
             .collect();
@@ -376,8 +353,6 @@ impl Test {
 pub struct OutputTest {
     /// The test name
     pub name: String,
-    /// The index within the fixture
-    pub index: usize,
     /// The input for the parser
     pub input: String,
     /// The expected output
@@ -386,7 +361,7 @@ pub struct OutputTest {
 
 impl OutputTest {
     /// Builds an output test from the specified AST
-    pub fn from_ast(node: AstNode, index: usize) -> OutputTest {
+    pub fn from_ast(node: AstNode) -> OutputTest {
         let name = node.child(0).get_value().unwrap();
         let input = hime_sdk::loaders::replace_escapees(node.child(3).get_value().unwrap());
         let output = node
@@ -401,7 +376,6 @@ impl OutputTest {
             .collect();
         OutputTest {
             name: name.to_string(),
-            index,
             input: input.to_string(),
             output,
         }
@@ -439,25 +413,13 @@ impl OutputTest {
             to_upper_camel_case(&self.name),
             to_upper_camel_case(&self.name)
         );
-        execute_command(
-            Runtime::Net,
-            "mono",
-            &["executor-net.exe", &name, "outputs"],
-        )
+        execute_command(Runtime::Net, "mono", &["executor-net.exe", &name, "outputs"])
     }
 
     /// Execute this test on the Java runtime
     fn execute_java(&self) -> Result<TestResultOnRuntime, Error> {
-        let name = format!(
-            "{}.{}Parser",
-            to_snake_case(&self.name),
-            to_upper_camel_case(&self.name)
-        );
-        execute_command(
-            Runtime::Java,
-            "java",
-            &["-jar", "executor-java.jar", &name, "outputs"],
-        )
+        let name = format!("{}.{}Parser", to_snake_case(&self.name), to_upper_camel_case(&self.name));
+        execute_command(Runtime::Java, "java", &["-jar", "executor-java.jar", &name, "outputs"])
     }
 
     /// Execute this test on the Rust runtime
@@ -469,11 +431,7 @@ impl OutputTest {
             program.set_extension(ext);
         }
         let name = to_snake_case(&self.name);
-        execute_command(
-            Runtime::Rust,
-            program.to_str().unwrap(),
-            &[&name, "outputs"],
-        )
+        execute_command(Runtime::Rust, program.to_str().unwrap(), &[&name, "outputs"])
     }
 }
 
@@ -502,8 +460,6 @@ impl ParsingTestVerb {
 pub struct ParsingTest {
     /// The test name
     pub name: String,
-    /// The index within the fixture
-    pub index: usize,
     /// The verb for this test
     pub verb: ParsingTestVerb,
     /// The input for the parser
@@ -514,7 +470,7 @@ pub struct ParsingTest {
 
 impl ParsingTest {
     /// Builds an output test from the specified AST
-    pub fn from_ast(node: AstNode, index: usize) -> ParsingTest {
+    pub fn from_ast(node: AstNode) -> ParsingTest {
         let name = node.child(0).get_value().unwrap();
         let verb = match node.get_symbol().id {
             crate::loaders::ID_VARIABLE_TEST_MATCHES => ParsingTestVerb::Matches,
@@ -531,7 +487,6 @@ impl ParsingTest {
         };
         ParsingTest {
             name: name.to_string(),
-            index,
             verb,
             input: input.to_string(),
             tree,
@@ -550,9 +505,7 @@ impl ParsingTest {
             // Decode the read value by replacing all the escape sequences
             let value = hime_sdk::loaders::replace_escapees(value);
             // Reset escape sequences for single quotes and backslashes
-            let value = value[1..(value.len() - 1)]
-                .replace('\\', "\\\\")
-                .replace('\'', "\\'");
+            let value = value[1..(value.len() - 1)].replace('\\', "\\\\").replace('\'', "\\'");
             buffer.push('\'');
             buffer.push_str(&value);
             buffer.push('\'');
@@ -600,20 +553,12 @@ impl ParsingTest {
             to_upper_camel_case(&self.name),
             to_upper_camel_case(&self.name)
         );
-        execute_command(
-            Runtime::Net,
-            "mono",
-            &["executor-net.exe", &name, self.verb.as_str()],
-        )
+        execute_command(Runtime::Net, "mono", &["executor-net.exe", &name, self.verb.as_str()])
     }
 
     /// Execute this test on the Java runtime
     fn execute_java(&self) -> Result<TestResultOnRuntime, Error> {
-        let name = format!(
-            "{}.{}Parser",
-            to_snake_case(&self.name),
-            to_upper_camel_case(&self.name)
-        );
+        let name = format!("{}.{}Parser", to_snake_case(&self.name), to_upper_camel_case(&self.name));
         execute_command(
             Runtime::Java,
             "java",
@@ -630,20 +575,12 @@ impl ParsingTest {
             program.set_extension(ext);
         }
         let name = to_snake_case(&self.name);
-        execute_command(
-            Runtime::Rust,
-            program.to_str().unwrap(),
-            &[&name, self.verb.as_str()],
-        )
+        execute_command(Runtime::Rust, program.to_str().unwrap(), &[&name, self.verb.as_str()])
     }
 }
 
 /// Execute s a command
-fn execute_command(
-    runtime: Runtime,
-    program: &str,
-    args: &[&str],
-) -> Result<TestResultOnRuntime, Error> {
+fn execute_command(runtime: Runtime, program: &str, args: &[&str]) -> Result<TestResultOnRuntime, Error> {
     let mut command = Command::new(program);
     command.args(args);
     let start_time = Instant::now();

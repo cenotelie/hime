@@ -22,10 +22,7 @@ use std::io::BufReader;
 #[allow(dead_code)]
 mod fixture;
 
-pub use fixture::{
-    ID_VARIABLE_TEST_FAILS, ID_VARIABLE_TEST_MATCHES, ID_VARIABLE_TEST_NO_MATCH,
-    ID_VARIABLE_TEST_OUTPUT,
-};
+pub use fixture::{ID_VARIABLE_TEST_MATCHES, ID_VARIABLE_TEST_NO_MATCH, ID_VARIABLE_TEST_OUTPUT};
 use hime_redist::ast::AstImpl;
 use hime_redist::errors::ParseErrorDataTrait;
 use hime_redist::result::{ParseResult, ParseResultAst};
@@ -45,9 +42,7 @@ pub fn parse_fixtures(fixtures: &[FixtureDef]) -> Result<Fixtures, Errors> {
         .collect();
     let is_ok = results.iter().all(ParseResult::<AstImpl>::is_success);
     if is_ok {
-        Ok(Fixtures(
-            results.into_iter().map(Fixture::from_content).collect(),
-        ))
+        Ok(Fixtures(results.into_iter().map(Fixture::from_content).collect()))
     } else {
         let errors: Vec<Error> = results
             .iter()

@@ -75,14 +75,8 @@ pub const CONTEXT_TREE: u16 = 0x0001;
 /// The terminals are in an order consistent with the automaton,
 /// so that terminal indices in the automaton can be used to retrieve the terminals in this table
 pub const TERMINALS: &[Symbol] = &[
-    Symbol {
-        id: 0x0001,
-        name: "ε",
-    },
-    Symbol {
-        id: 0x0002,
-        name: "$",
-    },
+    Symbol { id: 0x0001, name: "ε" },
+    Symbol { id: 0x0002, name: "$" },
     Symbol {
         id: 0x0007,
         name: "SEPARATOR",
@@ -171,62 +165,23 @@ pub const TERMINALS: &[Symbol] = &[
         id: 0x001E,
         name: "BLOCK_CONTEXT",
     },
-    Symbol {
-        id: 0x0043,
-        name: "=",
-    },
-    Symbol {
-        id: 0x0044,
-        name: ";",
-    },
-    Symbol {
-        id: 0x0045,
-        name: "(",
-    },
-    Symbol {
-        id: 0x0046,
-        name: ")",
-    },
-    Symbol {
-        id: 0x0048,
-        name: "{",
-    },
-    Symbol {
-        id: 0x0049,
-        name: ",",
-    },
-    Symbol {
-        id: 0x004A,
-        name: "}",
-    },
-    Symbol {
-        id: 0x004F,
-        name: "->",
-    },
+    Symbol { id: 0x0043, name: "=" },
+    Symbol { id: 0x0044, name: ";" },
+    Symbol { id: 0x0045, name: "(" },
+    Symbol { id: 0x0046, name: ")" },
+    Symbol { id: 0x0048, name: "{" },
+    Symbol { id: 0x0049, name: "," },
+    Symbol { id: 0x004A, name: "}" },
+    Symbol { id: 0x004F, name: "->" },
     Symbol {
         id: 0x0050,
         name: "fragment",
     },
-    Symbol {
-        id: 0x0052,
-        name: "@",
-    },
-    Symbol {
-        id: 0x0053,
-        name: "<",
-    },
-    Symbol {
-        id: 0x0055,
-        name: ">",
-    },
-    Symbol {
-        id: 0x0056,
-        name: "#",
-    },
-    Symbol {
-        id: 0x005E,
-        name: ":",
-    },
+    Symbol { id: 0x0052, name: "@" },
+    Symbol { id: 0x0053, name: "<" },
+    Symbol { id: 0x0055, name: ">" },
+    Symbol { id: 0x0056, name: "#" },
+    Symbol { id: 0x005E, name: ":" },
     Symbol {
         id: 0x0060,
         name: "grammar",
@@ -247,10 +202,7 @@ pub const TERMINALS: &[Symbol] = &[
         id: 0x0070,
         name: "parser",
     },
-    Symbol {
-        id: 0x0071,
-        name: "on",
-    },
+    Symbol { id: 0x0071, name: "on" },
     Symbol {
         id: 0x0072,
         name: "yields",
@@ -267,21 +219,13 @@ pub const TERMINALS: &[Symbol] = &[
         id: 0x0075,
         name: "outputs",
     },
-    Symbol {
-        id: 0x0078,
-        name: "!=",
-    },
+    Symbol { id: 0x0078, name: "!=" },
 ];
 
 /// Creates a new lexer
-fn new_lexer<'a: 'b, 'b, 'c>(
-    repository: TokenRepository<'a, 'b, 'c>,
-    errors: &'c mut ParseErrors<'a>,
-) -> Lexer<'a, 'b, 'c> {
+fn new_lexer<'a: 'b, 'b, 'c>(repository: TokenRepository<'a, 'b, 'c>, errors: &'c mut ParseErrors<'a>) -> Lexer<'a, 'b, 'c> {
     let automaton = Automaton::new(LEXER_AUTOMATON);
-    Lexer::ContextSensitive(ContextSensitiveLexer::new(
-        repository, errors, automaton, 0x0007,
-    ))
+    Lexer::ContextSensitive(ContextSensitiveLexer::new(repository, errors, automaton, 0x0007))
 }
 
 /// Static resource for the serialized parser automaton
@@ -703,14 +647,7 @@ fn parse_text_with<'s, 't, 'a>(
         let data = result.get_parsing_data();
         let mut lexer = new_lexer(data.0, data.1);
         let automaton = LRkAutomaton::new(PARSER_AUTOMATON);
-        let mut parser = LRkParser::new(
-            &mut lexer,
-            variables,
-            virtuals,
-            automaton,
-            data.2,
-            &mut my_actions,
-        );
+        let mut parser = LRkParser::new(&mut lexer, variables, virtuals, automaton, data.2, &mut my_actions);
         parser.parse();
     }
     result

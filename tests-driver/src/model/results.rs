@@ -118,10 +118,7 @@ impl ExecutionResults {
     /// Writes the test result as XML
     pub fn write_xml<W: Write>(&self, writer: &mut W) -> Result<(), Error> {
         let stats = self.get_stats();
-        writeln!(
-            writer,
-            "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\" ?>"
-        )?;
+        writeln!(writer, "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\" ?>")?;
         write!(writer, "<testsuite")?;
         write!(writer, " name=\"tests\"")?;
         write!(writer, " timestamp=\"\"")?;
@@ -189,20 +186,9 @@ pub struct TestResult {
 impl TestResult {
     /// Gets the statistics for this test
     pub fn get_stats(&self) -> Statistics {
-        self.dot_net
-            .as_ref()
-            .map(TestResultOnRuntime::get_stats)
-            .unwrap_or_default()
-            + self
-                .java
-                .as_ref()
-                .map(TestResultOnRuntime::get_stats)
-                .unwrap_or_default()
-            + self
-                .rust
-                .as_ref()
-                .map(TestResultOnRuntime::get_stats)
-                .unwrap_or_default()
+        self.dot_net.as_ref().map(TestResultOnRuntime::get_stats).unwrap_or_default()
+            + self.java.as_ref().map(TestResultOnRuntime::get_stats).unwrap_or_default()
+            + self.rust.as_ref().map(TestResultOnRuntime::get_stats).unwrap_or_default()
     }
 
     /// Writes the test result as XML

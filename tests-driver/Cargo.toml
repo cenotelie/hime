@@ -13,8 +13,8 @@ edition = "2021"
 [dependencies]
 hime_redist = "4.3.0"
 hime_sdk = { version = "4.3.0", features = ["print_errors"] }
-libloading = "0.7"
-miette = { version = "5.6", features = ["fancy"]}
+libloading = "0.8"
+miette = { version = "7.2", features = ["fancy"]}
 
 # Used for tests debugging
 # hime_generated = { path = "../tests-results/hime_generated-3.3.1" }
