@@ -88,7 +88,7 @@ impl<'t> LoadedInput<'t> {
         TextSpanContents {
             name: &self.name,
             content: self.content.get_value(start_offset, length),
-            span: SourceSpan::new(SourceOffset::from(start_offset), SourceOffset::from(length)),
+            span: SourceSpan::new(SourceOffset::from(start_offset), length),
             position: TextPosition {
                 line: start_line,
                 column: 1,
