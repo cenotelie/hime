@@ -29,9 +29,7 @@ use hime_redist::parsers::{
 };
 
 use crate::errors::Error;
-use crate::grammars::{
-    Grammar, Rule, RuleRef, SymbolRef, TerminalRef, TerminalSet, GENERATED_AXIOM,
-};
+use crate::grammars::{Grammar, Rule, RuleRef, SymbolRef, TerminalRef, TerminalSet, GENERATED_AXIOM};
 use crate::lr::{Graph, State};
 use crate::output::helper::{write_u16, write_u32, write_u8};
 
@@ -90,11 +88,7 @@ pub fn write_parser_lrk_data(
 }
 
 /// Writes the column headers for a parser data
-fn write_parser_column_headers(
-    writer: &mut dyn Write,
-    grammar: &Grammar,
-    expected: &TerminalSet,
-) -> Result<(), Error> {
+fn write_parser_column_headers(writer: &mut dyn Write, grammar: &Grammar, expected: &TerminalSet) -> Result<(), Error> {
     // writes the columns's id
     for terminal_ref in &expected.content {
         write_u16(writer, terminal_ref.sid() as u16)?;
@@ -109,11 +103,7 @@ fn write_parser_column_headers(
 fn write_parser_opening_contexts(writer: &mut dyn Write, graph: &Graph) -> Result<(), Error> {
     // write context openings for each state
     for state in &graph.states {
-        let count: usize = state
-            .opening_contexts
-            .values()
-            .map(std::vec::Vec::len)
-            .sum();
+        let count: usize = state.opening_contexts.values().map(std::vec::Vec::len).sum();
         write_u16(writer, count as u16)?;
         for (terminal, contexts) in &state.opening_contexts {
             for context in contexts {
@@ -134,9 +124,7 @@ fn write_parser_lrk_data_state(
     state: &State,
 ) -> Result<(), Error> {
     // write action on epsilon
-    if state.get_reduction_for(TerminalRef::Epsilon).is_some()
-        || state.get_reduction_for(TerminalRef::NullTerminal).is_some()
-    {
+    if state.get_reduction_for(TerminalRef::Epsilon).is_some() || state.get_reduction_for(TerminalRef::NullTerminal).is_some() {
         write_u16(writer, LR_ACTION_CODE_ACCEPT)?;
     } else {
         write_u16(writer, LR_ACTION_CODE_NONE)?;
@@ -149,17 +137,11 @@ fn write_parser_lrk_data_state(
             write_u16(writer, LR_ACTION_CODE_SHIFT)?;
             write_u16(writer, *next as u16)?;
         } else if let Some(reduction) = state.get_reduction_for(terminal) {
-            let index = rules
-                .iter()
-                .position(|rule| rule == &reduction.rule)
-                .unwrap();
+            let index = rules.iter().position(|rule| rule == &reduction.rule).unwrap();
             write_u16(writer, LR_ACTION_CODE_REDUCE)?;
             write_u16(writer, index as u16)?;
         } else if let Some(reduction) = state.get_reduction_for(TerminalRef::NullTerminal) {
-            let index = rules
-                .iter()
-                .position(|rule| rule == &reduction.rule)
-                .unwrap();
+            let index = rules.iter().position(|rule| rule == &reduction.rule).unwrap();
             write_u16(writer, LR_ACTION_CODE_REDUCE)?;
             write_u16(writer, index as u16)?;
         } else {
@@ -181,11 +163,7 @@ fn write_parser_lrk_data_state(
 }
 
 /// Generates the parser's binary representation of a rule production
-fn write_parser_lrk_data_rule(
-    writer: &mut dyn Write,
-    grammar: &Grammar,
-    rule: &Rule,
-) -> Result<(), Error> {
+fn write_parser_lrk_data_rule(writer: &mut dyn Write, grammar: &Grammar, rule: &Rule) -> Result<(), Error> {
     let head_index = grammar
         .variables
         .iter()
@@ -207,20 +185,12 @@ fn write_parser_lrk_data_rule(
     for element in &rule.body.elements {
         match element.symbol {
             SymbolRef::Virtual(id) => {
-                let index = grammar
-                    .virtuals
-                    .iter()
-                    .position(|symbol| symbol.id == id)
-                    .unwrap();
+                let index = grammar.virtuals.iter().position(|symbol| symbol.id == id).unwrap();
                 write_u16(writer, LR_OP_CODE_BASE_ADD_VIRTUAL | element.action)?;
                 write_u16(writer, index as u16)?;
             }
             SymbolRef::Action(id) => {
-                let index = grammar
-                    .actions
-                    .iter()
-                    .position(|symbol| symbol.id == id)
-                    .unwrap();
+                let index = grammar.actions.iter().position(|symbol| symbol.id == id).unwrap();
                 write_u16(writer, LR_OP_CODE_BASE_SEMANTIC_ACTION)?;
                 write_u16(writer, index as u16)?;
             }
@@ -265,17 +235,10 @@ pub fn write_parser_rnglr_data(
         let mut temp = Vec::new();
         for (rule_index, rule) in variable.rules.iter().enumerate() {
             // Add normal rule
-            temp.push((
-                RuleRef::new(variable.id, rule_index),
-                rule.body.choices[0].len(),
-            ));
+            temp.push((RuleRef::new(variable.id, rule_index), rule.body.choices[0].len()));
             // Look for right-nullable choices
             for i in 1..rule.body.choices[0].len() {
-                if rule.body.choices[i]
-                    .firsts
-                    .content
-                    .contains(&TerminalRef::Epsilon)
-                {
+                if rule.body.choices[i].firsts.content.contains(&TerminalRef::Epsilon) {
                     temp.push((RuleRef::new(variable.id, rule_index), i));
                 }
             }
@@ -312,14 +275,7 @@ pub fn write_parser_rnglr_data(
     let mut offsets: Vec<u32> = Vec::new(); // for each state, the offset in the action table
     let mut counts: Vec<u16> = Vec::new(); // for each state, the number of actions
     for state in &graph.states {
-        total = write_parser_rnglr_data_generate_offset(
-            expected,
-            grammar,
-            &mut offsets,
-            &mut counts,
-            total,
-            state,
-        );
+        total = write_parser_rnglr_data_generate_offset(expected, grammar, &mut offsets, &mut counts, total, state);
     }
     let axiom_index = grammar
         .variables
@@ -377,9 +333,7 @@ fn write_parser_rnglr_data_generate_offset(
 ) -> u32 {
     let mut reductions_counter: HashMap<TerminalRef, usize> = HashMap::new();
     for reduction in &state.reductions {
-        let counter = reductions_counter
-            .entry(reduction.lookahead.terminal)
-            .or_default();
+        let counter = reductions_counter.entry(reduction.lookahead.terminal).or_default();
         *counter += 1;
     }
     for terminal in &expected.content {
@@ -392,11 +346,7 @@ fn write_parser_rnglr_data_generate_offset(
         total += count as u32;
     }
     for variable in &grammar.variables {
-        let count = i32::from(
-            state
-                .children
-                .contains_key(&SymbolRef::Variable(variable.id)),
-        );
+        let count = i32::from(state.children.contains_key(&SymbolRef::Variable(variable.id)));
         offsets.push(total);
         counts.push(count as u16);
         total += count as u32;
@@ -424,11 +374,7 @@ fn write_parser_rnglr_data_action_table(
             write_u16(writer, LR_ACTION_CODE_SHIFT)?;
             write_u16(writer, *next as u16)?;
         }
-        for reduction in state
-            .reductions
-            .iter()
-            .filter(|r| r.lookahead.terminal == terminal)
-        {
+        for reduction in state.reductions.iter().filter(|r| r.lookahead.terminal == terminal) {
             let index = rules
                 .iter()
                 .position(|(rule, length)| rule == &reduction.rule && *length == reduction.length)
@@ -447,12 +393,7 @@ fn write_parser_rnglr_data_action_table(
 }
 
 /// Generates the parser's binary representation of a rule production
-fn write_parser_rnglr_data_rule(
-    writer: &mut dyn Write,
-    grammar: &Grammar,
-    rule: &Rule,
-    length: usize,
-) -> Result<(), Error> {
+fn write_parser_rnglr_data_rule(writer: &mut dyn Write, grammar: &Grammar, rule: &Rule, length: usize) -> Result<(), Error> {
     let head_index = grammar
         .variables
         .iter()
@@ -483,20 +424,12 @@ fn write_parser_rnglr_data_rule(
     for element in &rule.body.elements {
         match element.symbol {
             SymbolRef::Virtual(id) => {
-                let index = grammar
-                    .virtuals
-                    .iter()
-                    .position(|symbol| symbol.id == id)
-                    .unwrap();
+                let index = grammar.virtuals.iter().position(|symbol| symbol.id == id).unwrap();
                 write_u16(writer, LR_OP_CODE_BASE_ADD_VIRTUAL | element.action)?;
                 write_u16(writer, index as u16)?;
             }
             SymbolRef::Action(id) => {
-                let index = grammar
-                    .actions
-                    .iter()
-                    .position(|symbol| symbol.id == id)
-                    .unwrap();
+                let index = grammar.actions.iter().position(|symbol| symbol.id == id).unwrap();
                 write_u16(writer, LR_OP_CODE_BASE_SEMANTIC_ACTION)?;
                 write_u16(writer, index as u16)?;
             }
@@ -505,15 +438,8 @@ fn write_parser_rnglr_data_rule(
                     // Here the symbol must be a variable
                     // let variable_id = element.symbol.sid();
                     if let SymbolRef::Variable(id) = element.symbol {
-                        let index = grammar
-                            .variables
-                            .iter()
-                            .position(|symbol| symbol.id == id)
-                            .unwrap();
-                        write_u16(
-                            writer,
-                            LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE | element.action,
-                        )?;
+                        let index = grammar.variables.iter().position(|symbol| symbol.id == id).unwrap();
+                        write_u16(writer, LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE | element.action)?;
                         write_u16(writer, index as u16)?;
                     }
                 } else {

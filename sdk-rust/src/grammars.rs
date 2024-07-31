@@ -182,11 +182,7 @@ pub struct TerminalSet {
 
 impl PartialEq for TerminalSet {
     fn eq(&self, other: &TerminalSet) -> bool {
-        self.content.len() == other.content.len()
-            && self
-                .content
-                .iter()
-                .all(|t_ref| other.content.contains(t_ref))
+        self.content.len() == other.content.len() && self.content.iter().all(|t_ref| other.content.contains(t_ref))
     }
 }
 
@@ -194,9 +190,7 @@ impl TerminalSet {
     /// Creates a set with a single element
     #[must_use]
     pub fn single(terminal: TerminalRef) -> TerminalSet {
-        TerminalSet {
-            content: vec![terminal],
-        }
+        TerminalSet { content: vec![terminal] }
     }
 
     /// Gets the number of states in this automaton
@@ -383,10 +377,7 @@ impl Variable {
         let mut modified = false;
         for rule in &mut self.rules {
             modified |= self.firsts.add_others(&rule.body.firsts);
-            modified |= firsts_for_var
-                .entry(self.id)
-                .or_default()
-                .add_others(&rule.body.firsts);
+            modified |= firsts_for_var.entry(self.id).or_default().add_others(&rule.body.firsts);
             modified |= rule.body.compute_firsts(firsts_for_var);
         }
         modified
@@ -463,10 +454,7 @@ impl SymbolRef {
             SymbolRef::Dummy | SymbolRef::NullTerminal => 0,
             SymbolRef::Epsilon => 1,
             SymbolRef::Dollar => 2,
-            SymbolRef::Terminal(id)
-            | SymbolRef::Variable(id)
-            | SymbolRef::Virtual(id)
-            | SymbolRef::Action(id) => id,
+            SymbolRef::Terminal(id) | SymbolRef::Variable(id) | SymbolRef::Virtual(id) | SymbolRef::Action(id) => id,
         }
     }
 }
@@ -515,11 +503,7 @@ impl PartialEq for RuleBodyElement {
 impl RuleBodyElement {
     /// Creates a new body element
     #[must_use]
-    pub fn new(
-        symbol: SymbolRef,
-        action: TreeAction,
-        input_ref: Option<InputReference>,
-    ) -> RuleBodyElement {
+    pub fn new(symbol: SymbolRef, action: TreeAction, input_ref: Option<InputReference>) -> RuleBodyElement {
         RuleBodyElement {
             symbol,
             action,
@@ -592,11 +576,7 @@ impl RuleChoice {
     }
 
     /// Computes the FIRSTS set for this rule choice
-    pub fn compute_firsts(
-        &mut self,
-        next: &TerminalSet,
-        firsts_for_var: &mut HashMap<usize, TerminalSet>,
-    ) -> bool {
+    pub fn compute_firsts(&mut self, next: &TerminalSet, firsts_for_var: &mut HashMap<usize, TerminalSet>) -> bool {
         // If the choice is empty : Add the ε to the Firsts and return
         if self.elements.is_empty() {
             return self.firsts.add(TerminalRef::Epsilon);
@@ -630,12 +610,7 @@ impl RuleChoice {
 
 impl PartialEq for RuleChoice {
     fn eq(&self, other: &Self) -> bool {
-        self.elements.len() == other.elements.len()
-            && self
-                .elements
-                .iter()
-                .zip(other.elements.iter())
-                .all(|(e1, e2)| e1 == e2)
+        self.elements.len() == other.elements.len() && self.elements.iter().zip(other.elements.iter()).all(|(e1, e2)| e1 == e2)
     }
 }
 
@@ -735,11 +710,7 @@ impl RuleBody {
     #[must_use]
     pub fn single(symbol: SymbolRef, input_ref: InputReference) -> RuleBody {
         RuleBody {
-            elements: vec![RuleBodyElement::new(
-                symbol,
-                TREE_ACTION_NONE,
-                Some(input_ref),
-            )],
+            elements: vec![RuleBodyElement::new(symbol, TREE_ACTION_NONE, Some(input_ref))],
             firsts: TerminalSet::default(),
             choices: Vec::new(),
         }
@@ -835,22 +806,14 @@ impl RuleBody {
     }
 
     /// Propagate the followers
-    pub fn propagate_followers(
-        &self,
-        head: usize,
-        followers: &mut HashMap<usize, TerminalSet>,
-    ) -> bool {
+    pub fn propagate_followers(&self, head: usize, followers: &mut HashMap<usize, TerminalSet>) -> bool {
         let mut modified = false;
         // For all choices but the last (empty)
         for (i, choice) in self.choices.iter().enumerate().take(self.choices.len() - 1) {
             if let SymbolRef::Variable(id) = choice.elements[0].symbol {
                 // if the next choice FIRSTS set contains ε
                 // add the FOLLOWERS of the head variable to the FOLLOWERS of the found variable
-                if self.choices[i + 1]
-                    .firsts
-                    .content
-                    .contains(&TerminalRef::Epsilon)
-                {
+                if self.choices[i + 1].firsts.content.contains(&TerminalRef::Epsilon) {
                     let head_followers = followers.get(&head).cloned().unwrap_or_default();
                     modified |= followers.entry(id).or_default().add_others(&head_followers);
                 }
@@ -862,12 +825,7 @@ impl RuleBody {
 
 impl PartialEq for RuleBody {
     fn eq(&self, other: &Self) -> bool {
-        self.elements.len() == other.elements.len()
-            && self
-                .elements
-                .iter()
-                .zip(other.elements.iter())
-                .all(|(e1, e2)| e1 == e2)
+        self.elements.len() == other.elements.len() && self.elements.iter().zip(other.elements.iter()).all(|(e1, e2)| e1 == e2)
     }
 }
 
@@ -891,13 +849,7 @@ pub struct Rule {
 impl Rule {
     /// Initializes this rule
     #[must_use]
-    pub fn new(
-        head: usize,
-        head_action: TreeAction,
-        input_ref: InputReference,
-        body: RuleBody,
-        context: usize,
-    ) -> Rule {
+    pub fn new(head: usize, head_action: TreeAction, input_ref: InputReference, body: RuleBody, context: usize) -> Rule {
         Rule {
             head,
             head_action,
@@ -939,12 +891,7 @@ impl RuleRef {
     /// Panic when the rule's head cannot be found in the grammar
     #[must_use]
     pub fn get_rule_in<'g>(&self, grammar: &'g Grammar) -> &'g Rule {
-        &grammar
-            .variables
-            .iter()
-            .find(|v| v.id == self.variable)
-            .unwrap()
-            .rules[self.index]
+        &grammar.variables.iter().find(|v| v.id == self.variable).unwrap().rules[self.index]
     }
 }
 
@@ -1010,11 +957,7 @@ impl PartialEq for TemplateRuleElement {
 impl TemplateRuleElement {
     /// Creates a new body element
     #[must_use]
-    pub fn new(
-        symbol: TemplateRuleSymbol,
-        action: TreeAction,
-        input_ref: InputReference,
-    ) -> TemplateRuleElement {
+    pub fn new(symbol: TemplateRuleSymbol, action: TreeAction, input_ref: InputReference) -> TemplateRuleElement {
         TemplateRuleElement {
             symbol,
             action,
@@ -1075,20 +1018,14 @@ impl TemplateRuleBody {
     /// Initializes this rule body
     #[must_use]
     pub fn empty() -> TemplateRuleBody {
-        TemplateRuleBody {
-            elements: Vec::new(),
-        }
+        TemplateRuleBody { elements: Vec::new() }
     }
 
     /// Initializes this rule body
     #[must_use]
     pub fn single(symbol: TemplateRuleSymbol, input_ref: InputReference) -> TemplateRuleBody {
         TemplateRuleBody {
-            elements: vec![TemplateRuleElement::new(
-                symbol,
-                TREE_ACTION_NONE,
-                input_ref,
-            )],
+            elements: vec![TemplateRuleElement::new(symbol, TREE_ACTION_NONE, input_ref)],
         }
     }
 }
@@ -1124,11 +1061,7 @@ pub struct TemplateRule {
 impl TemplateRule {
     /// Initializes a new template rule
     #[must_use]
-    pub fn new(
-        name: String,
-        input_ref: InputReference,
-        parameters: Vec<TemplateRuleParam>,
-    ) -> TemplateRule {
+    pub fn new(name: String, input_ref: InputReference, parameters: Vec<TemplateRuleParam>) -> TemplateRule {
         TemplateRule {
             name,
             input_ref,
@@ -1145,11 +1078,7 @@ impl TemplateRule {
     pub fn has_instance(&self, arguments: &[SymbolRef]) -> bool {
         self.instances.iter().any(|instance| {
             instance.arguments.len() == arguments.len()
-                && instance
-                    .arguments
-                    .iter()
-                    .zip(arguments.iter())
-                    .all(|(a1, a2)| a1 == a2)
+                && instance.arguments.iter().zip(arguments.iter()).all(|(a1, a2)| a1 == a2)
         })
     }
 }
@@ -1265,13 +1194,7 @@ impl Grammar {
     }
 
     /// Adds an option to this grammar
-    pub fn add_option(
-        &mut self,
-        name_input_ref: InputReference,
-        value_input_ref: InputReference,
-        name: String,
-        value: String,
-    ) {
+    pub fn add_option(&mut self, name_input_ref: InputReference, value_input_ref: InputReference, name: String, value: String) {
         self.options.insert(
             name,
             GrammarOption {
@@ -1317,30 +1240,10 @@ impl Grammar {
             SymbolRef::Dummy | SymbolRef::NullTerminal => "",
             SymbolRef::Epsilon => "ε",
             SymbolRef::Dollar => "$",
-            SymbolRef::Terminal(id) => self
-                .terminals
-                .iter()
-                .find(|s| s.id == id)
-                .map(|s| &s.name)
-                .unwrap(),
-            SymbolRef::Variable(id) => self
-                .variables
-                .iter()
-                .find(|s| s.id == id)
-                .map(|s| &s.name)
-                .unwrap(),
-            SymbolRef::Virtual(id) => self
-                .virtuals
-                .iter()
-                .find(|s| s.id == id)
-                .map(|s| &s.name)
-                .unwrap(),
-            SymbolRef::Action(id) => self
-                .actions
-                .iter()
-                .find(|s| s.id == id)
-                .map(|s| &s.name)
-                .unwrap(),
+            SymbolRef::Terminal(id) => self.terminals.iter().find(|s| s.id == id).map(|s| &s.name).unwrap(),
+            SymbolRef::Variable(id) => self.variables.iter().find(|s| s.id == id).map(|s| &s.name).unwrap(),
+            SymbolRef::Virtual(id) => self.virtuals.iter().find(|s| s.id == id).map(|s| &s.name).unwrap(),
+            SymbolRef::Action(id) => self.actions.iter().find(|s| s.id == id).map(|s| &s.name).unwrap(),
         }
     }
 
@@ -1352,12 +1255,7 @@ impl Grammar {
     #[must_use]
     pub fn get_symbol_value(&self, symbol: SymbolRef) -> &str {
         match symbol {
-            SymbolRef::Terminal(id) => self
-                .terminals
-                .iter()
-                .find(|s| s.id == id)
-                .map(|s| &s.value)
-                .unwrap(),
+            SymbolRef::Terminal(id) => self.terminals.iter().find(|s| s.id == id).map(|s| &s.value).unwrap(),
             _ => self.get_symbol_name(symbol),
         }
     }
@@ -1374,12 +1272,7 @@ impl Grammar {
     }
 
     /// Adds the given anonymous terminal to this grammar
-    pub fn add_terminal_anonymous(
-        &mut self,
-        value: String,
-        input_ref: InputReference,
-        nfa: NFA,
-    ) -> &mut Terminal {
+    pub fn add_terminal_anonymous(&mut self, value: String, input_ref: InputReference, nfa: NFA) -> &mut Terminal {
         let name = format!("{}{}", PREFIX_GENERATED_TERMINAL, generate_unique_id());
         self.add_terminal(name, value, input_ref, nfa, 0, true, false)
     }
@@ -1461,13 +1354,8 @@ impl Grammar {
     #[must_use]
     pub fn get_terminal_context(&self, terminal: TerminalRef) -> usize {
         match terminal {
-            TerminalRef::Dummy
-            | TerminalRef::Epsilon
-            | TerminalRef::Dollar
-            | TerminalRef::NullTerminal => 0,
-            TerminalRef::Terminal(id) => {
-                self.terminals.iter().find(|t| t.id == id).unwrap().context
-            }
+            TerminalRef::Dummy | TerminalRef::Epsilon | TerminalRef::Dollar | TerminalRef::NullTerminal => 0,
+            TerminalRef::Terminal(id) => self.terminals.iter().find(|t| t.id == id).unwrap().context,
         }
     }
 
@@ -1476,8 +1364,7 @@ impl Grammar {
         let index = self.variables.len();
         let sid = self.get_next_sid();
         let name = format!("{PREFIX_GENERATED_VARIABLE}{sid}");
-        self.variables
-            .push(Variable::new(sid, name, Some(context_variable)));
+        self.variables.push(Variable::new(sid, name, Some(context_variable)));
         &mut self.variables[index]
     }
 
@@ -1500,8 +1387,7 @@ impl Grammar {
         }
         let index = self.variables.len();
         let sid = self.get_next_sid();
-        self.variables
-            .push(Variable::new(sid, name.to_string(), None));
+        self.variables.push(Variable::new(sid, name.to_string(), None));
         &mut self.variables[index]
     }
 
@@ -1510,8 +1396,7 @@ impl Grammar {
         if self.variables.iter().all(|v| v.name != other.name) {
             // no variable with the same name
             let sid = self.next_sid + other.id - 3;
-            self.variables
-                .push(Variable::new(sid, other.name.clone(), None));
+            self.variables.push(Variable::new(sid, other.name.clone(), None));
         }
     }
 
@@ -1637,17 +1522,9 @@ impl Grammar {
             TemplateRuleSymbol::Template(template_ref) => {
                 let mut new_arguments = Vec::new();
                 for arg in &template_ref.arguments {
-                    new_arguments.push(self.instantiate_template_symbol(
-                        template_index,
-                        instance_index,
-                        arg,
-                    ));
+                    new_arguments.push(self.instantiate_template_symbol(template_index, instance_index, arg));
                 }
-                self.instantiate_template_rule_at(
-                    template_ref.template,
-                    template_ref.input_ref,
-                    new_arguments,
-                )
+                self.instantiate_template_rule_at(template_ref.template, template_ref.input_ref, new_arguments)
             }
         }
     }
@@ -1668,21 +1545,12 @@ impl Grammar {
             SymbolRef::Variable(instance.head)
         } else {
             // push new instance
-            let args_names: Vec<&str> = new_instance
-                .arguments
-                .iter()
-                .map(|arg| self.get_symbol_name(*arg))
-                .collect();
+            let args_names: Vec<&str> = new_instance.arguments.iter().map(|arg| self.get_symbol_name(*arg)).collect();
             let args_names = args_names.join(", ");
-            let name = format!(
-                "{}<{}>",
-                &self.template_rules[template_index].name, args_names
-            );
+            let name = format!("{}<{}>", &self.template_rules[template_index].name, args_names);
             new_instance.head = self.add_variable(&name).id;
             let instance_index = self.template_rules[template_index].instances.len();
-            self.template_rules[template_index]
-                .instances
-                .push(new_instance);
+            self.template_rules[template_index].instances.push(new_instance);
 
             // fill-in the body
             let head_action = self.template_rules[template_index].head_action;
@@ -1692,11 +1560,7 @@ impl Grammar {
                 let mut elements = Vec::new();
                 for element in body.elements {
                     elements.push(RuleBodyElement {
-                        symbol: self.instantiate_template_symbol(
-                            template_index,
-                            instance_index,
-                            &element.symbol,
-                        ),
+                        symbol: self.instantiate_template_symbol(template_index, instance_index, &element.symbol),
                         action: element.action,
                         input_ref: Some(element.input_ref),
                     });
@@ -1752,9 +1616,7 @@ impl Grammar {
                 let sid = self.next_sid + terminal.id - 3;
                 let context = self.resolve_context(&other.contexts[terminal.context]);
                 let mut nfa = terminal.nfa.clone_no_finals();
-                nfa.states[nfa.exit]
-                    .items
-                    .push(FinalItem::Terminal(sid, context));
+                nfa.states[nfa.exit].items.push(FinalItem::Terminal(sid, context));
                 self.terminals.push(Terminal {
                     id: sid,
                     name: terminal.name.clone(),
@@ -1794,32 +1656,19 @@ impl Grammar {
     /// Inherits the grammar rules from the parent grammar
     fn inherit_rules(&mut self, other: &Grammar) {
         for variable in &other.variables {
-            let head = self
-                .variables
-                .iter()
-                .find(|v| v.name == variable.name)
-                .unwrap()
-                .id;
+            let head = self.variables.iter().find(|v| v.name == variable.name).unwrap().id;
             let mut rules = variable
                 .rules
                 .iter()
                 .map(|rule| {
                     let context_name = &other.contexts[rule.context];
-                    let context = self
-                        .contexts
-                        .iter()
-                        .position(|c| c == context_name)
-                        .unwrap();
+                    let context = self.contexts.iter().position(|c| c == context_name).unwrap();
                     let elements = rule
                         .body
                         .elements
                         .iter()
                         .map(|element| {
-                            RuleBodyElement::new(
-                                self.map_symbol_ref(other, element.symbol),
-                                element.action,
-                                element.input_ref,
-                            )
+                            RuleBodyElement::new(self.map_symbol_ref(other, element.symbol), element.action, element.input_ref)
                         })
                         .collect();
                     Rule::new(
@@ -1831,26 +1680,16 @@ impl Grammar {
                     )
                 })
                 .collect();
-            let head = self
-                .variables
-                .iter_mut()
-                .find(|v| v.name == variable.name)
-                .unwrap();
+            let head = self.variables.iter_mut().find(|v| v.name == variable.name).unwrap();
             head.rules.append(&mut rules);
         }
     }
 
     /// Creates the equivalent template rule symbol for this grammar
-    fn inherit_template_rule_symbol(
-        &self,
-        other: &Grammar,
-        symbol: &TemplateRuleSymbol,
-    ) -> TemplateRuleSymbol {
+    fn inherit_template_rule_symbol(&self, other: &Grammar, symbol: &TemplateRuleSymbol) -> TemplateRuleSymbol {
         match symbol {
             TemplateRuleSymbol::Parameter(index) => TemplateRuleSymbol::Parameter(*index),
-            TemplateRuleSymbol::Symbol(symbol) => {
-                TemplateRuleSymbol::Symbol(self.map_symbol_ref(other, *symbol))
-            }
+            TemplateRuleSymbol::Symbol(symbol) => TemplateRuleSymbol::Symbol(self.map_symbol_ref(other, *symbol)),
             TemplateRuleSymbol::Template(template_ref) => {
                 let name = &other.template_rules[template_ref.template].name;
                 let index = self
@@ -1891,16 +1730,8 @@ impl Grammar {
                         .instances
                         .iter()
                         .map(|instance| {
-                            let old_variable = other
-                                .variables
-                                .iter()
-                                .find(|v| v.id == instance.head)
-                                .unwrap();
-                            let new_variable = self
-                                .variables
-                                .iter()
-                                .find(|v| v.name == old_variable.name)
-                                .unwrap();
+                            let old_variable = other.variables.iter().find(|v| v.id == instance.head).unwrap();
+                            let new_variable = self.variables.iter().find(|v| v.name == old_variable.name).unwrap();
                             TemplateRuleInstance {
                                 arguments: instance
                                     .arguments
@@ -1927,9 +1758,7 @@ impl Grammar {
                         input_ref: element.input_ref,
                     });
                 }
-                self.template_rules[index]
-                    .bodies
-                    .push(TemplateRuleBody { elements });
+                self.template_rules[index].bodies.push(TemplateRuleBody { elements });
             }
         }
     }
@@ -1943,38 +1772,22 @@ impl Grammar {
             SymbolRef::NullTerminal => SymbolRef::NullTerminal,
             SymbolRef::Terminal(id) => {
                 let other_symbol = other.terminals.iter().find(|s| s.id == id).unwrap();
-                let symbol = self
-                    .terminals
-                    .iter()
-                    .find(|s| s.name == other_symbol.name)
-                    .unwrap();
+                let symbol = self.terminals.iter().find(|s| s.name == other_symbol.name).unwrap();
                 SymbolRef::Terminal(symbol.id)
             }
             SymbolRef::Variable(id) => {
                 let other_symbol = other.variables.iter().find(|s| s.id == id).unwrap();
-                let symbol = self
-                    .variables
-                    .iter()
-                    .find(|s| s.name == other_symbol.name)
-                    .unwrap();
+                let symbol = self.variables.iter().find(|s| s.name == other_symbol.name).unwrap();
                 SymbolRef::Variable(symbol.id)
             }
             SymbolRef::Virtual(id) => {
                 let other_symbol = other.virtuals.iter().find(|s| s.id == id).unwrap();
-                let symbol = self
-                    .virtuals
-                    .iter()
-                    .find(|s| s.name == other_symbol.name)
-                    .unwrap();
+                let symbol = self.virtuals.iter().find(|s| s.name == other_symbol.name).unwrap();
                 SymbolRef::Virtual(symbol.id)
             }
             SymbolRef::Action(id) => {
                 let other_symbol = other.actions.iter().find(|s| s.id == id).unwrap();
-                let symbol = self
-                    .actions
-                    .iter()
-                    .find(|s| s.name == other_symbol.name)
-                    .unwrap();
+                let symbol = self.actions.iter().find(|s| s.name == other_symbol.name).unwrap();
                 SymbolRef::Action(symbol.id)
             }
         }
@@ -2078,11 +1891,7 @@ impl Grammar {
     /// # Errors
     ///
     /// Return the errors produced when building the grammar
-    pub fn build(
-        &mut self,
-        parsing_method: Option<ParsingMethod>,
-        grammar_index: usize,
-    ) -> Result<BuildData, Vec<Error>> {
+    pub fn build(&mut self, parsing_method: Option<ParsingMethod>, grammar_index: usize) -> Result<BuildData, Vec<Error>> {
         if let Err(error) = self.prepare(grammar_index) {
             return Err(vec![error]);
         };
@@ -2118,12 +1927,7 @@ impl Grammar {
     }
 
     /// Gets the separator for the grammar
-    fn get_separator(
-        &self,
-        grammar_index: usize,
-        expected: &TerminalSet,
-        dfa: &DFA,
-    ) -> Result<Option<TerminalRef>, Error> {
+    fn get_separator(&self, grammar_index: usize, expected: &TerminalSet, dfa: &DFA) -> Result<Option<TerminalRef>, Error> {
         let Some(option) = self.get_option(OPTION_SEPARATOR) else {
             return Ok(None);
         };
@@ -2151,11 +1955,7 @@ impl Grammar {
     }
 
     /// Gets the parsing method
-    fn get_parsing_method(
-        &self,
-        parsing_method: Option<ParsingMethod>,
-        grammar_index: usize,
-    ) -> Result<ParsingMethod, Error> {
+    fn get_parsing_method(&self, parsing_method: Option<ParsingMethod>, grammar_index: usize) -> Result<ParsingMethod, Error> {
         match parsing_method {
             Some(method) => Ok(method),
             None => match self.get_option(OPTION_METHOD) {

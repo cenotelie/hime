@@ -18,10 +18,7 @@
 //! Error handling
 
 use hime_redist::text::TextPosition;
-use miette::{
-    Diagnostic, LabeledSpan, MietteError, Severity, SourceCode, SourceOffset, SourceSpan,
-    SpanContents,
-};
+use miette::{Diagnostic, LabeledSpan, MietteError, Severity, SourceCode, SourceOffset, SourceSpan, SpanContents};
 
 use super::{ContextualizedError, Error};
 use crate::grammars::{OPTION_AXIOM, OPTION_SEPARATOR};
@@ -64,12 +61,7 @@ impl<'a> SpanContents<'a> for TextSpanContents<'a> {
 }
 
 impl<'t> LoadedInput<'t> {
-    fn get_span_content(
-        &self,
-        span: SourceSpan,
-        context_lines_before: usize,
-        context_lines_after: usize,
-    ) -> TextSpanContents {
+    fn get_span_content(&self, span: SourceSpan, context_lines_before: usize, context_lines_after: usize) -> TextSpanContents {
         // compute lines
         let original_line = self.content.get_position_at(span.offset()).line;
         let start_line = if context_lines_before != 0 && original_line > 1 {
@@ -126,26 +118,16 @@ impl<'context, 'error, 't> ContextualizedError<'context, 'error, 't> {
 
     /// Gets a single miette label without a known location
     fn get_single_label_no_input(&self) -> Box<dyn Iterator<Item = miette::LabeledSpan> + '_> {
-        Box::new(std::iter::once(LabeledSpan::new(
-            Some(self.to_string()),
-            0,
-            0,
-        )))
+        Box::new(std::iter::once(LabeledSpan::new(Some(self.to_string()), 0, 0)))
     }
 
     /// Gets a single miette label with a known location
-    fn get_single_label_with_input(
-        &self,
-        input: &InputReference,
-    ) -> Box<dyn Iterator<Item = miette::LabeledSpan> + '_> {
+    fn get_single_label_with_input(&self, input: &InputReference) -> Box<dyn Iterator<Item = miette::LabeledSpan> + '_> {
         Box::new(std::iter::once(self.label_for_input(input)))
     }
 
     /// Gets a single miette label with a known location
-    fn get_single_label_with_grammar(
-        &self,
-        grammar_index: usize,
-    ) -> Box<dyn Iterator<Item = miette::LabeledSpan> + '_> {
+    fn get_single_label_with_grammar(&self, grammar_index: usize) -> Box<dyn Iterator<Item = miette::LabeledSpan> + '_> {
         let input = &self.context.grammars[grammar_index].input_ref;
         self.get_single_label_with_input(input)
     }
@@ -157,9 +139,7 @@ impl<'context, 'error, 't> ContextualizedError<'context, 'error, 't> {
 
     /// Gets a single miette label with a known location
     fn label_for_input_with_text(&self, input: &InputReference, text: String) -> LabeledSpan {
-        let offset = self.context.inputs[input.input_index]
-            .content
-            .get_index_at(input.position);
+        let offset = self.context.inputs[input.input_index].content.get_index_at(input.position);
         LabeledSpan::new(Some(text), offset, input.length)
     }
 }
@@ -177,58 +157,28 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
             Error::GrammarNotSpecified => None,
             Error::GrammarNotFound(_) => None,
             Error::Parsing(input, _) => Some(&self.context.inputs[input.input_index]),
-            Error::InvalidOption(grammar_index, _name, _valid) => {
-                Some(self.get_source_code_for_grammar(*grammar_index))
-            }
-            Error::AxiomNotSpecified(grammar_index) => {
-                Some(self.get_source_code_for_grammar(*grammar_index))
-            }
-            Error::AxiomNotDefined(grammar_index) => {
-                Some(self.get_source_code_for_grammar(*grammar_index))
-            }
-            Error::SeparatorNotDefined(grammar_index) => {
-                Some(self.get_source_code_for_grammar(*grammar_index))
-            }
+            Error::InvalidOption(grammar_index, _name, _valid) => Some(self.get_source_code_for_grammar(*grammar_index)),
+            Error::AxiomNotSpecified(grammar_index) => Some(self.get_source_code_for_grammar(*grammar_index)),
+            Error::AxiomNotDefined(grammar_index) => Some(self.get_source_code_for_grammar(*grammar_index)),
+            Error::SeparatorNotDefined(grammar_index) => Some(self.get_source_code_for_grammar(*grammar_index)),
             Error::SeparatorIsContextual(grammar_index, _terminal_ref) => {
                 Some(self.get_source_code_for_grammar(*grammar_index))
             }
-            Error::SeparatorCannotBeMatched(grammar_index, _error) => {
-                Some(self.get_source_code_for_grammar(*grammar_index))
-            }
-            Error::TemplateRuleNotFound(input, _name) => {
-                Some(&self.context.inputs[input.input_index])
-            }
-            Error::TemplateRuleWrongNumberOfArgs(input, _expected, _provided) => {
-                Some(&self.context.inputs[input.input_index])
-            }
+            Error::SeparatorCannotBeMatched(grammar_index, _error) => Some(self.get_source_code_for_grammar(*grammar_index)),
+            Error::TemplateRuleNotFound(input, _name) => Some(&self.context.inputs[input.input_index]),
+            Error::TemplateRuleWrongNumberOfArgs(input, _expected, _provided) => Some(&self.context.inputs[input.input_index]),
             Error::SymbolNotFound(input, _name) => Some(&self.context.inputs[input.input_index]),
             Error::InvalidCharacterSpan(input) => Some(&self.context.inputs[input.input_index]),
-            Error::UnknownUnicodeBlock(input, _name) => {
-                Some(&self.context.inputs[input.input_index])
-            }
-            Error::UnknownUnicodeCategory(input, _name) => {
-                Some(&self.context.inputs[input.input_index])
-            }
-            Error::UnsupportedNonPlane0InCharacterClass(input, _c) => {
-                Some(&self.context.inputs[input.input_index])
-            }
+            Error::UnknownUnicodeBlock(input, _name) => Some(&self.context.inputs[input.input_index]),
+            Error::UnknownUnicodeCategory(input, _name) => Some(&self.context.inputs[input.input_index]),
+            Error::UnsupportedNonPlane0InCharacterClass(input, _c) => Some(&self.context.inputs[input.input_index]),
             Error::InvalidCodePoint(input, _c) => Some(&self.context.inputs[input.input_index]),
-            Error::OverridingPreviousTerminal(input, _name, _previous) => {
-                Some(&self.context.inputs[input.input_index])
-            }
+            Error::OverridingPreviousTerminal(input, _name, _previous) => Some(&self.context.inputs[input.input_index]),
             Error::GrammarNotDefined(input, _name) => Some(&self.context.inputs[input.input_index]),
-            Error::LrConflict(grammar_index, _conflict) => {
-                Some(self.get_source_code_for_grammar(*grammar_index))
-            }
-            Error::TerminalOutsideContext(grammar_index, _error) => {
-                Some(self.get_source_code_for_grammar(*grammar_index))
-            }
-            Error::TerminalCannotBeMatched(grammar_index, _error) => {
-                Some(self.get_source_code_for_grammar(*grammar_index))
-            }
-            Error::TerminalMatchesEmpty(grammar_index, _terminal_ref) => {
-                Some(self.get_source_code_for_grammar(*grammar_index))
-            }
+            Error::LrConflict(grammar_index, _conflict) => Some(self.get_source_code_for_grammar(*grammar_index)),
+            Error::TerminalOutsideContext(grammar_index, _error) => Some(self.get_source_code_for_grammar(*grammar_index)),
+            Error::TerminalCannotBeMatched(grammar_index, _error) => Some(self.get_source_code_for_grammar(*grammar_index)),
+            Error::TerminalMatchesEmpty(grammar_index, _terminal_ref) => Some(self.get_source_code_for_grammar(*grammar_index)),
         }
     }
 
@@ -241,24 +191,16 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
             Error::GrammarNotFound(_) => Some(self.get_single_label_no_input()),
             Error::Parsing(input, _) => Some(self.get_single_label_with_input(input)),
             Error::InvalidOption(grammar_index, name, _valid) => {
-                let option = self.context.grammars[*grammar_index]
-                    .get_option(name)
-                    .unwrap();
+                let option = self.context.grammars[*grammar_index].get_option(name).unwrap();
                 Some(self.get_single_label_with_input(&option.value_input_ref))
             }
-            Error::AxiomNotSpecified(grammar_index) => {
-                Some(self.get_single_label_with_grammar(*grammar_index))
-            }
+            Error::AxiomNotSpecified(grammar_index) => Some(self.get_single_label_with_grammar(*grammar_index)),
             Error::AxiomNotDefined(grammar_index) => {
-                let option = self.context.grammars[*grammar_index]
-                    .get_option(OPTION_AXIOM)
-                    .unwrap();
+                let option = self.context.grammars[*grammar_index].get_option(OPTION_AXIOM).unwrap();
                 Some(self.get_single_label_with_input(&option.value_input_ref))
             }
             Error::SeparatorNotDefined(grammar_index) => {
-                let option = self.context.grammars[*grammar_index]
-                    .get_option(OPTION_SEPARATOR)
-                    .unwrap();
+                let option = self.context.grammars[*grammar_index].get_option(OPTION_SEPARATOR).unwrap();
                 Some(self.get_single_label_with_input(&option.value_input_ref))
             }
             Error::SeparatorIsContextual(grammar_index, terminal_ref) => {
@@ -281,31 +223,18 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
                 }
                 Some(Box::new(labels.into_iter()))
             }
-            Error::TemplateRuleNotFound(input, _name) => {
-                Some(self.get_single_label_with_input(input))
-            }
-            Error::TemplateRuleWrongNumberOfArgs(input, _expected, _provided) => {
-                Some(self.get_single_label_with_input(input))
-            }
+            Error::TemplateRuleNotFound(input, _name) => Some(self.get_single_label_with_input(input)),
+            Error::TemplateRuleWrongNumberOfArgs(input, _expected, _provided) => Some(self.get_single_label_with_input(input)),
             Error::SymbolNotFound(input, _name) => Some(self.get_single_label_with_input(input)),
             Error::InvalidCharacterSpan(input) => Some(self.get_single_label_with_input(input)),
-            Error::UnknownUnicodeBlock(input, _name) => {
-                Some(self.get_single_label_with_input(input))
-            }
-            Error::UnknownUnicodeCategory(input, _name) => {
-                Some(self.get_single_label_with_input(input))
-            }
-            Error::UnsupportedNonPlane0InCharacterClass(input, _c) => {
-                Some(self.get_single_label_with_input(input))
-            }
+            Error::UnknownUnicodeBlock(input, _name) => Some(self.get_single_label_with_input(input)),
+            Error::UnknownUnicodeCategory(input, _name) => Some(self.get_single_label_with_input(input)),
+            Error::UnsupportedNonPlane0InCharacterClass(input, _c) => Some(self.get_single_label_with_input(input)),
             Error::InvalidCodePoint(input, _c) => Some(self.get_single_label_with_input(input)),
             Error::OverridingPreviousTerminal(input, name, previous) => Some(Box::new(
                 vec![
                     self.label_for_input(input),
-                    self.label_for_input_with_text(
-                        previous,
-                        format!("previous definition of {name}"),
-                    ),
+                    self.label_for_input_with_text(previous, format!("previous definition of {name}")),
                 ]
                 .into_iter(),
             )),
@@ -318,10 +247,7 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
                     let choice = &rule.body.choices[0];
                     let value = grammar.get_symbol_value(conflict.lookahead.terminal.into());
                     let input_ref = choice.elements[item.position].input_ref.unwrap();
-                    labels.push(self.label_for_input_with_text(
-                        &input_ref,
-                        format!("Could consume `{value}` at this point"),
-                    ));
+                    labels.push(self.label_for_input_with_text(&input_ref, format!("Could consume `{value}` at this point")));
                 }
                 for item in &conflict.reduce_items {
                     let rule = item.rule.get_rule_in(grammar);
@@ -331,22 +257,16 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
                     if choice.elements.is_empty() {
                         // do not display this choice
                     } else if item.position >= choice.elements.len() {
-                        let input_ref = choice.elements[choice.elements.len() - 1]
-                            .input_ref
-                            .unwrap();
+                        let input_ref = choice.elements[choice.elements.len() - 1].input_ref.unwrap();
                         labels.push(self.label_for_input_with_text(
                             &input_ref,
-                            format!(
-                                "Could match the rule ending here when looking ahead to `{value}`"
-                            ),
+                            format!("Could match the rule ending here when looking ahead to `{value}`"),
                         ));
                     } else {
                         let input_ref = choice.elements[item.position].input_ref.unwrap();
                         labels.push(self.label_for_input_with_text(
                             &input_ref,
-                            format!(
-                                "Could match the rule ending here when looking ahead to `{value}`"
-                            ),
+                            format!("Could match the rule ending here when looking ahead to `{value}`"),
                         ));
                     }
                     for origin in &lookahead.origins {
@@ -370,10 +290,7 @@ impl<'context, 'error, 't> Diagnostic for ContextualizedError<'context, 'error, 
                     let rule = item.rule.get_rule_in(grammar);
                     let choice = &rule.body.choices[0];
                     let input_ref = choice.elements[item.position].input_ref.unwrap();
-                    labels.push(self.label_for_input_with_text(
-                        &input_ref,
-                        String::from("Used outside required context"),
-                    ));
+                    labels.push(self.label_for_input_with_text(&input_ref, String::from("Used outside required context")));
                 }
                 Some(Box::new(labels.into_iter()))
             }

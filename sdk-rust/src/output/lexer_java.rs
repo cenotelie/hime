@@ -72,15 +72,9 @@ pub fn write(
     writeln!(writer, "import fr.cenotelie.hime.redist.Symbol;")?;
     writeln!(writer, "import fr.cenotelie.hime.redist.lexer.Automaton;")?;
     if grammar.contexts.len() > 1 {
-        writeln!(
-            writer,
-            "import fr.cenotelie.hime.redist.lexer.ContextSensitiveLexer;"
-        )?;
+        writeln!(writer, "import fr.cenotelie.hime.redist.lexer.ContextSensitiveLexer;")?;
     } else {
-        writeln!(
-            writer,
-            "import fr.cenotelie.hime.redist.lexer.ContextFreeLexer;"
-        )?;
+        writeln!(writer, "import fr.cenotelie.hime.redist.lexer.ContextFreeLexer;")?;
     }
     writeln!(writer)?;
     writeln!(writer, "import java.io.InputStreamReader;")?;
@@ -89,22 +83,19 @@ pub fn write(
     writeln!(writer, "/**")?;
     writeln!(writer, " * Represents a lexer")?;
     writeln!(writer, " */")?;
-    writeln!(
-        writer,
-        "{}class {}Lexer extends {} {{",
-        modifier, &name, base_lexer
-    )?;
+    writeln!(writer, "{}class {}Lexer extends {} {{", modifier, &name, base_lexer)?;
 
     writeln!(writer, "    /**")?;
     writeln!(writer, "     * The automaton for this lexer")?;
     writeln!(writer, "     */")?;
-    writeln!(writer, "    private static final Automaton commonAutomaton = Automaton.find({}Lexer.class, \"{}\");", &name, bin_name)?;
-
-    writeln!(writer, "    /**")?;
     writeln!(
         writer,
-        "     * Contains the constant IDs for the terminals for this lexer"
+        "    private static final Automaton commonAutomaton = Automaton.find({}Lexer.class, \"{}\");",
+        &name, bin_name
     )?;
+
+    writeln!(writer, "    /**")?;
+    writeln!(writer, "     * Contains the constant IDs for the terminals for this lexer")?;
     writeln!(writer, "     */")?;
     writeln!(writer, "    public static class ID {{")?;
     for terminal_ref in expected.content.iter().skip(2) {
@@ -113,11 +104,7 @@ pub fn write(
             continue;
         }
         writeln!(writer, "        /**")?;
-        writeln!(
-            writer,
-            "         * The unique identifier for terminal {}",
-            &terminal.name
-        )?;
+        writeln!(writer, "         * The unique identifier for terminal {}", &terminal.name)?;
         writeln!(writer, "         */")?;
         writeln!(
             writer,
@@ -129,25 +116,16 @@ pub fn write(
     writeln!(writer, "    }}")?;
 
     writeln!(writer, "    /**")?;
-    writeln!(
-        writer,
-        "     * Contains the constant IDs for the contexts for this lexer"
-    )?;
+    writeln!(writer, "     * Contains the constant IDs for the contexts for this lexer")?;
     writeln!(writer, "     */")?;
     writeln!(writer, "    public static class Context {{")?;
     writeln!(writer, "        /**")?;
-    writeln!(
-        writer,
-        "         * The unique identifier for the default context"
-    )?;
+    writeln!(writer, "         * The unique identifier for the default context")?;
     writeln!(writer, "         */")?;
     writeln!(writer, "        public static final int DEFAULT = 0;")?;
     for (index, context) in grammar.contexts.iter().enumerate().skip(1) {
         writeln!(writer, "        /**")?;
-        writeln!(
-            writer,
-            "         * The unique identifier for context {context}"
-        )?;
+        writeln!(writer, "         * The unique identifier for context {context}")?;
         writeln!(writer, "         */")?;
         writeln!(
             writer,
@@ -159,16 +137,13 @@ pub fn write(
     writeln!(writer, "    }}")?;
 
     writeln!(writer, "    /**")?;
-    writeln!(
-        writer,
-        "     * The collection of terminals matched by this lexer"
-    )?;
+    writeln!(writer, "     * The collection of terminals matched by this lexer")?;
     writeln!(writer, "     *")?;
+    writeln!(writer, "     * The terminals are in an order consistent with the automaton,")?;
     writeln!(
         writer,
-        "     * The terminals are in an order consistent with the automaton,"
+        "     * so that terminal indices in the automaton can be used to retrieve the terminals in this table"
     )?;
-    writeln!(writer, "     * so that terminal indices in the automaton can be used to retrieve the terminals in this table")?;
     writeln!(writer, "     */")?;
     writeln!(writer, "    private static final Symbol[] terminals = {{")?;
     writeln!(writer, "        new Symbol(0x0001, \"ε\"),")?;
@@ -192,10 +167,7 @@ pub fn write(
     writeln!(writer, "     * @param input The lexer's input")?;
     writeln!(writer, "     */")?;
     writeln!(writer, "    public {}Lexer(String input) {{", &name)?;
-    writeln!(
-        writer,
-        "        super(commonAutomaton, terminals, 0x{separator:04X}, input);"
-    )?;
+    writeln!(writer, "        super(commonAutomaton, terminals, 0x{separator:04X}, input);")?;
     writeln!(writer, "    }}")?;
 
     writeln!(writer, "    /**")?;
@@ -203,15 +175,8 @@ pub fn write(
     writeln!(writer, "     *")?;
     writeln!(writer, "     * @param input The lexer's input")?;
     writeln!(writer, "     */")?;
-    writeln!(
-        writer,
-        "    public {}Lexer(InputStreamReader input) {{",
-        &name
-    )?;
-    writeln!(
-        writer,
-        "        super(commonAutomaton, terminals, 0x{separator:04X}, input);"
-    )?;
+    writeln!(writer, "    public {}Lexer(InputStreamReader input) {{", &name)?;
+    writeln!(writer, "        super(commonAutomaton, terminals, 0x{separator:04X}, input);")?;
     writeln!(writer, "    }}")?;
     writeln!(writer, "}}")?;
     Ok(())

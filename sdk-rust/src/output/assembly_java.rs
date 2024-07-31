@@ -42,11 +42,7 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
     // build the project
     let project_folder = build_maven_project(task, units)?;
     // compile
-    execute_mvn_command(
-        &project_folder,
-        &["package"],
-        task.java_maven_repository.as_deref(),
-    )?;
+    execute_mvn_command(&project_folder, &["package"], task.java_maven_repository.as_deref())?;
     // copy the output
     let mut output_file = project_folder.clone();
     output_file.push("target");
@@ -73,10 +69,7 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
         if let Some(path) = path {
             final_path.push(path);
         }
-        final_path.push(format!(
-            "{}.jar",
-            helper::to_upper_camel_case(&units[0].1.name)
-        ));
+        final_path.push(format!("{}.jar", helper::to_upper_camel_case(&units[0].1.name)));
         fs::copy(output_file, final_path)?;
     } else {
         // output the package
@@ -93,10 +86,7 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
 }
 
 /// Builds the cargo project
-fn build_maven_project(
-    task: &CompilationTask,
-    units: &[(usize, &Grammar)],
-) -> Result<PathBuf, Error> {
+fn build_maven_project(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<PathBuf, Error> {
     let project_folder = output::temporary_folder();
     fs::create_dir_all(&project_folder)?;
     output::export_resource(&project_folder, "pom.xml", MANIFEST)?;
@@ -155,11 +145,7 @@ fn get_namespace(task: &CompilationTask, grammar: &Grammar) -> String {
 }
 
 /// Execute a cargo command
-fn execute_mvn_command(
-    project_folder: &Path,
-    args: &[&str],
-    maven_repository: Option<&str>,
-) -> Result<(), Error> {
+fn execute_mvn_command(project_folder: &Path, args: &[&str], maven_repository: Option<&str>) -> Result<(), Error> {
     let (executable, prefix_args) = get_mvn_command();
     let mut command = Command::new(executable);
     if let Some(mvn_repo) = maven_repository {

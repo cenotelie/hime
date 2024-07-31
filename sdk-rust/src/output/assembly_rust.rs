@@ -71,10 +71,7 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
         ));
         fs::copy(output_file, &final_path)?;
         final_path.pop();
-        final_path.push(format!(
-            "{}.crate",
-            helper::to_upper_camel_case(&units[0].1.name)
-        ));
+        final_path.push(format!("{}.crate", helper::to_upper_camel_case(&units[0].1.name)));
         fs::copy(output_file2, &final_path)?;
     } else {
         // output the package
@@ -130,30 +127,18 @@ fn get_system_ext() -> &'static str {
 }
 
 /// Builds the cargo project
-fn build_cargo_project(
-    task: &CompilationTask,
-    units: &[(usize, &Grammar)],
-) -> Result<PathBuf, Error> {
+fn build_cargo_project(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<PathBuf, Error> {
     let project_folder = output::temporary_folder();
     fs::create_dir_all(&project_folder)?;
     output::export_resource(&project_folder, "Cargo.toml", MANIFEST)?;
     if let Some(runtime) = task.output_target_runtime_path.as_ref() {
         let mut file_path = project_folder.clone();
         file_path.push("Cargo.toml");
-        let mut writer = BufWriter::new(
-            OpenOptions::new()
-                .create(true)
-                .append(true)
-                .open(file_path)?,
-        );
+        let mut writer = BufWriter::new(OpenOptions::new().create(true).append(true).open(file_path)?);
         writeln!(writer)?;
         writeln!(writer)?;
         writeln!(writer, "[patch.crates-io]")?;
-        writeln!(
-            writer,
-            "hime_redist = {{ path = \"{}\" }}",
-            runtime.replace('\\', "\\\\")
-        )?;
+        writeln!(writer, "hime_redist = {{ path = \"{}\" }}", runtime.replace('\\', "\\\\"))?;
     }
     let mut src_folder = project_folder.clone();
     src_folder.push("src");
@@ -173,12 +158,7 @@ fn build_cargo_project(
                 let filename = if i == 0 { "lib.rs" } else { "mod.rs" };
                 let mut file_path = current.clone();
                 file_path.push(filename);
-                let mut writer = BufWriter::new(
-                    OpenOptions::new()
-                        .create(true)
-                        .append(true)
-                        .open(file_path)?,
-                );
+                let mut writer = BufWriter::new(OpenOptions::new().create(true).append(true).open(file_path)?);
                 writeln!(writer, "pub mod {part}")?;
                 // create the module file
                 let mut file_path = target.clone();
@@ -190,12 +170,7 @@ fn build_cargo_project(
         let filename = if parts.len() == 1 { "lib.rs" } else { "mod.rs" };
         let mut file_path = current.clone();
         file_path.push(filename);
-        let mut writer = BufWriter::new(
-            OpenOptions::new()
-                .create(true)
-                .append(true)
-                .open(file_path)?,
-        );
+        let mut writer = BufWriter::new(OpenOptions::new().create(true).append(true).open(file_path)?);
         writeln!(writer, "pub mod {};", parts[parts.len() - 1])?;
         for source in output::get_sources(task, grammar, *index)? {
             let mut target = current.clone();
@@ -228,10 +203,7 @@ fn get_module_name(task: &CompilationTask, grammar: &Grammar) -> String {
 
 /// Execute a cargo command
 fn execute_cargo_command(project_folder: &Path, args: &[&str]) -> Result<(), Error> {
-    let output = Command::new("cargo")
-        .current_dir(project_folder)
-        .args(args)
-        .output()?;
+    let output = Command::new("cargo").current_dir(project_folder).args(args).output()?;
     let stdout = String::from_utf8(output.stdout).unwrap();
     let stderr = String::from_utf8(output.stderr).unwrap();
     if stderr.starts_with("error") || stderr.contains("\nerror") {

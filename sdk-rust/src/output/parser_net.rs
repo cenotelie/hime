@@ -73,15 +73,8 @@ pub fn write(
     writeln!(writer, "\t/// <summary>")?;
     writeln!(writer, "\t/// Represents a parser")?;
     writeln!(writer, "\t/// </summary>")?;
-    writeln!(
-        writer,
-        "\t[GeneratedCodeAttribute(\"Hime.SDK\", \"{CRATE_VERSION}\")]"
-    )?;
-    writeln!(
-        writer,
-        "\t{} class {}Parser : {}",
-        modifier, &name, parser_type
-    )?;
+    writeln!(writer, "\t[GeneratedCodeAttribute(\"Hime.SDK\", \"{CRATE_VERSION}\")]")?;
+    writeln!(writer, "\t{} class {}Parser : {}", modifier, &name, parser_type)?;
     writeln!(writer, "\t{{")?;
 
     writeln!(writer, "\t\t/// <summary>")?;
@@ -113,10 +106,7 @@ fn write_code_symbols(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
         "\t\t/// Contains the constant IDs for the variables and virtuals in this parser"
     )?;
     writeln!(writer, "\t\t/// </summary>")?;
-    writeln!(
-        writer,
-        "\t\t[GeneratedCodeAttribute(\"Hime.SDK\", \"{CRATE_VERSION}\")]"
-    )?;
+    writeln!(writer, "\t\t[GeneratedCodeAttribute(\"Hime.SDK\", \"{CRATE_VERSION}\")]")?;
     writeln!(writer, "\t\tpublic class ID")?;
     writeln!(writer, "\t\t{{")?;
     for variable in grammar
@@ -125,11 +115,7 @@ fn write_code_symbols(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
         .filter(|v| !v.name.starts_with(PREFIX_GENERATED_VARIABLE))
     {
         writeln!(writer, "\t\t\t/// <summary>")?;
-        writeln!(
-            writer,
-            "\t\t\t/// The unique identifier for variable {}",
-            &variable.name
-        )?;
+        writeln!(writer, "\t\t\t/// The unique identifier for variable {}", &variable.name)?;
         writeln!(writer, "\t\t\t/// </summary>")?;
         writeln!(
             writer,
@@ -140,11 +126,7 @@ fn write_code_symbols(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
     }
     for symbol in &grammar.virtuals {
         writeln!(writer, "\t\t\t/// <summary>")?;
-        writeln!(
-            writer,
-            "\t\t\t/// The unique identifier for virtual {}",
-            &symbol.name
-        )?;
+        writeln!(writer, "\t\t\t/// The unique identifier for virtual {}", &symbol.name)?;
         writeln!(writer, "\t\t\t/// </summary>")?;
         writeln!(
             writer,
@@ -160,32 +142,22 @@ fn write_code_symbols(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
 /// Generates the code for the variables
 fn write_code_variables(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), Error> {
     writeln!(writer, "\t\t/// <summary>")?;
-    writeln!(
-        writer,
-        "\t\t/// The collection of variables matched by this parser"
-    )?;
+    writeln!(writer, "\t\t/// The collection of variables matched by this parser")?;
     writeln!(writer, "\t\t/// </summary>")?;
     writeln!(writer, "\t\t/// <remarks>")?;
+    writeln!(writer, "\t\t/// The variables are in an order consistent with the automaton,")?;
     writeln!(
         writer,
-        "\t\t/// The variables are in an order consistent with the automaton,"
+        "\t\t/// so that variable indices in the automaton can be used to retrieve the variables in this table"
     )?;
-    writeln!(writer, "\t\t/// so that variable indices in the automaton can be used to retrieve the variables in this table")?;
     writeln!(writer, "\t\t/// </remarks>")?;
-    writeln!(
-        writer,
-        "\t\tprivate static readonly Symbol[] variables = {{"
-    )?;
+    writeln!(writer, "\t\tprivate static readonly Symbol[] variables = {{")?;
     for (index, variable) in grammar.variables.iter().enumerate() {
         if index > 0 {
             writeln!(writer, ", ")?;
         }
         write!(writer, "\t\t\t")?;
-        write!(
-            writer,
-            "new Symbol(0x{:04X}, \"{}\")",
-            variable.id, &variable.name
-        )?;
+        write!(writer, "new Symbol(0x{:04X}, \"{}\")", variable.id, &variable.name)?;
     }
     writeln!(writer, " }};")?;
     Ok(())
@@ -194,17 +166,14 @@ fn write_code_variables(writer: &mut dyn Write, grammar: &Grammar) -> Result<(),
 /// Generates the code for the virtual symbols
 fn write_code_virtuals(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), Error> {
     writeln!(writer, "\t\t/// <summary>")?;
-    writeln!(
-        writer,
-        "\t\t/// The collection of virtuals matched by this parser"
-    )?;
+    writeln!(writer, "\t\t/// The collection of virtuals matched by this parser")?;
     writeln!(writer, "\t\t/// </summary>")?;
     writeln!(writer, "\t\t/// <remarks>")?;
+    writeln!(writer, "\t\t/// The virtuals are in an order consistent with the automaton,")?;
     writeln!(
         writer,
-        "\t\t/// The virtuals are in an order consistent with the automaton,"
+        "\t\t/// so that virtual indices in the automaton can be used to retrieve the virtuals in this table"
     )?;
-    writeln!(writer, "\t\t/// so that virtual indices in the automaton can be used to retrieve the virtuals in this table")?;
     writeln!(writer, "\t\t/// </remarks>")?;
     writeln!(writer, "\t\tprivate static readonly Symbol[] virtuals = {{")?;
     for (index, symbol) in grammar.virtuals.iter().enumerate() {
@@ -212,11 +181,7 @@ fn write_code_virtuals(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), 
             writeln!(writer, ", ")?;
         }
         write!(writer, "\t\t\t")?;
-        write!(
-            writer,
-            "new Symbol(0x{:04X}, \"{}\")",
-            symbol.id, &symbol.name
-        )?;
+        write!(writer, "new Symbol(0x{:04X}, \"{}\")", symbol.id, &symbol.name)?;
     }
     writeln!(writer, " }};")?;
     Ok(())
@@ -228,15 +193,9 @@ fn write_code_actions(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
         return Ok(());
     }
     writeln!(writer, "\t\t/// <summary>")?;
-    writeln!(
-        writer,
-        "\t\t/// Represents a set of semantic actions in this parser"
-    )?;
+    writeln!(writer, "\t\t/// Represents a set of semantic actions in this parser")?;
     writeln!(writer, "\t\t/// </summary>")?;
-    writeln!(
-        writer,
-        "\t\t[GeneratedCodeAttribute(\"Hime.SDK\", \"{CRATE_VERSION}\")]"
-    )?;
+    writeln!(writer, "\t\t[GeneratedCodeAttribute(\"Hime.SDK\", \"{CRATE_VERSION}\")]")?;
     writeln!(writer, "\t\tpublic class Actions")?;
     writeln!(writer, "\t\t{{")?;
     for action in &grammar.actions {
@@ -253,31 +212,19 @@ fn write_code_actions(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
     writeln!(writer, "\t\t}}")?;
 
     writeln!(writer, "\t\t/// <summary>")?;
-    writeln!(
-        writer,
-        "\t\t/// Represents a set of empty semantic actions (do nothing)"
-    )?;
+    writeln!(writer, "\t\t/// Represents a set of empty semantic actions (do nothing)")?;
     writeln!(writer, "\t\t/// </summary>")?;
-    writeln!(
-        writer,
-        "\t\tprivate static readonly Actions noActions = new Actions();"
-    )?;
+    writeln!(writer, "\t\tprivate static readonly Actions noActions = new Actions();")?;
 
     writeln!(writer, "\t\t/// <summary>")?;
-    writeln!(writer, "\t\t/// Gets the set of semantic actions in the form a table consistent with the automaton")?;
+    writeln!(
+        writer,
+        "\t\t/// Gets the set of semantic actions in the form a table consistent with the automaton"
+    )?;
     writeln!(writer, "\t\t/// </summary>")?;
-    writeln!(
-        writer,
-        "\t\t/// <param name=\"input\">A set of semantic actions</param>"
-    )?;
-    writeln!(
-        writer,
-        "\t\t/// <returns>A table of semantic actions</returns>"
-    )?;
-    writeln!(
-        writer,
-        "\t\tprivate static SemanticAction[] GetUserActions(Actions input)"
-    )?;
+    writeln!(writer, "\t\t/// <param name=\"input\">A set of semantic actions</param>")?;
+    writeln!(writer, "\t\t/// <returns>A table of semantic actions</returns>")?;
+    writeln!(writer, "\t\tprivate static SemanticAction[] GetUserActions(Actions input)")?;
     writeln!(writer, "\t\t{{")?;
     writeln!(
         writer,
@@ -296,17 +243,17 @@ fn write_code_actions(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
     writeln!(writer, "\t\t}}")?;
 
     writeln!(writer, "\t\t/// <summary>")?;
-    writeln!(writer, "\t\t/// Gets the set of semantic actions in the form a table consistent with the automaton")?;
+    writeln!(
+        writer,
+        "\t\t/// Gets the set of semantic actions in the form a table consistent with the automaton"
+    )?;
     writeln!(writer, "\t\t/// </summary>")?;
+    writeln!(writer, "\t\t/// <param name=\"input\">A set of semantic actions</param>")?;
+    writeln!(writer, "\t\t/// <returns>A table of semantic actions</returns>")?;
     writeln!(
         writer,
-        "\t\t/// <param name=\"input\">A set of semantic actions</param>"
+        "\t\tprivate static SemanticAction[] GetUserActions(Dictionary<string, SemanticAction> input)"
     )?;
-    writeln!(
-        writer,
-        "\t\t/// <returns>A table of semantic actions</returns>"
-    )?;
-    writeln!(writer, "\t\tprivate static SemanticAction[] GetUserActions(Dictionary<string, SemanticAction> input)")?;
     writeln!(writer, "\t\t{{")?;
     writeln!(
         writer,
@@ -314,11 +261,7 @@ fn write_code_actions(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
         grammar.actions.len()
     )?;
     for (index, action) in grammar.actions.iter().enumerate() {
-        writeln!(
-            writer,
-            "\t\t\tresult[{}] = input[\"{}\"];",
-            index, &action.name
-        )?;
+        writeln!(writer, "\t\t\tresult[{}] = input[\"{}\"];", index, &action.name)?;
     }
     writeln!(writer, "\t\t\treturn result;")?;
     writeln!(writer, "\t\t}}")?;
@@ -331,39 +274,28 @@ fn write_code_constructors(writer: &mut dyn Write, grammar: &Grammar) -> Result<
     writeln!(writer, "\t\t/// <summary>")?;
     writeln!(writer, "\t\t/// Initializes a new instance of the parser")?;
     writeln!(writer, "\t\t/// </summary>")?;
-    writeln!(
-        writer,
-        "\t\t/// <param name=\"lexer\">The input lexer</param>"
-    )?;
+    writeln!(writer, "\t\t/// <param name=\"lexer\">The input lexer</param>")?;
     if grammar.actions.is_empty() {
-        writeln!(writer, "\t\tpublic {}Parser({}Lexer lexer) : base (commonAutomaton, variables, virtuals, null, lexer) {{ }}", &name, &name)?;
+        writeln!(
+            writer,
+            "\t\tpublic {}Parser({}Lexer lexer) : base (commonAutomaton, variables, virtuals, null, lexer) {{ }}",
+            &name, &name
+        )?;
     } else {
         writeln!(writer, "\t\tpublic {}Parser({}Lexer lexer) : base (commonAutomaton, variables, virtuals, GetUserActions(noActions), lexer) {{ }}", &name, &name)?;
 
         writeln!(writer, "\t\t/// <summary>")?;
         writeln!(writer, "\t\t/// Initializes a new instance of the parser")?;
         writeln!(writer, "\t\t/// </summary>")?;
-        writeln!(
-            writer,
-            "\t\t/// <param name=\"lexer\">The input lexer</param>"
-        )?;
-        writeln!(
-            writer,
-            "\t\t/// <param name=\"actions\">The set of semantic actions</param>"
-        )?;
+        writeln!(writer, "\t\t/// <param name=\"lexer\">The input lexer</param>")?;
+        writeln!(writer, "\t\t/// <param name=\"actions\">The set of semantic actions</param>")?;
         writeln!(writer, "\t\tpublic {}Parser({}Lexer lexer, Actions actions) : base (commonAutomaton, variables, virtuals, GetUserActions(actions), lexer) {{ }}", &name, &name)?;
 
         writeln!(writer, "\t\t/// <summary>")?;
         writeln!(writer, "\t\t/// Initializes a new instance of the parser")?;
         writeln!(writer, "\t\t/// </summary>")?;
-        writeln!(
-            writer,
-            "\t\t/// <param name=\"lexer\">The input lexer</param>"
-        )?;
-        writeln!(
-            writer,
-            "\t\t/// <param name=\"actions\">The set of semantic actions</param>"
-        )?;
+        writeln!(writer, "\t\t/// <param name=\"lexer\">The input lexer</param>")?;
+        writeln!(writer, "\t\t/// <param name=\"actions\">The set of semantic actions</param>")?;
         writeln!(writer, "\t\tpublic {}Parser({}Lexer lexer, Dictionary<string, SemanticAction> actions) : base (commonAutomaton, variables, virtuals, GetUserActions(actions), lexer) {{ }}", &name, &name)?;
     }
     Ok(())
@@ -371,19 +303,12 @@ fn write_code_constructors(writer: &mut dyn Write, grammar: &Grammar) -> Result<
 
 /// Generates the visitor for the parse result
 #[allow(clippy::too_many_lines)]
-fn write_code_visitor(
-    writer: &mut dyn Write,
-    grammar: &Grammar,
-    expected: &TerminalSet,
-) -> Result<(), Error> {
+fn write_code_visitor(writer: &mut dyn Write, grammar: &Grammar, expected: &TerminalSet) -> Result<(), Error> {
     writeln!(writer)?;
     writeln!(writer, "\t\t/// <summary>")?;
     writeln!(writer, "\t\t/// Visitor interface")?;
     writeln!(writer, "\t\t/// </summary>")?;
-    writeln!(
-        writer,
-        "\t\t[GeneratedCodeAttribute(\"Hime.SDK\", \"{CRATE_VERSION}\")]"
-    )?;
+    writeln!(writer, "\t\t[GeneratedCodeAttribute(\"Hime.SDK\", \"{CRATE_VERSION}\")]")?;
     writeln!(writer, "\t\tpublic class Visitor")?;
     writeln!(writer, "\t\t{{")?;
     for terminal_ref in &expected.content {
@@ -420,46 +345,22 @@ fn write_code_visitor(
     writeln!(writer)?;
     writeln!(writer, "\t\t/// <summary>")?;
     writeln!(writer, "\t\t/// Walk the AST of a result using a visitor")?;
-    writeln!(
-        writer,
-        "\t\t/// <param name=\"result\">The parse result</param>"
-    )?;
-    writeln!(
-        writer,
-        "\t\t/// <param name=\"visitor\">The visitor to use</param>"
-    )?;
+    writeln!(writer, "\t\t/// <param name=\"result\">The parse result</param>")?;
+    writeln!(writer, "\t\t/// <param name=\"visitor\">The visitor to use</param>")?;
     writeln!(writer, "\t\t/// </summary>")?;
-    writeln!(
-        writer,
-        "\t\tpublic static void Visit(ParseResult result, Visitor visitor)"
-    )?;
+    writeln!(writer, "\t\tpublic static void Visit(ParseResult result, Visitor visitor)")?;
     writeln!(writer, "\t\t{{")?;
     writeln!(writer, "\t\t\tVisitASTNode(result.Root, visitor);")?;
     writeln!(writer, "\t\t}}")?;
     writeln!(writer)?;
     writeln!(writer, "\t\t/// <summary>")?;
-    writeln!(
-        writer,
-        "\t\t/// Walk the sub-AST from the specified node using a visitor"
-    )?;
+    writeln!(writer, "\t\t/// Walk the sub-AST from the specified node using a visitor")?;
     writeln!(writer, "\t\t/// </summary>")?;
-    writeln!(
-        writer,
-        "\t\t/// <param name=\"node\">The AST node to start from</param>"
-    )?;
-    writeln!(
-        writer,
-        "\t\t/// <param name=\"visitor\">The visitor to use</param>"
-    )?;
-    writeln!(
-        writer,
-        "\t\tpublic static void VisitASTNode(ASTNode node, Visitor visitor)"
-    )?;
+    writeln!(writer, "\t\t/// <param name=\"node\">The AST node to start from</param>")?;
+    writeln!(writer, "\t\t/// <param name=\"visitor\">The visitor to use</param>")?;
+    writeln!(writer, "\t\tpublic static void VisitASTNode(ASTNode node, Visitor visitor)")?;
     writeln!(writer, "\t\t{{")?;
-    writeln!(
-        writer,
-        "\t\t\tfor (int i = 0; i < node.Children.Count; i++)"
-    )?;
+    writeln!(writer, "\t\t\tfor (int i = 0; i < node.Children.Count; i++)")?;
     writeln!(writer, "\t\t\t\tVisitASTNode(node.Children[i], visitor);")?;
     writeln!(writer, "\t\t\tswitch(node.Symbol.ID)")?;
     writeln!(writer, "\t\t\t{{")?;

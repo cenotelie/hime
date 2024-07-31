@@ -279,11 +279,7 @@ impl DFA {
             let transitions = nfa_sets[i].get_transitions(&nfa);
             // For each transition
             for (value, child_set) in transitions {
-                if let Some((index, _)) = nfa_sets
-                    .iter_mut()
-                    .enumerate()
-                    .find(|(_, set)| *set == &child_set)
-                {
+                if let Some((index, _)) = nfa_sets.iter_mut().enumerate().find(|(_, set)| *set == &child_set) {
                     // An existing equivalent set is already present
                     states[i].add_transition(value, index);
                 } else {
@@ -445,10 +441,7 @@ impl DFAInverse {
                     reachable.push(*next);
                     len += 1;
                 }
-                inverses
-                    .entry(*next)
-                    .or_insert_with(Vec::new)
-                    .push(current.id);
+                inverses.entry(*next).or_insert_with(Vec::new).push(current.id);
             }
             if current.is_final() {
                 finals.push(current.id);
@@ -493,9 +486,7 @@ impl DFAInverse {
 impl<'a> DFAStateGroup<'a> {
     /// Initializes this group with a representative state
     fn new(state: &'a DFAState) -> DFAStateGroup {
-        DFAStateGroup {
-            states: vec![state],
-        }
+        DFAStateGroup { states: vec![state] }
     }
 }
 
@@ -579,10 +570,7 @@ impl<'a> DFAPartition<'a> {
 
     /// Gets the group of the given state in this partition
     fn group_of(&self, state: &DFAState) -> usize {
-        self.groups
-            .iter()
-            .position(|g| g.states.contains(&state))
-            .unwrap()
+        self.groups.iter().position(|g| g.states.contains(&state)).unwrap()
     }
 
     /// Splits the given partition with this group
@@ -609,11 +597,7 @@ impl<'a> DFAPartition<'a> {
     /// Gets the new dfa states produced by this partition
     fn into_dfa_states(mut self, dfa: &DFA) -> Vec<DFAState> {
         // move froup with state 0 as first group
-        let first_group = self
-            .groups
-            .iter()
-            .position(|g| g.states.iter().any(|s| s.id == 0))
-            .unwrap();
+        let first_group = self.groups.iter().position(|g| g.states.iter().any(|s| s.id == 0)).unwrap();
         self.groups.swap(0, first_group);
         // For each group in the partition
         // Create the corresponding state and add the finals
@@ -677,15 +661,10 @@ impl NFATransitionBound {
     /// Counts the number of starts and ends in the effects    
     #[must_use]
     pub fn count_starts_ends(&self) -> (usize, usize) {
-        self.effects
-            .iter()
-            .fold((0, 0), |(starts, ends), effect| match effect {
-                NFATransitionBoundEffect::Start { tid: _, next: _ }
-                | NFATransitionBoundEffect::OtherStart => (starts + 1, ends),
-                NFATransitionBoundEffect::End { tid: _ } | NFATransitionBoundEffect::OtherEnd => {
-                    (starts, ends + 1)
-                }
-            })
+        self.effects.iter().fold((0, 0), |(starts, ends), effect| match effect {
+            NFATransitionBoundEffect::Start { tid: _, next: _ } | NFATransitionBoundEffect::OtherStart => (starts + 1, ends),
+            NFATransitionBoundEffect::End { tid: _ } | NFATransitionBoundEffect::OtherEnd => (starts, ends + 1),
+        })
     }
 }
 
@@ -762,26 +741,14 @@ impl NFAState {
     fn fill_bounds_map(&self, map: &mut Vec<NFATransitionBound>) {
         for transition in &self.transitions {
             if transition.value != EPSILON {
-                Self::insert_sorted_in(
-                    map,
-                    transition.value.begin,
-                    NFATransitionBoundEffect::OtherStart,
-                );
-                Self::insert_sorted_in(
-                    map,
-                    transition.value.end,
-                    NFATransitionBoundEffect::OtherEnd,
-                );
+                Self::insert_sorted_in(map, transition.value.begin, NFATransitionBoundEffect::OtherStart);
+                Self::insert_sorted_in(map, transition.value.end, NFATransitionBoundEffect::OtherEnd);
             }
         }
     }
 
     /// Insert a bound in a sorted map of transition bounds
-    fn insert_sorted_in(
-        map: &mut Vec<NFATransitionBound>,
-        value: u16,
-        effect: NFATransitionBoundEffect,
-    ) {
+    fn insert_sorted_in(map: &mut Vec<NFATransitionBound>, value: u16, effect: NFATransitionBoundEffect) {
         let mut index = 0;
         while index < map.len() {
             if map[index].value == value {
@@ -822,11 +789,7 @@ impl NFAState {
                         next: transition.next,
                     },
                 );
-                Self::insert_sorted_in(
-                    &mut map,
-                    transition.value.end,
-                    NFATransitionBoundEffect::End { tid: index },
-                );
+                Self::insert_sorted_in(&mut map, transition.value.end, NFATransitionBoundEffect::End { tid: index });
             }
         }
         let mut current_start = 0;
@@ -837,21 +800,11 @@ impl NFAState {
             // end all ongoing ranges
             for &(_tid, next) in &current_nexts {
                 transitions.push(NFATransition {
-                    value: CharSpan::new(
-                        current_start,
-                        if starts == 0 {
-                            bound.value
-                        } else {
-                            bound.value - 1
-                        },
-                    ),
+                    value: CharSpan::new(current_start, if starts == 0 { bound.value } else { bound.value - 1 }),
                     next,
                 });
             }
-            let ongoings = current_nexts
-                .iter()
-                .map(|&(tid, _)| tid)
-                .collect::<Vec<_>>();
+            let ongoings = current_nexts.iter().map(|&(tid, _)| tid).collect::<Vec<_>>();
 
             // apply effects
             for effect in bound.effects {
@@ -869,10 +822,7 @@ impl NFAState {
                         }
                     }
                     NFATransitionBoundEffect::End { tid } => {
-                        let index = current_nexts
-                            .iter()
-                            .position(|&(id, _next)| id == tid)
-                            .unwrap();
+                        let index = current_nexts.iter().position(|&(id, _next)| id == tid).unwrap();
                         let (_tid, next) = current_nexts.swap_remove(index);
                         if starts > 0 {
                             // there are starts, we ends ongoing before
@@ -933,9 +883,7 @@ impl NFAState {
         for left in left {
             if left.value == EPSILON {
                 assert!(
-                    right
-                        .iter()
-                        .any(|r| r.value == EPSILON && r.next == left.next),
+                    right.iter().any(|r| r.value == EPSILON && r.next == left.next),
                     "missing transition on EPSILON to {}",
                     left.next
                 );
@@ -954,8 +902,7 @@ impl NFAState {
         for right in right {
             if right.value == EPSILON {
                 assert!(
-                    left.iter()
-                        .any(|l| l.value == EPSILON && l.next == right.next),
+                    left.iter().any(|l| l.value == EPSILON && l.next == right.next),
                     "spurious on EPSILON to {}",
                     right.next
                 );
@@ -983,12 +930,9 @@ impl Eq for NFAState {}
 
 #[cfg(test)]
 mod tests_nfa_normalize {
-    use crate::{
-        finite::{NFATransitionBound, NFATransitionBoundEffect},
-        CharSpan,
-    };
-
     use super::{NFAState, NFATransition};
+    use crate::finite::{NFATransitionBound, NFATransitionBoundEffect};
+    use crate::CharSpan;
 
     #[test]
     fn test_no_overlap_start_0() {
@@ -1017,7 +961,7 @@ mod tests_nfa_normalize {
                     value: CharSpan::new(30, 40)
                 },
             ]
-        )
+        );
     }
 
     #[test]
@@ -1047,7 +991,7 @@ mod tests_nfa_normalize {
                     value: CharSpan::new(30, 40)
                 },
             ]
-        )
+        );
     }
 
     #[test]
@@ -1077,7 +1021,7 @@ mod tests_nfa_normalize {
                     value: CharSpan::new(30, 0xFFFF)
                 },
             ]
-        )
+        );
     }
 
     #[test]
@@ -1110,7 +1054,7 @@ mod tests_nfa_normalize {
                     value: CharSpan::new(11, 15)
                 },
             ]
-        )
+        );
     }
 
     #[test]
@@ -1143,7 +1087,7 @@ mod tests_nfa_normalize {
                     value: CharSpan::new(5, 10)
                 },
             ]
-        )
+        );
     }
 
     #[test]
@@ -1176,7 +1120,7 @@ mod tests_nfa_normalize {
                     value: CharSpan::new(11, 15)
                 },
             ]
-        )
+        );
     }
 
     #[test]
@@ -1209,7 +1153,7 @@ mod tests_nfa_normalize {
                     value: CharSpan::new(10, 10)
                 },
             ]
-        )
+        );
     }
 
     #[test]
@@ -1218,10 +1162,7 @@ mod tests_nfa_normalize {
         state.add_transition(CharSpan::new(0, 10), 1);
         let mut map = vec![NFATransitionBound {
             value: 5,
-            effects: vec![
-                NFATransitionBoundEffect::OtherStart,
-                NFATransitionBoundEffect::OtherEnd,
-            ],
+            effects: vec![NFATransitionBoundEffect::OtherStart, NFATransitionBoundEffect::OtherEnd],
         }];
         state.fill_bounds_map(&mut map);
         let bounds = map.iter().map(|b| b.value).collect::<Vec<_>>();
@@ -1243,7 +1184,7 @@ mod tests_nfa_normalize {
                     value: CharSpan::new(6, 10)
                 },
             ]
-        )
+        );
     }
 }
 
@@ -1435,7 +1376,7 @@ impl NFA {
                 })
                 .collect(),
             entry: 0,
-            exit: std::usize::MAX,
+            exit: usize::MAX,
         }
     }
 

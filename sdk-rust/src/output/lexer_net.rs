@@ -79,32 +79,23 @@ pub fn write(
     writeln!(writer, "\t/// <summary>")?;
     writeln!(writer, "\t/// Represents a lexer")?;
     writeln!(writer, "\t/// </summary>")?;
-    writeln!(
-        writer,
-        "\t[GeneratedCodeAttribute(\"Hime.SDK\", \"{CRATE_VERSION}\")]"
-    )?;
-    writeln!(
-        writer,
-        "\t{} class {}Lexer : {}",
-        modifier, &name, base_lexer
-    )?;
+    writeln!(writer, "\t[GeneratedCodeAttribute(\"Hime.SDK\", \"{CRATE_VERSION}\")]")?;
+    writeln!(writer, "\t{} class {}Lexer : {}", modifier, &name, base_lexer)?;
     writeln!(writer, "\t{{")?;
 
     writeln!(writer, "\t\t/// <summary>")?;
     writeln!(writer, "\t\t/// The automaton for this lexer")?;
     writeln!(writer, "\t\t/// </summary>")?;
-    writeln!(writer, "\t\tprivate static readonly Automaton commonAutomaton = Automaton.Find(typeof({}Lexer), \"{}\");", &name, &bin_name)?;
+    writeln!(
+        writer,
+        "\t\tprivate static readonly Automaton commonAutomaton = Automaton.Find(typeof({}Lexer), \"{}\");",
+        &name, &bin_name
+    )?;
 
     writeln!(writer, "\t\t/// <summary>")?;
-    writeln!(
-        writer,
-        "\t\t/// Contains the constant IDs for the terminals for this lexer"
-    )?;
+    writeln!(writer, "\t\t/// Contains the constant IDs for the terminals for this lexer")?;
     writeln!(writer, "\t\t/// </summary>")?;
-    writeln!(
-        writer,
-        "\t\t[GeneratedCodeAttribute(\"Hime.SDK\", \"{CRATE_VERSION}\")]"
-    )?;
+    writeln!(writer, "\t\t[GeneratedCodeAttribute(\"Hime.SDK\", \"{CRATE_VERSION}\")]")?;
     writeln!(writer, "\t\tpublic class ID")?;
     writeln!(writer, "\t\t{{")?;
     for terminal_ref in expected.content.iter().skip(2) {
@@ -113,11 +104,7 @@ pub fn write(
             continue;
         }
         writeln!(writer, "\t\t\t/// <summary>")?;
-        writeln!(
-            writer,
-            "\t\t\t/// The unique identifier for terminal {}",
-            &terminal.name
-        )?;
+        writeln!(writer, "\t\t\t/// The unique identifier for terminal {}", &terminal.name)?;
         writeln!(writer, "\t\t\t/// </summary>")?;
         writeln!(
             writer,
@@ -129,30 +116,18 @@ pub fn write(
     writeln!(writer, "\t\t}}")?;
 
     writeln!(writer, "\t\t/// <summary>")?;
-    writeln!(
-        writer,
-        "\t\t/// Contains the constant IDs for the contexts for this lexer"
-    )?;
+    writeln!(writer, "\t\t/// Contains the constant IDs for the contexts for this lexer")?;
     writeln!(writer, "\t\t/// </summary>")?;
-    writeln!(
-        writer,
-        "\t\t[GeneratedCodeAttribute(\"Hime.SDK\", \"{CRATE_VERSION}\")]"
-    )?;
+    writeln!(writer, "\t\t[GeneratedCodeAttribute(\"Hime.SDK\", \"{CRATE_VERSION}\")]")?;
     writeln!(writer, "\t\tpublic class Context")?;
     writeln!(writer, "\t\t{{")?;
     writeln!(writer, "\t\t\t/// <summary>")?;
-    writeln!(
-        writer,
-        "\t\t\t/// The unique identifier for the default context"
-    )?;
+    writeln!(writer, "\t\t\t/// The unique identifier for the default context")?;
     writeln!(writer, "\t\t\t/// </summary>")?;
     writeln!(writer, "\t\t\tpublic const int Default = 0;")?;
     for (index, context) in grammar.contexts.iter().enumerate().skip(1) {
         writeln!(writer, "\t\t\t/// <summary>")?;
-        writeln!(
-            writer,
-            "\t\t\t/// The unique identifier for context {context}"
-        )?;
+        writeln!(writer, "\t\t\t/// The unique identifier for context {context}")?;
         writeln!(writer, "\t\t\t/// </summary>")?;
         writeln!(
             writer,
@@ -164,22 +139,16 @@ pub fn write(
     writeln!(writer, "\t\t}}")?;
 
     writeln!(writer, "\t\t/// <summary>")?;
-    writeln!(
-        writer,
-        "\t\t/// The collection of terminals matched by this lexer"
-    )?;
+    writeln!(writer, "\t\t/// The collection of terminals matched by this lexer")?;
     writeln!(writer, "\t\t/// </summary>")?;
     writeln!(writer, "\t\t/// <remarks>")?;
+    writeln!(writer, "\t\t/// The terminals are in an order consistent with the automaton,")?;
     writeln!(
         writer,
-        "\t\t/// The terminals are in an order consistent with the automaton,"
+        "\t\t/// so that terminal indices in the automaton can be used to retrieve the terminals in this table"
     )?;
-    writeln!(writer, "\t\t/// so that terminal indices in the automaton can be used to retrieve the terminals in this table")?;
     writeln!(writer, "\t\t/// </remarks>")?;
-    writeln!(
-        writer,
-        "\t\tprivate static readonly Symbol[] terminals = {{"
-    )?;
+    writeln!(writer, "\t\tprivate static readonly Symbol[] terminals = {{")?;
     writeln!(writer, "\t\t\tnew Symbol(0x0001, \"ε\"),")?;
     write!(writer, "\t\t\tnew Symbol(0x0002, \"$\")")?;
     for terminal_ref in expected.content.iter().skip(2) {
@@ -198,10 +167,7 @@ pub fn write(
     writeln!(writer, "\t\t/// <summary>")?;
     writeln!(writer, "\t\t/// Initializes a new instance of the lexer")?;
     writeln!(writer, "\t\t/// </summary>")?;
-    writeln!(
-        writer,
-        "\t\t/// <param name=\"input\">The lexer's input</param>"
-    )?;
+    writeln!(writer, "\t\t/// <param name=\"input\">The lexer's input</param>")?;
     writeln!(
         writer,
         "\t\tpublic {}Lexer(string input) : base(commonAutomaton, terminals, 0x{:04X}, input) {{}}",
@@ -211,11 +177,12 @@ pub fn write(
     writeln!(writer, "\t\t/// <summary>")?;
     writeln!(writer, "\t\t/// Initializes a new instance of the lexer")?;
     writeln!(writer, "\t\t/// </summary>")?;
+    writeln!(writer, "\t\t/// <param name=\"input\">The lexer's input</param>")?;
     writeln!(
         writer,
-        "\t\t/// <param name=\"input\">The lexer's input</param>"
+        "\t\tpublic {}Lexer(TextReader input) : base(commonAutomaton, terminals, 0x{:04X}, input) {{}}",
+        &name, separator
     )?;
-    writeln!(writer, "\t\tpublic {}Lexer(TextReader input) : base(commonAutomaton, terminals, 0x{:04X}, input) {{}}", &name,separator)?;
 
     writeln!(writer, "\t}}")?;
     writeln!(writer, "}}")?;

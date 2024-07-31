@@ -33,12 +33,7 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
     // build the project
     let project_folder = build_dotnet_project(task, units)?;
     // compile
-    execute_dotnet_command(
-        &project_folder,
-        "restore",
-        &[],
-        task.output_target_runtime_path.as_deref(),
-    )?;
+    execute_dotnet_command(&project_folder, "restore", &[], task.output_target_runtime_path.as_deref())?;
     execute_dotnet_command(
         &project_folder,
         "build",
@@ -58,10 +53,7 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
         if let Some(path) = path {
             final_path.push(path);
         }
-        final_path.push(format!(
-            "{}.dll",
-            helper::to_upper_camel_case(&units[0].1.name)
-        ));
+        final_path.push(format!("{}.dll", helper::to_upper_camel_case(&units[0].1.name)));
         fs::copy(output_file, final_path)?;
     } else {
         // output the package
@@ -78,10 +70,7 @@ pub fn build(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<(), 
 }
 
 /// Builds the dotnet project
-fn build_dotnet_project(
-    task: &CompilationTask,
-    units: &[(usize, &Grammar)],
-) -> Result<PathBuf, Error> {
+fn build_dotnet_project(task: &CompilationTask, units: &[(usize, &Grammar)]) -> Result<PathBuf, Error> {
     let project_folder = output::temporary_folder();
     fs::create_dir_all(&project_folder)?;
     for (index, grammar) in units {
@@ -96,12 +85,7 @@ fn build_dotnet_project(
 }
 
 /// Execute a dotnet command
-fn execute_dotnet_command(
-    project_folder: &Path,
-    verb: &str,
-    args: &[&str],
-    target_runtime: Option<&str>,
-) -> Result<(), Error> {
+fn execute_dotnet_command(project_folder: &Path, verb: &str, args: &[&str], target_runtime: Option<&str>) -> Result<(), Error> {
     let mut command = Command::new("dotnet");
     command.arg(verb).arg(project_folder.as_os_str()).args(args);
     if let Some(target_runtime) = target_runtime {

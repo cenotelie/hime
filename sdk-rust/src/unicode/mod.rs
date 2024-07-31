@@ -21,20 +21,19 @@ mod blocks;
 mod categories;
 
 use std::collections::HashMap;
-
-use lazy_static::lazy_static;
+use std::sync::LazyLock;
 
 use crate::{CharSpan, CHARSPAN_INVALID};
 
-lazy_static! {
-    /// Contains the supported Unicode blocks
-    pub static ref BLOCKS: HashMap<&'static str, Block> = blocks::get_blocks();
-}
+pub type BlocksMap = HashMap<&'static str, Block>;
 
-lazy_static! {
-    /// Contains the supported Unicode blocks
-    pub static ref CATEGORIES: HashMap<&'static str, Category> = categories::get_categories();
-}
+/// Contains the supported Unicode blocks
+pub static BLOCKS: LazyLock<BlocksMap, fn() -> BlocksMap> = LazyLock::new(blocks::get_blocks);
+
+pub type CategoriesMap = HashMap<&'static str, Category>;
+
+/// Contains the supported Unicode blocks
+pub static CATEGORIES: LazyLock<CategoriesMap, fn() -> CategoriesMap> = LazyLock::new(categories::get_categories);
 
 /// Represents a Unicode code point
 #[derive(Debug, Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Hash)]
@@ -156,10 +155,7 @@ impl Span {
                 // first high with low span from beginning to end of low surrogate range
                 [CharSpan::new(b[0], b[0]), CharSpan::new(b[1], 0xDFFF)],
                 // intermediate high surrogate, with full range of low surrogate
-                [
-                    CharSpan::new(b[0] + 1, e[0] - 1),
-                    CharSpan::new(0xDC00, 0xDFFF),
-                ],
+                [CharSpan::new(b[0] + 1, e[0] - 1), CharSpan::new(0xDC00, 0xDFFF)],
                 // last high with low span from start of low surrogate range to end
                 [CharSpan::new(e[0], e[0]), CharSpan::new(0xDC00, e[1])],
             ]
@@ -226,10 +222,7 @@ impl Category {
     /// Represents a Unicode category
     #[must_use]
     pub fn new_owned(name: String) -> Category {
-        Category {
-            name,
-            spans: Vec::new(),
-        }
+        Category { name, spans: Vec::new() }
     }
 
     /// Adds a span to this category
@@ -245,18 +238,14 @@ impl Category {
 
 #[test]
 fn test_unicode_blocks_well_formed() {
-    for (_, block) in &*BLOCKS {
-        assert!(
-            block.span.begin <= block.span.end,
-            "invalid unicode block {}",
-            block.name
-        );
+    for block in BLOCKS.values() {
+        assert!(block.span.begin <= block.span.end, "invalid unicode block {}", block.name);
     }
 }
 
 #[test]
 fn test_unicode_categories_well_formed() {
-    for (_, category) in &*CATEGORIES {
+    for category in CATEGORIES.values() {
         for span in &category.spans {
             assert!(
                 span.begin <= span.end,

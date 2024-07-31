@@ -65,8 +65,7 @@ impl<'s> InMemoryParser<'s> {
     #[must_use]
     pub fn parse<'a, 't>(&'a self, input: &'t str) -> ParseResult<'s, 't, 'a, AstImpl> {
         let text = Text::from_str(input);
-        let mut result =
-            ParseResult::<AstImpl>::new(&self.terminals, &self.variables, &self.virtuals, text);
+        let mut result = ParseResult::<AstImpl>::new(&self.terminals, &self.variables, &self.virtuals, text);
         let mut my_actions = |_index: usize, _head: Symbol, _body: &dyn SemanticBody| ();
         {
             let data = result.get_parsing_data();
@@ -110,15 +109,15 @@ impl<'s> InMemoryParser<'s> {
         repository: TokenRepository<'s, 't, 'a>,
         errors: &'a mut ParseErrors<'s>,
     ) -> Lexer<'s, 't, 'a> {
-        if !self.lexer_is_context_sensitive {
-            Lexer::ContextFree(ContextFreeLexer::new(
+        if self.lexer_is_context_sensitive {
+            Lexer::ContextSensitive(ContextSensitiveLexer::new(
                 repository,
                 errors,
                 self.lexer_automaton.clone(),
                 self.separator,
             ))
         } else {
-            Lexer::ContextSensitive(ContextSensitiveLexer::new(
+            Lexer::ContextFree(ContextFreeLexer::new(
                 repository,
                 errors,
                 self.lexer_automaton.clone(),

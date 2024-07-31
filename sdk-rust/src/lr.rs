@@ -25,8 +25,7 @@ use hime_redist::parsers::{LRActionCode, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_S
 use crate::errors::{Error, UnmatchableTokenError};
 use crate::finite::DFA;
 use crate::grammars::{
-    Grammar, RuleChoice, RuleChoiceRef, RuleRef, SymbolRef, Terminal, TerminalRef, TerminalSet,
-    GENERATED_AXIOM,
+    Grammar, RuleChoice, RuleChoiceRef, RuleRef, SymbolRef, Terminal, TerminalRef, TerminalSet, GENERATED_AXIOM,
 };
 use crate::ParsingMethod;
 
@@ -94,9 +93,7 @@ impl Lookaheads {
     /// Gets the lookahead with the specified terminal
     #[must_use]
     pub fn get(&self, terminal: TerminalRef) -> Option<&Lookahead> {
-        self.0
-            .iter()
-            .find(|lookahead| lookahead.terminal == terminal)
+        self.0.iter().find(|lookahead| lookahead.terminal == terminal)
     }
 
     /// Adds a new lookahead
@@ -122,9 +119,7 @@ impl Lookaheads {
     /// Gets whether the specified terminal is present as a lookahead
     #[must_use]
     pub fn contains(&self, terminal: TerminalRef) -> bool {
-        self.0
-            .iter()
-            .any(|candidate| candidate.terminal == terminal)
+        self.0.iter().any(|candidate| candidate.terminal == terminal)
     }
 
     /// Removes the specified terminal
@@ -285,9 +280,7 @@ impl Item {
                             position: 0,
                             lookaheads: firsts.clone(),
                         };
-                        if let Some(other) =
-                            closure.iter_mut().find(|item| item.same_base(&candidate))
-                        {
+                        if let Some(other) = closure.iter_mut().find(|item| item.same_base(&candidate)) {
                             other.lookaheads.add_others(&candidate.lookaheads);
                         } else {
                             closure.push(candidate);
@@ -342,11 +335,7 @@ impl Item {
     #[allow(clippy::missing_panics_doc)]
     pub fn format(&self, f: &mut Formatter, grammar: &Grammar) -> std::fmt::Result {
         let rule = self.rule.get_rule_in(grammar);
-        write!(
-            f,
-            "{} ->",
-            grammar.get_symbol_name(SymbolRef::Variable(rule.head))
-        )?;
+        write!(f, "{} ->", grammar.get_symbol_name(SymbolRef::Variable(rule.head)))?;
         for (index, element) in rule.body.choices[0].elements.iter().enumerate() {
             if index == self.position {
                 write!(f, " •")?;
@@ -391,8 +380,7 @@ pub struct StateKernel {
 
 impl PartialEq for StateKernel {
     fn eq(&self, other: &StateKernel) -> bool {
-        self.items.len() == other.items.len()
-            && self.items.iter().all(|item| other.items.contains(item))
+        self.items.len() == other.items.len() && self.items.iter().all(|item| other.items.contains(item))
     }
 }
 
@@ -460,23 +448,12 @@ impl State {
             }
             if !self.children.is_empty() {
                 // shift/reduce conflict
-                conflicts.raise_shift_reduce(
-                    self,
-                    id,
-                    grammar,
-                    item.clone(),
-                    Lookahead::from(TerminalRef::NullTerminal),
-                );
+                conflicts.raise_shift_reduce(self, id, grammar, item.clone(), Lookahead::from(TerminalRef::NullTerminal));
             }
             if let Some(previous_index) = reduce_index {
                 // reduce/reduce conflict
                 let previous: &Item = &self.items[previous_index];
-                conflicts.raise_reduce_reduce(
-                    id,
-                    previous.clone(),
-                    item.clone(),
-                    Lookahead::from(TerminalRef::NullTerminal),
-                );
+                conflicts.raise_reduce_reduce(id, previous.clone(), item.clone(), Lookahead::from(TerminalRef::NullTerminal));
             } else {
                 reduce_index = Some(index);
                 self.reductions.push(Reduction {
@@ -501,22 +478,11 @@ impl State {
                 let symbol_ref: SymbolRef = lookahead.terminal.into();
                 if self.children.contains_key(&symbol_ref) {
                     // There is already a shift action for the lookahead => conflict
-                    conflicts.raise_shift_reduce(
-                        self,
-                        id,
-                        grammar,
-                        item.clone(),
-                        lookahead.clone(),
-                    );
+                    conflicts.raise_shift_reduce(self, id, grammar, item.clone(), lookahead.clone());
                 } else if let Some(previous_index) = reductions.get(&lookahead.terminal) {
                     // There is already a reduction action for the lookahead => conflict
                     let previous: &Item = &self.items[*previous_index];
-                    conflicts.raise_reduce_reduce(
-                        id,
-                        previous.clone(),
-                        item.clone(),
-                        lookahead.clone(),
-                    );
+                    conflicts.raise_reduce_reduce(id, previous.clone(), item.clone(), lookahead.clone());
                 } else {
                     // no conflict
                     reductions.insert(lookahead.terminal, index);
@@ -550,22 +516,11 @@ impl State {
                 let symbol_ref: SymbolRef = lookahead.terminal.into();
                 if self.children.contains_key(&symbol_ref) {
                     // There is already a shift action for the lookahead => conflict
-                    conflicts.raise_shift_reduce(
-                        self,
-                        id,
-                        grammar,
-                        item.clone(),
-                        lookahead.clone(),
-                    );
+                    conflicts.raise_shift_reduce(self, id, grammar, item.clone(), lookahead.clone());
                 } else if let Some(previous_index) = reductions.get(&lookahead.terminal) {
                     // There is already a reduction action for the lookahead => conflict
                     let previous: &Item = &self.items[*previous_index];
-                    conflicts.raise_reduce_reduce(
-                        id,
-                        previous.clone(),
-                        item.clone(),
-                        lookahead.clone(),
-                    );
+                    conflicts.raise_reduce_reduce(id, previous.clone(), item.clone(), lookahead.clone());
                 }
                 reductions.insert(lookahead.terminal, index);
                 self.reductions.push(Reduction {
@@ -591,21 +546,11 @@ impl State {
     /// # Errors
     ///
     /// Return an error when formatting fails
-    pub fn format(
-        &self,
-        f: &mut Formatter,
-        state_index: usize,
-        grammar: &Grammar,
-    ) -> std::fmt::Result {
+    pub fn format(&self, f: &mut Formatter, state_index: usize, grammar: &Grammar) -> std::fmt::Result {
         writeln!(f, "state {state_index} {{")?;
         writeln!(f, "  transitions {{")?;
         for (&symbol, target) in &self.children {
-            writeln!(
-                f,
-                "    on {} goto {}",
-                grammar.get_symbol_value(symbol),
-                target
-            )?;
+            writeln!(f, "    on {} goto {}", grammar.get_symbol_value(symbol), target)?;
         }
         writeln!(f, "  }}")?;
         writeln!(f, "  reductions {{")?;
@@ -614,9 +559,7 @@ impl State {
                 f,
                 "    on {} reduce a {}",
                 grammar.get_symbol_value(reduction.lookahead.terminal.into()),
-                grammar.get_symbol_value(SymbolRef::Variable(
-                    reduction.rule.get_rule_in(grammar).head
-                ))
+                grammar.get_symbol_value(SymbolRef::Variable(reduction.rule.get_rule_in(grammar).head))
             )?;
         }
         writeln!(f, "  }}")?;
@@ -786,11 +729,7 @@ struct PNode {
 impl PNode {
     /// Creates a new path element
     fn new(state: usize, transition: Option<SymbolRef>, next: Option<usize>) -> PNode {
-        PNode {
-            state,
-            transition,
-            next,
-        }
+        PNode { state, transition, next }
     }
 }
 
@@ -1016,9 +955,7 @@ pub struct Conflicts(Vec<Conflict>);
 impl Conflicts {
     /// Find a similar conflict already regsitered
     fn find_similar(&mut self, kind: ConflictKind, lookahead: &Lookahead) -> Option<&mut Conflict> {
-        self.0
-            .iter_mut()
-            .find(|c| c.kind == kind && &c.lookahead == lookahead)
+        self.0.iter_mut().find(|c| c.kind == kind && &c.lookahead == lookahead)
     }
 
     /// Raise a shift/reduce conflict
@@ -1040,9 +977,7 @@ impl Conflicts {
         let mut shift_items = Vec::new();
         for item in &state.items {
             if item.get_next_symbol(grammar) == next_symbol
-                && shift_items
-                    .iter()
-                    .all(|candidate: &Item| !candidate.same_base(item))
+                && shift_items.iter().all(|candidate: &Item| !candidate.same_base(item))
             {
                 shift_items.push(item.clone());
             }
@@ -1058,13 +993,7 @@ impl Conflicts {
     }
 
     /// Raise a reduce/reduce conflict
-    pub fn raise_reduce_reduce(
-        &mut self,
-        state_id: usize,
-        previous: Item,
-        reducing: Item,
-        lookahead: Lookahead,
-    ) {
+    pub fn raise_reduce_reduce(&mut self, state_id: usize, previous: Item, reducing: Item, lookahead: Lookahead) {
         // look for previous conflict
         if let Some(previous) = self.find_similar(ConflictKind::ReduceReduce, &lookahead) {
             previous.reduce_items.push(reducing);
@@ -1178,11 +1107,7 @@ pub fn build_graph_rnglr1(grammar: &Grammar) -> (Graph, Conflicts) {
 /// Builds the kernels for a LALR(1) graph
 fn build_graph_lalr1_kernels(graph0: &Graph) -> Vec<StateKernel> {
     // copy kernel without the lookaheads
-    let mut kernels: Vec<StateKernel> = graph0
-        .states
-        .iter()
-        .map(|state| state.kernel.clone())
-        .collect();
+    let mut kernels: Vec<StateKernel> = graph0.states.iter().map(|state| state.kernel.clone()).collect();
     // set epsilon as lookahead on all items in kernel 0
     for item in &mut kernels[0].items {
         item.lookaheads.add(Lookahead::from(TerminalRef::Epsilon));
@@ -1200,11 +1125,7 @@ struct Propagation {
 }
 
 /// Builds the propagation table for a LALR(1) graph
-fn build_graph_lalr1_propagation_table(
-    graph0: &Graph,
-    grammar: &Grammar,
-    kernels: &mut [StateKernel],
-) -> Vec<Propagation> {
+fn build_graph_lalr1_propagation_table(graph0: &Graph, grammar: &Grammar, kernels: &mut [StateKernel]) -> Vec<Propagation> {
     let mut propagation = Vec::new();
     for i in 0..kernels.len() {
         // For each LALR(1) item in the kernel
@@ -1268,20 +1189,14 @@ fn build_graph_lalr1_propagate(kernels: &mut [StateKernel], table: &[Propagation
     while modifications != 0 {
         modifications = 0;
         for propagation in table {
-            let before = kernels[propagation.to_state].items[propagation.to_item]
-                .lookaheads
-                .0
-                .len();
+            let before = kernels[propagation.to_state].items[propagation.to_item].lookaheads.0.len();
             let others = kernels[propagation.from_state].items[propagation.from_item]
                 .lookaheads
                 .clone();
             kernels[propagation.to_state].items[propagation.to_item]
                 .lookaheads
                 .add_others(&others);
-            let after = kernels[propagation.to_state].items[propagation.to_item]
-                .lookaheads
-                .0
-                .len();
+            let after = kernels[propagation.to_state].items[propagation.to_item].lookaheads.0.len();
             modifications += after - before;
         }
     }
@@ -1296,8 +1211,8 @@ fn build_graph_lalr1_graph(kernels: Vec<StateKernel>, graph0: &Graph, grammar: &
         .collect();
     // Link for each LALR(1) set
     for (state0, state1) in graph0.states.iter().zip(states.iter_mut()) {
-        state1.children = state0.children.clone();
-        state1.opening_contexts = state0.opening_contexts.clone();
+        state1.children.clone_from(&state0.children);
+        state1.opening_contexts.clone_from(&state0.opening_contexts);
     }
     Graph { states }
 }
@@ -1328,11 +1243,7 @@ pub fn build_graph_rnglalr1(grammar: &Grammar) -> (Graph, Conflicts) {
 }
 
 /// Find the potential context errors in the graph
-fn find_context_errors(
-    graph: &Graph,
-    inverse: &InverseGraph,
-    grammar: &Grammar,
-) -> Vec<ContextError> {
+fn find_context_errors(graph: &Graph, inverse: &InverseGraph, grammar: &Grammar) -> Vec<ContextError> {
     let mut errors = Vec::new();
     for (from_state, state) in graph.states.iter().enumerate() {
         for (symbol, to_state) in &state.children {
@@ -1342,15 +1253,7 @@ fn find_context_errors(
                     continue;
                 }
                 // this is a contextual terminal, can we reach this state without the right context being available
-                find_context_errors_in(
-                    graph,
-                    inverse,
-                    grammar,
-                    &mut errors,
-                    from_state,
-                    *to_state,
-                    terminal,
-                );
+                find_context_errors_in(graph, inverse, grammar, &mut errors, from_state, *to_state, terminal);
             }
         }
     }
@@ -1378,12 +1281,9 @@ fn find_context_errors_in(
         let mut found = false;
         for i in 0..(path.0.len() - 1) {
             for item in &graph.states[path.0[i].state].items {
-                if item.position == 0 && item.rule.get_rule_in(grammar).context == terminal.context
-                {
+                if item.position == 0 && item.rule.get_rule_in(grammar).context == terminal.context {
                     // this is the opening of a context only if we are not going to the next state using the associated variable
-                    let child_by_var = graph.states[to_state]
-                        .children
-                        .get(&SymbolRef::Variable(item.rule.variable));
+                    let child_by_var = graph.states[to_state].children.get(&SymbolRef::Variable(item.rule.variable));
                     found |= child_by_var.is_none() || child_by_var != Some(&path.0[i + 1].state);
                     break;
                 }
@@ -1404,11 +1304,7 @@ fn find_context_errors_in(
         let next_symbol = Some(SymbolRef::Terminal(terminal.id));
         let mut items = Vec::new();
         for item in &graph.states[from_state].items {
-            if item.get_next_symbol(grammar) == next_symbol
-                && items
-                    .iter()
-                    .all(|candidate: &Item| !candidate.same_base(item))
-            {
+            if item.get_next_symbol(grammar) == next_symbol && items.iter().all(|candidate: &Item| !candidate.same_base(item)) {
                 items.push(item.clone());
             }
         }
@@ -1416,20 +1312,13 @@ fn find_context_errors_in(
             state: from_state,
             items,
             terminal: TerminalRef::Terminal(terminal.id),
-            phrases: paths
-                .into_iter()
-                .map(|path| path.get_phrase(grammar))
-                .collect(),
+            phrases: paths.into_iter().map(|path| path.get_phrase(grammar)).collect(),
         });
     }
 }
 
 /// Find the errors where a token is used but cannot be produced by the parser
-fn find_unmatchable_tokens(
-    graph: &Graph,
-    grammar: &Grammar,
-    expected: &TerminalSet,
-) -> TerminalSet {
+fn find_unmatchable_tokens(graph: &Graph, grammar: &Grammar, expected: &TerminalSet) -> TerminalSet {
     let mut unexpected = TerminalSet::default();
     for state in &graph.states {
         for item in &state.items {

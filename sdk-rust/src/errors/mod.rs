@@ -50,22 +50,22 @@ pub enum Error {
     /// The specified grammar was not found
     GrammarNotFound(String),
     /// The value for the option is invalid
-    /// (grammar_index, option_name, valid_options)
+    /// (`grammar_index`, `option_name`, `valid_options`)
     InvalidOption(usize, String, Vec<String>),
     /// The grammar's axiom has not been specified in the options
-    /// (grammar_index)
+    /// (`grammar_index`)
     AxiomNotSpecified(usize),
     /// The grammar's axiom is not defined (does not exist)
-    /// (grammar_index)
+    /// (`grammar_index`)
     AxiomNotDefined(usize),
     /// The separator token specified by a grammar is not defined
-    /// (grammar_index)
+    /// (`grammar_index`)
     SeparatorNotDefined(usize),
     /// The separator token is contextual
-    /// (grammar_index, separator)
+    /// (`grammar_index`, separator)
     SeparatorIsContextual(usize, TerminalRef),
     /// The separator token cannot be matched, it may be overriden by others
-    /// (grammar_index, separator, overriders)
+    /// (`grammar_index`, separator, overriders)
     SeparatorCannotBeMatched(usize, UnmatchableTokenError),
     /// The template rule could not be found
     TemplateRuleNotFound(InputReference, String),
@@ -94,7 +94,7 @@ pub enum Error {
     /// A terminal is used by the parser but cannot be produced by the lexer
     TerminalCannotBeMatched(usize, UnmatchableTokenError),
     /// A terminal matches the empty string
-    /// (grammar_index, terminal)
+    /// (`grammar_index`, terminal)
     TerminalMatchesEmpty(usize, TerminalRef),
 }
 
@@ -131,10 +131,9 @@ impl Display for Error {
             Self::TemplateRuleNotFound(_input, name) => {
                 write!(f, "Cannot find template rule `{name}`")
             }
-            Self::TemplateRuleWrongNumberOfArgs(_input, expected, provided) => write!(
-                f,
-                "Template expected {expected} arguments, {provided} given"
-            ),
+            Self::TemplateRuleWrongNumberOfArgs(_input, expected, provided) => {
+                write!(f, "Template expected {expected} arguments, {provided} given")
+            }
             Self::SymbolNotFound(_input, name) => write!(f, "Cannot find symbol `{name}`"),
             Self::InvalidCharacterSpan(_input) => {
                 write!(f, "Invalid character span, swap left and right bounds")
@@ -151,10 +150,7 @@ impl Display for Error {
                 *c,
                 u32::from(*c)
             ),
-            Self::InvalidCodePoint(_input, c) => write!(
-                f,
-                "The value U+{c:0X} is not a supported unicode code point"
-            ),
+            Self::InvalidCodePoint(_input, c) => write!(f, "The value U+{c:0X} is not a supported unicode code point"),
             Self::OverridingPreviousTerminal(_input, name, _previous) => {
                 write!(f, "Overriding the previous definition of `{name}`")
             }
@@ -200,10 +196,7 @@ impl Error {
         &'error self,
         context: &'context LoadedData<'t>,
     ) -> ContextualizedError<'context, 'error, 't> {
-        ContextualizedError {
-            context,
-            error: self,
-        }
+        ContextualizedError { context, error: self }
     }
 }
 
@@ -232,20 +225,12 @@ impl<'context, 'error, 't> Display for ContextualizedError<'context, 'error, 't>
                 write!(f, "Grammar axiom has not been specified")
             }
             Error::AxiomNotDefined(grammar_index) => {
-                let option = self.context.grammars[*grammar_index]
-                    .get_option(OPTION_AXIOM)
-                    .unwrap();
+                let option = self.context.grammars[*grammar_index].get_option(OPTION_AXIOM).unwrap();
                 write!(f, "Grammar axiom `{}` is not defined", &option.value)
             }
             Error::SeparatorNotDefined(grammar_index) => {
-                let option = self.context.grammars[*grammar_index]
-                    .get_option(OPTION_SEPARATOR)
-                    .unwrap();
-                write!(
-                    f,
-                    "Grammar separator token `{}` is not defined",
-                    &option.value
-                )
+                let option = self.context.grammars[*grammar_index].get_option(OPTION_SEPARATOR).unwrap();
+                write!(f, "Grammar separator token `{}` is not defined", &option.value)
             }
             Error::SeparatorIsContextual(grammar_index, terminal_ref) => {
                 let separator = self.context.grammars[*grammar_index]
@@ -254,28 +239,21 @@ impl<'context, 'error, 't> Display for ContextualizedError<'context, 'error, 't>
                 write!(
                     f,
                     "Grammar separator token `{}` is only defined for context `{}`",
-                    &separator.name,
-                    &self.context.grammars[*grammar_index].contexts[separator.context]
+                    &separator.name, &self.context.grammars[*grammar_index].contexts[separator.context]
                 )
             }
-            Error::SeparatorCannotBeMatched(grammar_index, error)
-            | Error::TerminalCannotBeMatched(grammar_index, error) => {
+            Error::SeparatorCannotBeMatched(grammar_index, error) | Error::TerminalCannotBeMatched(grammar_index, error) => {
                 let terminal = self.context.grammars[*grammar_index]
                     .get_terminal(error.terminal.sid())
                     .unwrap();
-                write!(
-                    f,
-                    "Token `{}` is expected but can never be matched",
-                    &terminal.value
-                )
+                write!(f, "Token `{}` is expected but can never be matched", &terminal.value)
             }
             Error::TemplateRuleNotFound(_input, name) => {
                 write!(f, "Cannot find template rule `{name}`")
             }
-            Error::TemplateRuleWrongNumberOfArgs(_input, expected, provided) => write!(
-                f,
-                "Template expected {expected} arguments, {provided} given"
-            ),
+            Error::TemplateRuleWrongNumberOfArgs(_input, expected, provided) => {
+                write!(f, "Template expected {expected} arguments, {provided} given")
+            }
             Error::SymbolNotFound(_input, name) => write!(f, "Cannot find symbol `{name}`"),
             Error::InvalidCharacterSpan(_input) => {
                 write!(f, "Invalid character span, swap left and right bounds")
@@ -292,10 +270,7 @@ impl<'context, 'error, 't> Display for ContextualizedError<'context, 'error, 't>
                 *c,
                 u32::from(*c)
             ),
-            Error::InvalidCodePoint(_input, c) => write!(
-                f,
-                "The value U+{c:0X} is not a supported unicode code point"
-            ),
+            Error::InvalidCodePoint(_input, c) => write!(f, "The value U+{c:0X} is not a supported unicode code point"),
             Error::OverridingPreviousTerminal(_input, name, _previous) => {
                 write!(f, "Overriding the previous definition of `{name}`")
             }
@@ -318,20 +293,13 @@ impl<'context, 'error, 't> Display for ContextualizedError<'context, 'error, 't>
             Error::TerminalOutsideContext(grammar_index, error) => {
                 let grammar = &self.context.grammars[*grammar_index];
                 let terminal = grammar.get_symbol_value(error.terminal.into());
-                write!(
-                    f,
-                    "Contextual terminal `{terminal}` is expected outside its context"
-                )
+                write!(f, "Contextual terminal `{terminal}` is expected outside its context")
             }
             Error::TerminalMatchesEmpty(grammar_index, terminal_ref) => {
                 let terminal = self.context.grammars[*grammar_index]
                     .get_terminal(terminal_ref.sid())
                     .unwrap();
-                write!(
-                    f,
-                    "Terminal `{}` matches empty string, which is not allowed",
-                    &terminal.name
-                )
+                write!(f, "Terminal `{}` matches empty string, which is not allowed", &terminal.name)
             }
         }
     }

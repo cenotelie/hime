@@ -18,7 +18,7 @@
 //! Module for generating parser code in rust
 
 use std::fs::OpenOptions;
-use std::io::{self, Write};
+use std::io::{BufWriter, Write};
 use std::path::PathBuf;
 
 use crate::errors::Error;
@@ -45,11 +45,8 @@ pub fn write(
         final_path.push(path);
     }
     final_path.push(file_name);
-    let file = OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(final_path)?;
-    let mut writer = io::BufWriter::new(file);
+    let file = OpenOptions::new().append(true).open(final_path)?;
+    let mut writer = BufWriter::new(file);
 
     let (parser_type, automaton_type, parser_ctor) = if method.is_rnglr() {
         ("RNGLRParser", "RNGLRAutomaton", "new_with_ast")
@@ -64,14 +61,8 @@ pub fn write(
             r#"include_flate::flate!(static PARSER_AUTOMATON: [u8] from "{bin_name}");"#
         )?;
     } else {
-        writeln!(
-            writer,
-            "/// Static resource for the serialized parser automaton"
-        )?;
-        writeln!(
-            writer,
-            "static PARSER_AUTOMATON: &[u8] = include_bytes!(\"{bin_name}\");"
-        )?;
+        writeln!(writer, "/// Static resource for the serialized parser automaton")?;
+        writeln!(writer, "static PARSER_AUTOMATON: &[u8] = include_bytes!(\"{bin_name}\");")?;
     }
     writeln!(writer)?;
 
@@ -121,11 +112,7 @@ fn write_code_symbols(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
         .iter()
         .filter(|v| !v.name.starts_with(PREFIX_GENERATED_VARIABLE))
     {
-        writeln!(
-            writer,
-            "/// The unique identifier for variable `{}`",
-            &variable.name
-        )?;
+        writeln!(writer, "/// The unique identifier for variable `{}`", &variable.name)?;
         writeln!(
             writer,
             "pub const ID_VARIABLE_{}: u32 = 0x{:04X};",
@@ -135,11 +122,7 @@ fn write_code_symbols(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
     }
     writeln!(writer)?;
     for symbol in &grammar.virtuals {
-        writeln!(
-            writer,
-            "/// The unique identifier for virtual {}",
-            &symbol.name
-        )?;
+        writeln!(writer, "/// The unique identifier for virtual {}", &symbol.name)?;
         writeln!(
             writer,
             "pub const ID_VIRTUAL_{}: u32 = 0x{:04X};",
@@ -153,15 +136,12 @@ fn write_code_symbols(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
 
 /// Generates the code for the variables
 fn write_code_variables(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), Error> {
+    writeln!(writer, "/// The collection of variables matched by this parser")?;
+    writeln!(writer, "/// The variables are in an order consistent with the automaton,")?;
     writeln!(
         writer,
-        "/// The collection of variables matched by this parser"
+        "/// so that variable indices in the automaton can be used to retrieve the variables in this table"
     )?;
-    writeln!(
-        writer,
-        "/// The variables are in an order consistent with the automaton,"
-    )?;
-    writeln!(writer, "/// so that variable indices in the automaton can be used to retrieve the variables in this table")?;
     writeln!(writer, "pub const VARIABLES: &[Symbol] = &[")?;
     for (index, variable) in grammar.variables.iter().enumerate() {
         if index > 0 {
@@ -180,15 +160,12 @@ fn write_code_variables(writer: &mut dyn Write, grammar: &Grammar) -> Result<(),
 
 /// Generates the code for the virtual symbols
 fn write_code_virtuals(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), Error> {
+    writeln!(writer, "/// The collection of virtuals matched by this parser")?;
+    writeln!(writer, "/// The virtuals are in an order consistent with the automaton,")?;
     writeln!(
         writer,
-        "/// The collection of virtuals matched by this parser"
+        "/// so that virtual indices in the automaton can be used to retrieve the virtuals in this table"
     )?;
-    writeln!(
-        writer,
-        "/// The virtuals are in an order consistent with the automaton,"
-    )?;
-    writeln!(writer, "/// so that virtual indices in the automaton can be used to retrieve the virtuals in this table")?;
     writeln!(writer, "pub const VIRTUALS: &[Symbol] = &[")?;
     for (index, symbol) in grammar.virtuals.iter().enumerate() {
         if index > 0 {
@@ -210,10 +187,7 @@ fn write_code_actions(writer: &mut dyn Write, grammar: &Grammar) -> Result<(), E
     if grammar.actions.is_empty() {
         return Ok(());
     }
-    writeln!(
-        writer,
-        "/// Represents a set of semantic actions in this parser"
-    )?;
+    writeln!(writer, "/// Represents a set of semantic actions in this parser")?;
     writeln!(writer, "#[allow(unused_variables)]")?;
     writeln!(writer, "pub trait Actions {{")?;
     for action in &grammar.actions {
@@ -254,10 +228,7 @@ fn write_code_constructors(
     writeln!(writer, "/// Parses the specified string with this parser")?;
     if output_assembly {
         writeln!(writer, "#[no_mangle]")?;
-        writeln!(
-            writer,
-            "#[export_name = \"{nmespace}_parse_str{fn_suffix}\"]"
-        )?;
+        writeln!(writer, "#[export_name = \"{nmespace}_parse_str{fn_suffix}\"]")?;
     }
     writeln!(writer, "#[must_use]")?;
     writeln!(
@@ -268,11 +239,7 @@ fn write_code_constructors(
     writeln!(
         writer,
         "    parse_text{fn_suffix}(text{})",
-        if has_actions {
-            ", &mut NoActions {}"
-        } else {
-            ""
-        }
+        if has_actions { ", &mut NoActions {}" } else { "" }
     )?;
     writeln!(writer, "}}")?;
     if has_actions {
@@ -280,10 +247,7 @@ fn write_code_constructors(
         writeln!(writer, "/// Parses the specified string with this parser")?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
-            writeln!(
-                writer,
-                "#[export_name = \"{nmespace}_parse_str{fn_suffix}_with\"]"
-            )?;
+            writeln!(writer, "#[export_name = \"{nmespace}_parse_str{fn_suffix}_with\"]")?;
         }
         writeln!(
             writer,
@@ -298,10 +262,7 @@ fn write_code_constructors(
     writeln!(writer, "/// Parses the specified string with this parser")?;
     if output_assembly {
         writeln!(writer, "#[no_mangle]")?;
-        writeln!(
-            writer,
-            "#[export_name = \"{nmespace}_parse_string{fn_suffix}\"]"
-        )?;
+        writeln!(writer, "#[export_name = \"{nmespace}_parse_string{fn_suffix}\"]")?;
     }
     writeln!(writer, "#[must_use]")?;
     writeln!(
@@ -312,11 +273,7 @@ fn write_code_constructors(
     writeln!(
         writer,
         "    parse_text{fn_suffix}(text{})",
-        if has_actions {
-            ", &mut NoActions {}"
-        } else {
-            ""
-        }
+        if has_actions { ", &mut NoActions {}" } else { "" }
     )?;
     writeln!(writer, "}}")?;
     if has_actions {
@@ -324,10 +281,7 @@ fn write_code_constructors(
         writeln!(writer, "/// Parses the specified string with this parser")?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
-            writeln!(
-                writer,
-                "#[export_name = \"{nmespace}_parse_string{fn_suffix}_with\"]"
-            )?;
+            writeln!(writer, "#[export_name = \"{nmespace}_parse_string{fn_suffix}_with\"]")?;
         }
         writeln!(
             writer,
@@ -340,10 +294,7 @@ fn write_code_constructors(
 
     if with_std {
         writeln!(writer)?;
-        writeln!(
-            writer,
-            "/// Parses the specified stream of UTF-8 with this parser"
-        )?;
+        writeln!(writer, "/// Parses the specified stream of UTF-8 with this parser")?;
         writeln!(writer, "///")?;
         writeln!(writer, "/// # Errors")?;
         writeln!(writer, "///")?;
@@ -353,10 +304,7 @@ fn write_code_constructors(
         )?;
         if output_assembly {
             writeln!(writer, "#[no_mangle]")?;
-            writeln!(
-                writer,
-                "#[export_name = \"{nmespace}_parse_utf8_stream{fn_suffix}\"]"
-            )?;
+            writeln!(writer, "#[export_name = \"{nmespace}_parse_utf8_stream{fn_suffix}\"]")?;
         }
         writeln!(
             writer,
@@ -366,30 +314,20 @@ fn write_code_constructors(
         writeln!(
             writer,
             "    Ok(parse_text{fn_suffix}(text{}))",
-            if has_actions {
-                ", &mut NoActions {}"
-            } else {
-                ""
-            }
+            if has_actions { ", &mut NoActions {}" } else { "" }
         )?;
         writeln!(writer, "}}")?;
         if has_actions {
             writeln!(writer)?;
             if output_assembly {
                 writeln!(writer, "#[no_mangle]")?;
-                writeln!(
-                    writer,
-                    "#[export_name = \"{nmespace}_parse_utf8_stream{fn_suffix}_with\"]"
-                )?;
+                writeln!(writer, "#[export_name = \"{nmespace}_parse_utf8_stream{fn_suffix}_with\"]")?;
             }
             writeln!(
                 writer,
                 "pub fn parse_utf8_stream{fn_suffix}_with(input: &mut dyn std::io::Read, actions: &mut dyn Actions) -> {parse_result_type} {{"
             )?;
-            writeln!(
-                writer,
-                "    let text = Text::from_utf8_stream(input).unwrap();"
-            )?;
+            writeln!(writer, "    let text = Text::from_utf8_stream(input).unwrap();")?;
             writeln!(writer, "    parse_text{fn_suffix}(text, actions)")?;
             writeln!(writer, "}}")?;
         }
@@ -400,11 +338,7 @@ fn write_code_constructors(
     writeln!(
         writer,
         "fn parse_text{fn_suffix}<'t>(text: Text<'t>{}) -> ParseResult<'static, 't, 'static, {tree_type}> {{",
-        if has_actions {
-            ", actions: &mut dyn Actions"
-        } else {
-            ""
-        }
+        if has_actions { ", actions: &mut dyn Actions" } else { "" }
     )?;
     writeln!(
         writer,
@@ -424,7 +358,10 @@ fn write_code_constructors(
     }
     writeln!(writer, ") -> ParseResult<'s, 't, 'a, {tree_type}> {{")?;
     if has_actions {
-        writeln!(writer, "    let mut my_actions = |index: usize, head: Symbol, body: &dyn SemanticBody| match index {{")?;
+        writeln!(
+            writer,
+            "    let mut my_actions = |index: usize, head: Symbol, body: &dyn SemanticBody| match index {{"
+        )?;
         for (index, action) in grammar.actions.iter().enumerate() {
             writeln!(
                 writer,
@@ -437,7 +374,10 @@ fn write_code_constructors(
         writeln!(writer, "    }};")?;
         writeln!(writer)?;
     } else {
-        writeln!(writer, "    let mut my_actions = |_index: usize, _head: Symbol, _body: &dyn SemanticBody| {{}};")?;
+        writeln!(
+            writer,
+            "    let mut my_actions = |_index: usize, _head: Symbol, _body: &dyn SemanticBody| {{}};"
+        )?;
     }
     writeln!(
         writer,
@@ -463,11 +403,7 @@ fn write_code_constructors(
 }
 
 /// Generates the visitor for the parse result
-fn write_code_visitor(
-    writer: &mut dyn Write,
-    grammar: &Grammar,
-    expected: &TerminalSet,
-) -> Result<(), Error> {
+fn write_code_visitor(writer: &mut dyn Write, grammar: &Grammar, expected: &TerminalSet) -> Result<(), Error> {
     writeln!(writer)?;
     writeln!(writer, "/// Visitor interface")?;
     writeln!(writer, "#[allow(unused_variables)]")?;
@@ -514,14 +450,8 @@ fn write_code_visitor(
     writeln!(writer, "    visit_ast_node(root, visitor);")?;
     writeln!(writer, "}}")?;
     writeln!(writer)?;
-    writeln!(
-        writer,
-        "/// Walk the sub-AST from the specified node using a visitor"
-    )?;
-    writeln!(
-        writer,
-        "pub fn visit_ast_node(node: AstNode, visitor: &dyn Visitor) {{"
-    )?;
+    writeln!(writer, "/// Walk the sub-AST from the specified node using a visitor")?;
+    writeln!(writer, "pub fn visit_ast_node(node: AstNode, visitor: &dyn Visitor) {{")?;
     writeln!(writer, "    let children = node.children();")?;
     writeln!(writer, "    for child in children.iter() {{")?;
     writeln!(writer, "        visit_ast_node(child, visitor);")?;

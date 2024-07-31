@@ -48,12 +48,7 @@ pub fn write_lexer_data_file(
 }
 
 /// Writes the lexer's data
-pub fn write_lexer_data(
-    writer: &mut dyn Write,
-    grammar: &Grammar,
-    dfa: &DFA,
-    expected: &TerminalSet,
-) -> Result<(), Error> {
+pub fn write_lexer_data(writer: &mut dyn Write, grammar: &Grammar, dfa: &DFA, expected: &TerminalSet) -> Result<(), Error> {
     // write number of states
     write_u32(writer, dfa.len() as u32)?;
     // write the offsets to all the states
@@ -120,13 +115,7 @@ fn write_lexer_data_state(
             // this is the first time this context is found in the current DFA state
             // this is the terminal with the most priority for this context
             contexts.push(terminal.context);
-            matched.push(
-                expected
-                    .content
-                    .iter()
-                    .position(|t| t == &terminal_ref)
-                    .unwrap(),
-            );
+            matched.push(expected.content.iter().position(|t| t == &terminal_ref).unwrap());
         }
     }
 

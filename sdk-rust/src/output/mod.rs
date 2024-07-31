@@ -94,24 +94,20 @@ pub fn output_grammar_artifacts(
         return Err(vec![error]);
     }
     if let Err(error) = match data.method {
-        ParsingMethod::LR0 | ParsingMethod::LR1 | ParsingMethod::LALR1 => {
-            parser_data::write_parser_lrk_data_file(
-                output_path.as_ref(),
-                get_parser_bin_name(grammar, runtime),
-                grammar,
-                &data.expected,
-                &data.graph,
-            )
-        }
-        ParsingMethod::RNGLR1 | ParsingMethod::RNGLALR1 => {
-            parser_data::write_parser_rnglr_data_file(
-                output_path.as_ref(),
-                get_parser_bin_name(grammar, runtime),
-                grammar,
-                &data.expected,
-                &data.graph,
-            )
-        }
+        ParsingMethod::LR0 | ParsingMethod::LR1 | ParsingMethod::LALR1 => parser_data::write_parser_lrk_data_file(
+            output_path.as_ref(),
+            get_parser_bin_name(grammar, runtime),
+            grammar,
+            &data.expected,
+            &data.graph,
+        ),
+        ParsingMethod::RNGLR1 | ParsingMethod::RNGLALR1 => parser_data::write_parser_rnglr_data_file(
+            output_path.as_ref(),
+            get_parser_bin_name(grammar, runtime),
+            grammar,
+            &data.expected,
+            &data.graph,
+        ),
     } {
         return Err(vec![error]);
     }
@@ -205,21 +201,9 @@ pub fn output_grammar_artifacts(
 /// # Errors
 ///
 /// Returns the errors produced by the grammar's compilation
-pub fn build_in_memory_grammar<'a>(
-    grammar: &'a Grammar,
-    data: &BuildData,
-) -> Result<InMemoryParser<'a>, Vec<Error>> {
+pub fn build_in_memory_grammar<'a>(grammar: &'a Grammar, data: &BuildData) -> Result<InMemoryParser<'a>, Vec<Error>> {
     // get symbols
-    let mut terminals: Vec<Symbol<'a>> = vec![
-        Symbol {
-            id: 0x01,
-            name: "ε",
-        },
-        Symbol {
-            id: 0x02,
-            name: "$",
-        },
-    ];
+    let mut terminals: Vec<Symbol<'a>> = vec![Symbol { id: 0x01, name: "ε" }, Symbol { id: 0x02, name: "$" }];
     for terminal_ref in data.expected.content.iter().skip(2) {
         if let Some(terminal) = grammar.get_terminal(terminal_ref.sid()) {
             terminals.push(Symbol {
@@ -247,26 +231,14 @@ pub fn build_in_memory_grammar<'a>(
 
     // build automata
     let mut lexer_automaton = Vec::new();
-    if let Err(error) =
-        lexer_data::write_lexer_data(&mut lexer_automaton, grammar, &data.dfa, &data.expected)
-    {
+    if let Err(error) = lexer_data::write_lexer_data(&mut lexer_automaton, grammar, &data.dfa, &data.expected) {
         return Err(vec![error]);
     }
     let mut parser_automaton = Vec::new();
-    if let Err(error) = if !data.method.is_rnglr() {
-        parser_data::write_parser_lrk_data(
-            &mut parser_automaton,
-            grammar,
-            &data.expected,
-            &data.graph,
-        )
+    if let Err(error) = if data.method.is_rnglr() {
+        parser_data::write_parser_rnglr_data(&mut parser_automaton, grammar, &data.expected, &data.graph)
     } else {
-        parser_data::write_parser_rnglr_data(
-            &mut parser_automaton,
-            grammar,
-            &data.expected,
-            &data.graph,
-        )
+        parser_data::write_parser_lrk_data(&mut parser_automaton, grammar, &data.expected, &data.graph)
     } {
         return Err(vec![error]);
     }
@@ -295,11 +267,7 @@ pub fn build_in_memory_grammar<'a>(
 /// # Errors
 ///
 /// Returns an error when resolving the target (net, java, rust) fails.
-pub fn get_sources(
-    task: &CompilationTask,
-    grammar: &Grammar,
-    grammar_index: usize,
-) -> Result<Vec<PathBuf>, Error> {
+pub fn get_sources(task: &CompilationTask, grammar: &Grammar, grammar_index: usize) -> Result<Vec<PathBuf>, Error> {
     let runtime = task.get_output_target_for(grammar, grammar_index)?;
     let output_path = task.get_output_path_for(grammar);
     Ok(match runtime {
@@ -328,10 +296,7 @@ pub fn get_sources(
             build_file(output_path.as_ref(), get_parser_bin_name_java(grammar)),
         ],
         Runtime::Rust => vec![
-            build_file(
-                output_path.as_ref(),
-                format!("{}.rs", helper::to_snake_case(&grammar.name)),
-            ),
+            build_file(output_path.as_ref(), format!("{}.rs", helper::to_snake_case(&grammar.name))),
             build_file(output_path.as_ref(), get_lexer_bin_name_rust(grammar)),
             build_file(output_path.as_ref(), get_parser_bin_name_rust(grammar)),
         ],
@@ -354,11 +319,7 @@ fn build_file(path: Option<&String>, file_name: String) -> PathBuf {
 ///
 /// Returns an error when building the assembly fails,
 /// whith a description of the failure.
-pub fn build_assembly(
-    task: &CompilationTask,
-    units: &[(usize, &Grammar)],
-    runtime: Runtime,
-) -> Result<(), Error> {
+pub fn build_assembly(task: &CompilationTask, units: &[(usize, &Grammar)], runtime: Runtime) -> Result<(), Error> {
     match runtime {
         Runtime::Net => assembly_net::build(task, units),
         Runtime::Java => assembly_java::build(task, units),
@@ -422,8 +383,7 @@ fn get_parser_bin_name_rust(grammar: &Grammar) -> String {
 #[must_use]
 pub fn temporary_folder() -> PathBuf {
     let mut result = env::temp_dir();
-    let name =
-        String::from_utf8(thread_rng().sample_iter(&Alphanumeric).take(10).collect()).unwrap();
+    let name = String::from_utf8(thread_rng().sample_iter(&Alphanumeric).take(10).collect()).unwrap();
     result.push(name);
     result
 }

@@ -40,10 +40,7 @@ use hime_redist::ast::AstNode;
 use hime_redist::text::{Text, TextPosition};
 
 use crate::errors::{Error, Errors};
-use crate::grammars::{
-    Grammar, OPTION_ACCESS_MODIFIER, OPTION_MODE, OPTION_NAMESPACE, OPTION_OUTPUT_PATH,
-    OPTION_RUNTIME,
-};
+use crate::grammars::{Grammar, OPTION_ACCESS_MODIFIER, OPTION_MODE, OPTION_NAMESPACE, OPTION_OUTPUT_PATH, OPTION_RUNTIME};
 use crate::sdk::InMemoryParser;
 
 /// The version of this program
@@ -159,54 +156,21 @@ impl PartialOrd for CharSpan {
 #[test]
 fn test_charspan_intersect() {
     // empty charspan
-    assert_eq!(
-        CHARSPAN_INVALID.intersect(CharSpan::new(3, 4)),
-        CHARSPAN_INVALID
-    );
-    assert_eq!(
-        CharSpan::new(3, 4).intersect(CHARSPAN_INVALID),
-        CHARSPAN_INVALID
-    );
-    assert_eq!(
-        CHARSPAN_INVALID.intersect(CHARSPAN_INVALID),
-        CHARSPAN_INVALID
-    );
+    assert_eq!(CHARSPAN_INVALID.intersect(CharSpan::new(3, 4)), CHARSPAN_INVALID);
+    assert_eq!(CharSpan::new(3, 4).intersect(CHARSPAN_INVALID), CHARSPAN_INVALID);
+    assert_eq!(CHARSPAN_INVALID.intersect(CHARSPAN_INVALID), CHARSPAN_INVALID);
     // no intersection
-    assert_eq!(
-        CharSpan::new(1, 2).intersect(CharSpan::new(3, 4)),
-        CHARSPAN_INVALID
-    );
-    assert_eq!(
-        CharSpan::new(3, 4).intersect(CharSpan::new(1, 2)),
-        CHARSPAN_INVALID
-    );
+    assert_eq!(CharSpan::new(1, 2).intersect(CharSpan::new(3, 4)), CHARSPAN_INVALID);
+    assert_eq!(CharSpan::new(3, 4).intersect(CharSpan::new(1, 2)), CHARSPAN_INVALID);
     // intersect single
-    assert_eq!(
-        CharSpan::new(1, 2).intersect(CharSpan::new(2, 3)),
-        CharSpan::new(2, 2)
-    );
-    assert_eq!(
-        CharSpan::new(2, 3).intersect(CharSpan::new(1, 2)),
-        CharSpan::new(2, 2)
-    );
+    assert_eq!(CharSpan::new(1, 2).intersect(CharSpan::new(2, 3)), CharSpan::new(2, 2));
+    assert_eq!(CharSpan::new(2, 3).intersect(CharSpan::new(1, 2)), CharSpan::new(2, 2));
     // intersect range
-    assert_eq!(
-        CharSpan::new(1, 5).intersect(CharSpan::new(3, 10)),
-        CharSpan::new(3, 5)
-    );
-    assert_eq!(
-        CharSpan::new(3, 10).intersect(CharSpan::new(1, 5)),
-        CharSpan::new(3, 5)
-    );
+    assert_eq!(CharSpan::new(1, 5).intersect(CharSpan::new(3, 10)), CharSpan::new(3, 5));
+    assert_eq!(CharSpan::new(3, 10).intersect(CharSpan::new(1, 5)), CharSpan::new(3, 5));
     // containment
-    assert_eq!(
-        CharSpan::new(1, 10).intersect(CharSpan::new(3, 5)),
-        CharSpan::new(3, 5)
-    );
-    assert_eq!(
-        CharSpan::new(3, 5).intersect(CharSpan::new(1, 10)),
-        CharSpan::new(3, 5)
-    );
+    assert_eq!(CharSpan::new(1, 10).intersect(CharSpan::new(3, 5)), CharSpan::new(3, 5));
+    assert_eq!(CharSpan::new(3, 5).intersect(CharSpan::new(1, 10)), CharSpan::new(3, 5));
 }
 
 #[test]
@@ -302,11 +266,7 @@ pub struct LoadedData<'t> {
 /// Transforms into an owned static version of the data
 fn loaded_data_into_static(data: LoadedData<'_>) -> LoadedData<'static> {
     LoadedData {
-        inputs: data
-            .inputs
-            .into_iter()
-            .map(loaded_input_into_static)
-            .collect(),
+        inputs: data.inputs.into_iter().map(loaded_input_into_static).collect(),
         grammars: data.grammars,
     }
 }
@@ -500,11 +460,7 @@ impl<'a> CompilationTask<'a> {
                     _ => Err(Error::InvalidOption(
                         grammar_index,
                         OPTION_MODE.to_string(),
-                        vec![
-                            String::from("sources"),
-                            String::from("all"),
-                            String::from("assembly"),
-                        ],
+                        vec![String::from("sources"), String::from("all"), String::from("assembly")],
                     )),
                 },
                 None => Ok(Mode::Sources),
@@ -519,11 +475,7 @@ impl<'a> CompilationTask<'a> {
     /// # Errors
     ///
     /// Return an error when the value for the runtime is not an expected ones
-    pub fn get_output_target_for(
-        &self,
-        grammar: &Grammar,
-        grammar_index: usize,
-    ) -> Result<Runtime, Error> {
+    pub fn get_output_target_for(&self, grammar: &Grammar, grammar_index: usize) -> Result<Runtime, Error> {
         match self.output_target {
             Some(target) => Ok(target),
             None => match grammar.get_option(OPTION_RUNTIME) {
@@ -534,11 +486,7 @@ impl<'a> CompilationTask<'a> {
                     _ => Err(Error::InvalidOption(
                         grammar_index,
                         OPTION_RUNTIME.to_string(),
-                        vec![
-                            String::from("net"),
-                            String::from("java"),
-                            String::from("rust"),
-                        ],
+                        vec![String::from("net"), String::from("java"), String::from("rust")],
                     )),
                 },
                 None => Ok(Runtime::Net),
@@ -551,9 +499,7 @@ impl<'a> CompilationTask<'a> {
     pub fn get_output_path_for(&self, grammar: &Grammar) -> Option<String> {
         match self.output_path.as_ref() {
             Some(path) => Some(path.clone()),
-            None => grammar
-                .get_option(OPTION_OUTPUT_PATH)
-                .map(|path| path.value.clone()),
+            None => grammar.get_option(OPTION_OUTPUT_PATH).map(|path| path.value.clone()),
         }
     }
 
@@ -562,9 +508,7 @@ impl<'a> CompilationTask<'a> {
     pub fn get_output_namespace(&self, grammar: &Grammar) -> Option<String> {
         match self.output_namespace.as_ref() {
             Some(nmspace) => Some(nmspace.clone()),
-            None => grammar
-                .get_option(OPTION_NAMESPACE)
-                .map(|path| path.value.clone()),
+            None => grammar.get_option(OPTION_NAMESPACE).map(|path| path.value.clone()),
         }
     }
 
@@ -575,11 +519,7 @@ impl<'a> CompilationTask<'a> {
     /// # Errors
     ///
     /// Return an error when the specified value for the modifier is not an expected ones
-    pub fn get_output_modifier_for(
-        &self,
-        grammar: &Grammar,
-        grammar_index: usize,
-    ) -> Result<Modifier, Error> {
+    pub fn get_output_modifier_for(&self, grammar: &Grammar, grammar_index: usize) -> Result<Modifier, Error> {
         match self.output_modifier {
             Some(modifier) => Ok(modifier),
             None => match grammar.get_option(OPTION_ACCESS_MODIFIER) {
@@ -690,10 +630,7 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Build the specified grammars
-    fn execute_build_grammars(
-        &self,
-        grammars: &mut [Grammar],
-    ) -> Result<Vec<BuildData>, Vec<Error>> {
+    fn execute_build_grammars(&self, grammars: &mut [Grammar]) -> Result<Vec<BuildData>, Vec<Error>> {
         let mut errors = Vec::new();
         let mut results = Vec::new();
         // prepare the grammars
@@ -715,11 +652,7 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Outputs the grammar artifacts
-    fn execute_grammar_artifacts(
-        &self,
-        grammars: &[Grammar],
-        data: &[BuildData],
-    ) -> Result<(), Vec<Error>> {
+    fn execute_grammar_artifacts(&self, grammars: &[Grammar], data: &[BuildData]) -> Result<(), Vec<Error>> {
         let mut errors = Vec::new();
         // prepare the grammars
         for (index, (grammar, data)) in grammars.iter().zip(data.iter()).enumerate() {
@@ -735,12 +668,7 @@ impl<'a> CompilationTask<'a> {
     }
 
     /// Build an assembly for the relevant grammars
-    fn execute_output_assembly(
-        &self,
-        grammars: &[Grammar],
-        target: Runtime,
-        errors: &mut Vec<Error>,
-    ) {
+    fn execute_output_assembly(&self, grammars: &[Grammar], target: Runtime, errors: &mut Vec<Error>) {
         // aggregate all targets for assembly
         let units = self.gather_grammars_for_assembly(grammars, target, errors);
         if units.is_empty() {
