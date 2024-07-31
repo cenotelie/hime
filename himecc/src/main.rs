@@ -21,7 +21,7 @@ use std::fmt::{Display, Formatter};
 use std::io::{self, Read};
 use std::{env, process};
 
-use clap::{Arg, Command};
+use clap::{Arg, ArgAction, Command};
 use hime_sdk::errors::{Error, Errors};
 use hime_sdk::{CompilationTask, Input, Mode, Modifier, ParsingMethod, Runtime};
 use miette::{EyreContext, MietteHandler};
@@ -38,7 +38,7 @@ pub const GIT_TAG: &str = env!("GIT_TAG");
 #[allow(clippy::too_many_lines)]
 pub fn main() -> miette::Result<()> {
     let matches = Command::new("Hime Parser Generator")
-        .version(format!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}").as_str())
+        .version(String::leak(format!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}")) as &'static str)
         .author("Association Cénotélie <contact@cenotelie.fr>")
         .about("Generator of lexers and parsers for the Hime runtime.")
         .arg(
@@ -47,9 +47,9 @@ pub fn main() -> miette::Result<()> {
                 .short('o')
                 .long("output")
                 .help("The output mode.")
-                .takes_value(true)
+                .action(ArgAction::Set)
                 .required(false)
-                .possible_values([
+                .value_parser([
                     "sources",
                     "assembly",
                     "all"
@@ -61,9 +61,9 @@ pub fn main() -> miette::Result<()> {
                 .short('t')
                 .long("target")
                 .help("The target runtime.")
-                .takes_value(true)
+                .action(ArgAction::Set)
                 .required(false)
-                .possible_values([
+                .value_parser([
                     "net",
                     "java",
                     "rust"
@@ -75,7 +75,7 @@ pub fn main() -> miette::Result<()> {
                 .short('r')
                 .long("runtime")
                 .help("The path to a specific target runtime.")
-                .takes_value(true)
+                .action(ArgAction::Set)
                 .required(false)
         )
         .arg(
@@ -84,7 +84,7 @@ pub fn main() -> miette::Result<()> {
                 .short('p')
                 .long("path")
                 .help("The path to write the output. By default, the current directory is used.")
-                .takes_value(true)
+                .action(ArgAction::Set)
                 .required(false)
         )
         .arg(
@@ -93,9 +93,9 @@ pub fn main() -> miette::Result<()> {
                 .short('a')
                 .long("access")
                 .help("The access modifier for the generated code.")
-                .takes_value(true)
+                .action(ArgAction::Set)
                 .required(false)
-                .possible_values([
+                .value_parser([
                     "internal",
                     "public"
                 ])
@@ -106,7 +106,7 @@ pub fn main() -> miette::Result<()> {
                 .short('n')
                 .long("namespace")
                 .help("The namespace to use for the generated code. If none is given, and the target runtime requires one, the name of the grammar will be used.")
-                .takes_value(true)
+                .action(ArgAction::Set)
                 .required(false)
         )
         .arg(
@@ -115,9 +115,9 @@ pub fn main() -> miette::Result<()> {
                 .short('m')
                 .long("method")
                 .help("The parsing method to use.")
-                .takes_value(true)
+                .action(ArgAction::Set)
                 .required(false)
-                .possible_values([
+                .value_parser([
                     "lr0",
                     "lr1",
                     "lalr1",
@@ -129,28 +129,28 @@ pub fn main() -> miette::Result<()> {
             Arg::new("debug")
                 .long("debug")
                 .help("Print debug data when building a grammar.")
-                .takes_value(false)
+                .action(ArgAction::SetTrue)
                 .required(false)
         )
         .arg(
             Arg::new("rust_no_std")
                 .long("--no-std")
                 .help("Rust-only, activates the support for no-std in the generated code (default to no support for no-std)")
-                .takes_value(false)
+                .action(ArgAction::SetTrue)
                 .required(false)
         )
         .arg(
             Arg::new("rust_suppress_module_doc")
                 .long("--embed")
                 .help("Rust-only,  indicates whether to suppress module documentation so that the generated code can be embedded (blocked by https://github.com/rust-lang/rust/issues/66920) (default to false)")
-                .takes_value(false)
+                .action(ArgAction::SetTrue)
                 .required(false)
         )
         .arg(
             Arg::new("rust_compress_automata")
                 .long("--compress")
                 .help("Rust-only, indicates whether to compress automata binary files (default to false)")
-                .takes_value(false)
+                .action(ArgAction::SetTrue)
                 .required(false)
         )
         .arg(
@@ -159,7 +159,7 @@ pub fn main() -> miette::Result<()> {
                 .short('g')
                 .long("grammar")
                 .help("The name of the grammar to compile if there are multiple.")
-                .takes_value(true)
+                .action(ArgAction::Set)
                 .required(false)
         )
         .arg(
@@ -172,40 +172,37 @@ pub fn main() -> miette::Result<()> {
             Arg::new("inputs")
                 .value_name("INPUTS")
                 .help("The file names of the input grammars")
-                .takes_value(true)
+                .action(ArgAction::Append)
                 .required(true)
-                .multiple_values(true)
         )
         .get_matches();
 
     let mut task = CompilationTask::default();
-    match matches.value_of("output_mode") {
+    match matches.get_one::<String>("output_mode").map(String::as_str) {
         Some("sources") => task.mode = Some(Mode::Sources),
         Some("assembly") => task.mode = Some(Mode::Assembly),
         Some("all") => task.mode = Some(Mode::SourcesAndAssembly),
         _ => {}
     }
-    match matches.value_of("output_target") {
+    match matches.get_one::<String>("output_target").map(String::as_str) {
         Some("net") => task.output_target = Some(Runtime::Net),
         Some("java") => task.output_target = Some(Runtime::Java),
         Some("rust") => task.output_target = Some(Runtime::Rust),
         _ => {}
     }
     task.output_target_runtime_path = matches
-        .value_of("output_target_runtime_path")
+        .get_one::<String>("output_target_runtime_path")
         .map(std::string::ToString::to_string);
-    task.output_path = matches
-        .value_of("output_path")
-        .map(std::string::ToString::to_string);
-    match matches.value_of("output_access") {
+    task.output_path = matches.get_one::<String>("output_path").map(std::string::ToString::to_string);
+    match matches.get_one::<String>("output_access").map(String::as_str) {
         Some("internal") => task.output_modifier = Some(Modifier::Internal),
         Some("public") => task.output_modifier = Some(Modifier::Public),
         _ => {}
     }
     task.output_namespace = matches
-        .value_of("output_namespace")
+        .get_one::<String>("output_namespace")
         .map(std::string::ToString::to_string);
-    match matches.value_of("parsing_method") {
+    match matches.get_one::<String>("parsing_method").map(String::as_str) {
         Some("lr0") => task.method = Some(ParsingMethod::LR0),
         Some("lr1") => task.method = Some(ParsingMethod::LR1),
         Some("lalr1") => task.method = Some(ParsingMethod::LALR1),
@@ -213,27 +210,27 @@ pub fn main() -> miette::Result<()> {
         Some("rnglalr1") => task.method = Some(ParsingMethod::RNGLALR1),
         _ => {}
     }
-    if matches.is_present("debug") {
+    if matches.get_flag("debug") {
         task.print_debug_data = Some(true);
     }
-    if matches.is_present("rust_no_std") {
+    if matches.get_flag("rust_no_std") {
         task.rust_use_std = Some(false);
     }
-    if matches.is_present("rust_suppress_module_doc") {
+    if matches.get_flag("rust_suppress_module_doc") {
         task.rust_suppress_module_doc = Some(true);
     }
-    if matches.is_present("rust_compress_automata") {
+    if matches.get_flag("rust_compress_automata") {
         task.rust_compress_automata = Some(true);
     }
     task.grammar_name = matches
-        .value_of("grammar_name")
+        .get_one::<String>("grammar_name")
         .map(std::string::ToString::to_string);
-    if let Some(inputs) = matches.values_of("inputs") {
+    if let Some(inputs) = matches.get_many::<String>("inputs") {
         for input in inputs {
             task.inputs.push(Input::FileName(input.to_string()));
         }
     }
-    let result = if matches.is_present("test") {
+    let result = if matches.get_flag("test") {
         execute_test(&task)
     } else {
         execute_normal(&task)
@@ -273,10 +270,7 @@ fn execute_test<'a>(task: &CompilationTask<'a>) -> Result<(), Errors<'a>> {
         {
             Some(couple) => couple,
             None => {
-                return Err(Errors::from(
-                    data,
-                    vec![Error::GrammarNotFound(name.clone())],
-                ));
+                return Err(Errors::from(data, vec![Error::GrammarNotFound(name.clone())]));
             }
         }
     };

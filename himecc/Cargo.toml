@@ -20,9 +20,9 @@ path = "src/main.rs"
 [dependencies]
 hime_redist = "4.3.0"
 hime_sdk = { version = "4.3.0", features = ["print_errors"] }
-clap = "3"
+clap = "4.5"
 serde_json = "1"
-miette = { version = "5.6", features = ["fancy"]}
+miette = { version = "7.2", features = ["fancy"]}
 
 [badges]
 maintenance = { status = "actively-developed" }

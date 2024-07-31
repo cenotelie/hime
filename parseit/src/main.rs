@@ -19,7 +19,7 @@
 
 use std::{env, io};
 
-use clap::{Arg, Command};
+use clap::{Arg, ArgAction, Command};
 use hime_redist::result::ParseResultAst;
 
 /// The name of this program
@@ -34,27 +34,27 @@ pub const GIT_TAG: &str = env!("GIT_TAG");
 /// Main entry point
 fn main() {
     let matches = Command::new("Hime ParseIt")
-        .version(format!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}").as_str())
+        .version(String::leak(format!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}")) as &'static str)
         .author("Association Cénotélie <contact@cenotelie.fr>")
         .about("Command line to parse a piece of input using a packaged parser.")
         .arg(
             Arg::new("library")
                 .value_name("LIBRARY")
                 .help("Path to the compiled library containing the parser")
-                .takes_value(true)
+                .action(ArgAction::Set)
                 .required(true),
         )
         .arg(
             Arg::new("module")
                 .value_name("MODULE")
                 .help("The module inside the library that contains the parser")
-                .takes_value(true)
+                .action(ArgAction::Set)
                 .required(true),
         )
         .get_matches();
 
-    let library = matches.value_of("library").unwrap();
-    let module = matches.value_of("module").unwrap();
+    let library = matches.get_one::<String>("library").unwrap();
+    let module = matches.get_one::<String>("module").unwrap();
     let mut input = io::stdin();
     do_parse(&mut input, library, module);
 }

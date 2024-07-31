@@ -22,15 +22,14 @@ use std::error::Error;
 use std::fs::File;
 use std::io::{BufReader, Read};
 
-use clap::{Arg, ArgMatches, Command};
+use clap::{Arg, ArgAction, ArgMatches, Command};
 use hime_redist::lexers::automaton::{Automaton, DEAD_STATE};
 use hime_redist::parsers::lrk::LRkAutomaton;
 use hime_redist::parsers::rnglr::RNGLRAutomaton;
 use hime_redist::parsers::{
-    get_op_code_base, get_op_code_tree_action, LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_NONE,
-    LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT, LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE,
-    LR_OP_CODE_BASE_ADD_VIRTUAL, LR_OP_CODE_BASE_POP_STACK, LR_OP_CODE_BASE_SEMANTIC_ACTION,
-    TREE_ACTION_DROP, TREE_ACTION_PROMOTE, TREE_ACTION_REPLACE_BY_CHILDREN,
+    get_op_code_base, get_op_code_tree_action, LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_NONE, LR_ACTION_CODE_REDUCE,
+    LR_ACTION_CODE_SHIFT, LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE, LR_OP_CODE_BASE_ADD_VIRTUAL, LR_OP_CODE_BASE_POP_STACK,
+    LR_OP_CODE_BASE_SEMANTIC_ACTION, TREE_ACTION_DROP, TREE_ACTION_PROMOTE, TREE_ACTION_REPLACE_BY_CHILDREN,
     TREE_ACTION_REPLACE_BY_EPSILON,
 };
 
@@ -46,22 +45,20 @@ pub const GIT_TAG: &str = env!("GIT_TAG");
 /// Main entry point
 fn main() -> Result<(), Box<dyn Error>> {
     let matches = Command::new("Hime SDK Debugger")
-        .version(format!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}").as_str())
+        .version(String::leak(format!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}")) as &'static str)
         .author("Association Cénotélie <contact@cenotelie.fr>")
         .about("Debugger for the SDK.")
         .subcommand(
             Command::new("print")
                 .override_help("Print compilation artifacts")
                 .subcommand(
-                    Command::new("lexer")
-                        .override_help("Prints a lexer's automaton")
-                        .arg(
-                            Arg::new("lexer_file")
-                                .value_name("FILE")
-                                .help("Path to the lexer's automaton")
-                                .takes_value(true)
-                                .required(true),
-                        ),
+                    Command::new("lexer").override_help("Prints a lexer's automaton").arg(
+                        Arg::new("lexer_file")
+                            .value_name("FILE")
+                            .help("Path to the lexer's automaton")
+                            .action(ArgAction::Set)
+                            .required(true),
+                    ),
                 )
                 .subcommand(
                     Command::new("parser")
@@ -70,7 +67,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                             Arg::new("glr")
                                 .long("glr")
                                 .help("Whether this is a GLR automaton")
-                                .takes_value(false)
+                                .action(ArgAction::SetTrue)
                                 .required(false),
                         )
                         .arg(
@@ -78,14 +75,14 @@ fn main() -> Result<(), Box<dyn Error>> {
                                 .short('b')
                                 .long("bytecode")
                                 .help("Activate to show the bytecode of reductions")
-                                .takes_value(false)
+                                .action(ArgAction::SetTrue)
                                 .required(false),
                         )
                         .arg(
                             Arg::new("parser_file")
                                 .value_name("FILE")
                                 .help("Path to the parser's automaton")
-                                .takes_value(true)
+                                .action(ArgAction::Set)
                                 .required(true),
                         ),
                 ),
@@ -100,14 +97,14 @@ fn main() -> Result<(), Box<dyn Error>> {
                             Arg::new("file_left")
                                 .value_name("FROM")
                                 .help("Path to a lexer's automaton")
-                                .takes_value(true)
+                                .action(ArgAction::Set)
                                 .required(true),
                         )
                         .arg(
                             Arg::new("file_right")
                                 .value_name("TO")
                                 .help("Path to a lexer's automaton")
-                                .takes_value(true)
+                                .action(ArgAction::Set)
                                 .required(true),
                         ),
                 )
@@ -118,21 +115,21 @@ fn main() -> Result<(), Box<dyn Error>> {
                             Arg::new("glr")
                                 .long("glr")
                                 .help("Whether this is a GLR automaton")
-                                .takes_value(false)
+                                .action(ArgAction::SetTrue)
                                 .required(false),
                         )
                         .arg(
                             Arg::new("file_left")
                                 .value_name("FROM")
                                 .help("Path to a lexer's automaton")
-                                .takes_value(true)
+                                .action(ArgAction::Set)
                                 .required(true),
                         )
                         .arg(
                             Arg::new("file_right")
                                 .value_name("TO")
                                 .help("Path to a lexer's automaton")
-                                .takes_value(true)
+                                .action(ArgAction::Set)
                                 .required(true),
                         ),
                 ),
@@ -146,27 +143,27 @@ fn execute(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     match matches.subcommand() {
         Some(("print", matches)) => match matches.subcommand() {
             Some(("lexer", matches)) => {
-                let file_name = matches.value_of("lexer_file").unwrap();
+                let file_name = matches.get_one::<String>("lexer_file").unwrap();
                 print_lexer(file_name)?;
             }
             Some(("parser", matches)) => {
-                let file_name = matches.value_of("parser_file").unwrap();
-                let is_glr = matches.is_present("glr");
-                let show_bytecode = matches.is_present("show_bytecode");
+                let file_name = matches.get_one::<String>("parser_file").unwrap();
+                let is_glr = matches.get_flag("glr");
+                let show_bytecode = matches.get_flag("show_bytecode");
                 print_parser(file_name, is_glr, show_bytecode)?;
             }
             _ => panic!("invalid command"),
         },
         Some(("diff", matches)) => match matches.subcommand() {
             Some(("lexer", matches)) => {
-                let file_left = matches.value_of("file_left").unwrap();
-                let file_right = matches.value_of("file_right").unwrap();
+                let file_left = matches.get_one::<String>("file_left").unwrap();
+                let file_right = matches.get_one::<String>("file_right").unwrap();
                 diff_lexer(file_left, file_right)?;
             }
             Some(("parser", matches)) => {
-                let is_glr = matches.is_present("glr");
-                let file_left = matches.value_of("file_left").unwrap();
-                let file_right = matches.value_of("file_right").unwrap();
+                let is_glr = matches.get_flag("glr");
+                let file_left = matches.get_one::<String>("file_left").unwrap();
+                let file_right = matches.get_one::<String>("file_right").unwrap();
                 diff_parser(file_left, file_right, is_glr)?;
             }
             _ => panic!("invalid command"),
@@ -201,12 +198,7 @@ fn print_lexer(file_name: &str) -> Result<(), Box<dyn Error>> {
         for i in 0..256 {
             let next = state.get_cached_transition(i);
             if next != DEAD_STATE {
-                println!(
-                    "    0x{:X} ('{}') -> {}",
-                    i,
-                    char::from_u32(u32::from(i)).unwrap(),
-                    next
-                );
+                println!("    0x{:X} ('{}') -> {}", i, char::from_u32(u32::from(i)).unwrap(), next);
             }
         }
     }
@@ -236,9 +228,7 @@ fn print_parser_lrk(file_name: &str, show_bytecode: bool) -> Result<(), Box<dyn 
             match action.get_code() {
                 LR_ACTION_CODE_SHIFT => {
                     print!("    on 0x{:X}, shift to {}", c, action.get_data());
-                    if let Some(context) =
-                        contexts.get_context_opened_by(automaton.get_sid_for_column(c))
-                    {
+                    if let Some(context) = contexts.get_context_opened_by(automaton.get_sid_for_column(c)) {
                         print!(", open context {context}");
                     }
                     println!();
@@ -256,9 +246,7 @@ fn print_parser_lrk(file_name: &str, show_bytecode: bool) -> Result<(), Box<dyn 
                         TREE_ACTION_REPLACE_BY_EPSILON => print!(" and replace by epsilon"),
                         _ => {}
                     }
-                    if let Some(context) =
-                        contexts.get_context_opened_by(automaton.get_sid_for_column(c))
-                    {
+                    if let Some(context) = contexts.get_context_opened_by(automaton.get_sid_for_column(c)) {
                         print!(", open context {context}");
                     }
                     println!();
@@ -327,9 +315,7 @@ fn print_parser_glr(file_name: &str, show_bytecode: bool) -> Result<(), Box<dyn 
                 match action.get_code() {
                     LR_ACTION_CODE_SHIFT => {
                         print!("    on 0x{:X}, shift to {}", c, action.get_data());
-                        if let Some(context) =
-                            contexts.get_context_opened_by(automaton.get_sid_for_column(c))
-                        {
+                        if let Some(context) = contexts.get_context_opened_by(automaton.get_sid_for_column(c)) {
                             print!(", open context {context}");
                         }
                         println!();
@@ -347,9 +333,7 @@ fn print_parser_glr(file_name: &str, show_bytecode: bool) -> Result<(), Box<dyn 
                             TREE_ACTION_REPLACE_BY_EPSILON => print!(" and replace by epsilon"),
                             _ => {}
                         }
-                        if let Some(context) =
-                            contexts.get_context_opened_by(automaton.get_sid_for_column(c))
-                        {
+                        if let Some(context) = contexts.get_context_opened_by(automaton.get_sid_for_column(c)) {
                             print!(", open context {context}");
                         }
                         println!();
@@ -462,14 +446,10 @@ fn diff_lexer(file_left: &str, file_right: &str) -> Result<(), Box<dyn Error>> {
             match (next_left, next_right) {
                 (DEAD_STATE, DEAD_STATE) => {}
                 (_, DEAD_STATE) => {
-                    println!(
-                        "State ({s_left}, {s_right}) has a transition on 0x{i:X} on the left, not on the right"
-                    );
+                    println!("State ({s_left}, {s_right}) has a transition on 0x{i:X} on the left, not on the right");
                 }
                 (DEAD_STATE, _) => {
-                    println!(
-                        "State ({s_left}, {s_right}) has a transition on 0x{i:X} on the right, not on the left"
-                    );
+                    println!("State ({s_left}, {s_right}) has a transition on 0x{i:X} on the right, not on the left");
                 }
                 (next_left, next_right) => {
                     map_left_right[next_left as usize] = next_right as usize;
@@ -531,26 +511,22 @@ fn diff_parser_lrk(file_left: &str, file_right: &str) -> Result<(), Box<dyn Erro
                         (None, None) => {}
                         (Some(from), Some(to)) => {
                             if from != to {
-                                println!("States ({s_left},{s_right}), on 0x{c:X}, shift opens different contexts: {from} and {to}");
+                                println!(
+                                    "States ({s_left},{s_right}), on 0x{c:X}, shift opens different contexts: {from} and {to}"
+                                );
                             }
                         }
                         (Some(from), None) => {
-                            println!(
-                                "States ({s_left},{s_right}), on 0x{c:X}, left opens context {from}, right do not"
-                            );
+                            println!("States ({s_left},{s_right}), on 0x{c:X}, left opens context {from}, right do not");
                         }
                         (None, Some(to)) => {
-                            println!(
-                                "States ({s_left},{s_right}), on 0x{c:X}, right opens context {to}, left do not"
-                            );
+                            println!("States ({s_left},{s_right}), on 0x{c:X}, right opens context {to}, left do not");
                         }
                     }
                 }
                 (LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_REDUCE) => {
-                    let reduction_left =
-                        automaton_left.get_production(action_left.get_data() as usize);
-                    let reduction_right =
-                        automaton_right.get_production(action_right.get_data() as usize);
+                    let reduction_left = automaton_left.get_production(action_left.get_data() as usize);
+                    let reduction_right = automaton_right.get_production(action_right.get_data() as usize);
                     if reduction_left.head != reduction_right.head {
                         println!(
                             "States ({},{}), on 0x{:X}, left reduces 0x{:X}, right reduces 0x{:X}",
@@ -563,9 +539,7 @@ fn diff_parser_lrk(file_left: &str, file_right: &str) -> Result<(), Box<dyn Erro
                         );
                     }
                     if reduction_left.reduction_length != reduction_right.reduction_length {
-                        println!(
-                            "States ({s_left},{s_right}), on 0x{c:X}, left and right have different reduction length"
-                        );
+                        println!("States ({s_left},{s_right}), on 0x{c:X}, left and right have different reduction length");
                     }
                     if reduction_left.bytecode.len() != reduction_right.bytecode.len() {
                         println!(
@@ -579,13 +553,10 @@ fn diff_parser_lrk(file_left: &str, file_right: &str) -> Result<(), Box<dyn Erro
                         .zip(reduction_right.bytecode.iter().copied())
                         .any(|(l, r)| l != r);
                     if different {
-                        println!(
-                            "States ({s_left},{s_right}), on 0x{c:X}, left and right have different reduction bytecode"
-                        );
+                        println!("States ({s_left},{s_right}), on 0x{c:X}, left and right have different reduction bytecode");
                     }
                 }
-                (LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_ACCEPT)
-                | (LR_ACTION_CODE_NONE, LR_ACTION_CODE_NONE) => {}
+                (LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_ACCEPT) | (LR_ACTION_CODE_NONE, LR_ACTION_CODE_NONE) => {}
                 (code_left, code_right) => {
                     println!(
                         "States ({}, {}) have different actions: {} and {}",
