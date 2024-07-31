@@ -33,7 +33,7 @@ stages:
     container: cenotelie/hime-build-env:latest
     steps:
     - script: |
-        cargo build --release --target x86_64-unknown-linux-musl --features vendored
+        cargo build --release --target x86_64-unknown-linux-musl
       displayName: Build
     - task: CopyFiles@2
       inputs:
@@ -61,7 +61,7 @@ stages:
         cargo --version
       displayName: Install Rust
     - script: |
-        cargo build --release --features vendored
+        cargo build --release
       displayName: Build
     - task: CopyFiles@2
       inputs:
