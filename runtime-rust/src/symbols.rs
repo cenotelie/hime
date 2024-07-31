@@ -124,9 +124,7 @@ impl<'s, 't, 'a> SemanticElementTrait<'s, 'a> for SemanticElement<'s, 't, 'a> {
     fn get_symbol(&self) -> Symbol<'s> {
         match self {
             SemanticElement::Token(token) => token.get_symbol(),
-            SemanticElement::Terminal(symbol)
-            | SemanticElement::Variable(symbol)
-            | SemanticElement::Virtual(symbol) => *symbol,
+            SemanticElement::Terminal(symbol) | SemanticElement::Variable(symbol) | SemanticElement::Virtual(symbol) => *symbol,
         }
     }
 

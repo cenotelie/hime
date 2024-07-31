@@ -142,8 +142,7 @@ impl SubTree {
     /// If the index is 0, the root's children are committed, assuming this is a depth-1 sub-tree.
     /// If not, the children of the child at the given index are committed.
     pub fn commit_children_of(&mut self, index: usize, ast: &mut AstImpl) {
-        self.nodes[index].first =
-            ast.store(&self.nodes, index + 1, self.nodes[index].count as usize) as u32;
+        self.nodes[index].first = ast.store(&self.nodes, index + 1, self.nodes[index].count as usize) as u32;
     }
 
     /// Commits this buffer to the final ast

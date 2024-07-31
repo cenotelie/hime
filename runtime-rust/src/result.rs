@@ -91,13 +91,7 @@ impl<'s, 't, 'a> ParseResult<'s, 't, 'a, AstImpl> {
 
     /// Gets the mutable data required for parsing
     #[must_use]
-    pub fn get_parsing_data<'x>(
-        &'x mut self,
-    ) -> (
-        TokenRepository<'s, 't, 'x>,
-        &'x mut ParseErrors<'s>,
-        &'x mut AstImpl,
-    ) {
+    pub fn get_parsing_data<'x>(&'x mut self) -> (TokenRepository<'s, 't, 'x>, &'x mut ParseErrors<'s>, &'x mut AstImpl) {
         (
             TokenRepository::new_mut(self.terminals, &self.text, &mut self.tokens),
             &mut self.errors,
@@ -126,13 +120,7 @@ impl<'s, 't, 'a> ParseResult<'s, 't, 'a, SppfImpl> {
 
     /// Gets the mutable data required for parsing
     #[must_use]
-    pub fn get_parsing_data<'x>(
-        &'x mut self,
-    ) -> (
-        TokenRepository<'s, 't, 'x>,
-        &'x mut ParseErrors<'s>,
-        &'x mut SppfImpl,
-    ) {
+    pub fn get_parsing_data<'x>(&'x mut self) -> (TokenRepository<'s, 't, 'x>, &'x mut ParseErrors<'s>, &'x mut SppfImpl) {
         (
             TokenRepository::new_mut(self.terminals, &self.text, &mut self.tokens),
             &mut self.errors,
@@ -147,11 +135,7 @@ impl<'s, 't, 'a> Serialize for ParseResult<'s, 't, 'a, AstImpl> {
         S: Serializer,
     {
         let ast = self.get_ast();
-        let root = if self.is_success() {
-            Some(ast.get_root())
-        } else {
-            None
-        };
+        let root = if self.is_success() { Some(ast.get_root()) } else { None };
         let mut state = serializer.serialize_struct("ParseResult", 2)?;
         state.serialize_field("errors", &self.errors.errors)?;
         state.serialize_field("root", &root)?;
@@ -165,11 +149,7 @@ impl<'s, 't, 'a> Serialize for ParseResult<'s, 't, 'a, SppfImpl> {
         S: Serializer,
     {
         let ast = self.get_ast();
-        let root = if self.is_success() {
-            Some(ast.get_root())
-        } else {
-            None
-        };
+        let root = if self.is_success() { Some(ast.get_root()) } else { None };
         let mut state = serializer.serialize_struct("ParseResult", 2)?;
         state.serialize_field("errors", &self.errors.errors)?;
         state.serialize_field("root", &root)?;

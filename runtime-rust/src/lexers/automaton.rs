@@ -114,9 +114,7 @@ impl<'a> AutomatonState<'a> {
     /// Gets the target of the cached transition for the specified value
     #[must_use]
     pub fn get_cached_transition(&self, value: Utf16C) -> u32 {
-        u32::from(
-            self.table[self.offset + 3 + self.table[self.offset] as usize * 2 + value as usize],
-        )
+        u32::from(self.table[self.offset + 3 + self.table[self.offset] as usize * 2 + value as usize])
     }
 
     /// Gets an iterator over all the cached transitions
@@ -224,10 +222,7 @@ pub struct TokenMatch {
 #[must_use]
 pub fn run_dfa(automaton: &Automaton, input: &Text, index: usize) -> Option<TokenMatch> {
     if input.is_end(index) {
-        return Some(TokenMatch {
-            state: 0,
-            length: 0,
-        });
+        return Some(TokenMatch { state: 0, length: 0 });
     }
 
     let mut result = None;

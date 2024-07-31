@@ -22,12 +22,10 @@ use alloc::vec::Vec;
 
 use super::subtree::SubTree;
 use super::{
-    get_op_code_base, get_op_code_tree_action, read_table_u16, read_u16, ContextProvider, LRAction,
-    LRActionCode, LRColumnMap, LRContexts, LRExpected, LRProduction, Parser, Symbol, TreeAction,
-    LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_NONE, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT,
-    LR_OP_CODE_BASE_ADD_VIRTUAL, LR_OP_CODE_BASE_SEMANTIC_ACTION, TREE_ACTION_DROP,
-    TREE_ACTION_NONE, TREE_ACTION_PROMOTE, TREE_ACTION_REPLACE_BY_CHILDREN,
-    TREE_ACTION_REPLACE_BY_EPSILON,
+    get_op_code_base, get_op_code_tree_action, read_table_u16, read_u16, ContextProvider, LRAction, LRActionCode, LRColumnMap,
+    LRContexts, LRExpected, LRProduction, Parser, Symbol, TreeAction, LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_NONE,
+    LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT, LR_OP_CODE_BASE_ADD_VIRTUAL, LR_OP_CODE_BASE_SEMANTIC_ACTION,
+    TREE_ACTION_DROP, TREE_ACTION_NONE, TREE_ACTION_PROMOTE, TREE_ACTION_REPLACE_BY_CHILDREN, TREE_ACTION_REPLACE_BY_EPSILON,
 };
 use crate::ast::{AstImpl, TableElemRef, TableType};
 use crate::errors::ParseErrorUnexpectedToken;
@@ -196,14 +194,10 @@ impl<'s, 't, 'a> SemanticBody for LRkAstBuilder<'s, 't, 'a> {
             Some(data) => {
                 let label = data.cache.get_label_at(self.handle[index]);
                 match label.table_type() {
-                    TableType::Token => SemanticElement::Token(
-                        self.lexer.get_data().repository.get_token(label.index()),
-                    ),
+                    TableType::Token => SemanticElement::Token(self.lexer.get_data().repository.get_token(label.index())),
                     TableType::Variable => SemanticElement::Variable(self.variables[label.index()]),
                     TableType::Virtual => SemanticElement::Virtual(self.virtuals[label.index()]),
-                    TableType::None => {
-                        SemanticElement::Terminal(self.lexer.get_data().repository.terminals[0])
-                    }
+                    TableType::None => SemanticElement::Terminal(self.lexer.get_data().repository.terminals[0]),
                 }
             }
         }
@@ -247,10 +241,7 @@ impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
             estimation += self.stack[self.stack.len() - length + i].get_size();
         }
         let mut cache = SubTree::new(estimation);
-        cache.setup_root(
-            TableElemRef::new(TableType::Variable, variable_index),
-            action,
-        );
+        cache.setup_root(TableElemRef::new(TableType::Variable, variable_index), action);
         self.reduction = Some(LRkAstReduction {
             length,
             cache,
@@ -259,12 +250,7 @@ impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
     }
 
     /// During a reduction, insert the given sub-tree
-    fn reduction_add_sub(
-        reduction: &mut LRkAstReduction,
-        handle: &mut Vec<usize>,
-        sub: &SubTree,
-        action: TreeAction,
-    ) {
+    fn reduction_add_sub(reduction: &mut LRkAstReduction, handle: &mut Vec<usize>, sub: &SubTree, action: TreeAction) {
         if sub.get_action_at(0) == TREE_ACTION_REPLACE_BY_CHILDREN {
             let children_count = sub.get_children_count_at(0);
             // copy the children to the cache
@@ -307,9 +293,7 @@ impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
             match self.reduction.as_mut() {
                 None => panic!("Not in a reduction"),
                 Some(reduction) => {
-                    let cache_index = reduction
-                        .cache
-                        .push(TableElemRef::new(TableType::Virtual, index), action);
+                    let cache_index = reduction.cache.push(TableElemRef::new(TableType::Virtual, index), action);
                     self.handle.push(cache_index);
                 }
             }
@@ -340,9 +324,7 @@ impl<'s, 't, 'a> LRkAstBuilder<'s, 't, 'a> {
     pub fn reduce_tree(reduction: &mut LRkAstReduction, handle: &[usize], result: &mut AstImpl) {
         // apply the epsilon replace, if any
         if reduction.cache.get_action_at(0) == TREE_ACTION_REPLACE_BY_EPSILON {
-            reduction
-                .cache
-                .set_label_at(0, TableElemRef::new(TableType::None, 0));
+            reduction.cache.set_label_at(0, TableElemRef::new(TableType::None, 0));
             reduction.cache.set_action_at(0, TREE_ACTION_NONE);
         }
         // promotion data
@@ -415,12 +397,7 @@ impl<'s, 'a> ContextProvider for LRkParserData<'s, 'a> {
     /// Gets the priority of the specified context required by the specified terminal
     /// The priority is an unsigned integer. The lesser the value the higher the priority.
     /// The absence of value represents the unavailability of the required context.
-    fn get_context_priority(
-        &self,
-        token_count: usize,
-        context: u16,
-        terminal_id: u32,
-    ) -> Option<usize> {
+    fn get_context_priority(&self, token_count: usize, context: u16, terminal_id: u32) -> Option<usize> {
         // the default context is always active
         if context == DEFAULT_CONTEXT {
             return Some(usize::MAX);
@@ -428,11 +405,7 @@ impl<'s, 'a> ContextProvider for LRkParserData<'s, 'a> {
         if token_count == 0 {
             // this is the first token, does it open the context?
             let contexts = self.automaton.get_contexts(0);
-            return if contexts.opens(terminal_id, context) {
-                Some(0)
-            } else {
-                None
-            };
+            return if contexts.opens(terminal_id, context) { Some(0) } else { None };
         }
         // retrieve the action for this terminal
         let state = self.stack[self.stack.len() - 1].state;
@@ -442,12 +415,7 @@ impl<'s, 'a> ContextProvider for LRkParserData<'s, 'a> {
             return None;
         }
         // does the context opens with the terminal?
-        if action.get_code() == LR_ACTION_CODE_SHIFT
-            && self
-                .automaton
-                .get_contexts(state)
-                .opens(terminal_id, context)
-        {
+        if action.get_code() == LR_ACTION_CODE_SHIFT && self.automaton.get_contexts(state).opens(terminal_id, context) {
             return Some(0);
         }
         let production = if action.get_code() == LR_ACTION_CODE_REDUCE {
@@ -494,17 +462,13 @@ impl<'s, 'a> ContextProvider for LRkParserData<'s, 'a> {
             let length = my_stack.len();
             my_stack.truncate(length - production.reduction_length);
             // this must be a shift
-            action = self
-                .automaton
-                .get_action(my_stack[my_stack.len() - 1].state, variable.id);
+            action = self.automaton.get_action(my_stack[my_stack.len() - 1].state, variable.id);
             my_stack.push(LRkHead {
                 state: u32::from(action.get_data()),
                 identifier: variable.id,
             });
             // now, get the new action for the terminal
-            action = self
-                .automaton
-                .get_action(u32::from(action.get_data()), terminal_id);
+            action = self.automaton.get_action(u32::from(action.get_data()), terminal_id);
         }
         // is this a shift action that opens the context?
         if action.get_code() == LR_ACTION_CODE_SHIFT
@@ -527,9 +491,7 @@ impl<'s, 't, 'a> LRkParserData<'s, 'a> {
     fn check_is_expected(&self, terminal: Symbol<'s>) -> bool {
         // copy the stack to use for the simulation
         let mut my_stack = self.stack.clone();
-        let mut action = self
-            .automaton
-            .get_action(my_stack[my_stack.len() - 1].state, terminal.id);
+        let mut action = self.automaton.get_action(my_stack[my_stack.len() - 1].state, terminal.id);
         while action.get_code() != LR_ACTION_CODE_NONE {
             if action.get_code() == LR_ACTION_CODE_SHIFT {
                 // yep, the terminal was expected
@@ -542,17 +504,13 @@ impl<'s, 't, 'a> LRkParserData<'s, 'a> {
                 let length = my_stack.len();
                 my_stack.truncate(length - production.reduction_length);
                 // this must be a shift
-                action = self
-                    .automaton
-                    .get_action(my_stack[my_stack.len() - 1].state, variable.id);
+                action = self.automaton.get_action(my_stack[my_stack.len() - 1].state, variable.id);
                 my_stack.push(LRkHead {
                     state: u32::from(action.get_data()),
                     identifier: variable.id,
                 });
                 // now, get the new action for the terminal
-                action = self
-                    .automaton
-                    .get_action(u32::from(action.get_data()), terminal.id);
+                action = self.automaton.get_action(u32::from(action.get_data()), terminal.id);
             }
         }
         // nope, that was a pathological case in a LALR graph
@@ -582,10 +540,9 @@ impl<'s, 't, 'a> LRkParserData<'s, 'a> {
             let variable = LRkParserData::reduce(production, builder, &mut self.actions);
             let length = stack.len();
             stack.truncate(length - production.reduction_length);
-            let action = self.automaton.get_action(
-                stack[stack.len() - 1].state,
-                builder.variables[production.head].id,
-            );
+            let action = self
+                .automaton
+                .get_action(stack[stack.len() - 1].state, builder.variables[production.head].id);
             stack.push(LRkHead {
                 state: u32::from(action.get_data()),
                 identifier: variable.id,
@@ -600,11 +557,7 @@ impl<'s, 't, 'a> LRkParserData<'s, 'a> {
         actions: &mut dyn FnMut(usize, Symbol, &dyn SemanticBody),
     ) -> Symbol<'s> {
         let variable = builder.variables[production.head];
-        builder.reduction_prepare(
-            production.head,
-            production.reduction_length,
-            production.head_action,
-        );
+        builder.reduction_prepare(production.head, production.reduction_length, production.head_action);
         let mut i = 0;
         while i < production.bytecode.len() {
             let op_code = production.bytecode[i];
@@ -651,10 +604,7 @@ impl<'s, 't, 'a> LRkParser<'s, 't, 'a> {
         LRkParser {
             data: LRkParserData {
                 automaton,
-                stack: alloc::vec![LRkHead {
-                    state: 0,
-                    identifier: 0
-                }],
+                stack: alloc::vec![LRkHead { state: 0, identifier: 0 }],
                 variables,
                 actions,
             },
@@ -670,12 +620,7 @@ impl<'s, 't, 'a> LRkParser<'s, 't, 'a> {
 
     /// Builds the unexpected token error
     fn build_error(&self, kernel: TokenKernel) -> ParseErrorUnexpectedToken<'s> {
-        let token = self
-            .builder
-            .lexer
-            .get_data()
-            .repository
-            .get_token(kernel.index as usize);
+        let token = self.builder.lexer.get_data().repository.get_token(kernel.index as usize);
         let state = self.data.stack[self.data.stack.len() - 1].state;
         let expected_on_head = self
             .data
@@ -724,11 +669,7 @@ impl<'s, 't, 'a> Parser for LRkParser<'s, 't, 'a> {
                         _ => {
                             // this is an error
                             let error = self.build_error(kernel);
-                            self.builder
-                                .lexer
-                                .get_data_mut()
-                                .errors
-                                .push_error_unexpected_token(error);
+                            self.builder.lexer.get_data_mut().errors.push_error_unexpected_token(error);
                             // TODO: try to recover here
                             return;
                         }

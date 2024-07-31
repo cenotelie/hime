@@ -84,12 +84,7 @@ impl TableElemRef {
     /// # Errors
     ///
     /// Propagates the error from `write!`
-    pub fn fmt(
-        &self,
-        f: &mut Formatter<'_>,
-        variables: &[Symbol],
-        virtuals: &[Symbol],
-    ) -> Result<(), Error> {
+    pub fn fmt(&self, f: &mut Formatter<'_>, variables: &[Symbol], virtuals: &[Symbol]) -> Result<(), Error> {
         match self.table_type() {
             TableType::None => write!(f, "none[{}]", self.index())?,
             TableType::Token => write!(f, "token[{}]", self.index())?,
@@ -126,11 +121,7 @@ impl AstCell {
     /// Initializes this node
     #[must_use]
     pub fn new(label: TableElemRef, count: u32, first: u32) -> AstCell {
-        AstCell {
-            label,
-            count,
-            first,
-        }
+        AstCell { label, count, first }
     }
 }
 
@@ -225,20 +216,14 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     pub fn get_root(&'a self) -> AstNode<'s, 't, 'a> {
         self.data
             .root
-            .map(|x| AstNode {
-                tree: self,
-                index: x,
-            })
+            .map(|x| AstNode { tree: self, index: x })
             .expect("No root defined!")
     }
 
     /// Gets a specific node in this tree
     #[must_use]
     pub fn get_node(&'a self, id: usize) -> AstNode<'s, 't, 'a> {
-        AstNode {
-            tree: self,
-            index: id,
-        }
+        AstNode { tree: self, index: id }
     }
 
     /// Gets the AST node (if any) that has the specified token as label
@@ -248,9 +233,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
             .nodes
             .iter()
             .enumerate()
-            .find(|(_, node)| {
-                node.label.table_type() == TableType::Token && node.label.index() == token.index
-            })
+            .find(|(_, node)| node.label.table_type() == TableType::Token && node.label.index() == token.index)
             .map(|(index, _)| AstNode { tree: self, index })
     }
 
@@ -258,9 +241,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     /// a token label that contains the specified index in the input text
     #[must_use]
     pub fn find_node_at_index(&'a self, index: usize) -> Option<AstNode<'s, 't, 'a>> {
-        self.tokens
-            .find_token_at(index)
-            .and_then(|token| self.find_node_for(&token))
+        self.tokens.find_token_at(index).and_then(|token| self.find_node_for(&token))
     }
 
     /// Gets the AST node (if any) that has
@@ -268,9 +249,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
     #[must_use]
     pub fn find_node_at_position(&'a self, position: TextPosition) -> Option<AstNode<'s, 't, 'a>> {
         let index = self.tokens.text.get_line_index(position.line) + position.column - 1;
-        self.tokens
-            .find_token_at(index)
-            .and_then(|token| self.find_node_for(&token))
+        self.tokens.find_token_at(index).and_then(|token| self.find_node_for(&token))
     }
 
     /// Gets the parent of the specified node, if any
@@ -281,9 +260,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
             .iter()
             .enumerate()
             .find(|(_, candidate)| {
-                candidate.count > 0
-                    && node >= candidate.first as usize
-                    && node < (candidate.first + candidate.count) as usize
+                candidate.count > 0 && node >= candidate.first as usize && node < (candidate.first + candidate.count) as usize
             })
             .map(|(index, _)| AstNode { tree: self, index })
     }
@@ -305,8 +282,7 @@ impl<'s, 't, 'a> Ast<'s, 't, 'a> {
             if let Some(total_span) = total_span.as_mut() {
                 if let Some(span) = self.get_span_at(current) {
                     if span.index + span.length > total_span.index + total_span.length {
-                        let margin =
-                            (span.index + span.length) - (total_span.index + total_span.length);
+                        let margin = (span.index + span.length) - (total_span.index + total_span.length);
                         total_span.length += margin;
                     }
                     if span.index < total_span.index {
@@ -661,13 +637,26 @@ impl<'s, 't, 'a> AstFamily<'s, 't, 'a> {
     }
 }
 
+impl<'s, 't, 'a> IntoIterator for &'a AstFamily<'s, 't, 'a> {
+    type Item = AstNode<'s, 't, 'a>;
+    type IntoIter = AstFamilyIterator<'s, 't, 'a>;
+    fn into_iter(self) -> Self::IntoIter {
+        let cell = self.tree.data.nodes[self.parent];
+        AstFamilyIterator {
+            tree: self.tree,
+            current: cell.first as usize,
+            end: (cell.first + cell.count) as usize,
+        }
+    }
+}
+
 impl<'s, 't, 'a> Serialize for AstFamily<'s, 't, 'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
         let mut seq = serializer.serialize_seq(Some(self.len()))?;
-        for node in self.iter() {
+        for node in self {
             seq.serialize_element(&node)?;
         }
         seq.end()

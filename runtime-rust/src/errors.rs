@@ -105,10 +105,7 @@ impl ParseErrorUnexpectedChar {
     /// Creates a new error
     #[must_use]
     pub fn new(position: TextPosition, unexpected: char) -> ParseErrorUnexpectedChar {
-        ParseErrorUnexpectedChar {
-            position,
-            unexpected,
-        }
+        ParseErrorUnexpectedChar { position, unexpected }
     }
 }
 
@@ -153,11 +150,7 @@ impl Display for ParseErrorIncorrectEncodingSequence {
 impl ParseErrorIncorrectEncodingSequence {
     /// Initializes this error
     #[must_use]
-    pub fn new(
-        position: TextPosition,
-        missing_high: bool,
-        sequence: Utf16C,
-    ) -> ParseErrorIncorrectEncodingSequence {
+    pub fn new(position: TextPosition, missing_high: bool, sequence: Utf16C) -> ParseErrorIncorrectEncodingSequence {
         ParseErrorIncorrectEncodingSequence {
             position,
             missing_high,
@@ -270,8 +263,7 @@ impl<'s> ParseErrorDataTrait for ParseError<'s> {
             ParseError::UnexpectedEndOfInput(x) => x.get_position(),
             ParseError::UnexpectedChar(x) => x.get_position(),
             ParseError::UnexpectedToken(x) => x.get_position(),
-            ParseError::IncorrectUTF16NoLowSurrogate(x)
-            | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_position(),
+            ParseError::IncorrectUTF16NoLowSurrogate(x) | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_position(),
         }
     }
 
@@ -281,8 +273,7 @@ impl<'s> ParseErrorDataTrait for ParseError<'s> {
             ParseError::UnexpectedEndOfInput(x) => x.get_length(),
             ParseError::UnexpectedChar(x) => x.get_length(),
             ParseError::UnexpectedToken(x) => x.get_length(),
-            ParseError::IncorrectUTF16NoLowSurrogate(x)
-            | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_length(),
+            ParseError::IncorrectUTF16NoLowSurrogate(x) | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.get_length(),
         }
     }
 }
@@ -294,8 +285,7 @@ impl<'s> Display for ParseError<'s> {
             ParseError::UnexpectedEndOfInput(x) => x.fmt(f),
             ParseError::UnexpectedChar(x) => x.fmt(f),
             ParseError::UnexpectedToken(x) => x.fmt(f),
-            ParseError::IncorrectUTF16NoLowSurrogate(x)
-            | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.fmt(f),
+            ParseError::IncorrectUTF16NoLowSurrogate(x) | ParseError::IncorrectUTF16NoHighSurrogate(x) => x.fmt(f),
         }
     }
 }
@@ -327,20 +317,12 @@ impl<'s> ParseErrors<'s> {
     }
 
     /// Handles the incorrect encoding sequence error
-    pub fn push_error_no_low_utf16_surrogate(
-        &mut self,
-        error: ParseErrorIncorrectEncodingSequence,
-    ) {
-        self.errors
-            .push(ParseError::IncorrectUTF16NoLowSurrogate(error));
+    pub fn push_error_no_low_utf16_surrogate(&mut self, error: ParseErrorIncorrectEncodingSequence) {
+        self.errors.push(ParseError::IncorrectUTF16NoLowSurrogate(error));
     }
 
     /// Handles the incorrect encoding sequence error
-    pub fn push_error_no_high_utf16_surrogate(
-        &mut self,
-        error: ParseErrorIncorrectEncodingSequence,
-    ) {
-        self.errors
-            .push(ParseError::IncorrectUTF16NoHighSurrogate(error));
+    pub fn push_error_no_high_utf16_surrogate(&mut self, error: ParseErrorIncorrectEncodingSequence) {
+        self.errors.push(ParseError::IncorrectUTF16NoHighSurrogate(error));
     }
 }

@@ -89,9 +89,7 @@ impl SppfImplNodeRef {
     /// Creates a new reference to a node version
     #[must_use]
     pub fn new_usize(node_id: usize) -> Self {
-        Self {
-            node_id: node_id as u32,
-        }
+        Self { node_id: node_id as u32 }
     }
 
     /// Creates a new reference to a node version
@@ -135,9 +133,7 @@ impl SppfImplNodeRef {
 
 impl From<SppfImplNodeVersRef> for SppfImplNodeRef {
     fn from(value: SppfImplNodeVersRef) -> Self {
-        Self {
-            node_id: value.node_id,
-        }
+        Self { node_id: value.node_id }
     }
 }
 
@@ -202,6 +198,16 @@ impl SppfImplNodeChildren {
     #[must_use]
     pub fn is_empty(&self) -> bool {
         matches!(self, SppfImplNodeChildren::None)
+    }
+
+    /// Gets an iterator over the children
+    #[must_use]
+    pub fn iter(&self) -> SppfImplNodeChildrenIterator {
+        SppfImplNodeChildrenIterator {
+            children: self,
+            index: 0,
+            end: self.len(),
+        }
     }
 }
 
@@ -355,11 +361,7 @@ impl SppfImplNodeVersion {
     pub fn is_same_as(&self, label: TableElemRef, children: &[SppfImplNodeRef]) -> bool {
         self.label == label
             && self.len() == children.len()
-            && self
-                .children
-                .into_iter()
-                .zip(children)
-                .all(|(left, &right)| left == right)
+            && self.children.into_iter().zip(children).all(|(left, &right)| left == right)
     }
 
     /// Insert a series of children at the front
@@ -391,12 +393,7 @@ impl SppfImplNodeVersion {
     /// # Errors
     ///
     /// Propagates the error from `write!`
-    pub fn fmt(
-        &self,
-        f: &mut Formatter,
-        variables: &[Symbol],
-        virtuals: &[Symbol],
-    ) -> Result<(), Error> {
+    pub fn fmt(&self, f: &mut Formatter, variables: &[Symbol], virtuals: &[Symbol]) -> Result<(), Error> {
         self.label.fmt(f, variables, virtuals)?;
         if !self.is_empty() {
             write!(f, " ->")?;
@@ -451,10 +448,7 @@ impl<T: PartialEq> SppfImplNodeVersions<T> {
                     SppfImplNodeVersions::Multiple(left)
                 }
             }
-            (
-                SppfImplNodeVersions::Multiple(mut left),
-                SppfImplNodeVersions::Multiple(mut right),
-            ) => {
+            (SppfImplNodeVersions::Multiple(mut left), SppfImplNodeVersions::Multiple(mut right)) => {
                 left.append(&mut right);
                 left.dedup();
                 SppfImplNodeVersions::Multiple(left)
@@ -476,6 +470,16 @@ impl<T: PartialEq> SppfImplNodeVersions<T> {
     #[must_use]
     pub fn is_empty(&self) -> bool {
         false
+    }
+
+    /// Gets an iterator over the versions
+    #[must_use]
+    pub fn iter(&self) -> SppfImplNodeVersionsIterator<T> {
+        SppfImplNodeVersionsIterator {
+            versions: self,
+            index: 0,
+            end: self.len(),
+        }
     }
 
     /// Gets the first version
@@ -506,21 +510,14 @@ impl<T: PartialEq> SppfImplNodeVersions<T> {
 impl SppfImplNodeVersions<SppfImplNodeVersion> {
     /// Adds a new version to this node
     #[must_use]
-    pub fn with_new_version(
-        self,
-        label: TableElemRef,
-        children: &[SppfImplNodeRef],
-    ) -> (Self, usize) {
+    pub fn with_new_version(self, label: TableElemRef, children: &[SppfImplNodeRef]) -> (Self, usize) {
         match self {
             SppfImplNodeVersions::Single(first) => {
                 if first.is_same_as(label, children) {
                     (SppfImplNodeVersions::Single(first), 0)
                 } else {
                     (
-                        SppfImplNodeVersions::Multiple(alloc::vec![
-                            first,
-                            SppfImplNodeVersion::from(label, children)
-                        ]),
+                        SppfImplNodeVersions::Multiple(alloc::vec![first, SppfImplNodeVersion::from(label, children)]),
                         0,
                     )
                 }
@@ -639,8 +636,7 @@ impl SppfImplNode {
     /// Adds a new version to this node
     pub fn add_version(&mut self, label: TableElemRef, children: &[SppfImplNodeRef]) -> usize {
         let result;
-        (self.versions, result) =
-            core::mem::take(&mut self.versions).with_new_version(label, children);
+        (self.versions, result) = core::mem::take(&mut self.versions).with_new_version(label, children);
         result
     }
 
@@ -694,12 +690,7 @@ impl SppfImplNode {
     /// # Errors
     ///
     /// Propagates the error from `write!`
-    pub fn fmt(
-        &self,
-        f: &mut Formatter,
-        variables: &[Symbol],
-        virtuals: &[Symbol],
-    ) -> Result<(), Error> {
+    pub fn fmt(&self, f: &mut Formatter, variables: &[Symbol], virtuals: &[Symbol]) -> Result<(), Error> {
         match &self.versions {
             SppfImplNodeVersions::Single(version) => {
                 version.fmt(f, variables, virtuals)?;
@@ -727,11 +718,7 @@ pub struct SppfImplNodeReplaceable {
 impl SppfImplNodeReplaceable {
     /// Initializes this node
     #[must_use]
-    pub fn new(
-        label: TableElemRef,
-        children: &[SppfImplNodeRef],
-        actions: &[TreeAction],
-    ) -> SppfImplNodeReplaceable {
+    pub fn new(label: TableElemRef, children: &[SppfImplNodeRef], actions: &[TreeAction]) -> SppfImplNodeReplaceable {
         Self {
             versions: SppfImplNodeVersions::Single(if children.is_empty() {
                 SppfImplNodeReplaceableVersion {
@@ -750,15 +737,9 @@ impl SppfImplNodeReplaceable {
     }
 
     /// Adds a new version to this node
-    pub fn add_version(
-        &mut self,
-        label: TableElemRef,
-        children: &[SppfImplNodeRef],
-        actions: &[TreeAction],
-    ) -> usize {
+    pub fn add_version(&mut self, label: TableElemRef, children: &[SppfImplNodeRef], actions: &[TreeAction]) -> usize {
         let result;
-        (self.versions, result) =
-            core::mem::take(&mut self.versions).with_new_version(label, children, actions);
+        (self.versions, result) = core::mem::take(&mut self.versions).with_new_version(label, children, actions);
         result
     }
 
@@ -767,12 +748,7 @@ impl SppfImplNodeReplaceable {
     /// # Errors
     ///
     /// Propagates the error from `write!`
-    pub fn fmt(
-        &self,
-        f: &mut Formatter,
-        variables: &[Symbol],
-        virtuals: &[Symbol],
-    ) -> Result<(), Error> {
+    pub fn fmt(&self, f: &mut Formatter, variables: &[Symbol], virtuals: &[Symbol]) -> Result<(), Error> {
         match &self.versions {
             SppfImplNodeVersions::Single(version) => {
                 version.fmt(f, variables, virtuals)?;
@@ -793,12 +769,7 @@ impl SppfImplNodeReplaceable {
 impl SppfImplNodeVersions<SppfImplNodeReplaceableVersion> {
     /// Adds a new version to this node
     #[must_use]
-    pub fn with_new_version(
-        self,
-        label: TableElemRef,
-        children: &[SppfImplNodeRef],
-        actions: &[TreeAction],
-    ) -> (Self, usize) {
+    pub fn with_new_version(self, label: TableElemRef, children: &[SppfImplNodeRef], actions: &[TreeAction]) -> (Self, usize) {
         match self {
             SppfImplNodeVersions::Single(first) => {
                 if first.is_same_as(label, children) {
@@ -822,9 +793,7 @@ impl SppfImplNodeVersions<SppfImplNodeReplaceableVersion> {
                     (SppfImplNodeVersions::Multiple(versions), version)
                 } else {
                     let current = versions.len();
-                    versions.push(SppfImplNodeReplaceableVersion::from(
-                        label, children, actions,
-                    ));
+                    versions.push(SppfImplNodeReplaceableVersion::from(label, children, actions));
                     (SppfImplNodeVersions::Multiple(versions), current)
                 }
             }
@@ -846,11 +815,7 @@ pub struct SppfImplNodeReplaceableVersion {
 impl SppfImplNodeReplaceableVersion {
     /// Initializes this node version
     #[must_use]
-    pub fn from(
-        label: TableElemRef,
-        children: &[SppfImplNodeRef],
-        actions: &[TreeAction],
-    ) -> SppfImplNodeReplaceableVersion {
+    pub fn from(label: TableElemRef, children: &[SppfImplNodeRef], actions: &[TreeAction]) -> SppfImplNodeReplaceableVersion {
         SppfImplNodeReplaceableVersion {
             label,
             children: children.to_vec(),
@@ -875,23 +840,14 @@ impl SppfImplNodeReplaceableVersion {
     pub fn is_same_as(&self, label: TableElemRef, children: &[SppfImplNodeRef]) -> bool {
         self.label == label
             && self.len() == children.len()
-            && self
-                .children
-                .iter()
-                .zip(children)
-                .all(|(left, right)| left == right)
+            && self.children.iter().zip(children).all(|(left, right)| left == right)
     }
     /// Format this node
     ///
     /// # Errors
     ///
     /// Propagates the error from `write!`
-    pub fn fmt(
-        &self,
-        f: &mut Formatter,
-        variables: &[Symbol],
-        virtuals: &[Symbol],
-    ) -> Result<(), Error> {
+    pub fn fmt(&self, f: &mut Formatter, variables: &[Symbol], virtuals: &[Symbol]) -> Result<(), Error> {
         self.label.fmt(f, variables, virtuals)?;
         if !self.children.is_empty() {
             write!(f, " ->")?;
@@ -951,14 +907,9 @@ impl SppfImpl {
     }
 
     /// Creates a new single node in the SPPF
-    pub fn new_normal_node_with_children(
-        &mut self,
-        label: TableElemRef,
-        children: &[SppfImplNodeRef],
-    ) -> SppfImplNodeRef {
+    pub fn new_normal_node_with_children(&mut self, label: TableElemRef, children: &[SppfImplNodeRef]) -> SppfImplNodeRef {
         let identifier = self.nodes.len();
-        self.nodes
-            .push(SppfImplNode::new_with_children(label, children));
+        self.nodes.push(SppfImplNode::new_with_children(label, children));
         SppfImplNodeRef::new_usize(identifier)
     }
 
@@ -970,8 +921,7 @@ impl SppfImpl {
         tail: &[SppfImplNodeRef],
     ) -> SppfImplNodeRef {
         let identifier = self.nodes.len();
-        self.nodes
-            .push(self.create_promoted_node(previous, head, tail));
+        self.nodes.push(self.create_promoted_node(previous, head, tail));
         SppfImplNodeRef::new_usize(identifier)
     }
 
@@ -990,10 +940,7 @@ impl SppfImpl {
             },
             SppfImplNodeVersions::Multiple(versions) => SppfImplNode {
                 versions: SppfImplNodeVersions::Multiple(
-                    versions
-                        .iter()
-                        .map(|version| version.with_head_tail(head, tail))
-                        .collect(),
+                    versions.iter().map(|version| version.with_head_tail(head, tail)).collect(),
                 ),
             },
         }
@@ -1081,20 +1028,14 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
     #[must_use]
     pub fn find_node_for(&'a self, token: &Token) -> Option<SppfNode<'s, 't, 'a>> {
         let root = self.get_root();
-        self.traverse(
-            root.node,
-            SppfImplNodeRef::new_usize(root.id()),
-            |child, child_ref| {
-                for (index, version) in child.versions.into_iter().enumerate() {
-                    if version.label.table_type() == TableType::Token
-                        && version.label.index() == token.index
-                    {
-                        return Some(child_ref.with_version_usize(index));
-                    }
+        self.traverse(root.node, SppfImplNodeRef::new_usize(root.id()), |child, child_ref| {
+            for (index, version) in child.versions.into_iter().enumerate() {
+                if version.label.table_type() == TableType::Token && version.label.index() == token.index {
+                    return Some(child_ref.with_version_usize(index));
                 }
-                None
-            },
-        )
+            }
+            None
+        })
         .map(|node_ref| SppfNode::new(self, node_ref.into()))
     }
 
@@ -1102,9 +1043,7 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
     /// a token label that contains the specified index in the input text
     #[must_use]
     pub fn find_node_at_index(&'a self, index: usize) -> Option<SppfNode<'s, 't, 'a>> {
-        self.tokens
-            .find_token_at(index)
-            .and_then(|token| self.find_node_for(&token))
+        self.tokens.find_token_at(index).and_then(|token| self.find_node_for(&token))
     }
 
     /// Gets the AST node (if any) that has
@@ -1112,39 +1051,27 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
     #[must_use]
     pub fn find_node_at_position(&'a self, position: TextPosition) -> Option<SppfNode<'s, 't, 'a>> {
         let index = self.tokens.text.get_line_index(position.line) + position.column - 1;
-        self.tokens
-            .find_token_at(index)
-            .and_then(|token| self.find_node_for(&token))
+        self.tokens.find_token_at(index).and_then(|token| self.find_node_for(&token))
     }
 
     /// Gets the parent of the specified node, if any
     #[must_use]
-    pub fn find_parent_of(
-        &'a self,
-        node_ref: SppfImplNodeRef,
-    ) -> Option<SppfNodeVersion<'s, 't, 'a>> {
+    pub fn find_parent_of(&'a self, node_ref: SppfImplNodeRef) -> Option<SppfNodeVersion<'s, 't, 'a>> {
         let root = self.get_root();
-        self.traverse(
-            root.node,
-            SppfImplNodeRef::new_usize(root.id()),
-            |child, child_ref| {
-                for (index, version) in child.versions.into_iter().enumerate() {
-                    if version.children.into_iter().any(|child| child == node_ref) {
-                        return Some(child_ref.with_version_usize(index));
-                    }
+        self.traverse(root.node, SppfImplNodeRef::new_usize(root.id()), |child, child_ref| {
+            for (index, version) in child.versions.into_iter().enumerate() {
+                if version.children.into_iter().any(|child| child == node_ref) {
+                    return Some(child_ref.with_version_usize(index));
                 }
-                None
-            },
-        )
+            }
+            None
+        })
         .map(|node_ref| SppfNodeVersion::new(self, node_ref))
     }
 
     /// Gets the total span of sub-tree given its root and its position
     #[must_use]
-    pub fn get_total_position_and_span(
-        &self,
-        node: &SppfImplNode,
-    ) -> Option<(TextPosition, TextSpan)> {
+    pub fn get_total_position_and_span(&self, node: &SppfImplNode) -> Option<(TextPosition, TextSpan)> {
         let mut total_span: Option<TextSpan> = None;
         let mut position = TextPosition {
             line: usize::MAX,
@@ -1156,10 +1083,7 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
 
     /// Gets the total span of sub-tree given its root and its position
     #[must_use]
-    pub fn get_total_position_and_span_version(
-        &self,
-        node: &SppfImplNodeVersion,
-    ) -> Option<(TextPosition, TextSpan)> {
+    pub fn get_total_position_and_span_version(&self, node: &SppfImplNodeVersion) -> Option<(TextPosition, TextSpan)> {
         let mut total_span: Option<TextSpan> = None;
         let mut position = TextPosition {
             line: usize::MAX,
@@ -1189,8 +1113,7 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
                 if let Some(total_span) = total_span.as_mut() {
                     if let Some(span) = self.get_span_at(version) {
                         if span.index + span.length > total_span.index + total_span.length {
-                            let margin =
-                                (span.index + span.length) - (total_span.index + total_span.length);
+                            let margin = (span.index + span.length) - (total_span.index + total_span.length);
                             total_span.length += margin;
                         }
                         if span.index < total_span.index {
@@ -1216,17 +1139,11 @@ impl<'s, 't, 'a> Sppf<'s, 't, 'a> {
     /// Gets the total span of sub-tree given its root
     #[must_use]
     pub fn get_total_span_version(&self, version: &SppfImplNodeVersion) -> Option<TextSpan> {
-        self.get_total_position_and_span_version(version)
-            .map(|(_, span)| span)
+        self.get_total_position_and_span_version(version).map(|(_, span)| span)
     }
 
     /// Traverses the AST from the specified node
-    fn traverse<R, F>(
-        &self,
-        from: &'a SppfImplNode,
-        from_ref: SppfImplNodeRef,
-        mut action: F,
-    ) -> Option<R>
+    fn traverse<R, F>(&self, from: &'a SppfImplNode, from_ref: SppfImplNodeRef, mut action: F) -> Option<R>
     where
         F: FnMut(&'a SppfImplNode, SppfImplNodeRef) -> Option<R>,
     {
@@ -1288,11 +1205,7 @@ impl<'s, 't, 'a> SppfNode<'s, 't, 'a> {
     #[must_use]
     fn new(sppf: &'a Sppf<'s, 't, 'a>, node_ref: SppfImplNodeRef) -> SppfNode<'s, 't, 'a> {
         let node = sppf.data.get_node(node_ref);
-        SppfNode {
-            sppf,
-            node_ref,
-            node,
-        }
+        SppfNode { sppf, node_ref, node }
     }
 
     /// Gets the identifier of this node
@@ -1492,16 +1405,9 @@ pub struct SppfNodeVersion<'s, 't, 'a> {
 impl<'s, 't, 'a> SppfNodeVersion<'s, 't, 'a> {
     /// Creates a new version
     #[must_use]
-    fn new(
-        sppf: &'a Sppf<'s, 't, 'a>,
-        node_ref: SppfImplNodeVersRef,
-    ) -> SppfNodeVersion<'s, 't, 'a> {
+    fn new(sppf: &'a Sppf<'s, 't, 'a>, node_ref: SppfImplNodeVersRef) -> SppfNodeVersion<'s, 't, 'a> {
         let version = sppf.data.get_node_version(node_ref);
-        SppfNodeVersion {
-            sppf,
-            version,
-            node_ref,
-        }
+        SppfNodeVersion { sppf, version, node_ref }
     }
 
     /// Gets a reference to this node version

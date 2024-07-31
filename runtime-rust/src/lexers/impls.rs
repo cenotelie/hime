@@ -135,16 +135,9 @@ impl<'s, 't, 'a> ContextFreeLexer<'s, 't, 'a> {
                     return;
                 }
                 // matched something
-                let terminal = self
-                    .data
-                    .automaton
-                    .get_state(the_match.state)
-                    .get_terminal(0)
-                    .index as usize;
+                let terminal = self.data.automaton.get_state(the_match.state).get_terminal(0).index as usize;
                 if self.data.repository.terminals[terminal].id != self.data.separator_id {
-                    self.data
-                        .repository
-                        .add(terminal, index, the_match.length as usize);
+                    self.data.repository.add(terminal, index, the_match.length as usize);
                 }
                 index += the_match.length as usize;
             } else {
@@ -191,11 +184,7 @@ impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
             return None;
         }
         loop {
-            let mut result = run_dfa(
-                &self.data.automaton,
-                self.data.repository.text,
-                self.input_index,
-            );
+            let mut result = run_dfa(&self.data.automaton, self.data.repository.text, self.input_index);
             if result.is_none() {
                 // failed to match, retry with error handling
                 result = run_fuzzy_matcher(
@@ -222,11 +211,10 @@ impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
                 let terminal_index = self.get_terminal_for(the_match.state, contexts);
                 let terminal_id = self.data.repository.terminals[terminal_index as usize].id;
                 if terminal_id != self.data.separator_id {
-                    let token_index = self.data.repository.add(
-                        terminal_index as usize,
-                        self.input_index,
-                        the_match.length as usize,
-                    );
+                    let token_index =
+                        self.data
+                            .repository
+                            .add(terminal_index as usize, self.input_index, the_match.length as usize);
                     self.input_index += the_match.length as usize;
                     return Some(TokenKernel {
                         terminal_id,
@@ -251,8 +239,7 @@ impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
             // the separator trumps all
             return result;
         }
-        let mut priority =
-            contexts.get_context_priority(self.data.repository.get_count(), matched.context, id);
+        let mut priority = contexts.get_context_priority(self.data.repository.get_count(), matched.context, id);
         for i in 1..state_data.get_terminals_count() {
             matched = state_data.get_terminal(i);
             id = self.data.repository.terminals[matched.index as usize].id;
@@ -260,11 +247,7 @@ impl<'s, 't, 'a> ContextSensitiveLexer<'s, 't, 'a> {
                 // the separator trumps all
                 return matched.index;
             }
-            let priority_candidate = contexts.get_context_priority(
-                self.data.repository.get_count(),
-                matched.context,
-                id,
-            );
+            let priority_candidate = contexts.get_context_priority(self.data.repository.get_count(), matched.context, id);
             if priority_candidate.is_none() {
                 continue;
             }

@@ -143,10 +143,7 @@ impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
     /// Gets the i-th token
     #[must_use]
     pub fn get_token(&'a self, index: usize) -> Token<'s, 't, 'a> {
-        Token {
-            repository: self,
-            index,
-        }
+        Token { repository: self, index }
     }
 
     /// Gets the number of tokens
@@ -182,6 +179,17 @@ impl<'s, 't, 'a> TokenRepository<'s, 't, 'a> {
             }
         }
         None
+    }
+}
+
+impl<'s, 't, 'a> IntoIterator for &'a TokenRepository<'s, 't, 'a> {
+    type Item = Token<'s, 't, 'a>;
+    type IntoIter = TokenRepositoryIterator<'s, 't, 'a>;
+    fn into_iter(self) -> Self::IntoIter {
+        TokenRepositoryIterator {
+            repository: self,
+            index: 0,
+        }
     }
 }
 

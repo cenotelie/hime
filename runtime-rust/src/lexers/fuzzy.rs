@@ -51,12 +51,7 @@ impl FuzzyMatcherHead {
     }
 
     /// Initializes this erroneous head from a previous one
-    pub fn new_error(
-        previous: &FuzzyMatcherHead,
-        state: u32,
-        offset: usize,
-        distance: usize,
-    ) -> FuzzyMatcherHead {
+    pub fn new_error(previous: &FuzzyMatcherHead, state: u32, offset: usize, distance: usize) -> FuzzyMatcherHead {
         let mut errors = Vec::with_capacity(distance);
         for &error in &previous.errors {
             errors.push(error);
@@ -129,8 +124,7 @@ impl FuzzyMatcherResult {
                 return;
             }
         }
-        self.heads
-            .push(FuzzyMatcherHead::new_previous(previous, state));
+        self.heads.push(FuzzyMatcherHead::new_previous(previous, state));
     }
 
     /// Pushes a new head onto the the queue for an error's fix
@@ -139,22 +133,15 @@ impl FuzzyMatcherResult {
     }
 
     /// Pushes a new head onto the the queue for an error's fix
-    pub fn push_head_long_error(
-        &mut self,
-        previous: &FuzzyMatcherHead,
-        state: u32,
-        offset: usize,
-        distance: usize,
-    ) {
+    pub fn push_head_long_error(&mut self, previous: &FuzzyMatcherHead, state: u32, offset: usize, distance: usize) {
         // try to find a pre-existing head with the same state at a lesser distance
         for x in self.heads.iter().rev() {
             if x.state == state && x.get_distance() <= distance {
                 return;
             }
         }
-        self.heads.push(FuzzyMatcherHead::new_error(
-            previous, state, offset, distance,
-        ));
+        self.heads
+            .push(FuzzyMatcherHead::new_error(previous, state, offset, distance));
     }
 }
 
@@ -223,8 +210,7 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
     fn on_success(&mut self, result: &FuzzyMatcherResult) -> TokenMatch {
         let mut last_error_index = result.match_length + 1;
         for i in 0..result.match_head.as_ref().unwrap().get_distance() {
-            let error_index =
-                self.origin_index + result.match_head.as_ref().unwrap().get_error(i) as usize;
+            let error_index = self.origin_index + result.match_head.as_ref().unwrap().get_error(i) as usize;
             if error_index != last_error_index {
                 self.on_error(error_index);
             }
@@ -246,36 +232,27 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
                 .push_error_eoi(ParseErrorEndOfInput::new(self.text.get_position_at(index)));
         } else {
             // a simple unexpected character
-            self.errors
-                .push_error_unexpected_char(ParseErrorUnexpectedChar::new(
-                    self.text.get_position_at(index),
-                    self.text.at(index),
-                ));
+            self.errors.push_error_unexpected_char(ParseErrorUnexpectedChar::new(
+                self.text.get_position_at(index),
+                self.text.at(index),
+            ));
         }
     }
 
     /// Constructs the solution when failed to fix the error
     fn on_failure(&mut self) -> Option<TokenMatch> {
-        self.errors
-            .push_error_unexpected_char(ParseErrorUnexpectedChar::new(
-                self.text.get_position_at(self.origin_index),
-                self.text.at(self.origin_index),
-            ));
+        self.errors.push_error_unexpected_char(ParseErrorUnexpectedChar::new(
+            self.text.get_position_at(self.origin_index),
+            self.text.at(self.origin_index),
+        ));
         None
     }
 
     /// Inspects a head while at the end of the input
-    fn inspect_at_end(
-        &self,
-        result: &mut FuzzyMatcherResult,
-        head: &FuzzyMatcherHead,
-        offset: usize,
-    ) {
+    fn inspect_at_end(&self, result: &mut FuzzyMatcherResult, head: &FuzzyMatcherHead, offset: usize) {
         let state_data = self.automaton.get_state(head.state);
         // is it a matching state
-        if state_data.get_terminals_count() > 0
-            && u32::from(state_data.get_terminal(0).index) != self.separator
-        {
+        if state_data.get_terminals_count() > 0 && u32::from(state_data.get_terminal(0).index) != self.separator {
             FuzzyMatcher::on_matching_head(result, head, offset);
         }
         if head.get_distance() < self.max_distance && !state_data.is_dead_end() {
@@ -286,18 +263,10 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
     }
 
     /// Inspects a head with a specified character ahead
-    fn inspect(
-        &self,
-        result: &mut FuzzyMatcherResult,
-        head: &FuzzyMatcherHead,
-        offset: usize,
-        current: Utf16C,
-    ) {
+    fn inspect(&self, result: &mut FuzzyMatcherResult, head: &FuzzyMatcherHead, offset: usize, current: Utf16C) {
         let state_data = self.automaton.get_state(head.state);
         // is it a matching state
-        if state_data.get_terminals_count() > 0
-            && u32::from(state_data.get_terminal(0).index) != self.separator
-        {
+        if state_data.get_terminals_count() > 0 && u32::from(state_data.get_terminal(0).index) != self.separator {
             FuzzyMatcher::on_matching_head(result, head, offset);
         }
         if head.get_distance() >= self.max_distance || state_data.is_dead_end() {
@@ -332,13 +301,7 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
             }
         }
         for i in 0..state_data.get_bulk_transitions_count() {
-            FuzzyMatcher::explore_transition_to_target(
-                result,
-                head,
-                state_data.get_bulk_transition(i).target,
-                offset,
-                at_end,
-            );
+            FuzzyMatcher::explore_transition_to_target(result, head, state_data.get_bulk_transition(i).target, offset, at_end);
         }
     }
 
@@ -407,9 +370,7 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
         distance: usize,
     ) {
         let state_data = self.automaton.get_state(head.state);
-        if state_data.get_terminals_count() > 0
-            && u32::from(state_data.get_terminal(0).index) != self.separator
-        {
+        if state_data.get_terminals_count() > 0 && u32::from(state_data.get_terminal(0).index) != self.separator {
             FuzzyMatcher::on_matching_insertion(result, head, offset, state, distance);
         }
         if !at_end {
@@ -430,8 +391,7 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
             result.match_head = Some(head.clone());
             result.match_length = offset;
         } else {
-            let current_cl =
-                get_comparable_length(result.match_head.as_ref().unwrap(), result.match_length);
+            let current_cl = get_comparable_length(result.match_head.as_ref().unwrap(), result.match_length);
             let candidate_cl = get_comparable_length(head, offset);
             if candidate_cl > current_cl {
                 result.match_head = Some(head.clone());
@@ -449,19 +409,14 @@ impl<'s, 't, 'a> FuzzyMatcher<'s, 't, 'a> {
         distance: usize,
     ) {
         if result.match_head.is_none() {
-            result.match_head = Some(FuzzyMatcherHead::new_error(
-                previous, target, offset, distance,
-            ));
+            result.match_head = Some(FuzzyMatcherHead::new_error(previous, target, offset, distance));
             result.match_length = offset;
         } else {
             let d = distance - previous.get_distance();
-            let current_cl =
-                get_comparable_length(result.match_head.as_ref().unwrap(), result.match_length);
+            let current_cl = get_comparable_length(result.match_head.as_ref().unwrap(), result.match_length);
             let candidate_cl = get_comparable_length(previous, offset - d);
             if candidate_cl > current_cl {
-                result.match_head = Some(FuzzyMatcherHead::new_error(
-                    previous, target, offset, distance,
-                ));
+                result.match_head = Some(FuzzyMatcherHead::new_error(previous, target, offset, distance));
                 result.match_length = offset;
             }
         }

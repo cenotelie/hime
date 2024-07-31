@@ -33,24 +33,14 @@ pub trait ContextProvider {
     /// Gets the priority of the specified context required by the specified terminal
     /// The priority is an unsigned integer. The lesser the value the higher the priority.
     /// The absence of value represents the unavailability of the required context.
-    fn get_context_priority(
-        &self,
-        token_count: usize,
-        context: u16,
-        terminal_id: u32,
-    ) -> Option<usize>;
+    fn get_context_priority(&self, token_count: usize, context: u16, terminal_id: u32) -> Option<usize>;
 }
 
 /// Implementation of the default context provider
 pub struct DefaultContextProvider {}
 
 impl ContextProvider for DefaultContextProvider {
-    fn get_context_priority(
-        &self,
-        _token_count: usize,
-        context: u16,
-        _terminal_id: u32,
-    ) -> Option<usize> {
+    fn get_context_priority(&self, _token_count: usize, context: u16, _terminal_id: u32) -> Option<usize> {
         if context == DEFAULT_CONTEXT {
             Some(usize::MAX)
         } else {

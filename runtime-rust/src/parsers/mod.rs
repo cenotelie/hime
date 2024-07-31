@@ -176,25 +176,20 @@ impl LRContexts {
     /// Initializes empty contexts
     #[must_use]
     pub fn new() -> LRContexts {
-        LRContexts {
-            openings: Vec::new(),
-        }
+        LRContexts { openings: Vec::new() }
     }
 
     /// Registers a new context
     pub fn add(&mut self, identifier: u16, context: u16) {
-        self.openings.push(LRContextOpening {
-            identifier,
-            context,
-        });
+        self.openings.push(LRContextOpening { identifier, context });
     }
 
     /// Gets whether the specified context opens by a transition using the specified terminal ID
     #[must_use]
     pub fn opens(&self, terminal_id: u32, context: u16) -> bool {
-        self.openings.iter().any(|opening| {
-            u32::from(opening.identifier) == terminal_id && opening.context == context
-        })
+        self.openings
+            .iter()
+            .any(|opening| u32::from(opening.identifier) == terminal_id && opening.context == context)
     }
 
     /// Gets the context opened by a symbol, if any

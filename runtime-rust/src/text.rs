@@ -170,9 +170,7 @@ impl<'a> Text<'a> {
     ///
     /// Return an error when reading the input fails.
     #[cfg(feature = "std")]
-    pub fn from_utf8_stream(
-        input: &mut dyn std::io::Read,
-    ) -> Result<Text<'static>, std::io::Error> {
+    pub fn from_utf8_stream(input: &mut dyn std::io::Read) -> Result<Text<'static>, std::io::Error> {
         let mut content = String::new();
         input.read_to_string(&mut content)?;
         let lines = find_lines_in(content.char_indices());
@@ -404,11 +402,7 @@ impl<'a> Iterator for Utf16Iter<'a> {
 /// Others:
 /// [?, U+000B], [?, U+000C], [?, U+0085], [?, U+2028], [?, U+2029]
 fn is_line_ending(c1: char, c2: char) -> bool {
-    (c2 == '\u{000B}'
-        || c2 == '\u{000C}'
-        || c2 == '\u{0085}'
-        || c2 == '\u{2028}'
-        || c2 == '\u{2029}')
+    (c2 == '\u{000B}' || c2 == '\u{000C}' || c2 == '\u{0085}' || c2 == '\u{2028}' || c2 == '\u{2029}')
         || (c1 == '\u{000D}' || c2 == '\u{000A}')
 }
 
@@ -474,27 +468,15 @@ fn test_text_get_value() {
 #[test]
 fn test_text_get_value_at() {
     let text = Text::from_str("this is\na new line");
-    assert_eq!(
-        text.get_value_at(TextPosition { line: 1, column: 1 }, 3),
-        "thi"
-    );
-    assert_eq!(
-        text.get_value_at(TextPosition { line: 2, column: 3 }, 3),
-        "new"
-    );
+    assert_eq!(text.get_value_at(TextPosition { line: 1, column: 1 }, 3), "thi");
+    assert_eq!(text.get_value_at(TextPosition { line: 2, column: 3 }, 3), "new");
 }
 
 #[test]
 fn test_text_get_value_at_2() {
     let text = Text::from_str("नमस्ते\nЗдравствуйте");
-    assert_eq!(
-        text.get_value_at(TextPosition { line: 1, column: 1 }, 6),
-        "नम"
-    );
-    assert_eq!(
-        text.get_value_at(TextPosition { line: 2, column: 3 }, 4),
-        "ра"
-    );
+    assert_eq!(text.get_value_at(TextPosition { line: 1, column: 1 }, 6), "नम");
+    assert_eq!(text.get_value_at(TextPosition { line: 2, column: 3 }, 4), "ра");
 }
 
 #[test]
@@ -522,13 +504,7 @@ fn test_text_get_line_content() {
 fn test_text_get_position_at() {
     let text = Text::from_str("this is\na new line");
     for i in 0..8 {
-        assert_eq!(
-            text.get_position_at(i),
-            TextPosition {
-                line: 1,
-                column: i + 1
-            }
-        );
+        assert_eq!(text.get_position_at(i), TextPosition { line: 1, column: i + 1 });
     }
     for i in 8..text.content.len() {
         assert_eq!(

@@ -110,10 +110,16 @@ impl<T: Default + Copy> BigList<T> {
     /// Gets an iterator over the list
     #[must_use]
     pub fn iter(&self) -> BigListIterator<T> {
-        BigListIterator {
-            list: self,
-            index: 0,
-        }
+        BigListIterator { list: self, index: 0 }
+    }
+}
+
+impl<'a, T: Copy> IntoIterator for &'a BigList<T> {
+    type Item = T;
+    type IntoIter = BigListIterator<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        BigListIterator { list: self, index: 0 }
     }
 }
 
@@ -161,7 +167,7 @@ fn test_big_list() {
     list.push('t');
     assert_eq!(list.len(), 1);
     assert_eq!(list[0], 't');
-    for x in list.iter() {
+    for x in &list {
         assert_eq!(x, 't');
     }
 }

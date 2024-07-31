@@ -22,20 +22,15 @@ use alloc::string::ToString;
 use alloc::vec::Vec;
 
 use super::{
-    get_op_code_base, get_op_code_tree_action, read_table_u16, read_u16, read_u32, ContextProvider,
-    LRAction, LRColumnMap, LRContexts, LRExpected, LRProduction, Parser, Symbol, TreeAction,
-    LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_REDUCE, LR_ACTION_CODE_SHIFT,
-    LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE, LR_OP_CODE_BASE_ADD_VIRTUAL,
-    LR_OP_CODE_BASE_SEMANTIC_ACTION, TREE_ACTION_DROP, TREE_ACTION_PROMOTE,
-    TREE_ACTION_REPLACE_BY_CHILDREN, TREE_ACTION_REPLACE_BY_EPSILON,
+    get_op_code_base, get_op_code_tree_action, read_table_u16, read_u16, read_u32, ContextProvider, LRAction, LRColumnMap,
+    LRContexts, LRExpected, LRProduction, Parser, Symbol, TreeAction, LR_ACTION_CODE_ACCEPT, LR_ACTION_CODE_REDUCE,
+    LR_ACTION_CODE_SHIFT, LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE, LR_OP_CODE_BASE_ADD_VIRTUAL, LR_OP_CODE_BASE_SEMANTIC_ACTION,
+    TREE_ACTION_DROP, TREE_ACTION_PROMOTE, TREE_ACTION_REPLACE_BY_CHILDREN, TREE_ACTION_REPLACE_BY_EPSILON,
 };
 use crate::ast::{AstCell, AstImpl, TableElemRef, TableType};
 use crate::errors::ParseErrorUnexpectedToken;
 use crate::lexers::{Lexer, TokenKernel, DEFAULT_CONTEXT};
-use crate::sppf::{
-    SppfImpl, SppfImplNodeRef, SppfImplNodeReplaceable, SppfImplNodeReplaceableVersion,
-    SppfImplNodeVersions,
-};
+use crate::sppf::{SppfImpl, SppfImplNodeRef, SppfImplNodeReplaceable, SppfImplNodeReplaceableVersion, SppfImplNodeVersions};
 use crate::symbols::{SemanticBody, SemanticElement, SemanticElementTrait, SID_EPSILON};
 use crate::utils::biglist::BigList;
 use crate::utils::OwnOrMut;
@@ -295,11 +290,7 @@ impl GSSPath {
         GSSPath {
             last_node,
             generation,
-            labels: if length == 0 {
-                Vec::new()
-            } else {
-                Vec::with_capacity(length)
-            },
+            labels: if length == 0 { Vec::new() } else { Vec::with_capacity(length) },
         }
     }
 
@@ -313,12 +304,7 @@ impl GSSPath {
     }
 
     /// Initializes this path
-    pub fn from(
-        previous: &GSSPath,
-        last_node: usize,
-        generation: usize,
-        label: GSSLabel,
-    ) -> GSSPath {
+    pub fn from(previous: &GSSPath, last_node: usize, generation: usize, label: GSSLabel) -> GSSPath {
         let mut result = GSSPath {
             last_node,
             generation,
@@ -497,11 +483,7 @@ impl GSS {
                             // swap m and p paths
                             paths.swap(m, p);
                         }
-                        paths[m].push(
-                            edge.to as usize,
-                            self.get_generation_of(edge.to as usize),
-                            edge.label,
-                        );
+                        paths[m].push(edge.to as usize, self.get_generation_of(edge.to as usize), edge.label);
                         // goto next
                         m += 1;
                     }
@@ -600,24 +582,15 @@ impl<'s, 't, 'a, 'l> SemanticBody for SPPFBuilder<'s, 't, 'a, 'l> {
         let reference = reduction.versions[0].nodes[index];
         let label = self.sppf.get_node(reference).first_version().label;
         match label.table_type() {
-            TableType::Token => {
-                SemanticElement::Token(self.lexer.get_data().repository.get_token(label.index()))
-            }
+            TableType::Token => SemanticElement::Token(self.lexer.get_data().repository.get_token(label.index())),
             TableType::Variable => SemanticElement::Variable(self.variables[label.index()]),
             TableType::Virtual => SemanticElement::Virtual(self.virtuals[label.index()]),
-            TableType::None => {
-                SemanticElement::Terminal(self.lexer.get_data().repository.terminals[0])
-            }
+            TableType::None => SemanticElement::Terminal(self.lexer.get_data().repository.terminals[0]),
         }
     }
 
     fn length(&self) -> usize {
-        self.reduction
-            .as_ref()
-            .expect("Not in a reduction")
-            .versions[0]
-            .nodes
-            .len()
+        self.reduction.as_ref().expect("Not in a reduction").versions[0].nodes.len()
     }
 }
 
@@ -698,11 +671,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             if replaceable_versions_count == 1 {
                 let version = replaceable.versions.first();
                 for (&node_ref, &action) in version.children.iter().zip(&version.actions) {
-                    SPPFBuilder::reduction_add_to_cache_node(
-                        &mut reduction.versions,
-                        node_ref,
-                        action,
-                    );
+                    SPPFBuilder::reduction_add_to_cache_node(&mut reduction.versions, node_ref, action);
                 }
             } else {
                 // compute the cross-product
@@ -716,20 +685,12 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             }
         } else {
             // this is a simple reference to an existing SPPF node
-            SPPFBuilder::reduction_add_to_cache_node(
-                &mut reduction.versions,
-                sppf_node_ref,
-                action,
-            );
+            SPPFBuilder::reduction_add_to_cache_node(&mut reduction.versions, sppf_node_ref, action);
         }
     }
 
     /// Adds the specified GSS label to the reduction cache with the given tree action
-    fn reduction_add_to_cache_node(
-        versions: &mut [SPPFReductionVersion],
-        sppf_node_ref: SppfImplNodeRef,
-        action: TreeAction,
-    ) {
+    fn reduction_add_to_cache_node(versions: &mut [SPPFReductionVersion], sppf_node_ref: SppfImplNodeRef, action: TreeAction) {
         // add the node in the cache for each version
         for version in versions {
             version.nodes.push(sppf_node_ref);
@@ -748,9 +709,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     /// During a reduction, inserts a virtual symbol
     pub fn reduction_add_virtual(&mut self, index: usize, action: TreeAction) {
         let reduction = self.reduction.as_mut().expect("Not in a reduction");
-        let sppf_node_ref = self
-            .sppf
-            .new_normal_node(TableElemRef::new(TableType::Virtual, index));
+        let sppf_node_ref = self.sppf.new_normal_node(TableElemRef::new(TableType::Virtual, index));
         SPPFBuilder::reduction_add_to_cache_node(&mut reduction.versions, sppf_node_ref, action);
     }
 
@@ -782,12 +741,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
 
     /// Prints the data for the current reduction
     #[cfg(all(feature = "std", feature = "debug"))]
-    fn reduce_normal_pre_print(
-        &self,
-        variable_index: usize,
-        head_action: TreeAction,
-        target: Option<SppfImplNodeRef>,
-    ) {
+    fn reduce_normal_pre_print(&self, variable_index: usize, head_action: TreeAction, target: Option<SppfImplNodeRef>) {
         let reduction = self.reduction.as_ref().expect("Not in a reduction");
         for (index, version) in reduction.versions.iter().enumerate() {
             std::print!("reducing [{index}]");
@@ -851,14 +805,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     #[cfg(feature = "debug")]
     fn get_label_symbol(&self, label: TableElemRef) -> &str {
         match label.table_type() {
-            TableType::Token => {
-                self.lexer
-                    .get_data()
-                    .repository
-                    .get_token(label.index())
-                    .get_symbol()
-                    .name
-            }
+            TableType::Token => self.lexer.get_data().repository.get_token(label.index()).get_symbol().name,
             TableType::Variable => self.variables[label.index()].name,
             TableType::Virtual => self.virtuals[label.index()].name,
             TableType::None => "ε",
@@ -874,13 +821,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     ) -> SppfImplNodeRef {
         let reduction = self.reduction.as_mut().expect("not in a reduction");
         let sppf = &mut self.sppf;
-        let first = Self::reduce_normal_version(
-            &mut reduction.versions[0],
-            sppf,
-            variable_index,
-            head_action,
-            target,
-        );
+        let first = Self::reduce_normal_version(&mut reduction.versions[0], sppf, variable_index, head_action, target);
         for version in reduction.versions.iter_mut().skip(1) {
             Self::reduce_normal_version(version, sppf, variable_index, head_action, Some(first));
         }
@@ -930,9 +871,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
             }
             (Some(target), None) => {
                 // new version of an existing node, no promotion
-                let _version = sppf
-                    .get_node_mut(target)
-                    .add_version(original_label, &version.nodes);
+                let _version = sppf.get_node_mut(target).add_version(original_label, &version.nodes);
                 target
             }
             (None, Some((promoted_index, promoted_ref))) => {
@@ -957,11 +896,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     }
 
     /// Executes the reduction as the reduction of a replaceable variable
-    pub fn reduce_replaceable(
-        &mut self,
-        variable_index: usize,
-        target: Option<SppfImplNodeRef>,
-    ) -> SppfImplNodeRef {
+    pub fn reduce_replaceable(&mut self, variable_index: usize, target: Option<SppfImplNodeRef>) -> SppfImplNodeRef {
         let reduction = self.reduction.as_mut().expect("Not in a reduction");
         let label = TableElemRef::new(TableType::Variable, variable_index);
         if let Some(target) = target {
@@ -1012,11 +947,7 @@ impl<'s, 't, 'a, 'l> SPPFBuilder<'s, 't, 'a, 'l> {
     }
 
     /// Builds thSe final AST for the specified SPPF node reference
-    fn build_final_ast(
-        sppf: &SppfImpl,
-        sppf_node_ref: SppfImplNodeRef,
-        result: &mut AstImpl,
-    ) -> AstCell {
+    fn build_final_ast(sppf: &SppfImpl, sppf_node_ref: SppfImplNodeRef, result: &mut AstImpl) -> AstCell {
         let node = sppf.get_node(sppf_node_ref);
         let version = &node.versions[0];
         if version.children.is_empty() {
@@ -1085,17 +1016,8 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
     /// Gets the priority of the specified context required by the specified terminal
     /// The priority is an unsigned integer. The lesser the value the higher the priority.
     /// The absence of value represents the unavailability of the required context.
-    #[allow(
-        clippy::cognitive_complexity,
-        clippy::too_many_lines,
-        clippy::cast_possible_truncation
-    )]
-    fn get_context_priority(
-        &self,
-        token_count: usize,
-        context: u16,
-        terminal_id: u32,
-    ) -> Option<usize> {
+    #[allow(clippy::cognitive_complexity, clippy::too_many_lines, clippy::cast_possible_truncation)]
+    fn get_context_priority(&self, token_count: usize, context: u16, terminal_id: u32) -> Option<usize> {
         // the default context is always active
         if context == DEFAULT_CONTEXT {
             return Some(usize::MAX);
@@ -1103,11 +1025,7 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
         if token_count == 0 {
             // this is the first token, does it open the context?
             let contexts = self.automaton.get_contexts(0);
-            return if contexts.opens(terminal_id, context) {
-                Some(0)
-            } else {
-                None
-            };
+            return if contexts.opens(terminal_id, context) { Some(0) } else { None };
         }
 
         // try to only look at stack heads that expect the terminal
@@ -1116,9 +1034,7 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
         let mut distances = Vec::new();
         let mut found_on_previous_shift = false;
         for shift in &self.shifts {
-            let count = self
-                .automaton
-                .get_actions_count(shift.to as u32, terminal_id);
+            let count = self.automaton.get_actions_count(shift.to as u32, terminal_id);
             for i in 0..count {
                 let action = self.automaton.get_action(shift.to as u32, terminal_id, i);
                 if action.get_code() == LR_ACTION_CODE_SHIFT {
@@ -1128,9 +1044,7 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
                         return Some(0);
                     }
                     // looking at the immediate history, does the context opens from the shift just before?
-                    let contexts2 = self
-                        .automaton
-                        .get_contexts(self.gss.get_represented_state(shift.from));
+                    let contexts2 = self.automaton.get_contexts(self.gss.get_represented_state(shift.from));
                     if contexts2.opens(self.get_next_token_id(), context) {
                         // found the context opening on the previous shift (and was not immediately closed by a reduction)
                         found_on_previous_shift = true;
@@ -1145,12 +1059,8 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
                 } else if action.get_code() == LR_ACTION_CODE_REDUCE {
                     let production = self.automaton.get_production(action.get_data() as usize);
                     // looking at the immediate history, does the context opens from the shift just before?
-                    let contexts = self
-                        .automaton
-                        .get_contexts(self.gss.get_represented_state(shift.from));
-                    if contexts.opens(self.get_next_token_id(), context)
-                        && production.reduction_length == 0
-                    {
+                    let contexts = self.automaton.get_contexts(self.gss.get_represented_state(shift.from));
+                    if contexts.opens(self.get_next_token_id(), context) && production.reduction_length == 0 {
                         // the reduction does not close the context
                         found_on_previous_shift = true;
                         break;
@@ -1182,9 +1092,7 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
             for path in &paths {
                 let last_node = path.last_node;
                 let symbol_id = path.labels[0].symbol_id;
-                let contexts = self
-                    .automaton
-                    .get_contexts(self.gss.get_represented_state(last_node));
+                let contexts = self.automaton.get_contexts(self.gss.get_represented_state(last_node));
                 // was the context opened on this transition?
                 if contexts.opens(symbol_id, context) {
                     if production == 0xFFFF_FFFF {
@@ -1209,9 +1117,7 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
         let mut queue_gss_heads = Vec::new(); // the related GSS head
         let mut queue_vstack = Vec::<Vec<u32>>::new(); // the virtual stack
         for shift in &self.shifts {
-            let count = self
-                .automaton
-                .get_actions_count(shift.to as u32, terminal_id);
+            let count = self.automaton.get_actions_count(shift.to as u32, terminal_id);
             if count > 0 {
                 // enqueue the info, top GSS stack node and target GLR state
                 queue_gss_heads.push(shift.from);
@@ -1245,8 +1151,7 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
                     queue_vstack.push(virtual_stack);
                 } else if production.reduction_length < queue_vstack[i].len() {
                     // we are still the virtual stack
-                    let mut virtual_stack =
-                        Vec::with_capacity(queue_vstack[i].len() - production.reduction_length + 1);
+                    let mut virtual_stack = Vec::with_capacity(queue_vstack[i].len() - production.reduction_length + 1);
                     for k in 0..(queue_vstack[i].len() - production.reduction_length) {
                         virtual_stack.push(queue_vstack[i][k]);
                     }
@@ -1257,10 +1162,9 @@ impl<'s, 'a> ContextProvider for RNGLRParserData<'s, 'a> {
                     queue_vstack.push(virtual_stack);
                 } else {
                     // we reach the GSS
-                    let paths = self.gss.get_paths(
-                        gss_node,
-                        production.reduction_length - queue_vstack[i].len(),
-                    );
+                    let paths = self
+                        .gss
+                        .get_paths(gss_node, production.reduction_length - queue_vstack[i].len());
                     for path in &paths {
                         // get the target GLR state
                         let next = self.get_next_by_var(
@@ -1317,11 +1221,9 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
                 .automaton
                 .get_actions_count(self.gss.get_represented_state(gss_node), terminal.id);
             for j in 0..count {
-                let action = self.automaton.get_action(
-                    self.gss.get_represented_state(gss_node),
-                    terminal.id,
-                    j,
-                );
+                let action = self
+                    .automaton
+                    .get_action(self.gss.get_represented_state(gss_node), terminal.id, j);
                 if action.get_code() != LR_ACTION_CODE_REDUCE {
                     continue;
                 }
@@ -1371,8 +1273,7 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
                     queue_vstack.push(virtual_stack);
                 } else if production.reduction_length < queue_vstack[i].len() {
                     // we are still the virtual stack
-                    let mut virtual_stack =
-                        Vec::with_capacity(queue_vstack[i].len() - production.reduction_length + 1);
+                    let mut virtual_stack = Vec::with_capacity(queue_vstack[i].len() - production.reduction_length + 1);
                     for k in 0..(queue_vstack[i].len() - production.reduction_length) {
                         virtual_stack.push(queue_vstack[i][k]);
                     }
@@ -1383,10 +1284,9 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
                     queue_vstack.push(virtual_stack);
                 } else {
                     // we reach the GSS
-                    let paths = self.gss.get_paths(
-                        gss_node,
-                        production.reduction_length - queue_vstack[i].len(),
-                    );
+                    let paths = self
+                        .gss
+                        .get_paths(gss_node, production.reduction_length - queue_vstack[i].len());
                     for path in &paths {
                         // get the target GLR state
                         let next = self.get_next_by_var(
@@ -1424,13 +1324,9 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
             // A node for the target state is already in the GSS
             self.gss.create_edge(w, shift.from, label);
             // Look for the new reductions at this state
-            let count = self
-                .automaton
-                .get_actions_count(shift.to as u32, self.get_next_token_id());
+            let count = self.automaton.get_actions_count(shift.to as u32, self.get_next_token_id());
             for i in 0..count {
-                let action =
-                    self.automaton
-                        .get_action(shift.to as u32, self.get_next_token_id(), i);
+                let action = self.automaton.get_action(shift.to as u32, self.get_next_token_id(), i);
                 if action.get_code() == LR_ACTION_CODE_REDUCE {
                     let production = self.automaton.get_production(action.get_data() as usize);
                     // length 0 reduction are not considered here because they already exist at this point
@@ -1448,13 +1344,9 @@ impl<'s, 'a> RNGLRParserData<'s, 'a> {
             let w = self.gss.create_node(shift.to as u32);
             self.gss.create_edge(w, shift.from, label);
             // Look for all the reductions and shifts at this state
-            let count = self
-                .automaton
-                .get_actions_count(shift.to as u32, self.get_next_token_id());
+            let count = self.automaton.get_actions_count(shift.to as u32, self.get_next_token_id());
             for i in 0..count {
-                let action =
-                    self.automaton
-                        .get_action(shift.to as u32, self.get_next_token_id(), i);
+                let action = self.automaton.get_action(shift.to as u32, self.get_next_token_id(), i);
                 if action.get_code() == LR_ACTION_CODE_SHIFT {
                     self.shifts.push_back(RNGLRShift {
                         from: w,
@@ -1579,20 +1471,12 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                     // not nullable, or already resolved
                     continue;
                 }
-                let can_resolve = dependencies[i].is_empty()
-                    || dependencies[i].iter().all(|&d| nullables[d] != 0xFFFF_FFFF);
+                let can_resolve = dependencies[i].is_empty() || dependencies[i].iter().all(|&d| nullables[d] != 0xFFFF_FFFF);
                 if can_resolve {
                     let path = GSSPath::new(0, 0, 0);
-                    nullables[i] = RNGLRParser::build_sppf(
-                        builder,
-                        actions,
-                        nullables,
-                        production.unwrap(),
-                        EPSILON,
-                        &path,
-                        None,
-                    )
-                    .node_id();
+                    nullables[i] =
+                        RNGLRParser::build_sppf(builder, actions, nullables, production.unwrap(), EPSILON, &path, None)
+                            .node_id();
                     dependencies[i].clear();
                     resolved += 1;
                 } else {
@@ -1609,10 +1493,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
     }
 
     /// Builds the dependency table between nullable variables
-    fn build_nullables_dependencies(
-        automaton: &RNGLRAutomaton,
-        variables: &[Symbol],
-    ) -> Vec<Vec<usize>> {
+    fn build_nullables_dependencies(automaton: &RNGLRAutomaton, variables: &[Symbol]) -> Vec<Vec<usize>> {
         variables
             .iter()
             .enumerate()
@@ -1678,10 +1559,8 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                 LR_OP_CODE_BASE_ADD_NULLABLE_VARIABLE => {
                     let index = production.bytecode[i] as usize;
                     i += 1;
-                    builder.reduction_add_nullable(
-                        SppfImplNodeRef::new_usize(nullables[index]),
-                        get_op_code_tree_action(op_code),
-                    );
+                    builder
+                        .reduction_add_nullable(SppfImplNodeRef::new_usize(nullables[index]), get_op_code_tree_action(op_code));
                 }
                 _ => {
                     builder.reduction_pop(get_op_code_tree_action(op_code));
@@ -1716,9 +1595,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                 self.data.gss.get_paths(reduction.node, 0)
             } else {
                 // The given GSS node is the second on the path, so start from it with length - 1
-                self.data
-                    .gss
-                    .get_paths(reduction.node, production.reduction_length - 1)
+                self.data.gss.get_paths(reduction.node, production.reduction_length - 1)
             }
         };
         for path in &paths {
@@ -1727,12 +1604,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
     }
 
     /// Executes a reduction operation for a given path
-    fn parse_reduction_path(
-        &mut self,
-        generation: usize,
-        reduction: RNGLRReduction,
-        path: &GSSPath,
-    ) {
+    fn parse_reduction_path(&mut self, generation: usize, reduction: RNGLRReduction, path: &GSSPath) {
         let production = self.data.automaton.get_production(reduction.production);
         // Get the rule's head
         let head = self.data.variables[production.head];
@@ -1744,29 +1616,21 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
         // Find a node for the target state in the GSS
         let w = self.data.gss.find_node(generation, to);
         // Do we have to create a GSS edge?
-        let previous_edge_label = w.and_then(|w| {
-            self.data
-                .gss
-                .get_edge(generation, w, path.last_node)
-                .map(|edge| edge.label)
-        });
-        let sppf_node =
-            if self.data.automaton.nullables[production.head] as usize == reduction.production {
-                // nullable production, use the nullable node
-                SppfImplNodeRef::new_usize(self.nullables[production.head])
-            } else {
-                RNGLRParser::build_sppf(
-                    &mut self.builder,
-                    &mut self.data.actions,
-                    &self.nullables,
-                    production,
-                    reduction.first,
-                    path,
-                    previous_edge_label
-                        .as_ref()
-                        .map(|previous| previous.sppf_node),
-                )
-            };
+        let previous_edge_label = w.and_then(|w| self.data.gss.get_edge(generation, w, path.last_node).map(|edge| edge.label));
+        let sppf_node = if self.data.automaton.nullables[production.head] as usize == reduction.production {
+            // nullable production, use the nullable node
+            SppfImplNodeRef::new_usize(self.nullables[production.head])
+        } else {
+            RNGLRParser::build_sppf(
+                &mut self.builder,
+                &mut self.data.actions,
+                &self.nullables,
+                production,
+                reduction.first,
+                path,
+                previous_edge_label.as_ref().map(|previous| previous.sppf_node),
+            )
+        };
         let label = previous_edge_label.unwrap_or(GSSLabel {
             sppf_node,
             symbol_id: head.id,
@@ -1779,20 +1643,11 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
                 self.data.gss.create_edge(w, path.last_node, label);
                 // Look for the new reductions at this state
                 if production.reduction_length != 0 {
-                    let count = self
-                        .data
-                        .automaton
-                        .get_actions_count(to, self.data.get_next_token_id());
+                    let count = self.data.automaton.get_actions_count(to, self.data.get_next_token_id());
                     for i in 0..count {
-                        let action =
-                            self.data
-                                .automaton
-                                .get_action(to, self.data.get_next_token_id(), i);
+                        let action = self.data.automaton.get_action(to, self.data.get_next_token_id(), i);
                         if action.get_code() == LR_ACTION_CODE_REDUCE {
-                            let new_production = self
-                                .data
-                                .automaton
-                                .get_production(action.get_data() as usize);
+                            let new_production = self.data.automaton.get_production(action.get_data() as usize);
                             // length 0 reduction are not considered here because they already exist at this point
                             if new_production.reduction_length > 0 {
                                 self.data.reductions.push_back(RNGLRReduction {
@@ -1810,25 +1665,16 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
             let w = self.data.gss.create_node(to);
             self.data.gss.create_edge(w, path.last_node, label);
             // Look for all the reductions and shifts at this state
-            let count = self
-                .data
-                .automaton
-                .get_actions_count(to, self.data.get_next_token_id());
+            let count = self.data.automaton.get_actions_count(to, self.data.get_next_token_id());
             for i in 0..count {
-                let action = self
-                    .data
-                    .automaton
-                    .get_action(to, self.data.get_next_token_id(), i);
+                let action = self.data.automaton.get_action(to, self.data.get_next_token_id(), i);
                 if action.get_code() == LR_ACTION_CODE_SHIFT {
                     self.data.shifts.push_back(RNGLRShift {
                         from: w,
                         to: action.get_data() as usize,
                     });
                 } else if action.get_code() == LR_ACTION_CODE_REDUCE {
-                    let new_production = self
-                        .data
-                        .automaton
-                        .get_production(action.get_data() as usize);
+                    let new_production = self.data.automaton.get_production(action.get_data() as usize);
                     if new_production.reduction_length == 0 {
                         self.data.reductions.push_back(RNGLRReduction {
                             node: w,
@@ -1869,20 +1715,12 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
 
     /// Builds the unexpected token error
     fn build_error(&self, kernel: TokenKernel, stem: usize) -> ParseErrorUnexpectedToken<'s> {
-        let token = self
-            .builder
-            .lexer
-            .get_data()
-            .repository
-            .get_token(kernel.index as usize);
+        let token = self.builder.lexer.get_data().repository.get_token(kernel.index as usize);
         let mut my_states = Vec::new();
         let mut my_expected = Vec::new();
         let generation_data = self.data.gss.get_current_generation();
         for i in 0..generation_data.count {
-            let state = self
-                .data
-                .gss
-                .get_represented_state(generation_data.start + i);
+            let state = self.data.gss.get_represented_state(generation_data.start + i);
             my_states.push(state);
             let expected_on_head = self
                 .data
@@ -1897,11 +1735,7 @@ impl<'s, 't, 'a, 'l> RNGLRParser<'s, 't, 'a, 'l> {
             if i < stem {
                 // the state was in the stem, also look for reductions
                 for symbol in &expected_on_head.reductions {
-                    if !my_expected.contains(symbol)
-                        && self
-                            .data
-                            .check_is_expected(generation_data.start + i, *symbol)
-                    {
+                    if !my_expected.contains(symbol) && self.data.check_is_expected(generation_data.start + i, *symbol) {
                         my_expected.push(*symbol);
                     }
                 }
@@ -1927,15 +1761,9 @@ impl<'s, 't, 'a, 'l> Parser for RNGLRParser<'s, 't, 'a, 'l> {
 
         // bootstrap the shifts and reductions queues
         {
-            let count = self
-                .data
-                .automaton
-                .get_actions_count(0, self.data.get_next_token_id());
+            let count = self.data.automaton.get_actions_count(0, self.data.get_next_token_id());
             for i in 0..count {
-                let action = self
-                    .data
-                    .automaton
-                    .get_action(0, self.data.get_next_token_id(), i);
+                let action = self.data.automaton.get_action(0, self.data.get_next_token_id(), i);
                 if action.get_code() == LR_ACTION_CODE_SHIFT {
                     self.data.shifts.push_back(RNGLRShift {
                         from: state0,
@@ -1961,11 +1789,7 @@ impl<'s, 't, 'a, 'l> Parser for RNGLRParser<'s, 't, 'a, 'l> {
             if self.data.shifts.is_empty() {
                 // this is an error
                 let error = self.build_error(self.data.next_token.unwrap(), stem);
-                self.builder
-                    .lexer
-                    .get_data_mut()
-                    .errors
-                    .push_error_unexpected_token(error);
+                self.builder.lexer.get_data_mut().errors.push_error_unexpected_token(error);
                 // TODO: try to recover here
                 return;
             }
