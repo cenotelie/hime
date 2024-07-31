@@ -799,10 +799,12 @@ impl NFAState {
 
             // end all ongoing ranges
             for &(_tid, next) in &current_nexts {
-                transitions.push(NFATransition {
-                    value: CharSpan::new(current_start, if starts == 0 { bound.value } else { bound.value - 1 }),
-                    next,
-                });
+                if starts == 0 || current_start != bound.value {
+                    transitions.push(NFATransition {
+                        value: CharSpan::new(current_start, if starts == 0 { bound.value } else { bound.value - 1 }),
+                        next,
+                    });
+                }
             }
             let ongoings = current_nexts.iter().map(|&(tid, _)| tid).collect::<Vec<_>>();
 
@@ -1178,6 +1180,62 @@ mod tests_nfa_normalize {
                 NFATransition {
                     next: 1,
                     value: CharSpan::new(5, 5)
+                },
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(6, 10)
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn test_no_overlap_consecutive() {
+        let mut state = NFAState::new(0);
+        state.add_transition(CharSpan::new(0, 10), 1);
+        // other ranges are: 2-3, 3-4, 4-5
+        let mut map = vec![
+            NFATransitionBound {
+                value: 2,
+                effects: vec![NFATransitionBoundEffect::OtherStart],
+            },
+            NFATransitionBound {
+                value: 3,
+                effects: vec![NFATransitionBoundEffect::OtherStart, NFATransitionBoundEffect::OtherEnd],
+            },
+            NFATransitionBound {
+                value: 4,
+                effects: vec![NFATransitionBoundEffect::OtherStart, NFATransitionBoundEffect::OtherEnd],
+            },
+            NFATransitionBound {
+                value: 5,
+                effects: vec![NFATransitionBoundEffect::OtherEnd],
+            },
+        ];
+        state.fill_bounds_map(&mut map);
+        state.normalize(&map);
+        assert_eq!(
+            state.transitions,
+            vec![
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(0, 1)
+                },
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(2, 2)
+                },
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(3, 3)
+                },
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(4, 4)
+                },
+                NFATransition {
+                    next: 1,
+                    value: CharSpan::new(5, 5),
                 },
                 NFATransition {
                     next: 1,
