@@ -33,7 +33,7 @@ RUN apt update && apt install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # add custom user
-RUN usermod -l builder -d /home/builder ubuntu && mv /home/ubuntu /home/builder
+RUN adduser builder
 ENV HOME=/home/builder
 USER builder
 

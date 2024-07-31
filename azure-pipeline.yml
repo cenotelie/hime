@@ -20,9 +20,7 @@ stages:
     displayName: Build and test
     pool:
       vmImage: 'ubuntu-latest'
-    container:
-      image: cenotelie/hime-build-env:latest
-      options: --user 1000
+    container: cenotelie/hime-build-env:latest
     steps:
     - script: ./build.sh
 - stage: BuildPublishableArtifacts
@@ -32,9 +30,7 @@ stages:
   - job: linux
     pool:
       vmImage: 'ubuntu-latest'
-    container:
-      image: cenotelie/hime-build-env:latest
-      options: --user 1000
+    container: cenotelie/hime-build-env:latest
     steps:
     - script: |
         cargo build --release --target x86_64-unknown-linux-musl --features vendored
