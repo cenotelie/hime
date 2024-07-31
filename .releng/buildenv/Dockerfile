@@ -33,9 +33,8 @@ RUN apt update && apt install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # add custom user
-RUN adduser builder
+RUN mkdir /home/builder
 ENV HOME=/home/builder
-USER builder
 
 # Add support for Rust
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && \
@@ -45,9 +44,7 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && \
 	chmod -R a+rwX /home/builder
 
 # Environment
-USER root
 RUN locale-gen fr_FR.UTF-8
-USER builder
 ENV LC_ALL=fr_FR.UTF-8
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 ENV _JAVA_OPTIONS=-Duser.home=/home/builder
