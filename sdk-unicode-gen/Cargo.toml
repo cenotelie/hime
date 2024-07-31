@@ -14,13 +14,9 @@ include = ["README.md", "Cargo.toml", "build.rs", "src/**/*.rs"]
 edition = "2021"
 
 [dependencies]
-openssl-sys = "*"
-reqwest= { version="0.11", features=["blocking"] }
+reqwest= { version="0.12", default-features = false, features=["blocking", "rustls-tls"] }
 regex="1"
 hime_sdk = "4.3.0"
-
-[features]
-vendored = ["openssl-sys/vendored"]
 
 [badges]
 maintenance = { status = "actively-developed" }

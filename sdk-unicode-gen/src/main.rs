@@ -93,9 +93,7 @@ fn get_latet_categories() -> Result<Vec<Category>, Box<dyn Error>> {
             last_codepoint = Some(cp);
         }
     }
-    if let (Some(current_name), Some(begin), Some(last)) =
-        (current_name.as_ref(), current_span_begin, last_codepoint)
-    {
+    if let (Some(current_name), Some(begin), Some(last)) = (current_name.as_ref(), current_span_begin, last_codepoint) {
         let category = categories
             .entry(current_name.clone())
             .or_insert_with(|| Category::new_owned(current_name.clone()));
@@ -118,15 +116,9 @@ fn generate_blocks_db(blocks: &[Block]) -> Result<(), Box<dyn Error>> {
     writeln!(writer, "use std::collections::HashMap;")?;
     writeln!(writer)?;
     writeln!(writer, "/// Gets all blocks")?;
-    writeln!(
-        writer,
-        "#[allow(clippy::similar_names, clippy::too_many_lines)]"
-    )?;
+    writeln!(writer, "#[allow(clippy::similar_names, clippy::too_many_lines)]")?;
     writeln!(writer, "#[must_use]")?;
-    writeln!(
-        writer,
-        "pub fn get_blocks() -> HashMap<&'static str, Block> {{"
-    )?;
+    writeln!(writer, "pub fn get_blocks() -> HashMap<&'static str, Block> {{")?;
     writeln!(writer, "    let mut db = HashMap::new();")?;
     for block in blocks {
         writeln!(
@@ -182,10 +174,7 @@ fn generate_categories_db(categories: &[Category]) -> Result<(), Box<dyn Error>>
     let mut aggragated = HashMap::new();
     for category in categories {
         let first = category.name[0..1].to_string();
-        aggragated
-            .entry(first)
-            .or_insert_with(Vec::new)
-            .push(category);
+        aggragated.entry(first).or_insert_with(Vec::new).push(category);
     }
     let mut writer = io::BufWriter::new(fs::File::create("categories.rs")?);
     writeln!(writer, "/*")?;
@@ -197,26 +186,16 @@ fn generate_categories_db(categories: &[Category]) -> Result<(), Box<dyn Error>>
     writeln!(writer, "use std::collections::HashMap;")?;
     writeln!(writer)?;
     writeln!(writer, "/// Gets all categories")?;
-    writeln!(
-        writer,
-        "#[allow(clippy::similar_names, clippy::too_many_lines)]"
-    )?;
+    writeln!(writer, "#[allow(clippy::similar_names, clippy::too_many_lines)]")?;
     writeln!(writer, "#[must_use]")?;
-    writeln!(
-        writer,
-        "pub fn get_categories() -> HashMap<&'static str, Category> {{"
-    )?;
+    writeln!(writer, "pub fn get_categories() -> HashMap<&'static str, Category> {{")?;
     writeln!(writer, "    let mut db = HashMap::new();")?;
     for category in categories {
         let lower_case = category.name.to_lowercase();
         writeln!(
             writer,
             "    let {}cat_{} = Category::new(\"{}\");",
-            if category.spans.is_empty() {
-                ""
-            } else {
-                "mut "
-            },
+            if category.spans.is_empty() { "" } else { "mut " },
             &lower_case,
             &category.name
         )?;
@@ -232,27 +211,15 @@ fn generate_categories_db(categories: &[Category]) -> Result<(), Box<dyn Error>>
     }
     for (key, categories) in &aggragated {
         let lower_case = key.to_lowercase();
-        writeln!(
-            writer,
-            "    let mut cat_{} = Category::new(\"{}\");",
-            &lower_case, &key
-        )?;
+        writeln!(writer, "    let mut cat_{} = Category::new(\"{}\");", &lower_case, &key)?;
         for category in categories.iter() {
             let sub_lower_case = category.name.to_lowercase();
-            writeln!(
-                writer,
-                "    cat_{}.aggregate(&cat_{});",
-                &lower_case, &sub_lower_case
-            )?;
+            writeln!(writer, "    cat_{}.aggregate(&cat_{});", &lower_case, &sub_lower_case)?;
         }
     }
     for category in categories {
         let lower_case = category.name.to_lowercase();
-        writeln!(
-            writer,
-            "    db.insert(\"{}\", cat_{});",
-            &category.name, &lower_case
-        )?;
+        writeln!(writer, "    db.insert(\"{}\", cat_{});", &category.name, &lower_case)?;
     }
     for key in aggragated.keys() {
         let lower_case = key.to_lowercase();
