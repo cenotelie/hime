@@ -134,21 +134,21 @@ pub fn main() -> miette::Result<()> {
         )
         .arg(
             Arg::new("rust_no_std")
-                .long("--no-std")
+                .long("no-std")
                 .help("Rust-only, activates the support for no-std in the generated code (default to no support for no-std)")
                 .action(ArgAction::SetTrue)
                 .required(false)
         )
         .arg(
             Arg::new("rust_suppress_module_doc")
-                .long("--embed")
+                .long("embed")
                 .help("Rust-only,  indicates whether to suppress module documentation so that the generated code can be embedded (blocked by https://github.com/rust-lang/rust/issues/66920) (default to false)")
                 .action(ArgAction::SetTrue)
                 .required(false)
         )
         .arg(
             Arg::new("rust_compress_automata")
-                .long("--compress")
+                .long("compress")
                 .help("Rust-only, indicates whether to compress automata binary files (default to false)")
                 .action(ArgAction::SetTrue)
                 .required(false)
@@ -166,6 +166,7 @@ pub fn main() -> miette::Result<()> {
             Arg::new("test")
                 .long("test")
                 .help("Compiles the target grammar in-memory and test it against an input read from std::in and output the AST or parse errors")
+                .action(ArgAction::SetTrue)
                 .required(false)
         )
         .arg(

@@ -28,12 +28,11 @@ use futures::future::join_all;
 use tokio::sync::RwLock;
 use tower_lsp::jsonrpc::{Error, Result};
 use tower_lsp::lsp_types::{
-    CodeLens, CodeLensOptions, CodeLensParams, DidChangeTextDocumentParams,
-    DidChangeWatchedFilesParams, ExecuteCommandOptions, ExecuteCommandParams, GotoDefinitionParams,
-    GotoDefinitionResponse, Hover, HoverParams, HoverProviderCapability, InitializeParams,
-    InitializeResult, Location, OneOf, ReferenceParams, ServerCapabilities, ServerInfo,
-    SymbolInformation, TextDocumentSyncCapability, TextDocumentSyncKind, WorkDoneProgressOptions,
-    WorkspaceFoldersServerCapabilities, WorkspaceServerCapabilities, WorkspaceSymbolParams,
+    CodeLens, CodeLensOptions, CodeLensParams, DidChangeTextDocumentParams, DidChangeWatchedFilesParams, ExecuteCommandOptions,
+    ExecuteCommandParams, GotoDefinitionParams, GotoDefinitionResponse, Hover, HoverParams, HoverProviderCapability,
+    InitializeParams, InitializeResult, Location, OneOf, ReferenceParams, ServerCapabilities, ServerInfo, SymbolInformation,
+    TextDocumentSyncCapability, TextDocumentSyncKind, WorkDoneProgressOptions, WorkspaceFoldersServerCapabilities,
+    WorkspaceServerCapabilities, WorkspaceSymbolParams,
 };
 use tower_lsp::{Client, LanguageServer, LspService, Server};
 use workspace::Workspace;
@@ -69,9 +68,12 @@ impl Backend {
     async fn worker(workspace: Arc<RwLock<Workspace>>, client: Arc<Client>) {
         let mut workspace = workspace.write().await;
         workspace.lint();
-        join_all(workspace.documents.iter().map(|doc| {
-            client.publish_diagnostics(doc.url.clone(), doc.diagnostics.clone(), doc.version)
-        }))
+        join_all(
+            workspace
+                .documents
+                .iter()
+                .map(|doc| client.publish_diagnostics(doc.url.clone(), doc.diagnostics.clone(), doc.version)),
+        )
         .await;
     }
 
@@ -94,9 +96,7 @@ impl LanguageServer for Backend {
 
         Ok(InitializeResult {
             capabilities: ServerCapabilities {
-                text_document_sync: Some(TextDocumentSyncCapability::Kind(
-                    TextDocumentSyncKind::FULL,
-                )),
+                text_document_sync: Some(TextDocumentSyncCapability::Kind(TextDocumentSyncKind::FULL)),
                 workspace: Some(WorkspaceServerCapabilities {
                     workspace_folders: Some(WorkspaceFoldersServerCapabilities {
                         supported: Some(true),
@@ -113,9 +113,7 @@ impl LanguageServer for Backend {
                 hover_provider: Some(HoverProviderCapability::Simple(true)),
                 definition_provider: Some(OneOf::Left(true)),
                 references_provider: Some(OneOf::Left(true)),
-                code_lens_provider: Some(CodeLensOptions {
-                    resolve_provider: None,
-                }),
+                code_lens_provider: Some(CodeLensOptions { resolve_provider: None }),
                 ..ServerCapabilities::default()
             },
             server_info: Some(ServerInfo {
@@ -143,10 +141,7 @@ impl LanguageServer for Backend {
         self.execute();
     }
 
-    async fn symbol(
-        &self,
-        params: WorkspaceSymbolParams,
-    ) -> Result<Option<Vec<SymbolInformation>>> {
+    async fn symbol(&self, params: WorkspaceSymbolParams) -> Result<Option<Vec<SymbolInformation>>> {
         let workspace = self.workspace.read().await;
         let data = workspace.lookup_symbols(&params.query);
         if data.is_empty() {
@@ -156,17 +151,10 @@ impl LanguageServer for Backend {
         }
     }
 
-    async fn goto_definition(
-        &self,
-        params: GotoDefinitionParams,
-    ) -> Result<Option<GotoDefinitionResponse>> {
+    async fn goto_definition(&self, params: GotoDefinitionParams) -> Result<Option<GotoDefinitionResponse>> {
         let workspace = self.workspace.read().await;
         Ok(workspace.get_definition_at(
-            params
-                .text_document_position_params
-                .text_document
-                .uri
-                .as_str(),
+            params.text_document_position_params.text_document.uri.as_str(),
             params.text_document_position_params.position.line,
             params.text_document_position_params.position.character,
         ))
@@ -184,11 +172,7 @@ impl LanguageServer for Backend {
     async fn hover(&self, params: HoverParams) -> Result<Option<Hover>> {
         let workspace = self.workspace.read().await;
         Ok(workspace.get_symbol_description_at(
-            params
-                .text_document_position_params
-                .text_document
-                .uri
-                .as_str(),
+            params.text_document_position_params.text_document.uri.as_str(),
             params.text_document_position_params.position.line,
             params.text_document_position_params.position.character,
         ))
@@ -199,10 +183,7 @@ impl LanguageServer for Backend {
         Ok(workspace.get_code_lens(params.text_document.uri.as_str()))
     }
 
-    async fn execute_command(
-        &self,
-        params: ExecuteCommandParams,
-    ) -> Result<Option<serde_json::Value>> {
+    async fn execute_command(&self, params: ExecuteCommandParams) -> Result<Option<serde_json::Value>> {
         let workspace = self.workspace.read().await;
         match params.command.as_str() {
             "hime.parse" => {
@@ -236,9 +217,7 @@ async fn main() {
         eprintln!("Panic: {location} : {message}");
     }));
 
-    let version = Box::leak::<'static>(
-        format!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}").into_boxed_str(),
-    );
+    let version = Box::leak::<'static>(format!("{CRATE_NAME} {CRATE_VERSION} tag={GIT_TAG} hash={GIT_HASH}").into_boxed_str());
     let matches = Command::new("Hime Language Server")
         .version(version as &str)
         .author("Association Cénotélie <contact@cenotelie.fr>")
@@ -275,9 +254,7 @@ async fn main() {
         }
         _ => {
             if matches.get_flag("tcp") {
-                let address = matches
-                    .get_one::<String>("address")
-                    .map_or("127.0.0.1", Deref::deref);
+                let address = matches.get_one::<String>("address").map_or("127.0.0.1", Deref::deref);
                 let port = matches
                     .get_one::<String>("port")
                     .map(|v| v.parse::<u16>())
@@ -285,9 +262,7 @@ async fn main() {
                     .unwrap_or_default()
                     .unwrap_or(9257);
                 println!("Listening on {address}:{port}");
-                let listener = tokio::net::TcpListener::bind(format!("{address}:{port}"))
-                    .await
-                    .unwrap();
+                let listener = tokio::net::TcpListener::bind(format!("{address}:{port}")).await.unwrap();
                 let (stream, _) = listener.accept().await.unwrap();
                 let (read, write) = tokio::io::split(stream);
                 let (service, socket) = LspService::new(Backend::new);

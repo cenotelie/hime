@@ -113,11 +113,7 @@ fn get_expected_output(my_path: &path::Path) -> String {
 }
 
 /// Gets the parsed input
-fn get_parsed_input(
-    my_path: &path::Path,
-    library: &libloading::Library,
-    parser_name: &str,
-) -> ParseResultAst {
+fn get_parsed_input(my_path: &path::Path, library: &libloading::Library, parser_name: &str) -> ParseResultAst {
     let mut function_name = String::new();
     function_name.push_str(parser_name);
     function_name.push_str("_parse_utf8_stream");
@@ -132,12 +128,7 @@ fn get_parsed_input(
 }
 
 /// Executes the specified test
-fn execute(
-    my_path: &path::Path,
-    library: &libloading::Library,
-    parser_name: &str,
-    verb: &str,
-) -> i32 {
+fn execute(my_path: &path::Path, library: &libloading::Library, parser_name: &str, verb: &str) -> i32 {
     match verb {
         VERB_MATCHES => execute_test_matches(my_path, library, parser_name),
         VERB_NOMATCHES => execute_test_no_matches(my_path, library, parser_name),
@@ -148,11 +139,7 @@ fn execute(
 }
 
 /// Executes the test as a parsing test with a matching condition
-fn execute_test_matches(
-    my_path: &path::Path,
-    library: &libloading::Library,
-    parser_name: &str,
-) -> i32 {
+fn execute_test_matches(my_path: &path::Path, library: &libloading::Library, parser_name: &str) -> i32 {
     let expected = get_expected_ast(my_path);
     if !expected.errors.errors.is_empty() {
         println!("Failed to parse the expected AST");
@@ -173,10 +160,7 @@ fn execute_test_matches(
         println!("Some errors while parsing the input");
         return RESULT_FAILURE_PARSING;
     }
-    if compare(
-        expected.get_ast().get_root(),
-        real_result.get_ast().get_root(),
-    ) {
+    if compare(expected.get_ast().get_root(), real_result.get_ast().get_root()) {
         RESULT_SUCCESS
     } else {
         println!("Produced AST does not match the expected one, expected:");
@@ -188,11 +172,7 @@ fn execute_test_matches(
 }
 
 /// Executes the test as a parsing test with a non-matching condition
-fn execute_test_no_matches(
-    my_path: &path::Path,
-    library: &libloading::Library,
-    parser_name: &str,
-) -> i32 {
+fn execute_test_no_matches(my_path: &path::Path, library: &libloading::Library, parser_name: &str) -> i32 {
     let expected = get_expected_ast(my_path);
     if !expected.errors.errors.is_empty() {
         println!("Failed to parse the expected AST");
@@ -213,10 +193,7 @@ fn execute_test_no_matches(
         println!("Some errors while parsing the input");
         return RESULT_FAILURE_PARSING;
     }
-    if compare(
-        expected.get_ast().get_root(),
-        real_result.get_ast().get_root(),
-    ) {
+    if compare(expected.get_ast().get_root(), real_result.get_ast().get_root()) {
         println!("Produced AST incorrectly matches the specified expectation");
         RESULT_FAILURE_VERB
     } else {
@@ -225,11 +202,7 @@ fn execute_test_no_matches(
 }
 
 /// Executes the test as a parsing test with a failing condition
-fn execute_test_fails(
-    my_path: &path::Path,
-    library: &libloading::Library,
-    parser_name: &str,
-) -> i32 {
+fn execute_test_fails(my_path: &path::Path, library: &libloading::Library, parser_name: &str) -> i32 {
     let real_result = get_parsed_input(my_path, library, parser_name);
     if !real_result.is_success() {
         return RESULT_SUCCESS;
@@ -242,11 +215,7 @@ fn execute_test_fails(
 }
 
 /// Executes the test as an output test
-fn execute_test_outputs(
-    my_path: &path::Path,
-    library: &libloading::Library,
-    parser_name: &str,
-) -> i32 {
+fn execute_test_outputs(my_path: &path::Path, library: &libloading::Library, parser_name: &str) -> i32 {
     let output = get_expected_output(my_path);
     let expected_lines: Vec<&str> = find_lines_in(&output);
     let real_result = get_parsed_input(my_path, library, parser_name);
@@ -312,20 +281,10 @@ fn compare(expected: AstNode, node: AstNode) -> bool {
     let predicate = expected_children.at(0);
     let predicate_children = predicate.children();
     if !predicate_children.is_empty() {
-        let test = predicate_children
-            .at(0)
-            .get_value()
-            .expect("Malformed expected AST");
-        let value_expected = unescape(
-            predicate_children
-                .at(1)
-                .get_value()
-                .expect("Malformed expected AST"),
-        );
+        let test = predicate_children.at(0).get_value().expect("Malformed expected AST");
+        let value_expected = unescape(predicate_children.at(1).get_value().expect("Malformed expected AST"));
         let value_real = node.get_value().expect("Malformed input AST");
-        if test.eq("=") && !value_expected.eq(&value_real)
-            || test.eq("!=") && value_expected.eq(&value_real)
-        {
+        if test.eq("=") && !value_expected.eq(&value_real) || test.eq("!=") && value_expected.eq(&value_real) {
             return false;
         }
     }
@@ -419,11 +378,7 @@ fn unescape(value: &str) -> String {
 /// Others:
 /// [?, U+000B], [?, U+000C], [?, U+0085], [?, U+2028], [?, U+2029]
 fn is_line_ending(c1: char, c2: char) -> bool {
-    (c2 == '\u{000B}'
-        || c2 == '\u{000C}'
-        || c2 == '\u{0085}'
-        || c2 == '\u{2028}'
-        || c2 == '\u{2029}')
+    (c2 == '\u{000B}' || c2 == '\u{000C}' || c2 == '\u{0085}' || c2 == '\u{2028}' || c2 == '\u{2029}')
         || (c1 == '\u{000D}' || c2 == '\u{000A}')
 }
 
@@ -437,18 +392,9 @@ fn find_lines_in(input: &str) -> Vec<&str> {
         c1 = c2;
         c2 = x;
         if is_line_ending(c1, c2) {
-            let end = if c1 == '\u{000D}' && c2 != '\u{000A}' {
-                i - 1
-            } else {
-                i
-            };
+            let end = if c1 == '\u{000D}' && c2 != '\u{000A}' { i - 1 } else { i };
             result.push(&input[start..end]);
-            start = end
-                + (if c1 == '\u{000D}' && c2 == '\u{000A}' {
-                    2
-                } else {
-                    1
-                });
+            start = end + (if c1 == '\u{000D}' && c2 == '\u{000A}' { 2 } else { 1 });
         }
     }
     if input.len() > start {

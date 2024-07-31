@@ -86,21 +86,13 @@ impl SymbolRegistry {
                             },
                         );
                     }
-                    for variable in grammar
-                        .variables
-                        .iter()
-                        .filter(|var| var.generated_for.is_none())
-                    {
+                    for variable in grammar.variables.iter().filter(|var| var.generated_for.is_none()) {
                         map.insert(
                             SymbolRef::Variable(variable.id),
                             SymbolRegistryElement {
                                 grammar_index,
                                 symbol_ref: SymbolRef::Variable(variable.id),
-                                definitions: variable
-                                    .rules
-                                    .iter()
-                                    .map(|rule| rule.head_input_ref)
-                                    .collect(),
+                                definitions: variable.rules.iter().map(|rule| rule.head_input_ref).collect(),
                                 references: Vec::new(),
                             },
                         );

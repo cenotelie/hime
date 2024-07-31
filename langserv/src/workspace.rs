@@ -23,16 +23,14 @@ use std::path::{Path, PathBuf};
 
 use hime_redist::text::TextPosition;
 use hime_sdk::errors::Error;
-use hime_sdk::grammars::{
-    Grammar, RuleBodyElement, Symbol, SymbolRef, OPTION_AXIOM, OPTION_SEPARATOR,
-};
+use hime_sdk::grammars::{Grammar, RuleBodyElement, Symbol, SymbolRef, OPTION_AXIOM, OPTION_SEPARATOR};
 use hime_sdk::{CompilationTask, Input, InputReference, LoadedData, LoadedInput};
 use serde_json::Value;
 use tower_lsp::jsonrpc::Error as JsonRpcError;
 use tower_lsp::lsp_types::{
-    CodeLens, Command, Diagnostic, DiagnosticRelatedInformation, DiagnosticSeverity,
-    DidChangeTextDocumentParams, FileChangeType, FileEvent, GotoDefinitionResponse, Hover,
-    HoverContents, Location, MarkedString, Position, Range, SymbolInformation, SymbolKind, Url,
+    CodeLens, Command, Diagnostic, DiagnosticRelatedInformation, DiagnosticSeverity, DidChangeTextDocumentParams,
+    FileChangeType, FileEvent, GotoDefinitionResponse, Hover, HoverContents, Location, MarkedString, Position, Range,
+    SymbolInformation, SymbolKind, Url,
 };
 
 use crate::symbols::{SymbolRegistry, SymbolRegistryElement};
@@ -221,11 +219,7 @@ impl Workspace {
 
     /// Synchronizes on changes
     pub fn on_file_changes(&mut self, event: DidChangeTextDocumentParams) {
-        if let Some(document) = self
-            .documents
-            .iter_mut()
-            .find(|doc| doc.url == event.text_document.uri)
-        {
+        if let Some(document) = self.documents.iter_mut().find(|doc| doc.url == event.text_document.uri) {
             for change in event.content_changes {
                 if change.range.is_none() && change.range_length.is_none() {
                     document.content = Some(change.text);
@@ -268,9 +262,7 @@ impl Workspace {
             Err(errors) => {
                 let errors = errors.into_static();
                 for error in &errors.errors {
-                    if let Some((index, diag)) =
-                        to_diagnostic(&mut self.documents, &errors.context, error)
-                    {
+                    if let Some((index, diag)) = to_diagnostic(&mut self.documents, &errors.context, error) {
                         self.documents[index].diagnostics.push(diag);
                     }
                 }
@@ -300,18 +292,9 @@ impl Workspace {
     }
 
     /// Lookup symbols matching the specified name in the grammar
-    fn lookup_symbols_in(
-        &self,
-        grammar: &Grammar,
-        buffer: &mut Vec<SymbolInformation>,
-        query: &str,
-    ) {
+    fn lookup_symbols_in(&self, grammar: &Grammar, buffer: &mut Vec<SymbolInformation>, query: &str) {
         if grammar.name.contains(query) {
-            buffer.push(self.new_symbol(
-                grammar.name.to_string(),
-                SymbolKind::CLASS,
-                grammar.input_ref,
-            ));
+            buffer.push(self.new_symbol(grammar.name.to_string(), SymbolKind::CLASS, grammar.input_ref));
         }
         for terminal in &grammar.terminals {
             if !terminal.is_anonymous && terminal.name.contains(query) {
@@ -335,9 +318,7 @@ impl Workspace {
         }
         for symbol in &grammar.virtuals {
             if symbol.name.contains(query) {
-                if let Some(element) =
-                    Self::lookup_symbol_in_rules(grammar, SymbolRef::Virtual(symbol.id))
-                {
+                if let Some(element) = Self::lookup_symbol_in_rules(grammar, SymbolRef::Virtual(symbol.id)) {
                     buffer.push(self.new_symbol(
                         format!("{}.{}", grammar.name, symbol.name),
                         SymbolKind::CONSTANT,
@@ -348,9 +329,7 @@ impl Workspace {
         }
         for symbol in &grammar.actions {
             if symbol.name.contains(query) {
-                if let Some(element) =
-                    Self::lookup_symbol_in_rules(grammar, SymbolRef::Action(symbol.id))
-                {
+                if let Some(element) = Self::lookup_symbol_in_rules(grammar, SymbolRef::Action(symbol.id)) {
                     buffer.push(self.new_symbol(
                         format!("{}.{}", grammar.name, symbol.name),
                         SymbolKind::METHOD,
@@ -363,12 +342,7 @@ impl Workspace {
 
     /// Gets the definition of a symbol at a location
     #[must_use]
-    pub fn get_definition_at(
-        &self,
-        doc_uri: &str,
-        line: u32,
-        character: u32,
-    ) -> Option<GotoDefinitionResponse> {
+    pub fn get_definition_at(&self, doc_uri: &str, line: u32, character: u32) -> Option<GotoDefinitionResponse> {
         let doc_index = self
             .documents
             .iter()
@@ -388,9 +362,7 @@ impl Workspace {
         if symbol.definitions.is_empty() {
             None
         } else if symbol.definitions.len() == 1 {
-            Some(GotoDefinitionResponse::Scalar(
-                self.get_location(symbol.definitions[0]),
-            ))
+            Some(GotoDefinitionResponse::Scalar(self.get_location(symbol.definitions[0])))
         } else {
             Some(GotoDefinitionResponse::Array(
                 symbol
@@ -404,12 +376,7 @@ impl Workspace {
 
     /// Gets all the references to a symbol at a location
     #[must_use]
-    pub fn get_references_at(
-        &self,
-        doc_uri: &str,
-        line: u32,
-        character: u32,
-    ) -> Option<Vec<Location>> {
+    pub fn get_references_at(&self, doc_uri: &str, line: u32, character: u32) -> Option<Vec<Location>> {
         let doc_index = self
             .documents
             .iter()
@@ -442,12 +409,7 @@ impl Workspace {
     ///
     /// Panics when a symbol cannot be found in the grammar
     #[must_use]
-    pub fn get_symbol_description_at(
-        &self,
-        doc_uri: &str,
-        line: u32,
-        character: u32,
-    ) -> Option<Hover> {
+    pub fn get_symbol_description_at(&self, doc_uri: &str, line: u32, character: u32) -> Option<Hover> {
         let doc_index = self
             .documents
             .iter()
@@ -481,10 +443,7 @@ impl Workspace {
                 .get_virtual(sid)
                 .unwrap()
                 .get_description(),
-            SymbolRef::Action(sid) => data.grammars[symbol.grammar_index]
-                .get_action(sid)
-                .unwrap()
-                .get_description(),
+            SymbolRef::Action(sid) => data.grammars[symbol.grammar_index].get_action(sid).unwrap().get_description(),
         };
         Some(Hover {
             contents: HoverContents::Scalar(MarkedString::String(content)),
@@ -534,11 +493,7 @@ impl Workspace {
     /// # Panics
     ///
     /// Panic when serialization/deserialization fails
-    pub fn parse_input(
-        &self,
-        grammar_name: &str,
-        input: &str,
-    ) -> Result<Option<Value>, JsonRpcError> {
+    pub fn parse_input(&self, grammar_name: &str, input: &str) -> Result<Option<Value>, JsonRpcError> {
         match &self.data {
             Some(data) => match data
                 .grammars
@@ -579,12 +534,7 @@ impl Workspace {
 
     /// Creates a new symbol information
     #[allow(deprecated)]
-    fn new_symbol(
-        &self,
-        name: String,
-        kind: SymbolKind,
-        input_ref: InputReference,
-    ) -> SymbolInformation {
+    fn new_symbol(&self, name: String, kind: SymbolKind, input_ref: InputReference) -> SymbolInformation {
         SymbolInformation {
             name,
             kind,
@@ -610,11 +560,7 @@ impl Workspace {
 
 /// Converts an error to a diagnostic
 #[allow(clippy::too_many_lines)]
-fn to_diagnostic(
-    documents: &mut [Document],
-    data: &LoadedData,
-    error: &Error,
-) -> Option<(usize, Diagnostic)> {
+fn to_diagnostic(documents: &mut [Document], data: &LoadedData, error: &Error) -> Option<(usize, Diagnostic)> {
     match error {
         Error::Parsing(input_reference, msg) => Some((
             input_reference.input_index,
@@ -671,9 +617,7 @@ fn to_diagnostic(
             ))
         }
         Error::AxiomNotDefined(grammar_index) => {
-            let option = data.grammars[*grammar_index]
-                .get_option(OPTION_AXIOM)
-                .unwrap();
+            let option = data.grammars[*grammar_index].get_option(OPTION_AXIOM).unwrap();
             let input_reference = option.value_input_ref;
             Some((
                 input_reference.input_index,
@@ -691,9 +635,7 @@ fn to_diagnostic(
             ))
         }
         Error::SeparatorNotDefined(grammar_index) => {
-            let option = data.grammars[*grammar_index]
-                .get_option(OPTION_SEPARATOR)
-                .unwrap();
+            let option = data.grammars[*grammar_index].get_option(OPTION_SEPARATOR).unwrap();
             let input_reference = option.value_input_ref;
             Some((
                 input_reference.input_index,
@@ -711,9 +653,7 @@ fn to_diagnostic(
             ))
         }
         Error::SeparatorIsContextual(grammar_index, terminal_ref) => {
-            let separator = data.grammars[*grammar_index]
-                .get_terminal(terminal_ref.sid())
-                .unwrap();
+            let separator = data.grammars[*grammar_index].get_terminal(terminal_ref.sid()).unwrap();
             let input_reference = separator.input_ref;
             let context = &data.grammars[*grammar_index].contexts[separator.context];
             Some((
@@ -734,11 +674,8 @@ fn to_diagnostic(
                 },
             ))
         }
-        Error::SeparatorCannotBeMatched(grammar_index, error)
-        | Error::TerminalCannotBeMatched(grammar_index, error) => {
-            let terminal = data.grammars[*grammar_index]
-                .get_terminal(error.terminal.sid())
-                .unwrap();
+        Error::SeparatorCannotBeMatched(grammar_index, error) | Error::TerminalCannotBeMatched(grammar_index, error) => {
+            let terminal = data.grammars[*grammar_index].get_terminal(error.terminal.sid()).unwrap();
             let input_reference = terminal.input_ref;
             Some((
                 input_reference.input_index,
@@ -748,10 +685,7 @@ fn to_diagnostic(
                     code: None,
                     code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
-                    message: format!(
-                        "Token `{}` is expected but can never be matched",
-                        &terminal.name
-                    ),
+                    message: format!("Token `{}` is expected but can never be matched", &terminal.name),
                     related_information: None,
                     tags: None,
                     data: None,
@@ -850,9 +784,7 @@ fn to_diagnostic(
                 code: None,
                 code_description: None,
                 source: Some(super::CRATE_NAME.to_string()),
-                message: format!(
-                    "Unsupported non-plane 0 Unicode character ({c}) in character class"
-                ),
+                message: format!("Unsupported non-plane 0 Unicode character ({c}) in character class"),
                 related_information: None,
                 tags: None,
                 data: None,
@@ -917,10 +849,7 @@ fn to_diagnostic(
                     code: None,
                     code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
-                    message: format!(
-                        "Contextual terminal `{}` is expected outside its context",
-                        &terminal.name
-                    ),
+                    message: format!("Contextual terminal `{}` is expected outside its context", &terminal.name),
                     related_information: Some(
                         error
                             .items
@@ -945,9 +874,7 @@ fn to_diagnostic(
             ))
         }
         Error::TerminalMatchesEmpty(grammar_index, terminal_ref) => {
-            let terminal = data.grammars[*grammar_index]
-                .get_terminal(terminal_ref.sid())
-                .unwrap();
+            let terminal = data.grammars[*grammar_index].get_terminal(terminal_ref.sid()).unwrap();
             let input_reference = terminal.input_ref;
             Some((
                 input_reference.input_index,
@@ -957,10 +884,7 @@ fn to_diagnostic(
                     code: None,
                     code_description: None,
                     source: Some(super::CRATE_NAME.to_string()),
-                    message: format!(
-                        "Terminal `{}` matches empty string, which is not allowed",
-                        &terminal.name
-                    ),
+                    message: format!("Terminal `{}` matches empty string, which is not allowed", &terminal.name),
                     related_information: None,
                     tags: None,
                     data: None,
