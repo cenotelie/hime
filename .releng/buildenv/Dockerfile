@@ -1,9 +1,5 @@
-FROM buildpack-deps:22.04-curl
+FROM buildpack-deps:24.04-curl
 LABEL maintainer="Laurent Wouters <lwouters@cenotelie.fr>" vendor="Association Cénotélie" description="Hime Build environment"
-
-# Custom Home
-RUN mkdir /home/builder
-ENV HOME=/home/builder
 
 # Add required packages
 RUN apt update && apt install -y --no-install-recommends \
@@ -24,7 +20,7 @@ RUN apt update && apt install -y --no-install-recommends \
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
 RUN echo "deb https://download.mono-project.com/repo/ubuntu stable-bionic main" | tee /etc/apt/sources.list.d/mono-official-stable.list
 RUN apt update && apt install -y --no-install-recommends \
-		dotnet-sdk-6.0 \
+		dotnet-sdk-8.0 \
 		mono-devel \
     && rm -rf /var/lib/apt/lists/*
 
@@ -36,6 +32,11 @@ RUN apt update && apt install -y --no-install-recommends \
 		maven \
     && rm -rf /var/lib/apt/lists/*
 
+# add custom user
+RUN usermod -l builder -d /home/builder ubuntu && mv /home/ubuntu /home/builder
+ENV HOME=/home/builder
+USER builder
+
 # Add support for Rust
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && \
 	export PATH="${HOME}/.cargo/bin:${PATH}" && \
@@ -44,7 +45,9 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && \
 	chmod -R a+rwX /home/builder
 
 # Environment
+USER root
 RUN locale-gen fr_FR.UTF-8
+USER builder
 ENV LC_ALL=fr_FR.UTF-8
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 ENV _JAVA_OPTIONS=-Duser.home=/home/builder
